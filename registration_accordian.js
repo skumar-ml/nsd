@@ -190,7 +190,7 @@ class AccordionForm {
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
 		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
-		program_dates.innerHTML = "Start Date: "+ startDate.toLocaleDateString() +" End Date: "+ endDate.toLocaleDateString();
+		program_dates.innerHTML = "Camp Dates: "+ startDate.toLocaleDateString() +" to "+ endDate.toLocaleDateString();
 	}
 	// Script for accordion feature
 	initiateAccordion(){
