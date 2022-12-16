@@ -39,24 +39,26 @@ class AccordionForm {
 			   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
 			   var labelDiv = creEl("div", "label label-"+$this.currentIndex);
 			   var checkAllForms = $this.checkAllForms(form.forms);
-			   //var imgUncheck = document.createElement("img");
-			   //imgUncheck.src = $this.getCheckedIcon(checkAllForms);
-			   var imgUncheck = $this.getCheckedText(checkAllForms);
+			   var imgUncheck = creEl("img",'all-img-status');
+			   imgUncheck.src = $this.getCheckedIcon(checkAllForms);
+			   var textUncheck = $this.getCheckedText(checkAllForms);
 			   labelDiv.innerHTML = form.name;
-			   labelDiv.prepend(imgUncheck)
+			   labelDiv.prepend(imgUncheck, textUncheck)
 			   var accordionContentDiv = document.createElement("div");
 			   accordionContentDiv.className="accordion-content";
-			   var ul= document.createElement('ul');
+			   var ul= creEl('ul');
 			   form.forms.forEach((cForm) => {
 				   //check it's editable
 				   let editable = $this.checkform(cForm.formId);
 				   let is_live = cForm.is_live;
-				   var li=document.createElement('li');
-				   var imgCheck = document.createElement("img");
+				   var li=creEl('li');
+				   var li_text=creEl('span', 'accordion_name');
+				   var imgCheck = creEl("img");
 			       imgCheck.src = $this.getCheckedIcon(editable);
-				   li.innerHTML = cForm.name;
-				   li.prepend(imgCheck)
-				   var formLink=document.createElement('a');
+				   li_text.innerHTML = cForm.name;
+				   //li_text.prepend(imgCheck)
+				   li.prepend(imgCheck, li_text);
+				   var formLink=creEl('a');
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
@@ -70,8 +72,8 @@ class AccordionForm {
 				    }
 				   }
 				   //Add iframe when it's live
-				   formLink.className = (is_live) ? "iframe-lightbox-link" : "";
-				   var span=document.createElement('span');
+				   formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+				   var span=creEl('span', 'action_text');
 				    if(is_live){
 						span.innerHTML = (editable) ? ((this.$isLiveProgram) ? "Edit form" : "View Form" ): "Go to form";
 					}else{
@@ -142,9 +144,9 @@ class AccordionForm {
 	}
 	getCheckedIcon(status){
 		if(status){
-			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6397004a34667b0dddf18448_circle-check-regular.svg";
+			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c46818dc1c611241eca7d_circle-check-regular.png";
 		}else{
-			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6397004a6204a0430dafe247_circle-regular.svg";
+			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c4681dc4879fbe47ab69c_circle-regular.png";
 		}
 	}
 	getCheckedText(status){
