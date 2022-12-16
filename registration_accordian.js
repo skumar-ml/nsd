@@ -144,9 +144,9 @@ class AccordionForm {
 	}
 	getCheckedIcon(status){
 		if(status){
-			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c46818dc1c611241eca7d_circle-check-regular.png";
+			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png";
 		}else{
-			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c4681dc4879fbe47ab69c_circle-regular.png";
+			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png";
 		}
 	}
 	getCheckedText(status){
