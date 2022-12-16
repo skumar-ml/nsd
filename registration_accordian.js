@@ -1,3 +1,4 @@
+/*Create Dom Element based on name , class name and id*/
 function creEl(name,className,idName){
   var el = document.createElement(name);
 	if(className){
@@ -8,6 +9,7 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
+//Handling single form using AccordionForm class
 class AccordionForm {
 	$completedForm = [];
 	$formslist = [];
@@ -16,9 +18,10 @@ class AccordionForm {
 	$studentDetail = {};
 	$totalForm = 0;
 	$isLiveProgram = true;
-	constructor(webflowMemberId,responseText,currentIndex){
+	constructor(webflowMemberId,responseText,currentIndex, accountEmail){
 		this.webflowMemberId = webflowMemberId;
 		this.currentIndex = currentIndex;
+		this.accountEmail = accountEmail;
 		this.$completedForm = [];
 		this.renderFormData(responseText)
 		
@@ -58,12 +61,12 @@ class AccordionForm {
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
 						if(this.$isLiveProgram){
-							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId=6352377431172a00041184b1&studentEmail="+$this.$studentDetail.studentEmail : "";
+							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail : "";
 						}else{
 						   formLink.href = "https://www.jotform.com/submission/"+dbData.submissionId;
 					   }
 				   }else{
-					formLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail : "";
+					formLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail : "";
 				    }
 				   }
 				   //Add iframe when it's live
@@ -241,7 +244,7 @@ class AccordionForm {
 				var spinner = document.getElementById('half-circle-spinner');
 				spinner.style.display = 'block';				
 				setTimeout(function() {
-					new AccordionTabs(this.webflowMemberId)
+					new AccordionTabs(this.webflowMemberId, this.accountEmail)
 				}, 500);
 			},
 			scrolling: true,
