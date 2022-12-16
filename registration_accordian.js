@@ -1,3 +1,13 @@
+function creEl(name,className,idName){
+  var el = document.createElement(name);
+	if(className){
+	  el.className = className;
+	}
+	if(idName){
+	  el.setAttribute("id", idName)
+	}
+	return el;
+}
 class AccordionForm {
 	$completedForm = [];
 	$formslist = [];
