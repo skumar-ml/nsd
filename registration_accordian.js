@@ -98,7 +98,7 @@ class AccordionForm {
 	}
 	viewService(){
 		var service = document.getElementById('service');
-		service.innerHTML = this.$programDetail.programName+" "+this.$programDetail.debateEvent+" "+this.$programCategory.programCategoryName;
+		service.innerHTML = this.$programDetail.programName+" "+this.$programCategory.programCategoryName;
 	}
 	checkform($formId){
 		if($formId){
