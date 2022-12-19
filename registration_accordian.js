@@ -181,7 +181,7 @@ class AccordionForm {
 		let percentage = document.createElement("div");
 		percentage.className = "percentage percentage-"+this.currentIndex;
 		progressContainer.prepend(progress, percentage);
-		progressbar.prepend(protext,progressContainer)
+		progressbar.prepend(progressContainer, protext)
 		let deadlineText = document.createElement("div");
 		deadlineText.className = "deadline-text";
 		let footerText = document.createElement("p");
