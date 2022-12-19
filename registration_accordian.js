@@ -1,4 +1,9 @@
-/*Create Dom Element based on name , class name and id*/
+/**
+ * 	
+ * @param name - HTML element name
+ * @param className - HTML element class attribute
+ * @param idName - HTML element id attribute
+ */
 function creEl(name,className,idName){
   var el = document.createElement(name);
 	if(className){
@@ -9,7 +14,13 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
-//Handling single form using AccordionForm class
+/**
+ * Class for handling single form
+ * @param webflowMemberId - memberId
+ * @param responseText - single form object provided by API
+ * @param currentIndex - current index for form object
+ * @param accountEmail - email id of member
+ */
 class AccordionForm {
 	$completedForm = [];
 	$formslist = [];
@@ -26,6 +37,9 @@ class AccordionForm {
 		this.renderFormData(responseText)
 		
 	}
+	/**
+	 * Display single accordion and form data
+	 */
 	view(){
 		var $this = this;
        if(this.$formslist){
@@ -93,6 +107,10 @@ class AccordionForm {
 		   })
 	   }		
 	}
+	/**
+	 * Render single json form data
+	 * @param responseText - single form object provided by API
+	 */
 	renderFormData(responseText){
 		var $this = this;
 		  $this.$completedForm = responseText.formCompletedList;
@@ -111,10 +129,17 @@ class AccordionForm {
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
 	}
+	/**
+	 * Display Program name for single program
+	 */
 	viewService(){
 		var service = document.getElementById('service');
 		service.innerHTML = this.$programDetail.programName+" "+this.$programCategory.programCategoryName;
 	}
+	/**
+	 * Check form's id in completed form link
+	 * @param formId - Jotform Id
+	 */
 	checkform($formId){
 		if($formId){
 			const found = this.$completedForm.some(el => el.formId == $formId);
@@ -122,6 +147,9 @@ class AccordionForm {
 		}
 		return false;
 	}
+	/**
+	 * Check Program Deadline
+	 */
 	checkProgramDeadline(){
 		var deadlineDate = this.$programDetail.deadlineDate.replace(/\\/g, '');
 		deadlineDate = deadlineDate.replace(/"/g, '')
@@ -129,6 +157,10 @@ class AccordionForm {
 		var currentDate = new Date(); 
 		this.$isLiveProgram = (currentDate < formatedDeadlineDate) ? true : false;
 	}
+	/**
+	 * Check all form status
+	 * @param forms - forms Array Object
+	 */
 	checkAllForms(forms){
 		if(forms){
 			var formsId = forms.map((formItem) => formItem.formId.toString());
@@ -138,10 +170,17 @@ class AccordionForm {
 			return ((formsId.length === uniqueform.length) && (formsId.every(val => uniqueform.includes(val))));
 		}
 	}
+	/**
+	 * Get Completed Form data by form id
+	 * @param formId - Jotform Id
+	 */
 	getformData($formId){
 		let data = this.$completedForm.find(o => o.formId == $formId);
 		return data;
 	}
+	/**
+	 * Get Checkbox icon for form complete or complete
+	 */
 	getCheckedIcon(status){
 		if(status){
 			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png";
@@ -149,6 +188,9 @@ class AccordionForm {
 			return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png";
 		}
 	}
+	/**
+	 * Get category all form status as a text like it's complete or not
+	 */
 	getCheckedText(status){
 		var imgCheck = "";
 		if(status){
@@ -160,7 +202,9 @@ class AccordionForm {
 		}
 		return imgCheck;
 	}
-	// Render Accordion Header like form completion and deadline
+	/**
+	 * Render Accordion Header like form completion and deadline
+	 */
 	renderAccordionHeader(){
 		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		var date = this.$programDetail.deadlineDate.replace(/\\/g, '');
@@ -191,7 +235,9 @@ class AccordionForm {
 		deadlineText.append(footerText);
 		accordionFooter.prepend(progressbar, deadlineText)
 	}
-	//Set Percentage value on accordion header
+	/**
+	 * Set Percentage value on accordion header
+	 */
 	setPercentage() {
 	  const progressContainer = document.querySelector('.progress-container-'+this.currentIndex);
 	  const percentage = progressContainer.getAttribute('data-percentage') + '%';
@@ -200,14 +246,18 @@ class AccordionForm {
 	  const percentageValue = document.querySelector('.percentage-value-'+this.currentIndex);
 	  percentageValue.innerText = percentage;
 	}
-	// Set Program Date
+	/**
+	 * Set Program Date
+	 */
 	programDates(){
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
 		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
 		program_dates.innerHTML = "Camp Dates: "+ startDate.toLocaleDateString() +" to "+ endDate.toLocaleDateString();
 	}
-	// Script for accordion feature
+	/**
+	 * Script for accordion feature
+	 */
 	initiateAccordion(){
 		const accordion = document.getElementsByClassName('label-'+this.currentIndex);
 
@@ -225,7 +275,9 @@ class AccordionForm {
 		  })
 		}
 	}
-	// initialize  ProgressBar and display
+	/**
+	 * initialize  ProgressBar and display
+	 */
 	initiateProgressBar(){
 		const progressContainer = document.querySelector('.progress-container');
 		function setPercentage() {
@@ -237,7 +289,9 @@ class AccordionForm {
 		  percentageEl.style.left = percentage;
 		}
 	}
-	// initialize Lightbox and rerender accordion after close the lightbox
+	/**
+	 * initialize Lightbox and rerender accordion after close the lightbox
+	 */
 	initiateLightbox(){
 		var $this = this;
 		[].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
