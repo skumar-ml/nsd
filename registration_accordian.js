@@ -42,17 +42,20 @@ class AccordionForm {
 	 */
 	view(){
 		var $this = this;
+	// SK: if there is a form?
        if(this.$formslist){
 		   let parentForm = this.$formslist;
 		   var accordionDiv = document.getElementById("accordion-"+$this.currentIndex);
 		   accordionDiv.innerHTML = "";
 		   var $tabNo = 1;
 		   $this.$totalForm = 0;
-		   parentForm.sort(function(r,a){return r.sequence-a.sequence});
+		   parentForm.sort(function(r,a){return r.sequence-a.sequence}); //SK: explain
 		   parentForm.forEach((form) => {
 			   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
 			   var labelDiv = creEl("div", "label label-"+$this.currentIndex);
+			   // SK: check forms for completion?
 			   var checkAllForms = $this.checkAllForms(form.forms);
+			   // SK: get icon depending on completion
 			   var imgUncheck = creEl("img",'all-img-status');
 			   imgUncheck.src = $this.getCheckedIcon(checkAllForms);
 			   var textUncheck = $this.getCheckedText(checkAllForms);
@@ -61,6 +64,7 @@ class AccordionForm {
 			   var accordionContentDiv = document.createElement("div");
 			   accordionContentDiv.className="accordion-content";
 			   var ul= creEl('ul');
+			   // SK: explain
 			   form.forms.forEach((cForm) => {
 				   //check it's editable
 				   let editable = $this.checkform(cForm.formId);
@@ -73,6 +77,7 @@ class AccordionForm {
 				   //li_text.prepend(imgCheck)
 				   li.prepend(imgCheck, li_text);
 				   var formLink=creEl('a');
+				   // SK: display link/text depending on if form is live/editable
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
@@ -85,7 +90,7 @@ class AccordionForm {
 					formLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail : "";
 				    }
 				   }
-				   //Add iframe when it's live
+				   //Add iframe when it's live and above certain screenwidth
 				   formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
 				   var span=creEl('span', 'action_text');
 				    if(is_live){
@@ -140,6 +145,7 @@ class AccordionForm {
 	 * Check form's id in completed form link
 	 * @param formId - Jotform Id
 	 */
+	// SK: explain
 	checkform($formId){
 		if($formId){
 			const found = this.$completedForm.some(el => el.formId == $formId);
@@ -230,7 +236,7 @@ class AccordionForm {
 		deadlineText.className = "deadline-text";
 		let footerText = document.createElement("p");
 		if(deadlineDate){
-			footerText.innerHTML = "Please complete these required document prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
+			footerText.innerHTML = "Please complete these required forms prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
 		}
 		deadlineText.append(footerText);
 		accordionFooter.prepend(progressbar, deadlineText)
