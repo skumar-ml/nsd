@@ -34,7 +34,7 @@ class AccordionForm {
 		this.currentIndex = currentIndex;
 		this.accountEmail = accountEmail;
 		this.$completedForm = [];
-		this.renderFormData(responseText)
+		this.renderFormData(responseText) // gets mongoDB data from responseText object for specific registrations
 		
 	}
 	/**
@@ -42,20 +42,19 @@ class AccordionForm {
 	 */
 	view(){
 		var $this = this;
-	// SK: if there is a form?
        if(this.$formslist){
 		   let parentForm = this.$formslist;
 		   var accordionDiv = document.getElementById("accordion-"+$this.currentIndex);
 		   accordionDiv.innerHTML = "";
 		   var $tabNo = 1;
 		   $this.$totalForm = 0;
-		   parentForm.sort(function(r,a){return r.sequence-a.sequence}); //SK: explain
-		   parentForm.forEach((form) => {
+		   parentForm.sort(function(r,a){return r.sequence-a.sequence}); // order form categories via order specified in MongoDB
+		   // for every form category in parentForm, start building accordion
+	       	   parentForm.forEach((form) => {
 			   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
 			   var labelDiv = creEl("div", "label label-"+$this.currentIndex);
-			   // SK: check forms for completion?
+			   // check forms for completion and put corresponding icon & text
 			   var checkAllForms = $this.checkAllForms(form.forms);
-			   // SK: get icon depending on completion
 			   var imgUncheck = creEl("img",'all-img-status');
 			   imgUncheck.src = $this.getCheckedIcon(checkAllForms);
 			   var textUncheck = $this.getCheckedText(checkAllForms);
@@ -64,7 +63,7 @@ class AccordionForm {
 			   var accordionContentDiv = document.createElement("div");
 			   accordionContentDiv.className="accordion-content";
 			   var ul= creEl('ul');
-			   // SK: explain
+			   // for every form in the formCategory
 			   form.forms.forEach((cForm) => {
 				   //check it's editable
 				   let editable = $this.checkform(cForm.formId);
@@ -77,7 +76,7 @@ class AccordionForm {
 				   //li_text.prepend(imgCheck)
 				   li.prepend(imgCheck, li_text);
 				   var formLink=creEl('a');
-				   // SK: display link/text depending on if form is live/editable
+				   // display link/text depending on if form is live/editable
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
@@ -116,6 +115,7 @@ class AccordionForm {
 	 * Render single json form data
 	 * @param responseText - single form object provided by API
 	 */
+	// responseText is an object corresponding to MongoDB collection
 	renderFormData(responseText){
 		var $this = this;
 		  $this.$completedForm = responseText.formCompletedList;
@@ -142,10 +142,9 @@ class AccordionForm {
 		service.innerHTML = this.$programDetail.programName+" "+this.$programCategory.programCategoryName;
 	}
 	/**
-	 * Check form's id in completed form link
+	 * Check form's id in completedForm list (from MongoDB) and use to determine if form is editable
 	 * @param formId - Jotform Id
 	 */
-	// SK: explain
 	checkform($formId){
 		if($formId){
 			const found = this.$completedForm.some(el => el.formId == $formId);
