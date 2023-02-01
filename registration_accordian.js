@@ -260,7 +260,7 @@ class AccordionForm {
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
 		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
-		program_dates.innerHTML = "Camp is " + startDate.getMonth() + " " + startDate.getDate() + " to " + "endDate.getMonth() + " " + endDate.getDate();
+		program_dates.innerHTML = "Camp is " + startDate.getMonth() + " " + startDate.getDate() + " to " + endDate.getMonth() + " " + endDate.getDate();
 	}
 	
 	/**
