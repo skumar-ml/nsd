@@ -211,10 +211,22 @@ class AccordionForm {
 	 * Render Accordion Header like form completion and deadline
 	 */
 	renderAccordionHeader(){
+		// Define months
 		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		
+		// Get and format deadline date
 		var date = this.$programDetail.deadlineDate.replace(/\\/g, '');
 		date = date.replace(/"/g, '')
 		var deadlineDate = new Date(date);
+		
+		// Get and format program dates
+		let startDate = new Date(this.$programDetail.startDate);
+		let endDate = new Date(this.$programDetail.endDate);
+		const program_dates_text = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
+		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
+		program_dates.innerHTML = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
+		
+		// create and set progress bar & percentage
 		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
 		let accordionFooter = document.getElementById("accordion-footer-"+this.currentIndex);
 		accordionFooter.innerHTML ="";
@@ -231,14 +243,26 @@ class AccordionForm {
 		percentage.className = "percentage percentage-"+this.currentIndex;
 		progressContainer.prepend(progress, percentage);
 		progressbar.prepend(progressContainer, protext)
+		
+		// accordian header text
 		let deadlineText = document.createElement("div");
 		deadlineText.className = "deadline-text";
 		let footerText = document.createElement("p");
 		footerText.className = "dm-sans";
 		if(deadlineDate){
 			footerText.innerHTML = "Please complete these required forms prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
-		}
+		}		
 		
+		// Countdown timer
+		let timer_clock = document.createElement("a");
+		timer_clock.class_name = "countdown-timer"; 
+		timer_clock.href = "https://logwork.com/countdown-xknf";
+		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
+		timer_clock.innerHTML = program_dates_text;
+		let parent = document.accordionFooter.parentNode;
+		parent.insertBefore(timer_clock, accordionFooter);
+		
+		// add elements to DOM
 		deadlineText.append(footerText);
 		accordionFooter.prepend(progressbar, deadlineText)
 	}
@@ -252,15 +276,6 @@ class AccordionForm {
 	  progressEl.style.width = percentage;
 	  const percentageValue = document.querySelector('.percentage-value-'+this.currentIndex);
 	  percentageValue.innerText = percentage;
-	}
-	/**
-	 * Set Program Date
-	 */
-	programDates(){
-		let startDate = new Date(this.$programDetail.startDate);
-		let endDate = new Date(this.$programDetail.endDate);
-		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
-		program_dates.innerHTML = "Camp is " + startDate.getMonth() + " " + startDate.getDate() + " to " + endDate.getMonth() + " " + endDate.getDate();
 	}
 	
 	/**
