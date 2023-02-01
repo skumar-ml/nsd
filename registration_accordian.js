@@ -111,7 +111,6 @@ class AccordionForm {
 		   })
 	   }
 	// add timer script after accordions are built	
-	<script src="https://cdn.logwork.com/widget/countdown.js"></script>
 	var script = document.createElement("script");
 	script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
 	document.body.appendChild(script);
