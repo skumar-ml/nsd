@@ -237,6 +237,16 @@ class AccordionForm {
 		if(deadlineDate){
 			footerText.innerHTML = "Please complete these required forms prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
 		}
+		
+		// show countdown and set correct date
+		const countdown_div = getElementsByClassName('countdown-div')[0];
+		countdown_div.style.display = "block";
+		
+		const countdown_button = getElementsByClassName('countdown-timer')[0];
+		console.log(date);
+		console.log(deadlineDate);
+		//countdown_button.setAttribute("data-date", 
+		
 		deadlineText.append(footerText);
 		accordionFooter.prepend(progressbar, deadlineText)
 	}
