@@ -227,8 +227,8 @@ class AccordionForm {
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
 		const program_dates_text = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
-		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
-		program_dates.innerHTML = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
+		//var program_dates = document.getElementById("program_dates-"+this.currentIndex)
+		//program_dates.innerHTML = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
 		
 		// create and set progress bar & percentage
 		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
