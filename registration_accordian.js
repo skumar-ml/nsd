@@ -217,6 +217,7 @@ class AccordionForm {
 		var date = this.$programDetail.deadlineDate.replace(/\\/g, '');
 		date = date.replace(/"/g, '')
 		var deadlineDate = new Date(date);
+		date = date.substring(0,16); //remove the final ':00' for countdown timer
 		
 		// Get and format program dates
 		let startDate = new Date(this.$programDetail.startDate);
