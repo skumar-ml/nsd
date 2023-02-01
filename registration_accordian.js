@@ -258,7 +258,7 @@ class AccordionForm {
 		timer_clock.href = "https://logwork.com/countdown-xknf";
 		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
 		timer_clock.innerHTML = program_dates_text;
-		let parent = document.accordionFooter.parentNode;
+		let parent = accordionFooter.parentNode;
 		parent.insertBefore(timer_clock, accordionFooter);
 		
 		// add elements to DOM
