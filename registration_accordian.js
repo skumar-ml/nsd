@@ -234,18 +234,10 @@ class AccordionForm {
 		let deadlineText = document.createElement("div");
 		deadlineText.className = "deadline-text";
 		let footerText = document.createElement("p");
+		footerText.className = "dm-sans";
 		if(deadlineDate){
 			footerText.innerHTML = "Please complete these required forms prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
 		}
-		
-		// show countdown and set correct date
-		const countdown_div = document.getElementsByClassName('countdown-div')[0];
-		countdown_div.style.display = "block";
-		
-		const countdown_button = document.getElementsByClassName('countdown-timer')[0];
-		console.log(date);
-		console.log(deadlineDate);
-		//countdown_button.setAttribute("data-date", 
 		
 		deadlineText.append(footerText);
 		accordionFooter.prepend(progressbar, deadlineText)
@@ -268,8 +260,9 @@ class AccordionForm {
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
 		var program_dates = document.getElementById("program_dates-"+this.currentIndex)
-		program_dates.innerHTML = "Camp Dates: "+ startDate.toLocaleDateString() +" to "+ endDate.toLocaleDateString();
+		program_dates.innerHTML = "Camp is " + startDate.getMonth() + " " + startDate.getDate() + " to " + "endDate.getMonth() + " " + endDate.getDate();
 	}
+	
 	/**
 	 * Script for accordion feature
 	 */
