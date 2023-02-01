@@ -124,7 +124,6 @@ class AccordionForm {
 		  $this.$studentDetail = responseText.studentDetail;
 		  $this.$programDetail = responseText.programDetail;
 		  $this.checkProgramDeadline();
-		  $this.programDates();
 		  $this.viewService();
 		  $this.view();
 		  $this.renderAccordionHeader();
