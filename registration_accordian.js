@@ -261,8 +261,8 @@ class AccordionForm {
 		let timer_div = document.createElement("div");
 		timer_div.style.width = '50%';
 		timer_div.style.display = 'flex';
-		timer_div.style.margin_left = 'auto';
-		timer_div.style.margin_right = 'auto';
+		timer_div.style.marginLeft = 'auto';
+		timer_div.style.marginRight = 'auto';
 		
 		let timer_clock = document.createElement("a");
 		timer_clock.href = "https://logwork.com/countdown-xknf";
