@@ -258,13 +258,20 @@ class AccordionForm {
 		}		
 		
 		// Countdown timer
+		let timer_div = document.createElement("div");
+		timer_div.style.width = '50%';
+		timer_div.style.display = 'flex';
+		timer_div.style.justify_content = 'center';
+		
 		let timer_clock = document.createElement("a");
 		timer_clock.href = "https://logwork.com/countdown-xknf";
 		timer_clock.className = "countdown-timer"; 
 		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
 		timer_clock.innerHTML = program_dates_text;
+		
 		let parent = accordionFooter.parentNode;
-		parent.insertBefore(timer_clock, accordionFooter);
+		timer_div.appendChild(timer_clock);
+		parent.insertBefore(timer_div, accordionFooter);		
 		
 		// add elements to DOM
 		deadlineText.append(footerText);
