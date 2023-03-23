@@ -125,7 +125,7 @@ class AccordionForm {
 		  $this.$programDetail = responseText.programDetail;
 		  $this.checkProgramDeadline();
 		  $this.programDates();
-		  $this.viewService();
+		  //$this.viewService();
 		  $this.view();
 		  $this.renderAccordionHeader();
 		  $this.setPercentage();
