@@ -131,8 +131,8 @@ class AccordionForm {
 		  $this.setPercentage();
 		  $this.initiateAccordion();
 		  $this.initiateLightbox();
-		  var spinner = document.getElementById('half-circle-spinner');
-		  spinner.style.display = 'none';
+		  //var spinner = document.getElementById('half-circle-spinner');
+		  //spinner.style.display = 'none';
 	}
 	/**
 	 * Display Program name for single program
