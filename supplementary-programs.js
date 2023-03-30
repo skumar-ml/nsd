@@ -313,3 +313,100 @@ class AccordionForm {
 		});
 	}
 }
+
+
+class SupplementaryProgram {
+	$activeTabID = "";
+	$activeMainTabID = "";
+	$apiData = '';
+	constructor(webflowMemberId, accountEmail){
+		this.webflowMemberId = webflowMemberId;
+		this.accountEmail = accountEmail;
+		this.callApi(); // renders data for each tab
+		
+	}
+  /*Method for create html element*/
+	creEl(name,className,idName){
+	  var el = document.createElement(name);
+		if(className){
+		  el.className = className;
+		}
+		if(idName){
+		  el.setAttribute("id", idName)
+		}
+		return el;
+	}
+  /*Create Student Select html element */
+	makeList(apiData, selectProgram){
+		this.$apiData = apiData;
+		var supContainer = document.getElementById("supplementary-program");
+		var studentList = this.creEl('select', 'student-select-list w-select', 'student-select-list');
+		//Add default option
+		var defaultoption = document.createElement("option");
+			defaultoption.value = "";
+			defaultoption.text = "Select Student";
+			studentList.appendChild(defaultoption);
+		supContainer.appendChild(studentList);
+    /* Creating student slect option */
+		apiData.forEach(item => {
+			var option = document.createElement("option");
+			option.value = item.studentDetail.uniqueIdentification;
+			option.text = item.studentDetail.studentName.first+' '+item.studentDetail.studentName.last+' ('+item.programDetail.programName+'-'+item.programCategory.programCategoryName+')';
+			studentList.appendChild(option);
+      option.setAttribute('data-programName', item.programDetail.programName)
+		})
+		var $this = this;
+    /*bind method after selecting student*/
+		studentList.onchange = function (){
+			$this.selectProgram($this);
+		};
+
+	}
+	/* Storing selected student data in local storage */
+	saveLocalStorageData(studentSelectListValue){
+	    if(Array.isArray(this.$apiData)){
+			var currentStudentData = this.$apiData.filter(item => item.studentDetail.uniqueIdentification == studentSelectListValue);
+			localStorage.setItem("supStuEmail", JSON.stringify(currentStudentData[0].studentDetail));
+		}
+		
+	}
+	selectProgram($this){
+		var studentSelectList = document.getElementById("student-select-list");
+		var supplementaryProgramList = document.getElementById("supplementary-program-list");
+		if(!studentSelectList.value){
+			supplementaryProgramList.classList.add("hide")
+		}else{
+			supplementaryProgramList.classList.remove('hide')
+			var studentSelectListValue = studentSelectList.value;
+			$this.saveLocalStorageData(studentSelectListValue);
+			
+			var supprolink = document.getElementsByClassName("supprolink");
+			Array.from(supprolink).forEach(link => {
+				var linkUrl = link.getAttribute('href').split("?");
+				link.setAttribute("href", linkUrl[0]+'?productType=supplementary');
+			})
+			let programName = studentSelectList.options[studentSelectList.selectedIndex].getAttribute("data-programName");
+			console.log('programName', programName)
+			if(programName == "Minnesota LD"){
+				$('.minnesota-ld').show();
+			}else{
+				$('.minnesota-ld').hide();
+			}
+		}
+	}
+	callApi(){
+  	
+		var xhr = new XMLHttpRequest()
+		var $this = this;
+		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId, true)
+		xhr.withCredentials = false
+		xhr.send()
+		xhr.onload = function() {
+    	
+		  var responseText =  JSON.parse(xhr.responseText);
+		  $this.makeList(responseText)
+      var spinner = document.getElementById('half-circle-spinner');
+      spinner.style.display = 'none';
+		}	
+	}
+}
