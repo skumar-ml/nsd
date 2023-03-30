@@ -375,6 +375,7 @@ class SupplementaryProgram {
 		}
 		
 	}
+	/* Added supplementary param on checkout page link and hide and show  Minnesota ld program*/
 	selectProgram($this){
 		var studentSelectList = document.getElementById("student-select-list");
 		var supplementaryProgramList = document.getElementById("supplementary-program-list");
@@ -399,6 +400,7 @@ class SupplementaryProgram {
 			}
 		}
 	}
+	/*Call API to get student list with program details*/
 	callApi(){
   	
 		var xhr = new XMLHttpRequest()
