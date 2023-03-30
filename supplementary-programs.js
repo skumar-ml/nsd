@@ -38,20 +38,20 @@ class SupplementaryForm {
 		
 	}
 	/**
-	 * Display single accordion and form data
+	 * Display single supplementary and form data
 	 */
 	view(){
 		var $this = this;
        if(this.$formslist){
 		   let parentForm = this.$formslist;
-		   var accordionDiv = document.getElementById("accordion-"+$this.currentIndex);
-		   accordionDiv.innerHTML = "";
+		   var supplementaryDiv = document.getElementById("supplementary-"+$this.currentIndex);
+		   supplementaryDiv.innerHTML = "";
 		   var $tabNo = 1;
 		   $this.$totalForm = 0;
 		   parentForm.sort(function(r,a){return r.sequence-a.sequence}); // order form categories via order specified in MongoDB
-		   // for every form category in parentForm, start building accordion
+		   // for every form category in parentForm, start building supplementary
 	       	   parentForm.forEach((form) => {
-			   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
+			   var supplementaryContainerDiv = creEl("div", "supplementary-container", "supplementary-container-"+$tabNo+$this.currentIndex)
 			   var labelDiv = creEl("div", "label label-"+$this.currentIndex);
 			   // check forms for completion and put corresponding icon & text
 			   var checkAllForms = $this.checkAllForms(form.forms);
@@ -60,8 +60,8 @@ class SupplementaryForm {
 			   var textUncheck = $this.getCheckedText(checkAllForms);
 			   labelDiv.innerHTML = form.name;
 			   labelDiv.prepend(imgUncheck, textUncheck)
-			   var accordionContentDiv = document.createElement("div");
-			   accordionContentDiv.className="accordion-content";
+			   var supplementaryContentDiv = document.createElement("div");
+			   supplementaryContentDiv.className="supplementary-content";
 			   var ul= creEl('ul');
 			   // for every form in the formCategory
 			   form.forms.forEach((cForm) => {
@@ -69,7 +69,7 @@ class SupplementaryForm {
 				   let editable = $this.checkform(cForm.formId);
 				   let is_live = cForm.is_live;
 				   var li=creEl('li');
-				   var li_text=creEl('span', 'accordion_name');
+				   var li_text=creEl('span', 'supplementary_name');
 				   var imgCheck = creEl("img");
 			       imgCheck.src = $this.getCheckedIcon(editable);
 				   li_text.innerHTML = cForm.name;
@@ -104,9 +104,9 @@ class SupplementaryForm {
 				    $this.$totalForm++;
 				   }
 			   })
-			   accordionContentDiv.appendChild(ul)
-			   accordionContainerDiv.prepend(labelDiv, accordionContentDiv);
-			   accordionDiv.appendChild(accordionContainerDiv);
+			   supplementaryContentDiv.appendChild(ul)
+			   supplementaryContainerDiv.prepend(labelDiv, supplementaryContentDiv);
+			   supplementaryDiv.appendChild(supplementaryContainerDiv);
 			   $tabNo++;
 		   })
 	   }		
@@ -127,9 +127,9 @@ class SupplementaryForm {
 		  $this.programDates();
 		  //$this.viewService();
 		  $this.view();
-		  $this.renderAccordionHeader();
+		  $this.renderSupplementaryHeader();
 		  $this.setPercentage();
-		  $this.initiateAccordion();
+		  $this.initiateSupplementary();
 		  $this.initiateLightbox();
 		  //var spinner = document.getElementById('half-circle-spinner');
 		  //spinner.style.display = 'none';
@@ -208,16 +208,16 @@ class SupplementaryForm {
 		return imgCheck;
 	}
 	/**
-	 * Render Accordion Header like form completion and deadline
+	 * Render Supplementary Header like form completion and deadline
 	 */
-	renderAccordionHeader(){
+	renderSupplementaryHeader(){
 		const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		var date = this.$programDetail.deadlineDate.replace(/\\/g, '');
 		date = date.replace(/"/g, '')
 		var deadlineDate = new Date(date);
 		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
-		let accordionFooter = document.getElementById("accordion-footer-"+this.currentIndex);
-		accordionFooter.innerHTML ="";
+		let supplementaryFooter = document.getElementById("supplementary-footer-"+this.currentIndex);
+		supplementaryFooter.innerHTML ="";
 		let progressbar = document.createElement("div");
 		progressbar.className = "form-progressbar";
 		let protext = document.createElement("p");
@@ -238,10 +238,10 @@ class SupplementaryForm {
 			footerText.innerHTML = "Please complete these required forms prior to: "+months[deadlineDate.getMonth()]+" "+deadlineDate.getDate()+", "+deadlineDate.getFullYear();
 		}
 		deadlineText.append(footerText);
-		accordionFooter.prepend(progressbar, deadlineText)
+		supplementaryFooter.prepend(progressbar, deadlineText)
 	}
 	/**
-	 * Set Percentage value on accordion header
+	 * Set Percentage value on supplementary header
 	 */
 	setPercentage() {
 	  const progressContainer = document.querySelector('.progress-container-'+this.currentIndex);
@@ -261,20 +261,20 @@ class SupplementaryForm {
 		program_dates.innerHTML = "Supplementary Program Dates: "+ startDate.toLocaleDateString() +" to "+ endDate.toLocaleDateString();
 	}
 	/**
-	 * Script for accordion feature
+	 * Script for supplementary feature
 	 */
-	initiateAccordion(){
-		const accordion = document.getElementsByClassName('label-'+this.currentIndex);
+	initiateSupplementary(){
+		const supplementary = document.getElementsByClassName('label-'+this.currentIndex);
 
 			function removeActiveItem(cEl){
-				for (let x=0; x<accordion.length; x++) {
-					if(cEl !==accordion[x]){
-						accordion[x].parentNode.classList.remove('active')
+				for (let x=0; x<supplementary.length; x++) {
+					if(cEl !==supplementary[x]){
+						supplementary[x].parentNode.classList.remove('active')
 					}
 				}
 			}
-		for (let i=0; i<accordion.length; i++) {
-			accordion[i].addEventListener('click', function () {
+		for (let i=0; i<supplementary.length; i++) {
+			supplementary[i].addEventListener('click', function () {
 			  removeActiveItem(this)
 			  this.parentNode.classList.toggle('active')
 		  })
@@ -295,7 +295,7 @@ class SupplementaryForm {
 		}
 	}
 	/**
-	 * initialize Lightbox and rerender accordion after close the lightbox
+	 * initialize Lightbox and rerender supplementary after close the lightbox
 	 */
 	initiateLightbox(){
 		var $this = this;
@@ -305,7 +305,7 @@ class SupplementaryForm {
 				var spinner = document.getElementById('half-circle-spinner');
 				spinner.style.display = 'block';				
 				setTimeout(function() {
-					new AccordionTabs(this.webflowMemberId, this.accountEmail)
+					new SupplementaryTabs(this.webflowMemberId, this.accountEmail)
 				}, 500);
 			},
 			scrolling: true,
@@ -313,8 +313,13 @@ class SupplementaryForm {
 		});
 	}
 }
-
-
+/*--------------------------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------------------------*/
+/**
+ * Class for Handling Student list select box
+ * @param webflowMemberId - MemberId
+ * @param accountEmail - Member Email
+ */
 class SupplementaryProgram {
 	$activeTabID = "";
 	$activeMainTabID = "";
@@ -411,10 +416,10 @@ class SupplementaryProgram {
 	}
 }
 
-
-
+/*--------------------------------------------------------------------------------------------------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------------------------*/
 /**
- * Class for Handling multiple forms tabs
+ * Class for Handling multiple forms stabs
  * @param webflowMemberId - MemberId
  * @param accountEmail - Member Email
  */
@@ -428,19 +433,19 @@ class SupplementaryTabs {
 		
 	}
 	/**
-	 * Render tabs for multiple forms
+	 * Render stabs for multiple forms
 	 * @param responseText - forms object provided by API
 	 */
-	viewtabs(responseText){
-		var tabsContainer = document.getElementById("tabs-container");
-		tabsContainer.innerHTML = "";
-		var tabs = creEl("ul", "tabs")
+	viewstabs(responseText){
+		var stabsContainer = document.getElementById("stabs-container");
+		stabsContainer.innerHTML = "";
+		var stabs = creEl("ul", "stabs")
 		var contentSection = creEl("div", "content-section");
     // if free student, show free resources
 		if(responseText == "No data Found"){
 			document.getElementById("free-resources").style.display = "block";
 			return false;
-    // else, show form accordion
+    // else, show form supplementary
 		}else{
 			document.getElementById("paid-resources").style.display = "block";
 		}
@@ -449,40 +454,40 @@ class SupplementaryTabs {
 		responseText.forEach((formData, index) => {
 			  let currentIndex = index+1;
 			  var activeliClass = (currentIndex == 1 && is_single) ? "tab_li active_tab" : "tab_li";
-			  // if not single, instantiate tabs
+			  // if not single, instantiate stabs
         //if(!is_single){
           //Hide service paragraph - SK: what is the service paragraph? 
           //document.getElementById("service-para").style.display = "none";				
-          var tabsE = creEl("li", activeliClass, 'li-tab'+currentIndex);
-          tabsE.innerHTML = formData.studentDetail.studentName.first+" "+formData.studentDetail.studentName.last+" - "+formData.programDetail.programName+" "+formData.programDetail.debateEvent+" "+formData.programCategory.programCategoryName;
-          tabsE.setAttribute("data-tab-id", 'tab'+currentIndex )
-          tabs.appendChild(tabsE);
+          var stabsE = creEl("li", activeliClass, 'li-tab'+currentIndex);
+          stabsE.innerHTML = formData.studentDetail.studentName.first+" "+formData.studentDetail.studentName.last+" - "+formData.programDetail.programName+" "+formData.programDetail.debateEvent+" "+formData.programCategory.programCategoryName;
+          stabsE.setAttribute("data-tab-id", 'tab'+currentIndex )
+          stabs.appendChild(stabsE);
 			//  }
         // if single, show single view
 			  var activeClass = (currentIndex == 1 && is_single) ? " " : "";
 			  var tabContent = creEl("div", "content "+activeClass, "tab"+currentIndex);
-			  var accordionHeading = creEl('h3', 'totolist-text');
-			  accordionHeading.innerHTML = "To Do List";
-			  var accordion = creEl("div","accordion","accordion-"+currentIndex)
+			  var supplementaryHeading = creEl('h3', 'totolist-text');
+			  supplementaryHeading.innerHTML = "To Do List";
+			  var supplementary = creEl("div","supplementary","supplementary-"+currentIndex)
 			  var program_dates = creEl("h4","program_dates","program_dates-"+currentIndex)
-			  var accordionFooter = creEl("div","accordion-footer","accordion-footer-"+currentIndex)
-			  tabContent.prepend(program_dates, accordionHeading, accordionFooter, accordion)
+			  var supplementaryFooter = creEl("div","supplementary-footer","supplementary-footer-"+currentIndex)
+			  tabContent.prepend(program_dates, supplementaryHeading, supplementaryFooter, supplementary)
 			  contentSection.appendChild(tabContent);
 		})
-		tabsContainer.prepend(tabs,contentSection)
+		stabsContainer.prepend(stabs,contentSection)
 	}
 	/**
-	 * initialize  Tabs feature - adds toggle function for folders in accordion 
+	 * initialize  Tabs feature - adds toggle function for folders in supplementary 
 	 */
 	initiateTabs(){
 	  var d = document,
-      tabs = d.querySelector('.tabs'),
+      stabs = d.querySelector('.stabs'),
       tab = d.querySelectorAll('.tab_li'),
       contents = d.querySelectorAll('.content');
-	  if(!tabs){
+	  if(!stabs){
 		 return false; 
 	  }
-	  tabs.addEventListener('click', function(e) {
+	  stabs.addEventListener('click', function(e) {
 		  if (e.target && e.target.nodeName === 'LI') {
 			for (var i = 0; i < tab.length; i++) {
 			  tab[i].classList.remove('active_tab');
@@ -497,28 +502,28 @@ class SupplementaryTabs {
 	  });
 	}
 	/**
-	 * Get current active tab before initiate new accordion
+	 * Get current active tab before initiate new supplementary
 	 */
 	getCurrentActiveTag(){
-		const accordion = document.getElementsByClassName('active');
+		const supplementary = document.getElementsByClassName('active');
 		var $this = this;
-		for (let i=0; i<accordion.length; i++) {
-			$this.$activeTabID = accordion[i].id;
+		for (let i=0; i<supplementary.length; i++) {
+			$this.$activeTabID = supplementary[i].id;
 		}
-		const tabs = document.getElementsByClassName('active_tab');
+		const stabs = document.getElementsByClassName('active_tab');
 		var $this = this; // makes global
-		for (let i=0; i<tabs.length; i++) {
-			$this.$activeMainTabID = tabs[i].id;
+		for (let i=0; i<stabs.length; i++) {
+			$this.$activeMainTabID = stabs[i].id;
 		}
 	}
 	/**
-   If form is submitted/closed, set active tab to know which accordion folder to display as open
+   If form is submitted/closed, set active tab to know which supplementary folder to display as open
 	 */
 	setCurrentActiveTag(){
 		var $this = this;
-		const accordion = document.getElementById($this.$activeTabID);
-		if(accordion){
-			accordion.classList.add("active");
+		const supplementary = document.getElementById($this.$activeTabID);
+		if(supplementary){
+			supplementary.classList.add("active");
 		}
 		const activeMainTabID = document.getElementById($this.$activeMainTabID);
 		if(activeMainTabID){
@@ -546,7 +551,7 @@ class SupplementaryTabs {
 		xhr.onload = function() {
       spinner.style.display = 'none';
 		  let responseText =  JSON.parse(xhr.responseText); 
-		  $this.viewtabs(responseText);
+		  $this.viewstabs(responseText);
 		  $this.initiateTabs();
 		  if(responseText == "No data Found"){
 			  return false;
