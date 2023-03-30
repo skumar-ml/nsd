@@ -21,7 +21,7 @@ function creEl(name,className,idName){
  * @param currentIndex - current index for form object
  * @param accountEmail - email id of member
  */
-class AccordionForm {
+class SupplementaryForm {
 	$completedForm = [];
 	$formslist = [];
 	$programCategory = {};
@@ -418,7 +418,7 @@ class SupplementaryProgram {
  * @param webflowMemberId - MemberId
  * @param accountEmail - Member Email
  */
-class AccordionTabs {
+class SupplementaryTabs {
 	$activeTabID = "";
 	$activeMainTabID = "";
 	constructor(webflowMemberId, accountEmail){
@@ -555,7 +555,7 @@ class AccordionTabs {
 		  responseText.forEach((formData,index) => {
 			  setTimeout(function(){
 				  let currentIndex = index+1;
-				  new AccordionForm($this.webflowMemberId, formData,currentIndex, $this.accountEmail);
+				  new SupplementaryForm($this.webflowMemberId, formData,currentIndex, $this.accountEmail);
 			  },30)
 		  })
 		  setTimeout(function(){
