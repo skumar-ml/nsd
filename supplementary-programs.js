@@ -52,7 +52,7 @@ function creEl(name,className,idName){
 			 // for every form category in parentForm, start building supplementary
 					parentForm.forEach((form) => {
 				 var supplementaryContainerDiv = creEl("div", "supplementary-container", "supplementary-container-"+$tabNo+$this.currentIndex)
-				 var labelDiv = creEl("div", "label label-"+$this.currentIndex);
+				 var labelDiv = creEl("div", "label slabel-"+$this.currentIndex);
 				 // check forms for completion and put corresponding icon & text
 				 var checkAllForms = $this.checkAllForms(form.forms);
 				 var imgUncheck = creEl("img",'all-img-status');
@@ -264,7 +264,7 @@ function creEl(name,className,idName){
 	   * Script for supplementary feature
 	   */
 	  initiateSupplementary(){
-		  const supplementary = document.getElementsByClassName('label-'+this.currentIndex);
+		  const supplementary = document.getElementsByClassName('slabel-'+this.currentIndex);
   
 			  function removeActiveItem(cEl){
 				  for (let x=0; x<supplementary.length; x++) {
