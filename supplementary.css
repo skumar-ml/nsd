@@ -287,10 +287,10 @@
       margin-bottom: 0;
       margin-top: 15px;
   }
-  #paid-resources{
+  #paid-supplementary-resources{
       display:none;
   }
-  #free-resources{
+  #free-supplementary-resources{
       display:none;
   }
   .hide{
