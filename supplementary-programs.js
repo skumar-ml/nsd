@@ -498,8 +498,8 @@ function creEl(name,className,idName){
 			  for (i = 0; i < contents.length; i++) {
 				contents[i].classList.remove('active_tab');
 			  }
-			  var tabId = '#' + e.target.dataset.tabId;
-	   d.querySelector(tabId).classList.toggle('active_tab'); 
+			  var stabId = '#' + e.target.dataset.stabId;
+	   d.querySelector(stabId).classList.toggle('active_tab'); 
 			}  
 		});
 	  }
