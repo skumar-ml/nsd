@@ -445,11 +445,11 @@ class SupplementaryTabs {
 		var contentSection = creEl("div", "content-section");
     // if free student, show free resources
 		if(responseText == "No data Found"){
-			document.getElementById("free-resources").style.display = "block";
+			document.getElementById("free-supplementary-resources").style.display = "block";
 			return false;
     // else, show form supplementary
 		}else{
-			document.getElementById("paid-resources").style.display = "block";
+			document.getElementById("paid-supplementary-resources").style.display = "block";
 		}
     // responseText is array corresponding to all payments under familyID
 		var is_single = (responseText.length > 1) ? false : true;
