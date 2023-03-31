@@ -455,7 +455,7 @@ function creEl(name,className,idName){
 		  var is_single = (responseText.length > 1) ? false : true;
 		  responseText.forEach((formData, index) => {
 				let currentIndex = index+1;
-				var activeliClass = (currentIndex == 1 && is_single) ? "stab_li active_tab" : "stab_li";
+				var activeliClass = (currentIndex == 1 && is_single) ? "stab_li" : "stab_li";
 				// if not single, instantiate stabs
 		  //if(!is_single){
 			//Hide service paragraph - SK: what is the service paragraph? 
