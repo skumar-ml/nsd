@@ -39,7 +39,8 @@ class Notification {
 	}
 	displayUnreadMessage(){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
-		var unreadMessage = this.messageData.filter(data => !data.is_read)
+		console.log('this.messageData', this.messageData)
+		var unreadMessage = this.filterData.filter(data => !data.is_read)
 		//notificationBudge.innerHTML = unreadMessage.length;
 		notificationBudge.setAttribute('data-count', unreadMessage.length)
 		console.log('notificationBudge', notificationBudge)
@@ -320,6 +321,7 @@ class Notification {
 			return data;
 		})
 		this.messageData = messageData;
+		this.displayUnreadMessage();
 		this.refreshData();
 	} 
 	displayDetailsPage(item){
@@ -334,7 +336,7 @@ class Notification {
 		notificationDetails.style.display = 'block';
 		
 		this.makeRead(item);
-		this.displayUnreadMessage();
+		
 		
 		
 		/*Data to display*/
