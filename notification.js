@@ -17,6 +17,7 @@ class Notification {
 		this.paginateData = this.paginatorList(messageData);
 		this.makeMessageFilter();
 		this.makeMessageList();
+		this.displayUnreadMessage();
 		
 	}
 	paginatorList(items, page, per_page) {
@@ -35,6 +36,13 @@ class Notification {
 			total_pages: total_pages,
 			data: paginatedItems
 		};
+	}
+	displayUnreadMessage(){
+		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
+		var unreadMessage = this.messageData.filter(data => !data.is_read)
+		//notificationBudge.innerHTML = unreadMessage.length;
+		notificationBudge.setAttribute('data-count', unreadMessage.length)
+		console.log('notificationBudge', notificationBudge)
 	}
 	getMessageType(){
 		return this.filterData.filter(
@@ -67,9 +75,8 @@ class Notification {
 		}
 		
 		if(searchFilter.value){
-			console.log('searchFilter.value', searchFilter.value)
 			var search = searchFilter.value;
-			var condition = new RegExp(search);
+			var condition = new RegExp(search, 'i');
 			messageData = messageData.filter(function (el) {
 			  return condition.test(el.title) || condition.test(el.message) || condition.test(el.type);
 			});
@@ -156,20 +163,38 @@ class Notification {
 		boldText.innerHTML = text;
 		return boldText;
 	}
+	getCheckedIcon(status){
+		var img = creEl('img', 'is_read_icon')
+		if(status){
+			var src = "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a83485b6551a71e5b7e12_dd-check.png";
+		}else{
+			var src = "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a834899a0eb5204d6dafd_dd-cross.png";
+		}
+		img.src = src;
+		return img
+	}
 	craeteMessageList(){
 		var $this = this;
 		var messageList = creEl('div', 'message-list');
 		this.paginateData.data.forEach((item, index) => {
 			var is_read = (item.is_read) ? 'read' : 'not-read';
 			var row = creEl('div', 'w-row '+is_read)
+			
+			var read_icon = this.getCheckedIcon(item.is_read); 
+			var col_icon = this.createCol('', 1);
+			col_icon.appendChild(read_icon);
+			row.appendChild(col_icon);
+			
 			var col_1 = this.createCol(item.title);
 			row.appendChild(col_1);
-			var col_2 = this.createCol(item.type, 2);
+			var col_2 = this.createCol(item.type, 1);
 			row.appendChild(col_2);
-			var col_3 = this.createCol(item.message.substring(0, 30) + '...', 4);
+			var col_3 = this.createCol(item.sendAs, 2);
 			row.appendChild(col_3);
-			var col_4 = this.createCol(item.created_on);
+			var col_4 = this.createCol(item.message.substring(0, 30) + '...', 3);
 			row.appendChild(col_4);
+			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
+			row.appendChild(col_5);
 			row.addEventListener('click', function () {
 				$this.displayDetailsPage(item);
 			})
@@ -178,10 +203,21 @@ class Notification {
 		return messageList;
 	}
 	createMessageTitle(){
-		var title = ['Title', 'Type', 'Message', 'Date']
+		var title = ['', 'Title', 'Type', 'Send As', 'Message', 'Date']
 		var row = creEl('div', 'w-row')
 		title.forEach(item=> {
-			var col_width = (item == 'Type') ? 2 : ((item == 'Message') ? '4' : 3 )
+			var col_width = 3
+			if(item == ''){
+				col_width = 1
+			}else if(item == 'Type' ){
+				col_width = 1
+			}else if(item == 'Send As'){
+				col_width = 2
+			}else if(item == 'Date'){
+				col_width = 2;
+			}else if(item == 'Message'){
+				col_width = 3;
+			}
 			var col = this.createCol(item, col_width);
 			row.appendChild(col);
 		})
@@ -203,14 +239,14 @@ class Notification {
 	}
 	detailPageBackButton(){
 		var $this = this;
-		var backButton = creEl('a', 'w-pagination-previous')
+		var backButton = creEl('a', 'w-previous')
 		backButton.innerHTML = '< Back';
 		backButton.addEventListener('click', function () {
 			$this.showListPage();
 		})
 		return backButton;
 	}
-	deatailPageRow(text, text_head){
+	/*deatailPageRow(text, text_head){
 		var row = creEl('div', 'w-row')
 		var title_head = this.creBoldText(text_head)
 		var title = text;
@@ -220,26 +256,62 @@ class Notification {
 		row.appendChild(col_1);
 		row.appendChild(col_2);
 		return row;
+	}*/
+	formatedDate(dateString){
+		var date = new Date(dateString);
+		var day = date.getDate();
+		var month = date.getMonth();
+		var year = date.getFullYear();
+		var newDate = day+'-'+month+'-'+year;
+		return newDate;
 	}
 	detailPageContain(item){
-		var contain = creEl('div', 'detail-contain', 'detail-contain');
+		var contain = creEl('div', 'detail-contain  w-row', 'detail-contain');
 		
-		var title = this.deatailPageRow(item.title, 'Title')
-		contain.appendChild(title);
+		/*Send As By Name*/
+		var sendAstext = this.creBoldText(item.sendAs);
+		var sendBycol = creEl("div", 'w-col detail-head w-col-2');
+		sendBycol.appendChild(sendAstext);
+		contain.appendChild(sendBycol);
 		
-		var title = this.deatailPageRow(item.type, 'Type')
-		contain.appendChild(title);
+		/*Created on Date*/
+		var dateText = this.formatedDate(item.created_on);
+		var dateTextcol = creEl("div", 'w-col w-col-10 detail-head text-right');
+		dateTextcol.innerHTML = dateText;
+		contain.appendChild(dateTextcol);
 		
-		var title = this.deatailPageRow(item.message, 'Message')
-		contain.appendChild(title);
+		var title = item.type+" >> "+ item.title;
+		var dateTextcol = creEl("div", 'w-col w-col-12 detail-title text-right');
+		dateTextcol.innerHTML = title;
+		contain.appendChild(dateTextcol);
 		
-		var title = this.deatailPageRow(item.created_on, 'Created On')
-		contain.appendChild(title);
+		var message = item.message;
+		var dateMessagecol = creEl("div", 'w-col w-col-12 details-message');
+		dateMessagecol.innerHTML = message;
+		contain.appendChild(dateMessagecol);
 
 		
 		return contain;
 	}
+	readApiCall(messageId){
+		var data = {
+			 "objectId" : messageId
+		}
+		var xhr = new XMLHttpRequest()
+		var $this = this;
+		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/isReadNotification", true)
+		xhr.withCredentials = false
+		xhr.send(JSON.stringify(data))
+		xhr.onload = function() {
+			let responseText = xhr.responseText;
+			console.log('responseText', responseText)
+		}
+	}
 	makeRead(item){
+		/*API Call for read unread API*/
+		if(!item.is_read){
+			this.readApiCall(item.oid)
+		}
 		var messageData =  this.messageData;
 		messageData.map(data =>{
 			if(data.oid == item.oid){
@@ -262,13 +334,18 @@ class Notification {
 		notificationDetails.style.display = 'block';
 		
 		this.makeRead(item);
+		this.displayUnreadMessage();
+		
 		
 		/*Data to display*/
 		var contain = this.detailPageContain(item);
 		notificationDetails.appendChild(contain);
+		
 		/*Back button for detail page*/
 		var backButton = this.detailPageBackButton();
 		notificationDetails.appendChild(backButton);
+
+		
 	}
 	createPagination(){
 		var $this = this;
