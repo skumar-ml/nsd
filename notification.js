@@ -79,7 +79,7 @@ class Notification {
 			var search = searchFilter.value;
 			var condition = new RegExp(search, 'i');
 			messageData = messageData.filter(function (el) {
-			  return condition.test(el.title) || condition.test(el.message) || condition.test(el.type);
+			  return condition.test(el.title) || condition.test(el.message) || condition.test(el.type) || condition.test(el.sendAs);
 			});
 		}
 		
