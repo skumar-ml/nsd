@@ -5,10 +5,11 @@ class NotificationCount {
 	}
 	displayUnreadMessage(messageData){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
-		var unreadMessage = messageData.filter(data => !data.is_read)
-		//notificationBudge.innerHTML = unreadMessage.length;
-		notificationBudge.setAttribute('data-count', unreadMessage.length)
-		console.log('notificationBudge', notificationBudge)
+		var unreadMessage = this.filterData.filter(data => !data.is_read)
+		var notificationMessage = creEl('span', 'notification-count');
+		notificationMessage.innerHTML = unreadMessage.length;
+		//notificationBudge.setAttribute('data-count', unreadMessage.length);
+		notificationBudge.appendChild(notificationMessage)
 	}
 	getNotificationData(){
 		var xhr = new XMLHttpRequest()
