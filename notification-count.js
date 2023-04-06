@@ -5,6 +5,10 @@ class NotificationCount {
 	}
 	displayUnreadMessage(messageData){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
+		var notificationCount = document.getElementsByClassName("notification-count")[0];
+		if(notificationCount){
+			notificationCount.remove();
+		}
 		var unreadMessage = messageData.filter(data => !data.is_read)
 		var notificationMessage = creEl('span', 'notification-count');
 		notificationMessage.innerHTML = unreadMessage.length;
