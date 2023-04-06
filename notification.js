@@ -265,7 +265,7 @@ class Notification {
 		var day = date.getDate();
 		var month = date.getMonth();
 		var year = date.getFullYear();
-		var newDate = day+'-'+month+'-'+year;
+		var newDate = month+'-'+day+'-'+year;
 		return newDate;
 	}
 	detailPageContain(item){
