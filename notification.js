@@ -12,6 +12,9 @@ function creEl(name,className,idName){
 class Notification {
 	constructor(webflowMemberId, messageData){
 		this.webflowMemberId = webflowMemberId;
+		messageData.sort(function(a,b){
+		  return new Date(b.created_on) - new Date(a.created_on);
+		});
 		this.messageData = messageData;
 		this.filterData = messageData;
 		this.paginateData = this.paginatorList(messageData);
@@ -322,7 +325,7 @@ class Notification {
 		var day = date.getDate();
 		var month = date.getMonth();
 		var year = date.getFullYear();
-		var newDate = month+'-'+day+'-'+year;
+		var newDate = month+1+'-'+day+'-'+year;
 		return newDate;
 	}
 	detailPageContain(item){
