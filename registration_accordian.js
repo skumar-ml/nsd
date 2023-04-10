@@ -63,6 +63,8 @@ class AccordionForm {
 			   var accordionContentDiv = document.createElement("div");
 			   accordionContentDiv.className="accordion-content";
 			   var ul= creEl('ul');
+			   //sorting forms based on sequence
+			   form.forms.sort(function(r,a){return r.sequence-a.sequence});
 			   // for every form in the formCategory
 			   form.forms.forEach((cForm) => {
 				   //check it's editable
@@ -80,7 +82,7 @@ class AccordionForm {
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
-						if(this.$isLiveProgram){
+						if(this.$isLiveProgram  && cForm.is_editable){
 							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
 						}else{
 						   formLink.href = "https://www.jotform.com/submission/"+dbData.submissionId;
@@ -93,7 +95,7 @@ class AccordionForm {
 				   formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
 				   var span=creEl('span', 'action_text');
 				    if(is_live){
-						span.innerHTML = (editable) ? ((this.$isLiveProgram) ? "Edit form" : "View Form" ): "Go to form";
+						span.innerHTML = (editable) ? ((this.$isLiveProgram && cForm.is_editable) ? "Edit form" : "View Form" ): "Go to form";
 					}else{
 						span.innerHTML = "Coming Soon";
 					}
