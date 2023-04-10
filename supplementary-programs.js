@@ -455,7 +455,7 @@ function creEl(name,className,idName){
 		  var is_single = (responseText.length > 1) ? false : true;
 		  responseText.forEach((formData, index) => {
 				let currentIndex = index+1;
-				var activeliClass = (currentIndex == 1 && is_single) ? "stab_li" : "stab_li";
+				var activeliClass = (currentIndex == 1 && is_single && formData.formList.length > 0) ? "stab_li" : "stab_li";
 				// if not single, instantiate stabs
 		  //if(!is_single){
 			//Hide service paragraph - SK: what is the service paragraph? 
@@ -466,6 +466,8 @@ function creEl(name,className,idName){
 			stabs.appendChild(stabsE);
 			  //  }
 		  // if single, show single view
+			  /* if form is not available, disble the code */
+			  if(formData.formList.length > 0){ 
 				var activeClass = (currentIndex == 1 && is_single) ? " " : "";
 				var tabContent = creEl("div", "content "+activeClass, "stab"+currentIndex);
 				var supplementaryHeading = creEl('h3', 'totolist-text');
@@ -475,6 +477,7 @@ function creEl(name,className,idName){
 				var supplementaryFooter = creEl("div","supplementary-footer","supplementary-footer-"+currentIndex)
 				tabContent.prepend(program_dates, supplementaryHeading, supplementaryFooter, supplementary)
 				contentSection.appendChild(tabContent);
+			  }
 		  })
 		  stabsContainer.prepend(stabs,contentSection)
 	  }
@@ -499,7 +502,9 @@ function creEl(name,className,idName){
 				contents[i].classList.remove('active_tab');
 			  }
 			  var stabId = '#' + e.target.dataset.stabId;
-	   d.querySelector(stabId).classList.toggle('active_tab'); 
+				if(d.querySelector(stabId) != null){
+	   				d.querySelector(stabId).classList.toggle('active_tab'); 
+				}
 			}  
 		});
 	  }
@@ -560,10 +565,13 @@ function creEl(name,className,idName){
 			}
 		// formData = responseText[index]
 			responseText.forEach((formData,index) => {
-				setTimeout(function(){
-					let currentIndex = index+1;
-					new SupplementaryForm($this.webflowMemberId, formData,currentIndex, $this.accountEmail);
-				},30)
+				/* if form is not available, disble the code */
+				if(formData.formList.length > 0){
+					setTimeout(function(){
+						let currentIndex = index+1;
+						new SupplementaryForm($this.webflowMemberId, formData,currentIndex, $this.accountEmail);
+					},30)
+				}
 			})
 			setTimeout(function(){
 			$this.setCurrentActiveTag();
