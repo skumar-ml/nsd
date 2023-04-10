@@ -461,7 +461,7 @@ function creEl(name,className,idName){
 			//Hide service paragraph - SK: what is the service paragraph? 
 			//document.getElementById("service-para").style.display = "none";				
 			var stabsE = creEl("li", activeliClass, 'li-stab'+currentIndex);
-			stabsE.innerHTML = formData.studentDetail.studentName.first+" "+formData.studentDetail.studentName.last+" - "+formData.programDetail.programName+" "+formData.programDetail.debateEvent+" "+formData.programCategory.programCategoryName;
+			stabsE.innerHTML = formData.studentDetail.studentName.first+" "+formData.studentDetail.studentName.last+" - "+formData.programDetail.programName+" "+formData.programDetail.debateEvent;
 			stabsE.setAttribute("data-stab-id", 'stab'+currentIndex )
 			stabs.appendChild(stabsE);
 			  //  }
