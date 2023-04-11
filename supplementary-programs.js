@@ -509,7 +509,9 @@ function creEl(name,className,idName){
 			timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
 			timer_clock.innerHTML = program_dates_text;
 			
-			tabContent.appendChild(timer_clock);
+			timer_div.appendChild(timer_clock);
+			tabContent.appendChild(timer_div);
+			  
 			contentSection.appendChild(tabContent);
 			/*End Timer here*/  
 			  
