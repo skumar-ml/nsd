@@ -320,34 +320,56 @@ class Notification {
 		row.appendChild(col_2);
 		return row;
 	}*/
-	formatedDate(dateString){
+	formatedDate(dateString, type=''){
+		const monthText = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 		var date = new Date(dateString);
 		var day = date.getDate();
 		var month = date.getMonth();
 		var year = date.getFullYear();
-		var newDate = month+1+'-'+day+'-'+year;
+		var newDate = month+1+'/'+day+'/'+year;
+		if(type == 'detailPage'){
+			newDate = monthText[date.getMonth()]+' '+day+', '+year
+		}
 		return newDate;
 	}
 	detailPageContain(item){
 		var contain = creEl('div', 'detail-contain  w-row', 'detail-contain');
 		
+		var detailHead = creEl('div', 'detail-head w-row');
+		var title = item.title;
+		var dateTextcol = creEl("div", 'w-col w-col-2');
+		var titleB= this.creBoldText(title)
+		dateTextcol.appendChild(titleB);
+		detailHead.appendChild(dateTextcol);
+		
+		
+		var sendBycol = creEl("div", 'w-col w-col-10 text-right header-right');
+		/*Created on Date*/
+		var dateText = this.formatedDate(item.created_on, 'detailPage');
+		var dateSpan = creEl('span','detail-date-section')
+		dateSpan.innerHTML = dateText;
+		sendBycol.appendChild(dateSpan);
+		
+		var br = creEl('br')
+		sendBycol.appendChild(br)
+		
 		/*Send As By Name*/
 		var sendAstext = this.creBoldText(item.sendAs);
-		var sendBycol = creEl("div", 'w-col detail-head w-col-2');
 		sendBycol.appendChild(sendAstext);
-		contain.appendChild(sendBycol);
 		
-		/*Created on Date*/
-		var dateText = this.formatedDate(item.created_on);
-		var dateTextcol = creEl("div", 'w-col w-col-10 detail-head text-right');
+		
+		detailHead.appendChild(sendBycol);
+		contain.appendChild(detailHead);
+		
+		/*var dateTextcol = creEl("div", 'w-col w-col-10 detail-head text-right');
 		dateTextcol.innerHTML = dateText;
 		contain.appendChild(dateTextcol);
 		
-		var title = item.type+" >> "+ item.title;
+		var title = item.title;
 		var dateTextcol = creEl("div", 'w-col w-col-12 detail-title text-right');
 		dateTextcol.innerHTML = title;
 		contain.appendChild(dateTextcol);
-		
+		*/
 		var message = item.message;
 		var dateMessagecol = creEl("div", 'w-col w-col-12 details-message');
 		dateMessagecol.innerHTML = message;
@@ -356,7 +378,7 @@ class Notification {
 		if(item.uploadedFiles){
 			var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
-			var download_head = this.creBoldText('Attached File: ')
+			var download_head = this.creBoldText('Attachments: ')
 			var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles);
 			downloadCol.appendChild(download_head);
 			downloadCol.appendChild(downloadIcon);
