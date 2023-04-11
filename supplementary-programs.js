@@ -505,7 +505,7 @@ function creEl(name,className,idName){
 			
 			let timer_clocks = document.createElement("a");
 			timer_clocks.href = "https://logwork.com/countdown-xknf";
-			timer_clocks.className = "countdown-timer1"; 
+			timer_clocks.className = "countdown-timer"; 
 			timer_clocks.setAttribute("data-style", "columns"); timer_clocks.setAttribute("data-timezone", "America/Los_Angeles"); timer_clocks.setAttribute("data-date", date); timer_clocks.setAttribute("data-digitscolor", "#a51c30");
 			timer_clocks.innerHTML = program_dates_text;
 			timer_divs.appendChild(timer_clocks);
