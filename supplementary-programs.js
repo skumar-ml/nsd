@@ -515,10 +515,7 @@ function creEl(name,className,idName){
 			  
 		  })
 		  stabsContainer.prepend(stabs,contentSection)
-		  /*Timer js*/
-		  var script = document.createElement("script");
-		  script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
-		  document.body.appendChild(script);
+		  
 	  }
 	  /**
 	   * initialize  Tabs feature - adds toggle function for folders in supplementary 
