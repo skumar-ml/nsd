@@ -497,23 +497,20 @@ function creEl(name,className,idName){
 			const program_dates_text = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
 			
 			// Countdown timer
-			let timer_div = document.createElement("div");
-			timer_div.style.width = '50%';
-			timer_div.style.display = 'flex';
-			timer_div.style.marginLeft = 'auto';
-			timer_div.style.marginRight = 'auto';
+			let timer_divs = document.createElement("div");
+			timer_divs.style.width = '50%';
+			timer_divs.style.display = 'flex';
+			timer_divs.style.marginLeft = 'auto';
+			timer_divs.style.marginRight = 'auto';
 			
-			let timer_clock = document.createElement("a");
-			timer_clock.href = "https://logwork.com/countdown-xknf";
-			timer_clock.className = "countdown-timer"; 
-			timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
-			timer_clock.innerHTML = program_dates_text;
-			
-			timer_div.appendChild(timer_clock);
-			tabContent.appendChild(timer_div);
-			  
+			let timer_clocks = document.createElement("a");
+			timer_clocks.href = "https://logwork.com/countdown-xknf";
+			timer_clocks.className = "countdown-timer1"; 
+			timer_clocks.setAttribute("data-style", "columns"); timer_clocks.setAttribute("data-timezone", "America/Los_Angeles"); timer_clocks.setAttribute("data-date", date); timer_clocks.setAttribute("data-digitscolor", "#a51c30");
+			timer_clocks.innerHTML = program_dates_text;
+			timer_divs.appendChild(timer_clocks);
+			tabContent.appendChild(timer_divs);
 			contentSection.appendChild(tabContent);
-			/*End Timer here*/  
 			  
 			  
 		  })
