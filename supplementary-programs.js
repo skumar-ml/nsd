@@ -486,9 +486,9 @@ function creEl(name,className,idName){
 			// Define months
 			const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 		
-			var date = formData.programDetail.deadlineDate.replace(/\\/g, '');
+			let date = formData.programDetail.deadlineDate.replace(/\\/g, '');
 			date = date.replace(/"/g, '')
-			var deadlineDate = new Date(date);
+			let deadlineDate = new Date(date);
 			date = date.substring(0,16); //remove the final ':00' for countdown timer
 			
 			// Get and format program dates
