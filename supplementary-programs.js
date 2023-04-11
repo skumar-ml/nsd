@@ -467,9 +467,10 @@ function creEl(name,className,idName){
 			  //  }
 		  // if single, show single view
 			  /* if form is not available, disble the code */
-			  if(formData.formList.length > 0){ 
+			  
 				var activeClass = (currentIndex == 1 && is_single) ? " " : "";
 				var tabContent = creEl("div", "content "+activeClass, "stab"+currentIndex);
+			  if(formData.formList.length > 0){ 
 				var supplementaryHeading = creEl('h3', 'totolist-text');
 				supplementaryHeading.innerHTML = "To Do List";
 				var supplementary = creEl("div","supplementary","supplementary-"+currentIndex)
@@ -478,8 +479,47 @@ function creEl(name,className,idName){
 				tabContent.prepend(program_dates, supplementaryHeading, supplementaryFooter, supplementary)
 				contentSection.appendChild(tabContent);
 			  }
+			  
+			  
+			/*Added Timer here*/
+			
+			// Define months
+			const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+		
+			var date = formData.programDetail.deadlineDate.replace(/\\/g, '');
+			date = date.replace(/"/g, '')
+			var deadlineDate = new Date(date);
+			date = date.substring(0,16); //remove the final ':00' for countdown timer
+			
+			// Get and format program dates
+			let startDate = new Date(formData.programDetail.startDate);
+			let endDate = new Date(formData.programDetail.endDate);
+			const program_dates_text = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
+			
+			// Countdown timer
+			let timer_div = document.createElement("div");
+			timer_div.style.width = '50%';
+			timer_div.style.display = 'flex';
+			timer_div.style.marginLeft = 'auto';
+			timer_div.style.marginRight = 'auto';
+			
+			let timer_clock = document.createElement("a");
+			timer_clock.href = "https://logwork.com/countdown-xknf";
+			timer_clock.className = "countdown-timer"; 
+			timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", date); timer_clock.setAttribute("data-digitscolor", "#a51c30");
+			timer_clock.innerHTML = program_dates_text;
+			
+			tabContent.appendChild(timer_clock);
+			contentSection.appendChild(tabContent);
+			/*End Timer here*/  
+			  
+			  
 		  })
 		  stabsContainer.prepend(stabs,contentSection)
+		  /*Timer js*/
+		  var script = document.createElement("script");
+		  script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
+		  document.body.appendChild(script);
 	  }
 	  /**
 	   * initialize  Tabs feature - adds toggle function for folders in supplementary 
