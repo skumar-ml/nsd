@@ -200,24 +200,34 @@ class Notification {
 		  })
 		  .catch(() => alert('oh no!'));
 	}
-	downLoadLinkIcon(fileLink){
+	downLoadLinkIcon(fileLink, type=''){
 		var $this = this;
 		var fileName = fileLink
 		var a = creEl('a', 'downloadLink')
-		var img = creEl('img', 'downloadIcon')
-		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642e8f4e85af6b0ef1e409b6_link-solid.png";
+		
+		if(type == 'download'){
+			var img = creEl('img', 'downloadIcon')
+			img.class="download-file"
+			img.title = 'Download'
+			img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6434ff69906fb9a8c9c8b4d3_download-file.svg";
+		}else{
+			var img = creEl('img')
+			img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642e8f4e85af6b0ef1e409b6_link-solid.png";
+		}
 		a.appendChild(img);
 		a.addEventListener('click', function () {
 				$this.download(fileLink, fileLink.substring(fileLink.lastIndexOf('/')+1));
 		})
 		return a;
 	}
+	/*Iframe view icon*/
 	viewDownLoadedFile(fileLink){
 		var $this = this;
 		var fileName = fileLink
 		var a = creEl('a', 'downloadLink iframe-lightbox-link')
-		var img = creEl('img', 'downloadIcon')
-		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642ea24ad58cc7503128b575_eye-solid.png";
+		var img = creEl('img','viewIcon')
+		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/643501a495c54e74d70e60ba_view-file.svg";
+		img.title = 'View';
 		a.appendChild(img);
 		a.href = fileLink;
 		
@@ -303,7 +313,10 @@ class Notification {
 	detailPageBackButton(){
 		var $this = this;
 		var backButton = creEl('a', 'w-previous')
-		backButton.innerHTML = '< Back';
+		var  img = creEl('img', 'back-icon')
+		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6434fd8a3e27f65f1168c15b_arrow-left.svg"
+		img.title = 'Back'
+		backButton.appendChild(img);
 		backButton.addEventListener('click', function () {
 			$this.showListPage();
 		})
@@ -379,7 +392,7 @@ class Notification {
 			var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
 			var download_head = this.creBoldText('Attachments: ')
-			var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles);
+			var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
 			downloadCol.appendChild(download_head);
 			downloadCol.appendChild(downloadIcon);
 			downloadCol.appendChild(viewIcon);
