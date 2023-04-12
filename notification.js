@@ -350,13 +350,13 @@ class Notification {
 		
 		var detailHead = creEl('div', 'detail-head w-row');
 		var title = item.title;
-		var dateTextcol = creEl("div", 'w-col w-col-2');
+		var dateTextcol = creEl("div", 'w-col w-col-6');
 		var titleB= this.creBoldText(title)
 		dateTextcol.appendChild(titleB);
 		detailHead.appendChild(dateTextcol);
 		
 		
-		var sendBycol = creEl("div", 'w-col w-col-10 text-right header-right');
+		var sendBycol = creEl("div", 'w-col w-col-6 text-right header-right');
 		/*Created on Date*/
 		var dateText = this.formatedDate(item.created_on, 'detailPage');
 		var dateSpan = creEl('span','detail-date-section')
