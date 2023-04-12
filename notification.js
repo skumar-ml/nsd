@@ -1,3 +1,9 @@
+/**
+ * 	
+ * @param name - HTML element name
+ * @param className - HTML element class attribute
+ * @param idName - HTML element id attribute
+ */
 function creEl(name,className,idName){
   var el = document.createElement(name);
 	if(className){
@@ -8,7 +14,11 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
-
+/**
+ * Class for handling Notification List
+ * @param webflowMemberId - memberId
+ * @param messageData - notification data by API
+ */
 class Notification {
 	constructor(webflowMemberId, messageData){
 		this.webflowMemberId = webflowMemberId;
@@ -24,6 +34,7 @@ class Notification {
 		this.displayUnreadMessage();
 		
 	}
+	/*Creating pagination array object*/
 	paginatorList(items, page, per_page) {
 		var page = page || 1,
 		per_page = per_page || 5,
@@ -41,6 +52,7 @@ class Notification {
 			data: paginatedItems
 		};
 	}
+	/*display notification message count based notification-budge class*/
 	displayUnreadMessage(){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
 		var notificationCount = document.getElementsByClassName("notification-count")[0];
@@ -54,12 +66,14 @@ class Notification {
 		notificationBudge.appendChild(notificationMessage)
 		console.log('notificationBudge', notificationBudge)
 	}
+	/*Get message type from api response*/
 	getMessageType(){
 		return this.filterData.filter(
 		  (obj, index) =>
 			this.filterData.findIndex((item) => item.type == obj.type) === index
 		);
 	}
+	/*Filter api response based on current seleted filter value*/
 	filterMessageData(){
 		//this.messageData = this.filterData;
 		var messageData = this.filterData;
@@ -96,7 +110,7 @@ class Notification {
 		this.paginateData = this.paginatorList(messageData);
 		this.refreshData();
 	}
-	
+	/*Creating the dom element for message type filter*/
 	createMessageTypeFilter(){
 		var col = creEl("div", 'col');
 		var $this = this;
@@ -120,6 +134,7 @@ class Notification {
 		col.appendChild(messagetype)
 		return col;
 	}
+	/* Creating the DOM element for date filter like new and old */
 	createDateFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -144,6 +159,7 @@ class Notification {
 		})
 		return col;
 	}
+	/* Creating dom element for search filter*/
 	createSearchFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -160,6 +176,7 @@ class Notification {
 		col.appendChild(searchFilter)
 		return col;
 	}
+	/* Creating dom element for column based on column width*/
 	createCol(message, col_width){
 		var col_width = (col_width) ? col_width : 3;
 		var col = creEl("div", 'w-col w-col-'+col_width);
@@ -168,11 +185,13 @@ class Notification {
 		}
 		return col;
 	}
+	/*Creating bold text dom element*/
 	creBoldText(text){
 		var boldText = creEl('b', 'bold-text');
 		boldText.innerHTML = text;
 		return boldText;
 	}
+	/*Creating Read and unread icon for list page*/
 	getCheckedIcon(status){
 		var img = creEl('img', 'is_read_icon')
 		if(status){
@@ -183,6 +202,7 @@ class Notification {
 		img.src = src;
 		return img
 	}
+	/*Download the file with the help of file url*/
 	download(fileLink, fileName){
 		fetch(fileLink)
 		  .then(resp => resp.blob())
@@ -200,6 +220,7 @@ class Notification {
 		  })
 		  .catch(() => alert('oh no!'));
 	}
+	/*Display download file icon for detail and listing page*/
 	downLoadLinkIcon(fileLink, type=''){
 		var $this = this;
 		var fileName = fileLink
@@ -233,6 +254,7 @@ class Notification {
 		
 		return a;
 	}
+	/*Creating dom element for message list*/
 	craeteMessageList(){
 		var $this = this;
 		var messageList = creEl('div', 'message-list');
@@ -275,6 +297,7 @@ class Notification {
 		
 		return messageList;
 	}
+	/*Creating dom element message list header*/
 	createMessageTitle(){
 		var title = ['', 'Title', 'Type', 'Send As', 'Message', 'Date']
 		var row = creEl('div', 'w-row')
@@ -296,12 +319,14 @@ class Notification {
 		})
 		return row;
 	}
+	/*Refreshing the message list*/
 	refreshData(){
 		var notification = document.getElementById("notification");
 		notification.innerHTML = "";
 		this.makeMessageList();
 		
 	}
+	/*hide and show message list and details page*/
 	showListPage(){
 		var notificationFilter = document.getElementById("notification-filter");
 		var notification = document.getElementById("notification");
@@ -310,6 +335,7 @@ class Notification {
 		notification.style.display = 'block';
 		notificationDetails.style.display = 'none';
 	}
+	/*Creating back button dom element for */
 	detailPageBackButton(){
 		var $this = this;
 		var backButton = creEl('a', 'w-previous')
@@ -333,6 +359,7 @@ class Notification {
 		row.appendChild(col_2);
 		return row;
 	}*/
+	/*Foramated date for list and details page*/
 	formatedDate(dateString, type=''){
 		const monthText = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 		var date = new Date(dateString);
@@ -345,6 +372,7 @@ class Notification {
 		}
 		return newDate;
 	}
+	/* Creating DOM element for detail page */
 	detailPageContain(item){
 		var contain = creEl('div', 'detail-contain  w-row', 'detail-contain');
 		
@@ -402,6 +430,7 @@ class Notification {
 		
 		return contain;
 	}
+	/* API for make message unread to read */
 	readApiCall(messageId){
 		var data = {
 			 "objectId" : messageId
@@ -416,6 +445,7 @@ class Notification {
 			console.log('responseText', responseText)
 		}
 	}
+	/* Calling readAPI and manupulating current message data*/
 	makeRead(item){
 		/*API Call for read unread API*/
 		if(!item.is_read){
@@ -431,7 +461,8 @@ class Notification {
 		this.messageData = messageData;
 		this.displayUnreadMessage();
 		this.refreshData();
-	} 
+	}
+	/* Hide and show detail page and append the content */
 	displayDetailsPage(item){
 		var $this = this;
 		/*hide and show detail and list page*/
@@ -458,6 +489,7 @@ class Notification {
 
 		
 	}
+	/* Creating dom element pagination */
 	createPagination(){
 		var $this = this;
 		var pagination = creEl('div', 'w-pagination-wrapper', 'notification-body');
@@ -484,6 +516,7 @@ class Notification {
 		
 		return pagination;
 	}
+	/* Creating dom element for filter header */
 	makeMessageFilter(){
 		var notificationFilter = document.getElementById("notification-filter");
 		/*Filter*/
@@ -496,6 +529,7 @@ class Notification {
 		notificationHeader.appendChild(searchFilter);
 		notificationFilter.appendChild(notificationHeader);
 	}
+	/* Creating dom element for message list */
 	makeMessageList(){
 		var notification = document.getElementById("notification");
 		
@@ -516,6 +550,7 @@ class Notification {
 		notification.appendChild(pagination);
 		
 	}
+	/* Initialize iframe for view button */
 	initiateLightbox(){
 		console.log('testing');
 		[].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
@@ -529,6 +564,10 @@ class Notification {
 	}
 	
 }
+/**
+  * Class for Handling API for notification center
+  * @param webflowMemberId - MemberId
+  */
 class NotificationApi {
 	$isLoading = true;
 	$messageData = '';
