@@ -1,8 +1,5 @@
 /*Attendance JS*/
-/**
-  * Class for Handling API for notification center
-  * @param webflowMemberId - MemberId
-  */
+
 /**
  * 	
  * @param name - HTML element name
