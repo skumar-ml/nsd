@@ -1,10 +1,5 @@
 /*Attendance JS*/
 /**
-  * Class for Handling API for notification center
-  * @param webflowMemberId - MemberId
-  */
-var webflowMemberId = "639ab37fb372b500040c4053";
-/**
  * 	
  * @param name - HTML element name
  * @param className - HTML element class attribute
