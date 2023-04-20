@@ -1,5 +1,3 @@
-/*Attendance JS*/
-
 /**
  * 	
  * @param name - HTML element name
