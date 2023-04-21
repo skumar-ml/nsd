@@ -310,10 +310,11 @@ class selfCheckInForm {
 			
 			var col_3 = this.createCol('', 3);
 			var icon = $this.getCheckedIcon(item.isInstructorCheckin);
+			console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
-				if(!item.isInstructorCheckin){
-					if (confirm("Are you sure want to check-in") == true) {
-						$this.updateAttendanceData(item.studentemail, item.isInstructorCheckin);
+					var message = (item.attendanceId) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					if (confirm(message) == true) {
+						$this.updateAttendanceData(item.studentemail, item.isInstructorCheckin, item.attendanceId, item.isSelfCheckin);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -323,9 +324,6 @@ class selfCheckInForm {
 						}
 						$this.$incheckIn = !item.isICheckedIn */
 					}
-				}else{
-					alert('Already checked in')
-				}
 				
 			})
 			col_3.appendChild(icon);
@@ -350,8 +348,8 @@ class selfCheckInForm {
 		
 		//return studentlist;
 	}
-	updateAttendanceData(studentId, isInstructorCheckin){
-		this.callCheckedInApi(studentId, isInstructorCheckin);
+	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin){
+		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin);
 		var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
@@ -372,15 +370,18 @@ class selfCheckInForm {
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
-	callCheckedInApi(studentId, isInstructorCheckin){
+	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
 		var data = {
 		 "labId" : currentLab.labid,
-		 "isSelfCheckin": false,
+		 "isSelfCheckin": isSelfCheckin,
 		 "emailId":studentId,
 		 "isInstructorCheckin": !isInstructorCheckin,
 		 "instructorMemberId": this.webflowMemberId
+		}
+		if(attendanceId){
+			data.attendanceId = attendanceId;
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
