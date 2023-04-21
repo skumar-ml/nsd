@@ -19,7 +19,7 @@ class selfCheckInForm {
 	$currentLab = {};
 	constructor(webflowMemberId, labsData){
 		this.webflowMemberId = webflowMemberId;
-		this.labsData = labsData.labs;
+		this.labsData = labsData.Lab;
 		this.view();
 	}
 	
@@ -75,7 +75,10 @@ class selfCheckInForm {
 		btn.style.transition = 'all 2s';
 		var currentLab = this.labsData.find(item => item.id == labId);
 		this.$currentLab = currentLab;
-		if(labId && currentLab.isCheckedIn){
+		console.log(labId+"&&"+currentLab.isChecked)
+		console.log((labId && currentLab.isChecked))
+		if(labId && currentLab.isChecked){
+			console.log('already checked in')
 			let checkInIcon = this.getCheckInIcon();
 			btn.innerHTML = 'Checked-In';
 			btn.prepend(checkInIcon)
@@ -92,15 +95,19 @@ class selfCheckInForm {
 	callCheckedInApi(){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
-		if(!currentLab.isCheckedIn){
+		if(!currentLab.isChecked){
 			var checkInBtn = document.getElementById('check-in-btn');
 			checkInBtn.innerHTML = 'Processing....';
-			
+			var data = {
+			 "labId" : currentLab.id,
+			 "isSelfCheckin": true,
+			 "memberId": this.webflowMemberId
+			}
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getNotifications/"+$this.webflowMemberId, true)
+			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance", true)
 			xhr.withCredentials = false
-			xhr.send()
+			xhr.send(JSON.stringify(data))
 			xhr.onload = function() {
 				let responseText =  JSON.parse(xhr.responseText);
 				let checkInIcon = $this.getCheckInIcon();
@@ -118,7 +125,7 @@ class selfCheckInForm {
 		var labsData = this.labsData;
 		labsData.map(item => {
 			if(item.id == labsSelectBox.value){
-				item.isCheckedIn = true;
+				item.isChecked = true;
 			}
 			return item;
 		})
@@ -135,12 +142,12 @@ class LabsData {
 	getLabsData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getNotifications/"+$this.webflowMemberId, true)
+		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getStudentAttendance/"+$this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {
-			//let responseText =  JSON.parse(xhr.responseText);
-			let responseText =  JSON.parse('{"labs":[{"name":"Morning check-in","id":"1","isCheckedIn":false},{"name":"Evening check-in","id":"2","isCheckedIn":false},{"name":"Lab 1","id":"3","isCheckedIn":false},{"name":"Lab 2","id":"4","isCheckedIn":false}]}');
+			let responseText =  JSON.parse(xhr.responseText);
+			//let responseText =  JSON.parse('{"labs":[{"name":"Morning check-in","id":"1","isCheckedIn":false},{"name":"Evening check-in","id":"2","isCheckedIn":false},{"name":"Lab 1","id":"3","isCheckedIn":false},{"name":"Lab 2","id":"4","isCheckedIn":false}]}');
 			new selfCheckInForm($this.webflowMemberId, responseText); 			
 		}
 	}
