@@ -58,7 +58,7 @@ class selfCheckInForm {
 		var $this = this;
 		var col = creEl("div", 'col');
 		var label = creEl("label", 'form-field-label')
-		label.innerHTML = "Check-in";
+		label.innerHTML = "Instructor";
 		col.appendChild(label)
 		
 		var dateFilter = creEl('select', 'ins-checkin-filter w-select', 'ins-checkin-filter');
@@ -69,12 +69,12 @@ class selfCheckInForm {
 		//Newest
 		var newestoption = creEl("option");
 		newestoption.value = "true";
-		newestoption.text = "Yes";
+		newestoption.text = "CheckedIn";
 		dateFilter.appendChild(newestoption);
 		//oldest
 		var oldestoption = creEl("option");
 		oldestoption.value = "false";
-		oldestoption.text = "Not";
+		oldestoption.text = "Not Checked In";
 		dateFilter.appendChild(oldestoption);
 		col.appendChild(dateFilter)
 		dateFilter.addEventListener('change', function () {
@@ -85,12 +85,12 @@ class selfCheckInForm {
 	/* Creating the DOM element for date filter like new and old */
 	createStudentCheckInFilter(){
 		var $this = this;
-		var col = creEl("div", 'col hide');
+		var col = creEl("div", 'col');
 		var label = creEl("label", 'form-field-label')
 		label.innerHTML = "Student";
 		col.appendChild(label)
 		
-		var dateFilter = creEl('select', 'student-checkin-filter w-select ', 'student-checkin-filter');
+		var dateFilter = creEl('select', 'student-checkin-filter w-select', 'student-checkin-filter');
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
 		defaultoption.text = "Select";
@@ -162,10 +162,10 @@ class selfCheckInForm {
 		console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
 			console.log('insCheckinFilter sss')
-			studentData = studentData.filter(item => item.incheckIn.toString() == insCheckinFilter.value)
+			studentData = studentData.filter(item => item.isInstructorCheckin.toString() == insCheckinFilter.value)
 		}
 		if(studentCheckinFilter.value){
-			studentData = studentData.filter(item => item.incheckIn.toString() == studentCheckinFilter.value)
+			studentData = studentData.filter(item => item.isSelfCheckin.toString() == studentCheckinFilter.value)
 		}
 		
 		if(searchFilter.value){
@@ -256,8 +256,8 @@ class selfCheckInForm {
 	}
 	/*Creating dom element message list header*/
 	createAttendanceTitle(){
-		//var title = ['Student Name', 'Student', 'Instructor']
-		var title = ['Student Name', 'Check-in']
+		var title = ['Student Name', 'Student', 'Instructor']
+		//var title = ['Student Name', 'Check-in']
 		var row = creEl('div', 'w-row student-list-head', 'student-list-head')
 		title.forEach(item=> {
 			var col_width = 3
@@ -300,20 +300,20 @@ class selfCheckInForm {
 			var col_1 = this.createCol(item.studentname,6);
 			row.appendChild(col_1);
 			
-			/* Need to add again */
-			/*var col_2 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.incheckIn);
+			
+			var col_2 = this.createCol('', 3);
+			var icon = $this.getCheckedIcon(item.isSelfCheckin);
 			col_2.appendChild(icon);
 			
 			row.appendChild(col_2);
-			studentlist.appendChild(row)*/
+			studentlist.appendChild(row)
 			
 			var col_3 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.incheckIn);
+			var icon = $this.getCheckedIcon(item.isInstructorCheckin);
 			icon.addEventListener('click', function(){
-				if(!item.incheckIn){
+				if(!item.isInstructorCheckin){
 					if (confirm("Are you sure want to check-in") == true) {
-						$this.updateAttendanceData(item.studentemail, item.incheckIn);
+						$this.updateAttendanceData(item.studentemail, item.isInstructorCheckin);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -350,14 +350,14 @@ class selfCheckInForm {
 		
 		//return studentlist;
 	}
-	updateAttendanceData(studentId, incheckIn){
-		this.callCheckedInApi(studentId, incheckIn);
+	updateAttendanceData(studentId, isInstructorCheckin){
+		this.callCheckedInApi(studentId, isInstructorCheckin);
 		var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
 				currentLab.studentDeatils.map(sItem => {
 					if(sItem.studentemail == studentId){
-						sItem.incheckIn = !incheckIn;
+						sItem.isInstructorCheckin = !isInstructorCheckin;
 					}
 					return sItem;
 				})
@@ -372,14 +372,14 @@ class selfCheckInForm {
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
-	callCheckedInApi(studentId, incheckIn){
+	callCheckedInApi(studentId, isInstructorCheckin){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
 		var data = {
 		 "labId" : currentLab.labid,
 		 "isSelfCheckin": false,
 		 "emailId":studentId,
-		 "isInstructorCheckin": !incheckIn,
+		 "isInstructorCheckin": !isInstructorCheckin,
 		 "instructorMemberId": this.webflowMemberId
 		}
 		var xhr = new XMLHttpRequest()
