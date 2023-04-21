@@ -18,9 +18,10 @@ function creEl(name,className,idName){
 class selfCheckInForm {
 	$currentLab = {};
 	$currentLabStudent = {};
+	$incheckIn = false;
 	constructor(webflowMemberId, labsData){
 		this.webflowMemberId = webflowMemberId;
-		this.labsData = labsData.labs;
+		this.labsData = labsData.Lab;
 		this.view();
 	}
 	/*Creating pagination array object*/
@@ -41,12 +42,23 @@ class selfCheckInForm {
 			data: paginatedItems
 		};
 	}
+	
+	resetFilter(){
+		var studentData = this.$currentLab.studentDeatils;
+		
+		var insCheckinFilter = document.getElementById("ins-checkin-filter");
+		
+		var studentCheckinFilter = document.getElementById("student-checkin-filter");
+		studentData.value = "";
+		insCheckinFilter.value = "";
+		studentCheckinFilter.value = "";
+	}
 	/* Creating the DOM element for date filter like new and old */
 	createInstructorCheckInFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
 		var label = creEl("label", 'form-field-label')
-		label.innerHTML = "Instructor";
+		label.innerHTML = "Check-in";
 		col.appendChild(label)
 		
 		var dateFilter = creEl('select', 'ins-checkin-filter w-select', 'ins-checkin-filter');
@@ -57,12 +69,12 @@ class selfCheckInForm {
 		//Newest
 		var newestoption = creEl("option");
 		newestoption.value = "true";
-		newestoption.text = "CheckedIn";
+		newestoption.text = "Yes";
 		dateFilter.appendChild(newestoption);
 		//oldest
 		var oldestoption = creEl("option");
 		oldestoption.value = "false";
-		oldestoption.text = "Not Checked In";
+		oldestoption.text = "Not";
 		dateFilter.appendChild(oldestoption);
 		col.appendChild(dateFilter)
 		dateFilter.addEventListener('change', function () {
@@ -73,12 +85,12 @@ class selfCheckInForm {
 	/* Creating the DOM element for date filter like new and old */
 	createStudentCheckInFilter(){
 		var $this = this;
-		var col = creEl("div", 'col');
+		var col = creEl("div", 'col hide');
 		var label = creEl("label", 'form-field-label')
 		label.innerHTML = "Student";
 		col.appendChild(label)
 		
-		var dateFilter = creEl('select', 'student-checkin-filter w-select', 'student-checkin-filter');
+		var dateFilter = creEl('select', 'student-checkin-filter w-select ', 'student-checkin-filter');
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
 		defaultoption.text = "Select";
@@ -139,7 +151,7 @@ class selfCheckInForm {
 	/*Filter api response based on current seleted filter value*/
 	filterstudentData(){
 		//this.studentData = this.filterData;
-		var studentData = this.$currentLab.student;
+		var studentData = this.$currentLab.studentDeatils;
 		
 		var insCheckinFilter = document.getElementById("ins-checkin-filter");
 		
@@ -150,17 +162,17 @@ class selfCheckInForm {
 		console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
 			console.log('insCheckinFilter sss')
-			studentData = studentData.filter(item => item.isICheckedIn.toString() == insCheckinFilter.value)
+			studentData = studentData.filter(item => item.incheckIn.toString() == insCheckinFilter.value)
 		}
 		if(studentCheckinFilter.value){
-			studentData = studentData.filter(item => item.isCheckedIn.toString() == studentCheckinFilter.value)
+			studentData = studentData.filter(item => item.incheckIn.toString() == studentCheckinFilter.value)
 		}
 		
 		if(searchFilter.value){
 			var search = searchFilter.value;
 			var condition = new RegExp(search, 'i');
 			studentData = studentData.filter(function (el) {
-			  return condition.test(el.name);
+			  return condition.test(el.studentname);
 			});
 		}
 		console.log('studentData', studentData)
@@ -209,6 +221,10 @@ class selfCheckInForm {
 		var studentlist = creEl("div", 'student-list', 'student-list');
 		col.appendChild(studentlist)
 		
+		var noRecord = creEl('p', 'no-record', 'no-record');
+		noRecord.innerHTML = 'No record found';
+		col.appendChild(noRecord)
+		
 		var pagination = creEl("div", "pagination-student-list", 'pagination-student-list')
 		col.appendChild(pagination)
 		
@@ -226,20 +242,22 @@ class selfCheckInForm {
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
-				option.value = item.id;
-				option.text = item.name;
+				option.value = item.labid;
+				option.text = item.labname;
 				labsSelectBox.appendChild(option);
 		})
 		
 		labsSelectBox.addEventListener('change', function () {
 			$this.displayStudentList(this.value, 'init');
+			$this.resetFilter();
 		})
 		
 		return labsSelectBox;
 	}
 	/*Creating dom element message list header*/
 	createAttendanceTitle(){
-		var title = ['Student Name', 'Student', 'Instructor']
+		//var title = ['Student Name', 'Student', 'Instructor']
+		var title = ['Student Name', 'Check-in']
 		var row = creEl('div', 'w-row student-list-head', 'student-list-head')
 		title.forEach(item=> {
 			var col_width = 3
@@ -268,9 +286,9 @@ class selfCheckInForm {
 		var studentlist = document.getElementById('student-list');
 		studentlist.innerHTML = "";
 		var $this = this;
-		var currentLab = this.labsData.find(item => item.id == labId);
+		var currentLab = this.labsData.find(item => item.labid == labId);
 		if(type == 'init'){
-			var currentLabStudent = this.paginatorList(currentLab.student)
+			var currentLabStudent = this.paginatorList(currentLab.studentDeatils)
 		}else{
 			var currentLabStudent = this.$currentLabStudent
 		}
@@ -279,23 +297,34 @@ class selfCheckInForm {
 		currentLabStudent.data.forEach((item, index) => {
 			var row = creEl('div', 'w-row')
 			
-			var col_1 = this.createCol(item.name,6);
+			var col_1 = this.createCol(item.studentname,6);
 			row.appendChild(col_1);
 			
-			
-			var col_2 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.isCheckedIn);
+			/* Need to add again */
+			/*var col_2 = this.createCol('', 3);
+			var icon = $this.getCheckedIcon(item.incheckIn);
 			col_2.appendChild(icon);
 			
 			row.appendChild(col_2);
-			studentlist.appendChild(row)
+			studentlist.appendChild(row)*/
 			
 			var col_3 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.isICheckedIn);
+			var icon = $this.getCheckedIcon(item.incheckIn);
 			icon.addEventListener('click', function(){
-				if (confirm("Are you sure want to check-in") == true) {
-					$this.updateAttendanceData(item.id);
-					icon.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a83485b6551a71e5b7e12_dd-check.png";
+				if(!item.incheckIn){
+					if (confirm("Are you sure want to check-in") == true) {
+						$this.updateAttendanceData(item.studentemail, item.incheckIn);
+						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
+						$this.$incheckIn = item.isICheckedIn
+						if($this.$incheckIn){
+							icon.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a83485b6551a71e5b7e12_dd-check.png";
+						}else{
+							icon.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a834899a0eb5204d6dafd_dd-cross.png";
+						}
+						$this.$incheckIn = !item.isICheckedIn */
+					}
+				}else{
+					alert('Already checked in')
 				}
 				
 			})
@@ -307,6 +336,12 @@ class selfCheckInForm {
 			studentlist.appendChild(row)
 		})
 		
+		var noRecord = document.getElementById('no-record');
+		if(currentLabStudent.data.length > 0){
+			noRecord.style.display = 'none';
+		}else{
+			noRecord.style.display = 'block';
+		} 
 		//Pagination
 		var paginationStuList = document.getElementById('pagination-student-list');
 		paginationStuList.innerHTML = "";
@@ -315,61 +350,62 @@ class selfCheckInForm {
 		
 		//return studentlist;
 	}
-	updateAttendanceData(studentId){
+	updateAttendanceData(studentId, incheckIn){
+		this.callCheckedInApi(studentId, incheckIn);
 		var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
-				currentLab.student.map(sItem => {
-					if(sItem.id == studentId){
-						sItem.isICheckedIn = true;
+				currentLab.studentDeatils.map(sItem => {
+					if(sItem.studentemail == studentId){
+						sItem.incheckIn = !incheckIn;
 					}
 					return sItem;
 				})
 		//})
 		console.log('currentLab', currentLab)
 		this.$currentLab = currentLab
-		this.$currentLabStudent = this.paginatorList(currentLab.student);
+		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils);
+		this.refreshData();
 	}
 	getCheckInIcon(){
 		var img = creEl('img', 'checkedInIcon')
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
-	callCheckedInApi(){
+	callCheckedInApi(studentId, incheckIn){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
-		if(!currentLab.isCheckedIn){
-			var checkInBtn = document.getElementById('check-in-btn');
-			checkInBtn.innerHTML = 'Processing....';
-			
-			var xhr = new XMLHttpRequest()
-			var $this = this;
-			xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getNotifications/"+$this.webflowMemberId, true)
-			xhr.withCredentials = false
-			xhr.send()
-			xhr.onload = function() {
-				let responseText =  JSON.parse(xhr.responseText);
-				let checkInIcon = $this.getCheckInIcon();
-				checkInBtn.innerHTML = 'CheckedIn';
-				checkInBtn.prepend(checkInIcon)
-				$this.updateCurrentData();
-			}
-		}else{
-			alert("You have already checkin for this lab");
+		var data = {
+		 "labId" : currentLab.labid,
+		 "isSelfCheckin": false,
+		 "emailId":studentId,
+		 "isInstructorCheckin": !incheckIn,
+		 "instructorMemberId": this.webflowMemberId
 		}
+		var xhr = new XMLHttpRequest()
+		var $this = this;
+		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance/", true)
+		xhr.withCredentials = false
+		xhr.send(JSON.stringify(data))
+		xhr.onload = function() {
+			let responseText =  JSON.parse(xhr.responseText);
+			console.log('responseText', responseText)
+			//$this.updateCurrentData();
+		}
+		
 	}
-	updateCurrentData(){
+	/*updateCurrentData(){
 		var labsSelectBox = document.getElementById('select-labs');
 		console.log('labsSelectBox.value', labsSelectBox.value)
 		var labsData = this.labsData;
 		labsData.map(item => {
 			if(item.id == labsSelectBox.value){
-				item.isCheckedIn = true;
+				item.incheckIn = true;
 			}
 			return item;
 		})
 		this.labsData = labsData;
-	}
+	}*/
 	/* Creating dom element pagination */
 	createPagination(){
 		var $this = this;
@@ -380,7 +416,7 @@ class selfCheckInForm {
 			var preBtn = creEl('a', 'w-pagination-previous');
 			preBtn.innerHTML = '< Previous';
 			preBtn.addEventListener('click', function () {
-				$this.$currentLabStudent = $this.paginatorList($this.$currentLab.student, $this.$currentLabStudent.pre_page);
+				$this.$currentLabStudent = $this.paginatorList($this.$currentLab.studentDeatils, $this.$currentLabStudent.pre_page);
 				$this.refreshData();
 			})
 			pagination.appendChild(preBtn);
@@ -390,7 +426,7 @@ class selfCheckInForm {
 			var nextBtn = creEl('a', 'w-pagination-next');
 			nextBtn.innerHTML = 'Next >';
 			nextBtn.addEventListener('click', function () {
-				$this.$currentLabStudent = $this.paginatorList($this.$currentLab.student, $this.$currentLabStudent.next_page);
+				$this.$currentLabStudent = $this.paginatorList($this.$currentLab.studentDeatils, $this.$currentLabStudent.next_page);
 				$this.refreshData();
 			})
 			pagination.appendChild(nextBtn);
@@ -417,12 +453,12 @@ class LabsData {
 	getLabsData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getNotifications/"+$this.webflowMemberId, true)
+		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getStudentAttendance/"+$this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {
-			//let responseText =  JSON.parse(xhr.responseText);
-			let responseText =  JSON.parse('{"labs":[{"name":"Lab 1","id":"97427492749274927342","student":[{"name":"Yogesh Yadav","id":"1","isCheckedIn":true,"isICheckedIn":false},{"name":"Dev Narayan","id":"2","isCheckedIn":false,"isICheckedIn":false},{"name":"Rahul","id":"2","isCheckedIn":false,"isICheckedIn":false},{"name":"Aryan","id":"3","isCheckedIn":true,"isICheckedIn":false},{"name":"Drishti","id":"4","isCheckedIn":false,"isICheckedIn":false},{"name":"Abha","id":"5","isCheckedIn":false,"isICheckedIn":false},{"name":"shiv","id":"6","isCheckedIn":true,"isICheckedIn":false},{"name":"ajay","id":"7","isCheckedIn":false,"isICheckedIn":false},{"name":"ram","id":"8","isCheckedIn":false,"isICheckedIn":false}]},{"name":"Lab 2","id":"97427492749274927333","student":[{"name":"aryan","id":"9","isCheckedIn":false,"isICheckedIn":false},{"name":"devendra","id":"10","isCheckedIn":true,"isICheckedIn":false},{"name":"Shubham","id":"11","isCheckedIn":false,"isICheckedIn":false},{"name":"rahul","id":"12","isCheckedIn":false,"isICheckedIn":false},{"name":"mukesh","id":"13","isCheckedIn":true,"isICheckedIn":false},{"name":"manju","id":"14","isCheckedIn":false,"isICheckedIn":false},{"name":"sourabh","id":"15","isCheckedIn":false,"isICheckedIn":false},{"name":"sheetal","id":"16","isCheckedIn":false,"isICheckedIn":false},{"name":"samir","id":"17","isCheckedIn":false,"isICheckedIn":false},{"name":"akhil","id":"18","isCheckedIn":true,"isICheckedIn":false},{"name":"rahi","id":"19","isCheckedIn":false,"isICheckedIn":false},{"name":"ram","id":"20","isCheckedIn":true,"isICheckedIn":false}]}]}');
+			let responseText =  JSON.parse(xhr.responseText);
+			//let responseText =  JSON.parse('{"labs":[{"name":"Lab 1","id":"97427492749274927342","student":[{"name":"Yogesh Yadav","id":"1","incheckIn":true,"isICheckedIn":false},{"name":"Dev Narayan","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Rahul","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Aryan","id":"3","incheckIn":true,"isICheckedIn":false},{"name":"Drishti","id":"4","incheckIn":false,"isICheckedIn":false},{"name":"Abha","id":"5","incheckIn":false,"isICheckedIn":false},{"name":"shiv","id":"6","incheckIn":true,"isICheckedIn":false},{"name":"ajay","id":"7","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"8","incheckIn":false,"isICheckedIn":false}]},{"name":"Lab 2","id":"97427492749274927333","student":[{"name":"aryan","id":"9","incheckIn":false,"isICheckedIn":false},{"name":"devendra","id":"10","incheckIn":true,"isICheckedIn":false},{"name":"Shubham","id":"11","incheckIn":false,"isICheckedIn":false},{"name":"rahul","id":"12","incheckIn":false,"isICheckedIn":false},{"name":"mukesh","id":"13","incheckIn":true,"isICheckedIn":false},{"name":"manju","id":"14","incheckIn":false,"isICheckedIn":false},{"name":"sourabh","id":"15","incheckIn":false,"isICheckedIn":false},{"name":"sheetal","id":"16","incheckIn":false,"isICheckedIn":false},{"name":"samir","id":"17","incheckIn":false,"isICheckedIn":false},{"name":"akhil","id":"18","incheckIn":true,"isICheckedIn":false},{"name":"rahi","id":"19","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"20","incheckIn":true,"isICheckedIn":false}]}]}');
 			new selfCheckInForm($this.webflowMemberId, responseText); 			
 		}
 	}
