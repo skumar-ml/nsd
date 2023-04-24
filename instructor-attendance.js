@@ -312,7 +312,7 @@ class selfCheckInForm {
 			var icon = $this.getCheckedIcon(item.isInstructorCheckin);
 			console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
-					var message = (item.attendanceId) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					var message = (item.isInstructorCheckin) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
 					if (confirm(message) == true) {
 						$this.updateAttendanceData(item.studentemail, item.isInstructorCheckin, item.attendanceId, item.isSelfCheckin);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
