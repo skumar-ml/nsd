@@ -101,6 +101,18 @@ class AccordionForm {
 					}
 				   formLink.append(span)
 				   li.append(formLink);
+				   
+				   /* Resubmission allow based db condition form code*/
+				   if(cForm.is_resubmission && (editable && this.$isLiveProgram && cForm.is_editable)){
+					var resubmissionFormLink=creEl('a');
+					resubmissionFormLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
+					resubmissionFormLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+					var span2=creEl('span', 'resubmit_text');
+					span2.innerHTML = "Resubmit";
+					resubmissionFormLink.append(span2)
+					li.append(resubmissionFormLink);
+				    }
+				   
 				   ul.appendChild(li);
 				   if(is_live){
 				    $this.$totalForm++;
