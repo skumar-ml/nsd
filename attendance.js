@@ -44,7 +44,7 @@ class selfCheckInForm {
 		var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
-		defaultoption.text = "Select Labs";
+		defaultoption.text = "Select activity to check-in";
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
