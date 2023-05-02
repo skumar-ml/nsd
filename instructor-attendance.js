@@ -236,17 +236,22 @@ class selfCheckInForm {
 		var $this = this;
 		var labs = this.labsData;
 		var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
-		var defaultoption = creEl("option");
+		/*Added by default first lab and removed select labs option*/
+		/*var defaultoption = creEl("option");
 		defaultoption.value = "";
 		defaultoption.text = "Select Labs";
-		labsSelectBox.appendChild(defaultoption);
+		labsSelectBox.appendChild(defaultoption);*/
 		labs.forEach(item => {
 			var option = creEl("option");
 				option.value = item.labid;
 				option.text = item.labname;
 				labsSelectBox.appendChild(option);
 		})
-		
+		/*Showing by default first labs*/
+		setTimeout(function() {
+			$this.displayStudentList(labs[0].labid, 'init');
+			$this.resetFilter();
+		}, 0);
 		labsSelectBox.addEventListener('change', function () {
 			$this.displayStudentList(this.value, 'init');
 			$this.resetFilter();
