@@ -14,8 +14,12 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
-
-class selfCheckInForm {
+/**
+ * Class for handling instructor checkInForm form
+ * @param webflowMemberId - memberId
+ * @param messageData - instructor checkInForm data by API
+ */
+class checkInForm {
 	$currentLab = {};
 	$currentLabStudent = {};
 	$incheckIn = false;
@@ -42,7 +46,7 @@ class selfCheckInForm {
 			data: paginatedItems
 		};
 	}
-	
+	// clear filter select box data
 	resetFilter(){
 		var studentData = this.$currentLab.studentDeatils;
 		
@@ -53,7 +57,7 @@ class selfCheckInForm {
 		insCheckinFilter.value = "";
 		studentCheckinFilter.value = "";
 	}
-	/* Creating the DOM element for date filter like new and old */
+	/* Creating the DOM element for instructor checked in */
 	createInstructorCheckInFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -82,7 +86,7 @@ class selfCheckInForm {
 		})
 		return col;
 	}
-	/* Creating the DOM element for date filter like new and old */
+	/* Creating the DOM element for student checked in */
 	createStudentCheckInFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -200,6 +204,7 @@ class selfCheckInForm {
 		img.src = src;
 		return img
 	}
+	/* Display Labs select box for instructor */
 	view(){
 		var accordionDiv = document.getElementById("instructor-attendance");
 		var row = creEl('div', 'w-row ');
@@ -231,6 +236,7 @@ class selfCheckInForm {
 		row.appendChild(col)
 		accordionDiv.appendChild(row);
 	}
+	/* Get labs select box dom element */
 	getLabs(){
 		
 		var $this = this;
@@ -276,6 +282,7 @@ class selfCheckInForm {
 		})
 		return row;
 	}
+	/*Creating DOM element for student list*/
 	displayStudentList(labId, type=''){
 		
 		var opacity = (labId) ? 1 : 0;
@@ -353,6 +360,7 @@ class selfCheckInForm {
 		
 		//return studentlist;
 	}
+	/*Update current attendance data*/
 	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin){
 		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin);
 		var labsData = this.labsData;
@@ -370,11 +378,13 @@ class selfCheckInForm {
 		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils);
 		this.refreshData();
 	}
+	/*Get tick icon for checked in*/
 	getCheckInIcon(){
 		var img = creEl('img', 'checkedInIcon')
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
+	/*API call for checked in*/
 	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
@@ -440,6 +450,7 @@ class selfCheckInForm {
 		
 		return pagination;
 	}
+	/*Refresh currrnt student list data*/
 	refreshData(){
 		var studentlist = document.getElementById('student-list');
 		var paginationStuList = document.getElementById('pagination-student-list');
@@ -449,6 +460,10 @@ class selfCheckInForm {
 		this.displayStudentList(labsSelectBox.value);
 	}
 }
+/**
+  * Class for Handling API for Labs Data
+  * @param webflowMemberId - MemberId
+  */
 class LabsData {
 	$isLoading = true;
 	$studentData = '';
@@ -465,7 +480,7 @@ class LabsData {
 		xhr.onload = function() {
 			let responseText =  JSON.parse(xhr.responseText);
 			//let responseText =  JSON.parse('{"labs":[{"name":"Lab 1","id":"97427492749274927342","student":[{"name":"Yogesh Yadav","id":"1","incheckIn":true,"isICheckedIn":false},{"name":"Dev Narayan","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Rahul","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Aryan","id":"3","incheckIn":true,"isICheckedIn":false},{"name":"Drishti","id":"4","incheckIn":false,"isICheckedIn":false},{"name":"Abha","id":"5","incheckIn":false,"isICheckedIn":false},{"name":"shiv","id":"6","incheckIn":true,"isICheckedIn":false},{"name":"ajay","id":"7","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"8","incheckIn":false,"isICheckedIn":false}]},{"name":"Lab 2","id":"97427492749274927333","student":[{"name":"aryan","id":"9","incheckIn":false,"isICheckedIn":false},{"name":"devendra","id":"10","incheckIn":true,"isICheckedIn":false},{"name":"Shubham","id":"11","incheckIn":false,"isICheckedIn":false},{"name":"rahul","id":"12","incheckIn":false,"isICheckedIn":false},{"name":"mukesh","id":"13","incheckIn":true,"isICheckedIn":false},{"name":"manju","id":"14","incheckIn":false,"isICheckedIn":false},{"name":"sourabh","id":"15","incheckIn":false,"isICheckedIn":false},{"name":"sheetal","id":"16","incheckIn":false,"isICheckedIn":false},{"name":"samir","id":"17","incheckIn":false,"isICheckedIn":false},{"name":"akhil","id":"18","incheckIn":true,"isICheckedIn":false},{"name":"rahi","id":"19","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"20","incheckIn":true,"isICheckedIn":false}]}]}');
-			new selfCheckInForm($this.webflowMemberId, responseText); 			
+			new checkInForm($this.webflowMemberId, responseText); 			
 		}
 	}
 }
