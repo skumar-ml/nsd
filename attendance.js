@@ -14,7 +14,11 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
-
+/**
+ * Class for handling self CheckIn
+ * @param webflowMemberId - memberId
+ * @param labsData - labs data by API
+ */
 class selfCheckInForm {
 	$currentLab = {};
 	constructor(webflowMemberId, labsData){
@@ -22,24 +26,28 @@ class selfCheckInForm {
 		this.labsData = labsData.Lab;
 		this.view();
 	}
-	
+	/*Display Self checkin form*/
 	view(){
+		// Get Parent Div
 		var accordionDiv = document.getElementById("attendanceSelfCheckIn");
+		// Create parent row div
 		var row = creEl('div', 'w-row ');
 		
 		var col = creEl("div", 'w-col-12 checkin-row');
+		// Get labs data
 		var labData = this.getLabs();
 		col.appendChild(labData)
-		
+		// Get Self checkin button
 		var checkInBtn = this.getCheckInBtn();
 		col.appendChild(checkInBtn)
 		
 		row.appendChild(col)
 		accordionDiv.appendChild(row);
 	}
+	// Create labs select box html element 
 	getLabs(){
-		
 		var $this = this;
+		// Get all labs data
 		var labs = this.labsData;
 		var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
 		var defaultoption = creEl("option");
@@ -59,6 +67,7 @@ class selfCheckInForm {
 		
 		return labsSelectBox;
 	}
+	// Create default checked button html element
 	getCheckInBtn(){
 		var $this = this;
 		var checkInBtn = creEl('button', 'main-button red w-button check-in-btn', 'check-in-btn');
@@ -68,6 +77,7 @@ class selfCheckInForm {
 		})
 		return checkInBtn;
 	}
+	// Display checked in button on lab change
 	displayCheckInBtn(labId){
 		var opacity = (labId) ? 1 : 0;
 		var btn = document.getElementsByClassName('check-in-btn')[0];
@@ -87,11 +97,13 @@ class selfCheckInForm {
 		}
 		
 	}
+	// get checkin tick icon
 	getCheckInIcon(){
 		var img = creEl('img', 'checkedInIcon')
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
+	// API call for daily checked in
 	callCheckedInApi(){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
@@ -119,6 +131,7 @@ class selfCheckInForm {
 			alert("You have already checkin for this lab");
 		}
 	}
+	// After checked in update local data
 	updateCurrentData(){
 		var labsSelectBox = document.getElementById('select-labs');
 		console.log('labsSelectBox.value', labsSelectBox.value)
@@ -132,6 +145,10 @@ class selfCheckInForm {
 		this.labsData = labsData;
 	}
 }
+/**
+  * Class for Handling API for LabsData
+  * @param webflowMemberId - MemberId
+  */
 class LabsData {
 	$isLoading = true;
 	$messageData = '';
