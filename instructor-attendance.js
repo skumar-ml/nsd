@@ -26,6 +26,7 @@ class checkInForm {
 	constructor(webflowMemberId, labsData){
 		this.webflowMemberId = webflowMemberId;
 		this.labsData = labsData.Lab;
+		this.timezones = labsData.timezones;
 		this.view();
 	}
 	/*Creating pagination array object*/
@@ -162,10 +163,10 @@ class checkInForm {
 		var studentCheckinFilter = document.getElementById("student-checkin-filter");
 		
 		var searchFilter = document.getElementById("search-filter");
-		console.log('studentData', studentData)
-		console.log('insCheckinFilter.value', insCheckinFilter.value)
+		//console.log('studentData', studentData)
+		//console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
-			console.log('insCheckinFilter sss')
+			//console.log('insCheckinFilter sss')
 			studentData = studentData.filter(item => item.isInstructorCheckin.toString() == insCheckinFilter.value)
 		}
 		if(studentCheckinFilter.value){
@@ -179,7 +180,7 @@ class checkInForm {
 			  return condition.test(el.studentname);
 			});
 		}
-		console.log('studentData', studentData)
+		//console.log('studentData', studentData)
 		this.$currentLab = studentData;
 		this.$currentLabStudent = this.paginatorList(studentData)
 		this.refreshData();
@@ -212,6 +213,11 @@ class checkInForm {
 		var col = creEl("div", 'w-col-12 checkin-row');
 		var labData = this.getLabs();
 		col.appendChild(labData)
+		
+		
+		//timezone 
+		var getTimeZones = this.getTimeZones();
+		col.appendChild(getTimeZones)
 		
 		var studentlistfilter = creEl("div", 'student-list-filter', 'student-list-filter');
 		var filter = this.makeAttendanceFilter();
@@ -265,6 +271,25 @@ class checkInForm {
 		
 		return labsSelectBox;
 	}
+	// Create labs select box html element 
+	getTimeZones(){
+		var $this = this;
+		// Get all labs data
+		var labs = this.timezones;
+		var labsSelectBox = creEl('select', 'select-timezones w-select', 'select-timezone')
+		labs.forEach(item => {
+			var option = creEl("option");
+				option.value = item.timezoneId;
+				option.text = item.timezone;
+				labsSelectBox.appendChild(option);
+		})
+		
+		labsSelectBox.addEventListener('change', function () {
+			//$this.displayCheckInBtn(this.value);
+		})
+		
+		return labsSelectBox;
+	}
 	/*Creating dom element message list header*/
 	createAttendanceTitle(){
 		var title = ['Student Name', 'Student', 'Instructor']
@@ -306,27 +331,35 @@ class checkInForm {
 		}
 		this.$currentLab = currentLab;
 		this.$currentLabStudent = currentLabStudent;
+		
+		var timeZoneOpacity = (currentLab.typeId != 4) ? 1 : 0;
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		timeZoneSelect.style.opacity = timeZoneOpacity;
+		
 		currentLabStudent.data.forEach((item, index) => {
 			var row = creEl('div', 'w-row')
 			
 			var col_1 = this.createCol(item.studentname,6);
 			row.appendChild(col_1);
-			
-			
+
+			var selectTimezone = item.selfCheckin.find(data => data.timezoneId == timeZoneSelect.value)
+
+			var selectInsTimezone = item.instructorCheckin.find(data => data.timezoneId == timeZoneSelect.value)
+			console.log('selectTimezone', selectTimezone)
 			var col_2 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.isSelfCheckin);
+			var icon = $this.getCheckedIcon((selectTimezone && selectTimezone.isSelfCheckin) ? selectTimezone.isSelfCheckin : false);
 			col_2.appendChild(icon);
 			
 			row.appendChild(col_2);
 			studentlist.appendChild(row)
 			
 			var col_3 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon(item.isInstructorCheckin);
-			console.log('item.attendanceId', item.attendanceId)
+			var icon = $this.getCheckedIcon( (selectInsTimezone && selectInsTimezone.isInstructorCheckin) ? selectInsTimezone.isInstructorCheckin : false);
+			//console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
-					var message = (item.isInstructorCheckin) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					var message = (selectInsTimezone && selectInsTimezone.isInstructorCheckin) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
 					if (confirm(message) == true) {
-						$this.updateAttendanceData(item.studentemail, item.isInstructorCheckin, item.attendanceId, item.isSelfCheckin);
+						$this.updateAttendanceData(item.studentemail, selectInsTimezone.isInstructorCheckin, item.attendanceId, item.isSelfCheckin, timeZoneSelect.value);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -361,19 +394,34 @@ class checkInForm {
 		//return studentlist;
 	}
 	/*Update current attendance data*/
-	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin){
-		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin);
+	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId){
+		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId);
 		var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
 				currentLab.studentDeatils.map(sItem => {
 					if(sItem.studentemail == studentId){
-						sItem.isInstructorCheckin = !isInstructorCheckin;
+						//sItem.isInstructorCheckin = !isInstructorCheckin;
+						sItem.instructorCheckin
+						var selectTimezone = sItem.instructorCheckin.find(data => data.timezoneId == timezoneId)
+						if(selectTimezone){
+							sItem.instructorCheckin.map(data => {
+								if(data.timezoneId == timezoneId){
+									data.isInstructorCheckin = !isInstructorCheckin;
+								}
+								return data;
+							})
+						}else{
+							var checkdata = {};
+							checkdata.isInstructorCheckin = !isInstructorCheckin;
+							checkdata.timezoneId = timezoneId;
+							sItem.instructorCheckin.push(checkdata);
+						}
 					}
 					return sItem;
 				})
 		//})
-		console.log('currentLab', currentLab)
+		console.log('currentLabqqq', currentLab)
 		this.$currentLab = currentLab
 		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils);
 		this.refreshData();
@@ -385,7 +433,7 @@ class checkInForm {
 		return img
 	}
 	/*API call for checked in*/
-	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin){
+	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin, timezoneId){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
 		var data = {
@@ -393,11 +441,14 @@ class checkInForm {
 		 "isSelfCheckin": isSelfCheckin,
 		 "emailId":studentId,
 		 "isInstructorCheckin": !isInstructorCheckin,
-		 "instructorMemberId": this.webflowMemberId
+		 "instructorMemberId": this.webflowMemberId,
+		 "timezoneId": parseInt(timezoneId)
 		}
 		if(attendanceId){
 			data.attendanceId = attendanceId;
 		}
+		console.log('data', data)
+		return;
 		var xhr = new XMLHttpRequest()
 		var $this = this;
 		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance/", true)
@@ -405,7 +456,7 @@ class checkInForm {
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function() {
 			let responseText =  JSON.parse(xhr.responseText);
-			console.log('responseText', responseText)
+			//console.log('responseText', responseText)
 			//$this.updateCurrentData();
 		}
 		
@@ -427,7 +478,7 @@ class checkInForm {
 		var $this = this;
 		var pagination = creEl('div', 'w-pagination-wrapper', 'notification-body');
 		/*Previous Button*/
-		console.log('this.$currentLabStudent', this.$currentLabStudent)
+		//console.log('this.$currentLabStudent', this.$currentLabStudent)
 		if(this.$currentLabStudent.pre_page != null){
 			var preBtn = creEl('a', 'w-pagination-previous');
 			preBtn.innerHTML = '< Previous';
@@ -479,7 +530,6 @@ class LabsData {
 		xhr.send()
 		xhr.onload = function() {
 			let responseText =  JSON.parse(xhr.responseText);
-			//let responseText =  JSON.parse('{"labs":[{"name":"Lab 1","id":"97427492749274927342","student":[{"name":"Yogesh Yadav","id":"1","incheckIn":true,"isICheckedIn":false},{"name":"Dev Narayan","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Rahul","id":"2","incheckIn":false,"isICheckedIn":false},{"name":"Aryan","id":"3","incheckIn":true,"isICheckedIn":false},{"name":"Drishti","id":"4","incheckIn":false,"isICheckedIn":false},{"name":"Abha","id":"5","incheckIn":false,"isICheckedIn":false},{"name":"shiv","id":"6","incheckIn":true,"isICheckedIn":false},{"name":"ajay","id":"7","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"8","incheckIn":false,"isICheckedIn":false}]},{"name":"Lab 2","id":"97427492749274927333","student":[{"name":"aryan","id":"9","incheckIn":false,"isICheckedIn":false},{"name":"devendra","id":"10","incheckIn":true,"isICheckedIn":false},{"name":"Shubham","id":"11","incheckIn":false,"isICheckedIn":false},{"name":"rahul","id":"12","incheckIn":false,"isICheckedIn":false},{"name":"mukesh","id":"13","incheckIn":true,"isICheckedIn":false},{"name":"manju","id":"14","incheckIn":false,"isICheckedIn":false},{"name":"sourabh","id":"15","incheckIn":false,"isICheckedIn":false},{"name":"sheetal","id":"16","incheckIn":false,"isICheckedIn":false},{"name":"samir","id":"17","incheckIn":false,"isICheckedIn":false},{"name":"akhil","id":"18","incheckIn":true,"isICheckedIn":false},{"name":"rahi","id":"19","incheckIn":false,"isICheckedIn":false},{"name":"ram","id":"20","incheckIn":true,"isICheckedIn":false}]}]}');
 			new checkInForm($this.webflowMemberId, responseText); 			
 		}
 	}
