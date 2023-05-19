@@ -113,18 +113,18 @@ class selfCheckInForm {
 		var currentLab = this.labsData.find(item => item.id == labId);
 		this.$currentLab = currentLab;
 		
-		var timeZoneOpacity = (currentLab.typeId == typeId) ? 0 : 1;
+		var timeZoneOpacity = (currentLab.typeId == 4) ? 0 : 1;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		timeZoneSelect.style.opacity = timeZoneOpacity;
 		//console.log('currentLab', currentLab)
 		//console.log(labId+"&&"+currentLab.typeId +'&&'+currentLab.isChecked)
 		//console.log((labId && currentLab.typeId == undefined  && currentLab.isChecked))
-		if(labId && currentLab.typeId == typeId && currentLab.isChecked){
+		if(labId && currentLab.typeId == 4 && currentLab.isChecked){
 			console.log('already checked in')
 			let checkInIcon = this.getCheckInIcon();
 			btn.innerHTML = 'Checked-In';
 			btn.prepend(checkInIcon)
-		}else if(labId && currentLab.typeId != typeId){
+		}else if(labId && currentLab.typeId != 4){
 			//console.log('currentLab4', currentLab.checkedIn, timeZoneSelect.value)
 			var selectTimezone = currentLab.checkedIn.find(item => item.timezoneId == timeZoneSelect.value)
 			if(selectTimezone && selectTimezone.isSelfCheckin){
@@ -158,7 +158,7 @@ class selfCheckInForm {
 			 "labId" : currentLab.id,
 			 "isSelfCheckin": true,
 			 "memberId": this.webflowMemberId,
-			 "timezoneId": (timeZoneSelect.value && currentLab.typeId != typeId) ? parseInt(timeZoneSelect.value) : null
+			 "timezoneId": (timeZoneSelect.value && currentLab.typeId != 4) ? parseInt(timeZoneSelect.value) : null
 			}
 			var xhr = new XMLHttpRequest()
 			var $this = this;
