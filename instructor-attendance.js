@@ -1,4 +1,3 @@
-var webflowMemberId = "6440cffd1e39130002d78018";
 /**
  * 	
  * @param name - HTML element name
@@ -168,10 +167,10 @@ class checkInForm {
 		//console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
 			//console.log('insCheckinFilter sss')
-			studentData = studentData.filter(item => item.isInstructorCheckin.toString() == insCheckinFilter.value)
+			studentData = studentData.filter(item => item.checkedIn.toString() == insCheckinFilter.value)
 		}
 		if(studentCheckinFilter.value){
-			studentData = studentData.filter(item => item.isSelfCheckin.toString() == studentCheckinFilter.value)
+			studentData = studentData.filter(item => item.checkedIn.toString() == studentCheckinFilter.value)
 		}
 		
 		if(searchFilter.value){
@@ -286,7 +285,9 @@ class checkInForm {
 		})
 		
 		labsSelectBox.addEventListener('change', function () {
-			//$this.displayCheckInBtn(this.value);
+			var labsSelectBox = document.getElementById('select-labs');
+			$this.displayStudentList(labsSelectBox.value, 'init');
+			$this.resetFilter();
 		})
 		
 		return labsSelectBox;
@@ -348,19 +349,19 @@ class checkInForm {
 			var selectInsTimezone = item.instructorCheckin.find(data => data.timezoneId == timeZoneSelect.value)
 			console.log('selectTimezone', selectTimezone)
 			var col_2 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon((selectTimezone && selectTimezone.isSelfCheckin) ? selectTimezone.isSelfCheckin : false);
+			var icon = $this.getCheckedIcon((selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false);
 			col_2.appendChild(icon);
 			
 			row.appendChild(col_2);
 			studentlist.appendChild(row)
 			
 			var col_3 = this.createCol('', 3);
-			var icon = $this.getCheckedIcon( (selectInsTimezone && selectInsTimezone.isInstructorCheckin) ? selectInsTimezone.isInstructorCheckin : false);
+			var icon = $this.getCheckedIcon( (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false);
 			//console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
-					var message = (selectInsTimezone && selectInsTimezone.isInstructorCheckin) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					var message = (selectInsTimezone && selectInsTimezone.checkedIn) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
 					if (confirm(message) == true) {
-						$this.updateAttendanceData(item.studentemail, selectInsTimezone.isInstructorCheckin, selectInsTimezone.attendanceId, item.isSelfCheckin, timeZoneSelect.value);
+						$this.updateAttendanceData(item.studentemail, selectInsTimezone.checkedIn, selectInsTimezone.attendanceId, item.checkedIn, timeZoneSelect.value);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -408,13 +409,13 @@ class checkInForm {
 						if(selectTimezone){
 							sItem.instructorCheckin.map(data => {
 								if(data.timezoneId == timezoneId){
-									data.isInstructorCheckin = !isInstructorCheckin;
+									data.checkedIn = !isInstructorCheckin;
 								}
 								return data;
 							})
 						}else{
 							var checkdata = {};
-							checkdata.isInstructorCheckin = !isInstructorCheckin;
+							checkdata.checkedIn = !isInstructorCheckin;
 							checkdata.timezoneId = timezoneId;
 							sItem.instructorCheckin.push(checkdata);
 						}
