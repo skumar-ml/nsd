@@ -361,7 +361,10 @@ class checkInForm {
 			icon.addEventListener('click', function(){
 					var message = (selectInsTimezone && selectInsTimezone.checkedIn) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
 					if (confirm(message) == true) {
-						$this.updateAttendanceData(item.studentemail, selectInsTimezone.checkedIn, selectInsTimezone.attendanceId, item.checkedIn, timeZoneSelect.value);
+						var insCheckedIn = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false;
+						var attendanceId = (selectInsTimezone && selectInsTimezone.attendanceId) ? selectInsTimezone.attendanceId : '';
+						var sCheckedIn = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false;
+						$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -440,7 +443,7 @@ class checkInForm {
 		console.log('currentLab', currentLab)
 		var data = {
 		 "labId" : currentLab.labid,
-		 "isSelfCheckin": isSelfCheckin,
+		 //"isSelfCheckin": isSelfCheckin,
 		 "emailId":studentId,
 		 "isInstructorCheckin": !isInstructorCheckin,
 		 "instructorMemberId": this.webflowMemberId,
@@ -449,6 +452,8 @@ class checkInForm {
 		if(attendanceId){
 			data.attendanceId = attendanceId;
 		}
+		//console.log('data', data)
+		//return;
 		var xhr = new XMLHttpRequest()
 		var $this = this;
 		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance/", true)
