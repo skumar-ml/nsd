@@ -1,3 +1,4 @@
+var webflowMemberId = "6440cffd1e39130002d78018";
 /**
  * 	
  * @param name - HTML element name
@@ -359,7 +360,7 @@ class checkInForm {
 			icon.addEventListener('click', function(){
 					var message = (selectInsTimezone && selectInsTimezone.isInstructorCheckin) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
 					if (confirm(message) == true) {
-						$this.updateAttendanceData(item.studentemail, selectInsTimezone.isInstructorCheckin, item.attendanceId, item.isSelfCheckin, timeZoneSelect.value);
+						$this.updateAttendanceData(item.studentemail, selectInsTimezone.isInstructorCheckin, selectInsTimezone.attendanceId, item.isSelfCheckin, timeZoneSelect.value);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -447,8 +448,6 @@ class checkInForm {
 		if(attendanceId){
 			data.attendanceId = attendanceId;
 		}
-		console.log('data', data)
-		return;
 		var xhr = new XMLHttpRequest()
 		var $this = this;
 		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance/", true)
