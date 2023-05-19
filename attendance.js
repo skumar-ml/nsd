@@ -24,6 +24,7 @@ class selfCheckInForm {
 	constructor(webflowMemberId, labsData){
 		this.webflowMemberId = webflowMemberId;
 		this.labsData = labsData.Lab;
+		this.timezones = labsData.timezones;
 		this.view();
 	}
 	/*Display Self checkin form*/
@@ -37,6 +38,11 @@ class selfCheckInForm {
 		// Get labs data
 		var labData = this.getLabs();
 		col.appendChild(labData)
+		
+		//timezone 
+		var getTimeZones = this.getTimeZones();
+		col.appendChild(getTimeZones)
+		
 		// Get Self checkin button
 		var checkInBtn = this.getCheckInBtn();
 		col.appendChild(checkInBtn)
@@ -67,6 +73,26 @@ class selfCheckInForm {
 		
 		return labsSelectBox;
 	}
+	// Create labs select box html element 
+	getTimeZones(){
+		var $this = this;
+		// Get all labs data
+		var labs = this.timezones;
+		var labsSelectBox = creEl('select', 'select-timezones w-select', 'select-labs')
+		labs.forEach(item => {
+			var option = creEl("option");
+				option.value = item.timezoneId;
+				option.text = item.timezone;
+				labsSelectBox.appendChild(option);
+		})
+		
+		labsSelectBox.addEventListener('change', function () {
+			var labsSelectBox = document.getElementById('select-labs');
+			$this.displayCheckInBtn(labsSelectBox.value);
+		})
+		
+		return labsSelectBox;
+	}
 	// Create default checked button html element
 	getCheckInBtn(){
 		var $this = this;
@@ -83,15 +109,32 @@ class selfCheckInForm {
 		var btn = document.getElementsByClassName('check-in-btn')[0];
 		btn.style.opacity = opacity;
 		btn.style.transition = 'all 2s';
+		
 		var currentLab = this.labsData.find(item => item.id == labId);
 		this.$currentLab = currentLab;
-		console.log(labId+"&&"+currentLab.isChecked)
-		console.log((labId && currentLab.isChecked))
-		if(labId && currentLab.isChecked){
+		
+		var timeZoneOpacity = (currentLab.typeId == typeId) ? 0 : 1;
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		timeZoneSelect.style.opacity = timeZoneOpacity;
+		//console.log('currentLab', currentLab)
+		//console.log(labId+"&&"+currentLab.typeId +'&&'+currentLab.isChecked)
+		//console.log((labId && currentLab.typeId == undefined  && currentLab.isChecked))
+		if(labId && currentLab.typeId == typeId && currentLab.isChecked){
 			console.log('already checked in')
 			let checkInIcon = this.getCheckInIcon();
 			btn.innerHTML = 'Checked-In';
 			btn.prepend(checkInIcon)
+		}else if(labId && currentLab.typeId != typeId){
+			//console.log('currentLab4', currentLab.checkedIn, timeZoneSelect.value)
+			var selectTimezone = currentLab.checkedIn.find(item => item.timezoneId == timeZoneSelect.value)
+			if(selectTimezone && selectTimezone.isSelfCheckin){
+				let checkInIcon = this.getCheckInIcon();
+				btn.innerHTML = 'Checked-In';
+				btn.prepend(checkInIcon)
+			}else{
+				btn.innerHTML = 'Self Check-In';
+			}
+			//console.log('selectTimezone', selectTimezone)
 		}else{
 			btn.innerHTML = 'Self Check-In';
 		}
@@ -110,10 +153,12 @@ class selfCheckInForm {
 		if(!currentLab.isChecked){
 			var checkInBtn = document.getElementById('check-in-btn');
 			checkInBtn.innerHTML = 'Processing....';
+			var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 			var data = {
 			 "labId" : currentLab.id,
 			 "isSelfCheckin": true,
-			 "memberId": this.webflowMemberId
+			 "memberId": this.webflowMemberId,
+			 "timezoneId": (timeZoneSelect.value && currentLab.typeId != typeId) ? parseInt(timeZoneSelect.value) : null
 			}
 			var xhr = new XMLHttpRequest()
 			var $this = this;
@@ -134,11 +179,29 @@ class selfCheckInForm {
 	// After checked in update local data
 	updateCurrentData(){
 		var labsSelectBox = document.getElementById('select-labs');
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		console.log('labsSelectBox.value', labsSelectBox.value)
 		var labsData = this.labsData;
 		labsData.map(item => {
-			if(item.id == labsSelectBox.value){
+			if(item.id == labsSelectBox.value && item.typeId == 4){
 				item.isChecked = true;
+			}else if(item.id == labsSelectBox.value && item.typeId != 4){
+				console.log('item', item)
+				var selectTimezone = item.checkedIn.find(data => data.timezoneId == timeZoneSelect.value)
+				if(selectTimezone){
+					item.checkedIn.map(data => {
+						if(data.timezoneId == timeZoneSelect.value){
+							data.isSelfCheckin = true;
+						}
+						return data;
+					})
+				}else{
+					var checkdata = {};
+					checkdata.isSelfCheckin = true;
+					checkdata.timezoneId = timeZoneSelect.value;
+					item.checkedIn.push(checkdata);
+				}
+				
 			}
 			return item;
 		})
