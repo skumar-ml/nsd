@@ -166,11 +166,20 @@ class checkInForm {
 		//console.log('studentData', studentData)
 		//console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
-			//console.log('insCheckinFilter sss')
-			studentData = studentData.filter(item => item.checkedIn.toString() == insCheckinFilter.value)
+			studentData = studentData.filter(item => {
+				var selectInsTimezone = item.instructorCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				var status = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false
+				return (status.toString() == insCheckinFilter.value)
+				
+			})
 		}
 		if(studentCheckinFilter.value){
-			studentData = studentData.filter(item => item.checkedIn.toString() == studentCheckinFilter.value)
+			studentData = studentData.filter(item => {
+				var selectTimezone = item.selfCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				var status = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false
+				return (status.toString() == studentCheckinFilter.value)
+				
+			})
 		}
 		
 		if(searchFilter.value){
