@@ -157,6 +157,7 @@ class checkInForm {
 	filterstudentData(){
 		//this.studentData = this.filterData;
 		var studentData = this.$currentLab.studentDeatils;
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		
 		var insCheckinFilter = document.getElementById("ins-checkin-filter");
 		
