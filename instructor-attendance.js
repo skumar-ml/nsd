@@ -159,6 +159,8 @@ class checkInForm {
 		var studentData = this.$currentLab.studentDeatils;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		
+		console.log('studentData', studentData)
+		
 		var insCheckinFilter = document.getElementById("ins-checkin-filter");
 		
 		var studentCheckinFilter = document.getElementById("student-checkin-filter");
@@ -374,7 +376,7 @@ class checkInForm {
 						var insCheckedIn = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false;
 						var attendanceId = (selectInsTimezone && selectInsTimezone.attendanceId) ? selectInsTimezone.attendanceId : '';
 						var sCheckedIn = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false;
-						$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value);
+						$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value, item.submissionId);
 						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
 						$this.$incheckIn = item.isICheckedIn
 						if($this.$incheckIn){
@@ -409,8 +411,8 @@ class checkInForm {
 		//return studentlist;
 	}
 	/*Update current attendance data*/
-	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId){
-		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId);
+	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId){
+		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId);
 		var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
@@ -448,13 +450,14 @@ class checkInForm {
 		return img
 	}
 	/*API call for checked in*/
-	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin, timezoneId){
+	callCheckedInApi(studentId, isInstructorCheckin,attendanceId, isSelfCheckin, timezoneId, submissionId){
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
 		var data = {
 		 "labId" : currentLab.labid,
 		 //"isSelfCheckin": isSelfCheckin,
 		 "emailId":studentId,
+		 "submissionId":submissionId,
 		 "isInstructorCheckin": !isInstructorCheckin,
 		 "instructorMemberId": this.webflowMemberId,
 		 "timezoneId": parseInt(timezoneId)
