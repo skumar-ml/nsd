@@ -71,7 +71,9 @@ class AccordionForm {
 				   let editable = $this.checkform(cForm.formId);
 				   let is_live = cForm.is_live;
 				   var li=creEl('li');
-				   var li_text=creEl('span', 'accordion_name');
+				   //var li_text=creEl('span', 'accordion_name');
+				   // Added cross line for completed forms
+				   var li_text=creEl('span', 'accordion_name'+((editable)? ' completed_form': ''));
 				   var imgCheck = creEl("img");
 			       imgCheck.src = $this.getCheckedIcon(editable);
 				   li_text.innerHTML = cForm.name;
@@ -185,7 +187,10 @@ class AccordionForm {
 	 */
 	checkAllForms(forms){
 		if(forms){
-			var formsId = forms.map((formItem) => formItem.formId.toString());
+			// showing status only for live forms
+			var form = forms.filter((item => item.is_live));
+			var formsId = form.map((formItem) => formItem.formId.toString());
+			//var formsId = forms.map((formItem) => formItem.formId.toString());
 			var completedFormsId = this.$completedForm.map((formItem) => formItem.formId.toString());
 			const compareForm = completedFormsId.filter((obj) => formsId.indexOf(obj) !== -1);
 			const uniqueform = compareForm.filter((value, index, self) => self.indexOf(value) === index)
