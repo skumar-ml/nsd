@@ -2,21 +2,7 @@ class SigninActivity {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		//this.getNotificationData();
-		this.getSignInData();
-	}
-	getSignInData(){
-		
-		var xhr = new XMLHttpRequest()
-		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getSignInDetail/"+this.webflowMemberId, true)
-		xhr.withCredentials = false
-		xhr.send()
-		xhr.onload = function() {
-			let responseText = JSON.parse(xhr.responseText);
-			if(!responseText.isTodaySignIn){
-				$this.InsertSignInData()
-			}
-		}
+		this.InsertSignInData();
 	}
 	InsertSignInData(){
 		var data = {
