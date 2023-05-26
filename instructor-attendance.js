@@ -261,10 +261,10 @@ class checkInForm {
 		var labs = this.labsData;
 		var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
 		/*Added by default first lab and removed select labs option*/
-		/*var defaultoption = creEl("option");
+		var defaultoption = creEl("option");
 		defaultoption.value = "";
 		defaultoption.text = "Select Labs";
-		labsSelectBox.appendChild(defaultoption);*/
+		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
 				option.value = item.labid;
@@ -272,10 +272,10 @@ class checkInForm {
 				labsSelectBox.appendChild(option);
 		})
 		/*Showing by default first labs*/
-		setTimeout(function() {
+		/*setTimeout(function() {
 			$this.displayStudentList(labs[0].labid, 'init');
 			$this.resetFilter();
-		}, 0);
+		}, 0);*/
 		labsSelectBox.addEventListener('change', function () {
 			$this.displayStudentList(this.value, 'init');
 			$this.resetFilter();
@@ -289,6 +289,10 @@ class checkInForm {
 		// Get all labs data
 		var labs = this.timezones;
 		var labsSelectBox = creEl('select', 'select-timezones w-select', 'select-timezone')
+		var defaultoption = creEl("option");
+		defaultoption.value = "";
+		defaultoption.text = "Select Timezone";
+		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
 				option.value = item.timezoneId;
@@ -324,15 +328,7 @@ class checkInForm {
 	/*Creating DOM element for student list*/
 	displayStudentList(labId, type=''){
 		
-		var opacity = (labId) ? 1 : 0;
 		
-		var btn = document.getElementsByClassName('student-list-head')[0];
-		btn.style.opacity = opacity;
-		btn.style.transition = 'all 2s';
-		
-		var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
-		studentlistfilter.style.opacity = opacity;
-		studentlistfilter.style.transition = 'all 2s';
 		
 		var studentlist = document.getElementById('student-list');
 		studentlist.innerHTML = "";
@@ -349,6 +345,18 @@ class checkInForm {
 		var timeZoneOpacity = (currentLab.typeId != 4) ? 1 : 0;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		timeZoneSelect.style.opacity = timeZoneOpacity;
+		var opacity = (labId && timeZoneSelect.value) ? 1 : 0;
+		
+		var btn = document.getElementsByClassName('student-list-head')[0];
+		btn.style.opacity = opacity;
+		//btn.style.transition = 'all 2s';
+		
+		var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
+		studentlistfilter.style.opacity = opacity;
+		//studentlistfilter.style.transition = 'all 2s';
+		
+		studentlist.style.opacity = opacity;
+		//studentlist.style.transition = 'all 2s';
 		
 		currentLabStudent.data.forEach((item, index) => {
 			var row = creEl('div', 'w-row')
