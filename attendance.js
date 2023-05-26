@@ -68,6 +68,8 @@ class selfCheckInForm {
 		})
 		
 		labsSelectBox.addEventListener('change', function () {
+			var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+			timeZoneSelect.value = "";
 			$this.displayCheckInBtn(this.value);
 		})
 		
@@ -79,6 +81,13 @@ class selfCheckInForm {
 		// Get all labs data
 		var labs = this.timezones;
 		var labsSelectBox = creEl('select', 'select-timezones w-select', 'select-labs')
+		
+		//default option
+		var defaultoption = creEl("option");
+		defaultoption.value = "";
+		defaultoption.text = "Select timezone to check-in";
+		labsSelectBox.appendChild(defaultoption);
+		
 		labs.forEach(item => {
 			var option = creEl("option");
 				option.value = item.timezoneId;
@@ -105,10 +114,6 @@ class selfCheckInForm {
 	}
 	// Display checked in button on lab change
 	displayCheckInBtn(labId){
-		var opacity = (labId) ? 1 : 0;
-		var btn = document.getElementsByClassName('check-in-btn')[0];
-		btn.style.opacity = opacity;
-		btn.style.transition = 'all 2s';
 		
 		var currentLab = this.labsData.find(item => item.id == labId);
 		this.$currentLab = currentLab;
@@ -116,26 +121,38 @@ class selfCheckInForm {
 		var timeZoneOpacity = (currentLab.typeId == 4) ? 0 : 1;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		timeZoneSelect.style.opacity = timeZoneOpacity;
+
+		
+		
+		var opacity = (labId && (timeZoneSelect.value || currentLab.typeId == 4) ) ? 1 : 0;
+		var btn = document.getElementsByClassName('check-in-btn')[0];
+		btn.style.opacity = opacity;
+		//btn.style.transition = 'all 2s';
+		
 		//console.log('currentLab', currentLab)
 		//console.log(labId+"&&"+currentLab.typeId +'&&'+currentLab.isChecked)
 		//console.log((labId && currentLab.typeId == undefined  && currentLab.isChecked))
 		if(labId && currentLab.typeId == 4 && currentLab.checkedIn){
 			console.log('already checked in')
 			let checkInIcon = this.getCheckInIcon();
-			btn.innerHTML = 'Checked-In';
+			btn.classList.add('already-checkedin');
+			btn.innerHTML = 'Already Checked In';
 			btn.prepend(checkInIcon)
 		}else if(labId && currentLab.typeId != 4){
 			//console.log('currentLab4', currentLab.checkedIn, timeZoneSelect.value)
 			var selectTimezone = currentLab.selfCheckin.find(item => item.timezoneId == timeZoneSelect.value)
 			if(selectTimezone && selectTimezone.checkedIn){
 				let checkInIcon = this.getCheckInIcon();
-				btn.innerHTML = 'Checked-In';
+				btn.innerHTML = 'Already Checked In';
+				btn.classList.add('already-checkedin');
 				btn.prepend(checkInIcon)
 			}else{
+				btn.classList.remove('already-checkedin');
 				btn.innerHTML = 'Self Check-In';
 			}
 			//console.log('selectTimezone', selectTimezone)
 		}else{
+			btn.classList.remove('already-checkedin');
 			btn.innerHTML = 'Self Check-In';
 		}
 		
@@ -143,7 +160,7 @@ class selfCheckInForm {
 	// get checkin tick icon
 	getCheckInIcon(){
 		var img = creEl('img', 'checkedInIcon')
-		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
+		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/647062754a2e7d5b5208c785_square-check-red.svg';
 		return img
 	}
 	// API call for daily checked in
@@ -181,7 +198,8 @@ class selfCheckInForm {
 			xhr.onload = function() {
 				let responseText =  JSON.parse(xhr.responseText);
 				let checkInIcon = $this.getCheckInIcon();
-				checkInBtn.innerHTML = 'CheckedIn';
+				checkInBtn.classList.add('already-checkedin');
+				checkInBtn.innerHTML = 'Checked In Successfully';
 				checkInBtn.prepend(checkInIcon)
 				$this.updateCurrentData();
 			}
@@ -240,7 +258,6 @@ class LabsData {
 		xhr.send()
 		xhr.onload = function() {
 			let responseText =  JSON.parse(xhr.responseText);
-			//let responseText =  JSON.parse('{"labs":[{"name":"Morning check-in","id":"1","isCheckedIn":false},{"name":"Evening check-in","id":"2","isCheckedIn":false},{"name":"Lab 1","id":"3","isCheckedIn":false},{"name":"Lab 2","id":"4","isCheckedIn":false}]}');
 			new selfCheckInForm($this.webflowMemberId, responseText); 			
 		}
 	}
