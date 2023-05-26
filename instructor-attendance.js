@@ -277,6 +277,8 @@ class checkInForm {
 			$this.resetFilter();
 		}, 0);*/
 		labsSelectBox.addEventListener('change', function () {
+			var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+			timeZoneSelect.value = "";
 			$this.displayStudentList(this.value, 'init');
 			$this.resetFilter();
 		})
@@ -379,21 +381,19 @@ class checkInForm {
 			var icon = $this.getCheckedIcon( (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false);
 			//console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
-					var message = (selectInsTimezone && selectInsTimezone.checkedIn) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
-					if (confirm(message) == true) {
-						var insCheckedIn = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false;
-						var attendanceId = (selectInsTimezone && selectInsTimezone.attendanceId) ? selectInsTimezone.attendanceId : '';
-						var sCheckedIn = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false;
-						$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value, item.submissionId);
-						/*console.log('item.isICheckedIn >>>', $this.$incheckIn)
-						$this.$incheckIn = item.isICheckedIn
-						if($this.$incheckIn){
-							icon.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a83485b6551a71e5b7e12_dd-check.png";
-						}else{
-							icon.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/642a834899a0eb5204d6dafd_dd-cross.png";
+					//var message = (selectInsTimezone && selectInsTimezone.checkedIn) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					var insCheckedIn = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false;
+					var attendanceId = (selectInsTimezone && selectInsTimezone.attendanceId) ? selectInsTimezone.attendanceId : '';
+					var sCheckedIn = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false;
+					if(selectInsTimezone && selectInsTimezone.checkedIn){
+						
+						if (confirm("Are you sure want to uncheck-in") == true) {
+							$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value, item.submissionId);
 						}
-						$this.$incheckIn = !item.isICheckedIn */
+					}else{
+						$this.updateAttendanceData(item.studentemail, insCheckedIn, attendanceId, sCheckedIn, timeZoneSelect.value, item.submissionId);
 					}
+					
 				
 			})
 			col_3.appendChild(icon);
