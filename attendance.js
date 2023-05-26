@@ -58,7 +58,7 @@ class selfCheckInForm {
 		var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
-		defaultoption.text = "Select activity to check-in";
+		defaultoption.text = "Select activity to check in";
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
@@ -85,7 +85,7 @@ class selfCheckInForm {
 		//default option
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
-		defaultoption.text = "Select timezone to check-in";
+		defaultoption.text = "Select timezone to check in";
 		labsSelectBox.appendChild(defaultoption);
 		
 		labs.forEach(item => {
@@ -106,7 +106,7 @@ class selfCheckInForm {
 	getCheckInBtn(){
 		var $this = this;
 		var checkInBtn = creEl('button', 'main-button red w-button check-in-btn', 'check-in-btn');
-		checkInBtn.innerHTML = 'Self Check-In';
+		checkInBtn.innerHTML = 'Self Check In';
 		checkInBtn.addEventListener('click', function(){
 			$this.callCheckedInApi();
 		})
@@ -148,12 +148,12 @@ class selfCheckInForm {
 				btn.prepend(checkInIcon)
 			}else{
 				btn.classList.remove('already-checkedin');
-				btn.innerHTML = 'Self Check-In';
+				btn.innerHTML = 'Self Check In';
 			}
 			//console.log('selectTimezone', selectTimezone)
 		}else{
 			btn.classList.remove('already-checkedin');
-			btn.innerHTML = 'Self Check-In';
+			btn.innerHTML = 'Self Check In';
 		}
 		
 	}
