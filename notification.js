@@ -279,7 +279,13 @@ class Notification {
 			row.appendChild(col_2);
 			var col_3 = this.createCol(item.sendAs, 2);
 			row.appendChild(col_3);
-			var col_4 = this.createCol(item.message.substring(0, 30) + '...', 3);
+			
+			var div = document.createElement("div");
+			div.innerHTML = item.message;
+			var text = div.textContent || div.innerText || "";
+			
+			console.log('item.message', text)
+			var col_4 = this.createCol(text.substring(0, 30) + '...', 3);
 			row.appendChild(col_4);
 			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
 			
@@ -299,7 +305,7 @@ class Notification {
 	}
 	/*Creating dom element message list header*/
 	createMessageTitle(){
-		var title = ['', 'Title', 'Type', 'Send As', 'Message', 'Date']
+		var title = ['', 'Title', 'Type', 'From', 'Message', 'Date']
 		var row = creEl('div', 'w-row')
 		title.forEach(item=> {
 			var col_width = 3
@@ -307,7 +313,7 @@ class Notification {
 				col_width = 1
 			}else if(item == 'Type' ){
 				col_width = 1
-			}else if(item == 'Send As'){
+			}else if(item == 'From'){
 				col_width = 2
 			}else if(item == 'Date'){
 				col_width = 2;
@@ -331,18 +337,23 @@ class Notification {
 		var notificationFilter = document.getElementById("notification-filter");
 		var notification = document.getElementById("notification");
 		var notificationDetails = document.getElementById("notification-details");
+		var notificationHeading = document.getElementsByClassName("notification-heading")[0];
 		notificationFilter.style.display = 'block';
 		notification.style.display = 'block';
 		notificationDetails.style.display = 'none';
+		notificationHeading.style.display = 'block';
 	}
 	/*Creating back button dom element for */
-	detailPageBackButton(){
+	detailPageBackButton(className){
 		var $this = this;
-		var backButton = creEl('a', 'w-previous')
+		var backButton = creEl('a', 'w-previous '+className)
 		var  img = creEl('img', 'back-icon')
 		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6434fd8a3e27f65f1168c15b_arrow-left.svg"
 		img.title = 'Back'
 		backButton.appendChild(img);
+		var backText = creEl("span", 'back-text')
+		backText.innerHTML = "BACK";
+		backButton.appendChild(backText);
 		backButton.addEventListener('click', function () {
 			$this.showListPage();
 		})
@@ -378,7 +389,7 @@ class Notification {
 		
 		var detailHead = creEl('div', 'detail-head w-row');
 		var title = item.title;
-		var dateTextcol = creEl("div", 'w-col w-col-6');
+		var dateTextcol = creEl("div", 'w-col w-col-6 detail-title-text');
 		var titleB= this.creBoldText(title)
 		dateTextcol.appendChild(titleB);
 		detailHead.appendChild(dateTextcol);
@@ -417,13 +428,15 @@ class Notification {
 		contain.appendChild(dateMessagecol);
 		
 		if(item.uploadedFiles){
-			var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
+			//var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
 			var download_head = this.creBoldText('Attachments: ')
-			var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
-			downloadCol.appendChild(download_head);
-			downloadCol.appendChild(downloadIcon);
-			downloadCol.appendChild(viewIcon);
+			if(item.uploadedFiles){
+				var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
+				downloadCol.appendChild(download_head);
+				downloadCol.appendChild(downloadIcon);
+			}
+			//downloadCol.appendChild(viewIcon);
 			contain.appendChild(downloadCol);
 		}
 
@@ -469,22 +482,30 @@ class Notification {
 		var notification = document.getElementById("notification");
 		var notificationFilter = document.getElementById("notification-filter");
 		var notificationDetails = document.getElementById("notification-details");
+		var notificationHeading = document.getElementsByClassName("notification-heading")[0];
+		
 		notificationDetails.innerHTML = "";
 		notificationFilter.style.display = 'none';
 		notification.style.display = 'none';
 		notificationDetails.style.display = 'block';
+		notificationHeading.style.display = 'none';
+		
+		var backButton = this.detailPageBackButton('top-button');
+		notificationDetails.appendChild(backButton);
+		
+		var notificationInnerDetails =creEl("div", 'notification-details')
 		
 		this.makeRead(item);
 		
 		
-		
 		/*Data to display*/
 		var contain = this.detailPageContain(item);
-		notificationDetails.appendChild(contain);
+		notificationInnerDetails.appendChild(contain);
 		
 		/*Back button for detail page*/
-		var backButton = this.detailPageBackButton();
-		notificationDetails.appendChild(backButton);
+		var backButton = this.detailPageBackButton('bottom-button');
+		notificationInnerDetails.appendChild(backButton);
+		notificationDetails.appendChild(notificationInnerDetails);
 		this.initiateLightbox();
 
 		
