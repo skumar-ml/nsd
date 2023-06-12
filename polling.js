@@ -330,7 +330,7 @@ class Polling {
 		pollingFilter.style.display = 'block';
 		polling.style.display = 'block';
 		pollingDetails.style.display = 'none';
-		notificationHeading.style.display = 'block';
+		pollingHeading.style.display = 'block';
 	}
 	/*Creating back button dom element for */
 	detailPageBackButton(){
@@ -476,7 +476,7 @@ class Polling {
 		pollingFilter.style.display = 'none';
 		polling.style.display = 'none';
 		pollingDetails.style.display = 'block';
-		pollingHeading.style.display = 'block';
+		pollingHeading.style.display = 'none';
 		//this.makeRead(item);
 		
 		
