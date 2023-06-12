@@ -37,7 +37,7 @@ class Notification {
 	/*Creating pagination array object*/
 	paginatorList(items, page, per_page) {
 		var page = page || 1,
-		per_page = per_page || 5,
+		per_page = per_page || 20,
 		offset = (page - 1) * per_page,
 
 		paginatedItems = items.slice(offset).slice(0, per_page),
@@ -392,8 +392,22 @@ class Notification {
 		var dateTextcol = creEl("div", 'w-col w-col-6 detail-title-text');
 		var titleB= this.creBoldText(title)
 		dateTextcol.appendChild(titleB);
-		detailHead.appendChild(dateTextcol);
 		
+		console.log('item.uploadedFiles', item.uploadedFiles)
+		if(item.uploadedFiles){
+			//var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
+			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
+			var download_head = this.creBoldText('Attachments: ')
+			if(item.uploadedFiles){
+				var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
+				downloadCol.appendChild(download_head);
+				downloadCol.appendChild(downloadIcon);
+			}
+			//downloadCol.appendChild(viewIcon);
+			dateTextcol.appendChild(downloadCol);
+		}
+		
+		detailHead.appendChild(dateTextcol);
 		
 		var sendBycol = creEl("div", 'w-col w-col-6 text-right header-right');
 		/*Created on Date*/
