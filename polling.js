@@ -274,11 +274,11 @@ class Polling {
 			row.appendChild(col_1);
 			
 			
-			var col_2 = this.createCol(item.type, 1);
+			var col_2 = this.createCol(item.type, 2);
 			row.appendChild(col_2);
 			var col_3 = this.createCol((item.instructorNames.length > 1)? item.instructorNames[0]+'...': item.instructorNames[0], 2);
 			row.appendChild(col_3);
-			var col_4 = this.createCol(item.activityType, 3);
+			var col_4 = this.createCol(item.activityType, 2);
 			row.appendChild(col_4);
 			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
 			
@@ -301,13 +301,13 @@ class Polling {
 			if(item == ''){
 				col_width = 1
 			}else if(item == 'Type' ){
-				col_width = 1
+				col_width = 2
 			}else if(item == 'Instructor'){
 				col_width = 2
 			}else if(item == 'Date'){
 				col_width = 2;
 			}else if(item == 'Activity Type'){
-				col_width = 3;
+				col_width = 2;
 			}
 			var col = this.createCol(item, col_width);
 			row.appendChild(col);
@@ -326,9 +326,11 @@ class Polling {
 		var pollingFilter = document.getElementById("polling-filter");
 		var polling = document.getElementById("polling");
 		var pollingDetails = document.getElementById("polling-details");
+		var pollingHeading = document.getElementsByClassName("polling-heading")[0];
 		pollingFilter.style.display = 'block';
 		polling.style.display = 'block';
 		pollingDetails.style.display = 'none';
+		notificationHeading.style.display = 'block';
 	}
 	/*Creating back button dom element for */
 	detailPageBackButton(){
@@ -408,8 +410,13 @@ class Polling {
 		*/
 		var message = item.activityType;
 		var dateMessagecol = creEl("div", 'w-col w-col-12 details-message');
-		dateMessagecol.innerHTML = message;
+		dateMessagecol.innerHTML = '<b>Activity Type</b>: '+ message;
 		contain.appendChild(dateMessagecol);
+		
+		var type = item.type;
+		var typecol = creEl("div", 'w-col w-col-12 details-message')
+		typecol.innerHTML = '<b>Poll Type</b>: '+ type;
+		contain.appendChild(typecol);
 		
 		if(item.jotformUrl){
 			var viewIcon = this.viewDownLoadedFile(item.jotformUrl, item)
@@ -464,11 +471,12 @@ class Polling {
 		var polling = document.getElementById("polling");
 		var pollingFilter = document.getElementById("polling-filter");
 		var pollingDetails = document.getElementById("polling-details");
+		var pollingHeading = document.getElementsByClassName("polling-heading")[0];
 		pollingDetails.innerHTML = "";
 		pollingFilter.style.display = 'none';
 		polling.style.display = 'none';
 		pollingDetails.style.display = 'block';
-		
+		pollingHeading.style.display = 'block';
 		//this.makeRead(item);
 		
 		
