@@ -397,10 +397,10 @@ class Notification {
 		if(item.uploadedFiles){
 			//var viewIcon = this.viewDownLoadedFile(item.uploadedFiles)
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
-			var download_head = this.creBoldText('Attachments: ')
+			//var download_head = this.creBoldText('Attachments: ')
 			if(item.uploadedFiles){
 				var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
-				downloadCol.appendChild(download_head);
+				//downloadCol.appendChild(download_head);
 				downloadCol.appendChild(downloadIcon);
 			}
 			//downloadCol.appendChild(viewIcon);
