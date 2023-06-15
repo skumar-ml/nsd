@@ -64,7 +64,7 @@ class Notification {
 		notificationMessage.innerHTML = unreadMessage.length;
 		//notificationBudge.setAttribute('data-count', unreadMessage.length);
 		notificationBudge.appendChild(notificationMessage)
-		console.log('notificationBudge', notificationBudge)
+		//console.log('notificationBudge', notificationBudge)
 	}
 	/*Get message type from api response*/
 	getMessageType(){
@@ -284,7 +284,7 @@ class Notification {
 			div.innerHTML = item.message;
 			var text = div.textContent || div.innerText || "";
 			
-			console.log('item.message', text)
+			//console.log('item.message', text)
 			var col_4 = this.createCol(text.substring(0, 30) + '...', 3);
 			row.appendChild(col_4);
 			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
@@ -399,9 +399,18 @@ class Notification {
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
 			//var download_head = this.creBoldText('Attachments: ')
 			if(item.uploadedFiles){
-				var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
-				//downloadCol.appendChild(download_head);
-				downloadCol.appendChild(downloadIcon);
+				if(Array.isArray(item.uploadedFiles)){
+					item.uploadedFiles.forEach(url=>{
+					var downloadIcon = this.downLoadLinkIcon(url,'download');
+					//downloadCol.appendChild(download_head);
+					downloadCol.appendChild(downloadIcon);	
+					})
+				}else{
+					var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
+					//downloadCol.appendChild(download_head);
+					downloadCol.appendChild(downloadIcon);
+				}
+				
 			}
 			//downloadCol.appendChild(viewIcon);
 			dateTextcol.appendChild(downloadCol);
@@ -446,9 +455,19 @@ class Notification {
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
 			var download_head = this.creBoldText('Attachments: ')
 			if(item.uploadedFiles){
-				var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
 				downloadCol.appendChild(download_head);
-				downloadCol.appendChild(downloadIcon);
+				if(Array.isArray(item.uploadedFiles)){
+					item.uploadedFiles.forEach(url=>{
+					var downloadIcon = this.downLoadLinkIcon(url,'download');
+					
+					downloadCol.appendChild(downloadIcon);	
+					})
+				}else{
+					var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
+					downloadCol.appendChild(download_head);
+					downloadCol.appendChild(downloadIcon);
+				}
+				
 			}
 			//downloadCol.appendChild(viewIcon);
 			contain.appendChild(downloadCol);
@@ -469,7 +488,7 @@ class Notification {
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function() {
 			let responseText = xhr.responseText;
-			console.log('responseText', responseText)
+			//console.log('responseText', responseText)
 		}
 	}
 	/* Calling readAPI and manupulating current message data*/
@@ -587,7 +606,7 @@ class Notification {
 	}
 	/* Initialize iframe for view button */
 	initiateLightbox(){
-		console.log('testing');
+		//console.log('testing');
 		[].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
 		  el.lightbox = new IframeLightbox(el, {
 			onClosed: function() {
