@@ -218,7 +218,7 @@ class Notification {
 			window.URL.revokeObjectURL(url);
 			//alert('your file has downloaded!'); // or you know, something with better UX...
 		  })
-		  .catch(() => alert('oh no!'));
+		  .catch(() => alert('File not found'));
 	}
 	/*Display download file icon for detail and listing page*/
 	downLoadLinkIcon(fileLink, type=''){
@@ -406,9 +406,12 @@ class Notification {
 					downloadCol.appendChild(downloadIcon);	
 					})
 				}else{
-					var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
+					var urls = item.uploadedFiles.split(",");
+					urls.forEach(url=>{
+					var downloadIcon = this.downLoadLinkIcon(url,'download');
 					//downloadCol.appendChild(download_head);
-					downloadCol.appendChild(downloadIcon);
+					downloadCol.appendChild(downloadIcon);	
+					})
 				}
 				
 			}
@@ -463,9 +466,12 @@ class Notification {
 					downloadCol.appendChild(downloadIcon);	
 					})
 				}else{
-					var downloadIcon = this.downLoadLinkIcon(item.uploadedFiles,'download');
-					downloadCol.appendChild(download_head);
-					downloadCol.appendChild(downloadIcon);
+					var urls = item.uploadedFiles.split(",");
+					urls.forEach(url=>{
+						var downloadIcon = this.downLoadLinkIcon(url,'download');
+					
+						downloadCol.appendChild(downloadIcon);	
+					})
 				}
 				
 			}
