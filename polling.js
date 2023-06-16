@@ -30,8 +30,8 @@ class Polling {
 		this.filterData = messageData;
 		this.paginateData = this.paginatorList(messageData);
 		
-		this.makeMessageFilter();
-		this.makeMessageList();
+		this.makePollingFilter();
+		this.makePollingList();
 		//this.displayUnreadMessage();
 		
 	}
@@ -54,14 +54,14 @@ class Polling {
 		};
 	}
 	/*Get message type from api response*/
-	getMessageType(){
+	getPollingType(){
 		return this.filterData.filter(
 		  (obj, index) =>
 			this.filterData.findIndex((item) => item.type == obj.type) === index
 		);
 	}
 	/*Filter api response based on current seleted filter value*/
-	filterMessageData(){
+	filterPollingData(){
 		//this.messageData = this.filterData;
 		var messageData = this.filterData;
 		var type = document.getElementById("polling-type-filter");
@@ -98,10 +98,10 @@ class Polling {
 		this.refreshData();
 	}
 	/*Creating the dom element for message type filter*/
-	createMessageTypeFilter(){
+	createPollingTypeFilter(){
 		var col = creEl("div", 'col');
 		var $this = this;
-		var getMessage = this.getMessageType();
+		var getMessage = this.getPollingType();
 		var messagetype = creEl('select', 'polling-type-filter w-select', 'polling-type-filter')
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
@@ -115,7 +115,7 @@ class Polling {
 		})
 		
 		messagetype.addEventListener('change', function () {
-			$this.filterMessageData('type', this.value);
+			$this.filterPollingData('type', this.value);
 		})
 		
 		col.appendChild(messagetype)
@@ -142,7 +142,7 @@ class Polling {
 		dateFilter.appendChild(oldestoption);
 		col.appendChild(dateFilter)
 		dateFilter.addEventListener('change', function () {
-			$this.filterMessageData('type', this.value);
+			$this.filterPollingData('type', this.value);
 		})
 		return col;
 	}
@@ -156,7 +156,7 @@ class Polling {
 		/*Event for search*/
 		searchFilter.addEventListener('keypress', function (event) {
 			if (event.key === "Enter") {
-				$this.filterMessageData('type', this.value);
+				$this.filterPollingData('type', this.value);
 			}
 		})
 		
@@ -253,7 +253,7 @@ class Polling {
 		return a;
 	}
 	/*Creating dom element for message list*/
-	craeteMessageList(){
+	craetePollingList(){
 		var $this = this;
 		var messageList = creEl('div', 'message-list');
 		this.paginateData.data.forEach((item, index) => {
@@ -293,7 +293,7 @@ class Polling {
 		return messageList;
 	}
 	/*Creating dom element message list header*/
-	createMessageTitle(){
+	createPollingTitle(){
 		var title = ['', 'Poll Title', 'Type', 'Instructor', 'Activity Type', 'Date']
 		var row = creEl('div', 'w-row')
 		title.forEach(item=> {
@@ -318,7 +318,7 @@ class Polling {
 	refreshData(){
 		var polling = document.getElementById("polling");
 		polling.innerHTML = "";
-		this.makeMessageList();
+		this.makePollingList();
 		
 	}
 	/*hide and show message list and details page*/
@@ -433,6 +433,7 @@ class Polling {
 		return contain;
 	}
 	/* API for make message unread to read */
+	/*Need to remove*/
 	readApiCall(messageId){
 		var data = {
 			 "objectId" : messageId
@@ -448,6 +449,7 @@ class Polling {
 		}
 	}
 	/* Calling readAPI and manupulating current message data*/
+	/*Need to remove*/
 	makeRead(item){                       
 		/*API Call for read unread API*/
 		if(!item.is_read){
@@ -520,11 +522,11 @@ class Polling {
 		return pagination;
 	}
 	/* Creating dom element for filter header */
-	makeMessageFilter(){
+	makePollingFilter(){
 		var pollingFilter = document.getElementById("polling-filter");
 		/*Filter*/
 		var pollingHeader = creEl('div', 'polling-header w-layout-grid grid-3', 'polling-header')
-		var messageType = this.createMessageTypeFilter();
+		var messageType = this.createPollingTypeFilter();
 		var dateFilter = this.createDateFilter();
 		var searchFilter = this.createSearchFilter();
 		pollingHeader.appendChild(messageType);
@@ -533,16 +535,16 @@ class Polling {
 		pollingFilter.appendChild(pollingHeader);
 	}
 	/* Creating dom element for message list */
-	makeMessageList(){
+	makePollingList(){
 		var polling = document.getElementById("polling");
 		
 		/*Message Title*/
-		var messageTitle = this.createMessageTitle();
+		var messageTitle = this.createPollingTitle();
 		var pollingTitle = creEl('div', 'polling-title', 'polling-title');
 		pollingTitle.appendChild(messageTitle);
 		polling.appendChild(pollingTitle);
 		/*Message List*/
-		var messageList = this.craeteMessageList();
+		var messageList = this.craetePollingList();
 		var pollingbody = creEl('div', 'polling-body', 'polling-body');
 		pollingbody.appendChild(messageList);
 		polling.appendChild(pollingbody);
@@ -600,7 +602,7 @@ class Polling {
 }
 
 /**
-  * Class for Handling API for polling center
+  * Class for Handling API for polling data
   * @param webflowMemberId - MemberId
   */
 class PollingApi {
