@@ -404,8 +404,9 @@ class AccordionForm {
 			resourceGrid.insertAdjacentHTML('beforeend', skillBuilderHTML);
 		}
 
-		// Add resourceGrid to DOM
-		resourcesDiv.appendChild(resourceGrid);		
+		// Append resourceGrid and add entire div to DOM
+		resourcesDiv.appendChild(resourceGrid);	
+		parentAccordionDiv.appendChild(resourcesDiv);		
 		
 	}
 }
