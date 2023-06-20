@@ -367,7 +367,7 @@ class AccordionForm {
 	/**
 	 * Script for accordion feature
 	 */
-	initializeCampResources(){
+	initiateCampResources(){
 		// get Div to insert child into
 		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
 
