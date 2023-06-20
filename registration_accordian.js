@@ -131,6 +131,7 @@ class AccordionForm {
 	script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
 	document.body.appendChild(script);
 	}
+	
 	/**
 	 * Render single json form data
 	 * @param responseText - single form object provided by API
@@ -152,6 +153,7 @@ class AccordionForm {
 		  $this.initiateLightbox();
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
+		  $this.initiateCampResources();
 	}
 	/**
 	 * Display Program name for single program
@@ -360,5 +362,50 @@ class AccordionForm {
 			scrolling: true,
 		  });
 		});
+	}
+
+	/**
+	 * Script for accordion feature
+	 */
+	initializeCampResources(){
+		// get Div to insert child into
+		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
+
+		// create Resources div
+		const resourcesDiv = document.createElement('div');
+		resourcesDiv.classList.add('portal-dash-resources');
+
+		// Resources heading
+		const headingEl = document.createElement('p');
+		headingEl.classList.add('portal-subheader');
+		headingEl.textContent = "Resources";
+		resourcesDiv.appendChild(headingEl);
+
+		// Resources grid
+		const resourceGrid = document.createElement('div');
+		resourceGrid.classList.add('w-layout-grid', 'portal-resources-grid');
+
+		// Packing List
+		const packingHTML = '<a href="https://global-uploads.webflow.com/6271a4bf060d543533060f47/645c80eecc019a3d39d67ce6_2023%20NSD%20Packing%20List.pdf" target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Packing List</p></a>';
+		resourceGrid.insertAdjacentHTML('beforeend', packingHTML);
+
+		// Skill Builder
+		const debateEvent = this.$programDetail.debateEvent;
+		var skillBuilderLink = "#";
+		if (debateEvent === "Lincoln-Douglas") {
+			skillBuilderLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
+		}
+		else if (debateEvent === "Public Forum") {
+			skillBuilderLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
+		}
+
+		if (skillBuilderLink !== "#") {
+			const skillBuilderHTML = '<a href=' + skillBuilderLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">NSD Skill Builder</p></a>';
+			resourceGrid.insertAdjacentHTML('beforeend', skillBuilderHTML);
+		}
+
+		// Add resourceGrid to DOM
+		resourcesDiv.appendChild(resourceGrid);		
+		
 	}
 }
