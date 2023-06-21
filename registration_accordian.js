@@ -407,7 +407,7 @@ class AccordionForm {
 		else if (debateEvent === "Public Forum") {
 			skillBuilderLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
 		}
-		else if (debateEvent === "All Events") {
+		else if (debateEvent === "All Events" || debateEvent === "Worlds School") {
 			var allEventSkillLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
 			var allEventSkillHTML = '<a href=' + allEventSkillLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">LD Skill Builder</p></a>';
 			resourceGrid.insertAdjacentHTML('beforeend', allEventSkillHTML);
