@@ -404,6 +404,20 @@ class AccordionForm {
 			resourceGrid.insertAdjacentHTML('beforeend', skillBuilderHTML);
 		}
 
+		// Schedule
+		const scheduleLink = this.$programDetail.scheduleLink;
+		if (scheduleLink !== "#") {
+			const scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Daily Schedule</p></a>';
+			resourceGrid.insertAdjacentHTML('beforeend', scheduleHTML);
+		}
+
+		// Info Sheet
+		const infoLink = this.$programDetail.logisticLink;
+		if (infoLink !== "#") {
+			const infoHTML = '<a href=' + infoLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Info Sheet</p></a>';
+			resourceGrid.insertAdjacentHTML('beforeend', infoHTML);
+		}
+
 		// Append resourceGrid and add entire div to DOM
 		resourcesDiv.appendChild(resourceGrid);	
 		parentAccordionDiv.appendChild(resourcesDiv);		
