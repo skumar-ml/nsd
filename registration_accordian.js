@@ -130,6 +130,11 @@ class AccordionForm {
 	var script = document.createElement("script");
 	script.setAttribute("src", "https://cdn.logwork.com/widget/countdown.js");
 	document.body.appendChild(script);
+	// added class for completed form	
+	let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+	if(percentageAmount == '100'){
+		accordionDiv.classList.add("completed_form")
+	}
 	}
 	
 	/**
@@ -254,6 +259,10 @@ class AccordionForm {
 		// create and set progress bar & percentage
 		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
 		let accordionFooter = document.getElementById("accordion-footer-"+this.currentIndex);
+		// added class for completed form
+		if(percentageAmount == '100'){
+			accordionFooter.classList.add("completed_form")
+		}
 		accordionFooter.innerHTML ="";
 		let progressbar = document.createElement("div");
 		progressbar.className = "form-progressbar";
