@@ -133,7 +133,7 @@ class AccordionForm {
 	// added class for completed form	
 	let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
 	if(percentageAmount == '100'){
-		accordionDiv.classList.add("completed_form")
+		accordionDiv.classList.add("all_completed_form")
 	}
 	}
 	
@@ -261,7 +261,7 @@ class AccordionForm {
 		let accordionFooter = document.getElementById("accordion-footer-"+this.currentIndex);
 		// added class for completed form
 		if(percentageAmount == '100'){
-			accordionFooter.classList.add("completed_form")
+			accordionFooter.classList.add("all_completed_form")
 		}
 		accordionFooter.innerHTML ="";
 		let progressbar = document.createElement("div");
