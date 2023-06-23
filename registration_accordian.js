@@ -396,6 +396,7 @@ class AccordionForm {
 
 		// Topic text
 		const topicText = document.createElement('p');
+		topicText.classList.add('dm-sans', 'bold');
 		if (debateEvent === "Lincoln-Douglas") {
 			topicText.textContent = "Resolved: The United States ought to guarantee the right to housing.";
 		}
