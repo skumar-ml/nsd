@@ -382,6 +382,7 @@ class AccordionForm {
 	initiateCampResources(){
 		// get Div to insert child into
 		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
+		const debateEvent = this.$programDetail.debateEvent;
 
 		// create Topic div
 		const topicDiv = document.createElement('div');
@@ -423,7 +424,6 @@ class AccordionForm {
 		resourceGrid.insertAdjacentHTML('beforeend', packingHTML);
 
 		// Skill Builder
-		const debateEvent = this.$programDetail.debateEvent;
 		var skillBuilderLink = "#";
 		if (debateEvent === "Lincoln-Douglas") {
 			skillBuilderLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
