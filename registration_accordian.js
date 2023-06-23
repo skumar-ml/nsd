@@ -383,12 +383,33 @@ class AccordionForm {
 		// get Div to insert child into
 		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
 
+		// create Topic div
+		const topicDiv = document.createElement('div');
+		topicDiv.classList.add('portal-dash-resources');
+
+		// Topic heading
+		var headingEl = document.createElement('p');
+		headingEl.classList.add('portal-subheader');
+		headingEl.textContent = "Camp Topic";
+		topicDiv.appendChild(headingEl);
+
+		// Topic text
+		const topicText = document.createElement('p');
+		if (debateEvent === "Lincoln-Douglas") {
+			topicText.textContent = "Resolved: The United States ought to guarantee the right to housing.";
+		}
+		else if (debateEvent === "Public Forum") {
+			topicText.textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
+		}
+		topicDiv.appendChild(topicText);
+		parentAccordionDiv.appendChild(topicDiv);
+
 		// create Resources div
 		const resourcesDiv = document.createElement('div');
 		resourcesDiv.classList.add('portal-dash-resources');
 
 		// Resources heading
-		const headingEl = document.createElement('p');
+		headingEl = document.createElement('p');
 		headingEl.classList.add('portal-subheader');
 		headingEl.textContent = "Resources";
 		resourcesDiv.appendChild(headingEl);
