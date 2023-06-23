@@ -36,7 +36,7 @@ class NotificationCount {
 			if(pollingCount){
 				pollingCount.remove();
 			}
-			var unreadPolling = this.messageData.filter(data => !data.submissionId)
+			var unreadPolling = messageData.filter(data => !data.submissionId)
 			var notificationPolling = creEl('span', 'polling-count');
 			notificationPolling.innerHTML = unreadPolling.length;
 			pollingBudge.appendChild(notificationPolling)
