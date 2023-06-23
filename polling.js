@@ -32,7 +32,7 @@ class Polling {
 		
 		this.makePollingFilter();
 		this.makePollingList();
-		//this.displayUnreadMessage();
+		this.displayUnreadPolling();
 		
 	}
 	/*Creating pagination array object*/
@@ -52,6 +52,18 @@ class Polling {
 			total_pages: total_pages,
 			data: paginatedItems
 		};
+	}
+	/*display notification polling count based polling-budge class*/
+	displayUnreadPolling(){
+		var pollingBudge = document.getElementsByClassName("polling-budge")[0];
+		var pollingCount = document.getElementsByClassName("polling-count")[0];
+		if(pollingCount){
+			pollingCount.remove();
+		}
+		var unreadPolling = this.messageData.filter(data => !data.submissionId)
+		var notificationPolling = creEl('span', 'polling-count');
+		notificationPolling.innerHTML = unreadPolling.length;
+		pollingBudge.appendChild(notificationPolling)
 	}
 	/*Get message type from api response*/
 	getPollingType(){
@@ -579,6 +591,7 @@ class Polling {
 					responseText.sort(function(a,b){
 					  return new Date(b.created_on) - new Date(a.created_on);
 					});
+					$this.displayUnreadPolling();
 					$this.paginateData = $this.paginatorList(responseText, $this.paginateData.page);
 					$this.refreshData();
 				}
