@@ -29,6 +29,3 @@ class PollingNotificationCount {
 	}
 }
 
-(function() {
-    new PollingNotificationCount(webflowMemberId)
-})();
