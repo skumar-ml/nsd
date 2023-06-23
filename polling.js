@@ -232,7 +232,7 @@ class Polling {
 	viewDownLoadedFile(fileLink, item){
 		var $this = this;
 		var fileName = fileLink
-		var a = creEl('a', 'downloadLink iframe-lightbox-link poll-btn')
+		var a = creEl('a', 'downloadLink iframe-lightbox-link poll-btn main-button red w-button')
 		/*var img = creEl('img','viewIcon')
 		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/643501a495c54e74d70e60ba_view-file.svg";
 		img.title = 'View';
