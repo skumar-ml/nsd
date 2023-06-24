@@ -132,7 +132,13 @@ class selfCheckInForm {
 		//console.log('currentLab', currentLab)
 		//console.log(labId+"&&"+currentLab.typeId +'&&'+currentLab.isChecked)
 		//console.log((labId && currentLab.typeId == undefined  && currentLab.isChecked))
-		if(labId && currentLab.typeId == 4 && currentLab.checkedIn){
+		if(labId && currentLab.typeId == 4 && currentLab.typeName != 'One Time' && currentLab.checkedIn){
+			console.log('already checked in')
+			let checkInIcon = this.getCheckInIcon();
+			btn.classList.add('already-checkedin');
+			btn.innerHTML = 'Already Checked In';
+			btn.prepend(checkInIcon)
+		}else if(labId && currentLab.typeId == 4 && currentLab.typeName == 'One Time' && currentLab.selfCheckin.length > 0){
 			console.log('already checked in')
 			let checkInIcon = this.getCheckInIcon();
 			btn.classList.add('already-checkedin');
