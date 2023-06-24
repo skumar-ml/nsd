@@ -101,7 +101,7 @@ class Polling {
 			var search = searchFilter.value;
 			var condition = new RegExp(search, 'i');
 			messageData = messageData.filter(function (el) {
-			  return condition.test(el.title) || condition.test(el.activityType) || condition.test(el.type) || condition.test(el.sendAs) || condition.test(el.instructorNames.toString());
+			  return condition.test(el.title) || condition.test(el.activityType) || condition.test(el.type) || condition.test(el.sendAs);
 			});
 		}
 		
@@ -282,14 +282,13 @@ class Polling {
 			col_icon.appendChild(read_icon);
 			row.appendChild(col_icon);
 			
-			var col_1 = this.createCol(item.title);
+			var col_1 = this.createCol(item.title, 4);
 			row.appendChild(col_1);
 			
 			
 			var col_2 = this.createCol(item.type, 2);
 			row.appendChild(col_2);
-			var col_3 = this.createCol((item.instructorNames.length > 1)? item.instructorNames[0]+'...': item.instructorNames[0], 2);
-			row.appendChild(col_3);
+			
 			var col_4 = this.createCol(item.activityType, 2);
 			row.appendChild(col_4);
 			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
@@ -306,15 +305,13 @@ class Polling {
 	}
 	/*Creating dom element message list header*/
 	createPollingTitle(){
-		var title = ['', 'Poll Title', 'Type', 'Instructor', 'Activity Type', 'Date']
+		var title = ['', 'Poll Title', 'Type', , 'Activity Type', 'Date']
 		var row = creEl('div', 'w-row')
 		title.forEach(item=> {
-			var col_width = 3
+			var col_width = 4
 			if(item == ''){
 				col_width = 1
 			}else if(item == 'Type' ){
-				col_width = 2
-			}else if(item == 'Instructor'){
 				col_width = 2
 			}else if(item == 'Date'){
 				col_width = 2;
@@ -402,10 +399,6 @@ class Polling {
 		
 		var br = creEl('br')
 		sendBycol.appendChild(br)
-		
-		/*Send As By Name*/
-		var sendAstext = this.creBoldText(item.instructorNames.toString());
-		sendBycol.appendChild(sendAstext);
 		
 		
 		detailHead.appendChild(sendBycol);
