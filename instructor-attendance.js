@@ -437,11 +437,22 @@ class checkInForm {
 					if(sItem.studentemail == studentId){
 						//sItem.isInstructorCheckin = !isInstructorCheckin;
 						sItem.instructorCheckin
-						var selectTimezone = sItem.instructorCheckin.find(data => data.timezoneId == timezoneId)
+						if(currentLab.typeId == 4 || currentLab.typeId == 5){
+							var selectTimezone = sItem.instructorCheckin.find(data => data.timezoneId == null)
+						}else{
+							var selectTimezone = sItem.instructorCheckin.find(data => data.timezoneId == timezoneId)
+						}
+						console.log('selectTimezone', selectTimezone)
 						if(selectTimezone){
 							sItem.instructorCheckin.map(data => {
-								if(data.timezoneId == timezoneId){
-									data.checkedIn = !isInstructorCheckin;
+								if(currentLab.typeId == 4 || currentLab.typeId == 5){
+									if(data.timezoneId == null){
+										data.checkedIn = !isInstructorCheckin;
+									}
+								}else{
+									if(data.timezoneId == timezoneId){
+										data.checkedIn = !isInstructorCheckin;
+									}
 								}
 								return data;
 							})
