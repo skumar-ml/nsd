@@ -344,11 +344,14 @@ class checkInForm {
 		this.$currentLab = currentLab;
 		this.$currentLabStudent = currentLabStudent;
 		
-		var timeZoneOpacity = (currentLab.typeId != 4) ? 1 : 0;
+		var timeZoneOpacity = (currentLab.typeId != 4 && currentLab.typeId != 5) ? 1 : 0;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		timeZoneSelect.style.opacity = timeZoneOpacity;
+		if(!timeZoneOpacity){
+			var opacity = 1;
+		}else{
 		var opacity = (labId && timeZoneSelect.value) ? 1 : 0;
-		
+		}
 		var btn = document.getElementsByClassName('student-list-head')[0];
 		btn.style.opacity = opacity;
 		//btn.style.transition = 'all 2s';
@@ -366,9 +369,15 @@ class checkInForm {
 			var col_1 = this.createCol(item.studentname,6);
 			row.appendChild(col_1);
 
-			var selectTimezone = item.selfCheckin.find(data => data.timezoneId == timeZoneSelect.value)
-
-			var selectInsTimezone = item.instructorCheckin.find(data => data.timezoneId == timeZoneSelect.value)
+			
+			if(currentLab.typeId == 4 || currentLab.typeId == 5){
+				var selectInsTimezone = item.instructorCheckin.find(data => data.timezoneId == null)
+				var selectTimezone = item.selfCheckin.find(data => data.timezoneId == null)
+			}else{
+				var selectInsTimezone = item.instructorCheckin.find(data => data.timezoneId == timeZoneSelect.value)
+				var selectTimezone = item.selfCheckin.find(data => data.timezoneId == timeZoneSelect.value)
+			}
+			console.log('selectInsTimezone>>>>', selectInsTimezone, currentLab.typeId)
 			console.log('selectTimezone', selectTimezone)
 			var col_2 = this.createCol('', 3);
 			var icon = $this.getCheckedIcon((selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false);
