@@ -1,4 +1,4 @@
-const coachResourceGrid = document.getElementsById('coach-resource-grid');
+const coachResourceGrid = document.getElementById('coach-resource-grid');
 const coachCampText = document.getElementById('service');
 
 var scheduleLink = "#"
