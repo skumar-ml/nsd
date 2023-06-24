@@ -1,7 +1,7 @@
 function coachResources(coachCampId) {
 
   const coachResourceGrid = document.getElementById('coach-resource-grid');
-  const coachCampText = document.getElementById('service');
+  const coachCampText = document.getElementById('coach-service');
   
   var scheduleLink = "#"
   // Texas PF
