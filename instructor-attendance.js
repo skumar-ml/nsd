@@ -266,10 +266,12 @@ class checkInForm {
 		defaultoption.text = "Select Labs";
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
+			if(item.labid){
 			var option = creEl("option");
 				option.value = item.labid;
 				option.text = item.labname;
 				labsSelectBox.appendChild(option);
+			}
 		})
 		/*Showing by default first labs*/
 		/*setTimeout(function() {
