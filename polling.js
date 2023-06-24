@@ -288,9 +288,8 @@ class Polling {
 			
 			var col_2 = this.createCol(item.type, 2);
 			row.appendChild(col_2);
-			
-			var col_4 = this.createCol(item.activityType, 2);
-			row.appendChild(col_4);
+				var col_4 = this.createCol((item.activityType) ? item.activityType : '-', 2);
+				row.appendChild(col_4);
 			var col_5 = this.createCol(this.formatedDate(item.created_on), 2);
 			
 			row.appendChild(col_5);
@@ -413,7 +412,7 @@ class Polling {
 		dateTextcol.innerHTML = title;
 		contain.appendChild(dateTextcol);
 		*/
-		var message = item.activityType;
+		var message = (item.activityType)? item.activityType : '-';
 		var dateMessagecol = creEl("div", 'w-col w-col-12 details-message');
 		dateMessagecol.innerHTML = '<b>Activity Type</b>: '+ message;
 		contain.appendChild(dateMessagecol);
