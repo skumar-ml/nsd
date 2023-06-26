@@ -458,7 +458,7 @@ class checkInForm {
 	/*Update current attendance data*/
 	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId){
 		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId);
-		var labsData = this.labsData;
+		/*var labsData = this.labsData;
 		var currentLab = this.$currentLab;
 		//currentLab.map(item =>{
 				currentLab.studentDeatils.map(sItem => {
@@ -487,7 +487,7 @@ class checkInForm {
 						}else{
 							var checkdata = {};
 							checkdata.checkedIn = !isInstructorCheckin;
-							checkdata.timezoneId = timezoneId;
+							checkdata.timezoneId = (timezoneId)?timezoneId: null;
 							sItem.instructorCheckin.push(checkdata);
 						}
 					}
@@ -498,6 +498,7 @@ class checkInForm {
 		this.$currentLab = currentLab
 		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils, this.$currentLabStudent.page);
 		this.refreshData();
+		*/
 	}
 	/*Get tick icon for checked in*/
 	getCheckInIcon(){
@@ -532,6 +533,7 @@ class checkInForm {
 			let responseText =  JSON.parse(xhr.responseText);
 			//console.log('responseText', responseText)
 			//$this.updateCurrentData();
+			$this.getUpdatedLabsData(currentLab.labid)
 		}
 		
 	}
@@ -583,6 +585,22 @@ class checkInForm {
 		paginationStuList.innerHTML = "";
 		var labsSelectBox = document.getElementById('select-labs');
 		this.displayStudentList(labsSelectBox.value);
+	}
+	getUpdatedLabsData(labid){
+		var xhr = new XMLHttpRequest()
+		var $this = this;
+		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getStudentAttendance/"+$this.webflowMemberId, true)
+		xhr.withCredentials = false
+		xhr.send()
+		xhr.onload = function() {
+			let responseText =  JSON.parse(xhr.responseText);
+			$this.labsData	= responseText.Lab;
+			var currentLab = responseText.Lab.find(item => item.labid == labid);
+			
+			$this.$currentLab = currentLab
+			$this.$currentLabStudent = $this.paginatorList(currentLab.studentDeatils, $this.$currentLabStudent.page);
+			$this.refreshData();
+		}
 	}
 }
 /**
