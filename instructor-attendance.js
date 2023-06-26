@@ -314,7 +314,7 @@ class checkInForm {
 	}
 	/*Creating dom element message list header*/
 	createAttendanceTitle(){
-		var title = ['Student Name', 'Student', 'Instructor']
+		var title = ['Student Name', 'Student Self Check-In', 'Instructor Check-In']
 		//var title = ['Student Name', 'Check-in']
 		var row = creEl('div', 'w-row student-list-head', 'student-list-head')
 		title.forEach(item=> {
