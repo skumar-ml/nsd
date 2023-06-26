@@ -32,7 +32,7 @@ class checkInForm {
 	/*Creating pagination array object*/
 	paginatorList(items, page, per_page) {
 		var page = page || 1,
-		per_page = per_page || 5,
+		per_page = per_page || 2,
 		offset = (page - 1) * per_page,
 
 		paginatedItems = items.slice(offset).slice(0, per_page),
@@ -57,6 +57,9 @@ class checkInForm {
 		studentData.value = "";
 		insCheckinFilter.value = "";
 		studentCheckinFilter.value = "";
+		
+		
+		
 	}
 	/* Creating the DOM element for instructor checked in */
 	createInstructorCheckInFilter(){
@@ -267,10 +270,12 @@ class checkInForm {
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			if(item.labid){
-			var option = creEl("option");
-				option.value = item.labid;
-				option.text = item.labname;
-				labsSelectBox.appendChild(option);
+				if(item.labid){
+					var option = creEl("option");
+					option.value = item.labid;
+					option.text = item.labname;
+					labsSelectBox.appendChild(option);
+				}
 			}
 		})
 		/*Showing by default first labs*/
@@ -283,9 +288,25 @@ class checkInForm {
 			timeZoneSelect.value = "";
 			$this.displayStudentList(this.value, 'init');
 			$this.resetFilter();
+			if(!this.value){
+				$this.hideShowUI();
+			}
 		})
 		
 		return labsSelectBox;
+	}
+	hideShowUI(){
+		console.log("Hide and SHow")
+		var studentlist = document.getElementById('student-list');
+		var btn = document.getElementsByClassName('student-list-head')[0];
+		var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
+		timeZoneSelect.style.opacity = 0;
+		btn.style.opacity = 0;
+		studentlist.style.opacity = 0;
+		studentlistfilter.style.opacity = 0;
+		paginationStudentList.style.opacity = 0;
 	}
 	// Create labs select box html element 
 	getTimeZones(){
@@ -332,7 +353,9 @@ class checkInForm {
 	/*Creating DOM element for student list*/
 	displayStudentList(labId, type=''){
 		
-		
+		if(!labId){
+			return;
+		}
 		
 		var studentlist = document.getElementById('student-list');
 		studentlist.innerHTML = "";
@@ -364,6 +387,9 @@ class checkInForm {
 		
 		studentlist.style.opacity = opacity;
 		//studentlist.style.transition = 'all 2s';
+		
+		var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
+		paginationStudentList.style.opacity = opacity;
 		
 		currentLabStudent.data.forEach((item, index) => {
 			var row = creEl('div', 'w-row')
@@ -470,7 +496,7 @@ class checkInForm {
 		//})
 		console.log('currentLabqqq', currentLab)
 		this.$currentLab = currentLab
-		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils);
+		this.$currentLabStudent = this.paginatorList(currentLab.studentDeatils, this.$currentLabStudent.page);
 		this.refreshData();
 	}
 	/*Get tick icon for checked in*/
