@@ -61,19 +61,32 @@ class selfCheckInForm {
 		defaultoption.text = "Select activity to check in";
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
+			if(item.id){
 			var option = creEl("option");
 				option.value = item.id;
 				option.text = item.name;
 				labsSelectBox.appendChild(option);
+			}
 		})
 		
 		labsSelectBox.addEventListener('change', function () {
 			var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 			timeZoneSelect.value = "";
 			$this.displayCheckInBtn(this.value);
+			if(!this.value){
+				$this.hideShowUI();
+			}
 		})
 		
 		return labsSelectBox;
+	}
+	hideShowUI(){
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		var btn = document.getElementsByClassName('check-in-btn')[0];
+		timeZoneSelect.disabled = true;
+		btn.disabled = true;
+		btn.style.opacity = 0;
+		timeZoneSelect.style.opacity = 0;
 	}
 	// Create labs select box html element 
 	getTimeZones(){
@@ -114,6 +127,9 @@ class selfCheckInForm {
 	}
 	// Display checked in button on lab change
 	displayCheckInBtn(labId){
+		if(!labId){
+			return;
+		}
 		
 		var currentLab = this.labsData.find(item => item.id == labId);
 		this.$currentLab = currentLab;
@@ -121,12 +137,14 @@ class selfCheckInForm {
 		var timeZoneOpacity = (currentLab.typeId == 4 || currentLab.typeId == 5) ? 0 : 1;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		timeZoneSelect.style.opacity = timeZoneOpacity;
+		timeZoneSelect.disabled = (!timeZoneOpacity) ? true : false;
 
 		
 		
 		var opacity = (labId && (timeZoneSelect.value || currentLab.typeId == 4  || currentLab.typeId == 5) ) ? 1 : 0;
 		var btn = document.getElementsByClassName('check-in-btn')[0];
 		btn.style.opacity = opacity;
+		btn.disabled = (!opacity) ? true : false;
 		//btn.style.transition = 'all 2s';
 		
 		//console.log('currentLab', currentLab)
