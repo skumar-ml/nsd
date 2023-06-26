@@ -419,6 +419,7 @@ class checkInForm {
 			//console.log('item.attendanceId', item.attendanceId)
 			icon.addEventListener('click', function(){
 					//var message = (selectInsTimezone && selectInsTimezone.checkedIn) ? "Are you sure want to uncheck-in" : "Are you sure want to check-in";
+					icon.src = "https://cdn.jsdelivr.net/gh/sk1840939/nsd@044393b/loading.gif";
 					var insCheckedIn = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false;
 					var attendanceId = (selectInsTimezone && selectInsTimezone.attendanceId) ? selectInsTimezone.attendanceId : '';
 					var sCheckedIn = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false;
