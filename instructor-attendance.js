@@ -160,6 +160,7 @@ class checkInForm {
 	filterstudentData(){
 		//this.studentData = this.filterData;
 		var studentData = this.$currentLab.studentDeatils;
+		var currentLab = this.$currentLab;
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		
 		console.log('studentData', studentData)
@@ -173,7 +174,11 @@ class checkInForm {
 		//console.log('insCheckinFilter.value', insCheckinFilter.value)
 		if(insCheckinFilter.value){
 			studentData = studentData.filter(item => {
-				var selectInsTimezone = item.instructorCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				if(currentLab.typeId == 4 || currentLab.typeId == 5){
+					var selectInsTimezone = item.instructorCheckin.find(timezone => timezone.timezoneId == null)
+				}else{
+					var selectInsTimezone = item.instructorCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				}
 				var status = (selectInsTimezone && selectInsTimezone.checkedIn) ? selectInsTimezone.checkedIn : false
 				return (status.toString() == insCheckinFilter.value)
 				
@@ -181,7 +186,11 @@ class checkInForm {
 		}
 		if(studentCheckinFilter.value){
 			studentData = studentData.filter(item => {
-				var selectTimezone = item.selfCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				if(currentLab.typeId == 4 || currentLab.typeId == 5){
+					var selectTimezone = item.selfCheckin.find(timezone => timezone.timezoneId == null)
+				}else{
+					var selectTimezone = item.selfCheckin.find(timezone => timezone.timezoneId == timeZoneSelect.value)
+				}
 				var status = (selectTimezone && selectTimezone.checkedIn) ? selectTimezone.checkedIn : false
 				return (status.toString() == studentCheckinFilter.value)
 				
