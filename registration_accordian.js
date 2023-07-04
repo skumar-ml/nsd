@@ -255,7 +255,7 @@ class AccordionForm {
 		// Get and format program dates
 		let startDate = new Date(this.$programDetail.startDate);
 		let endDate = new Date(this.$programDetail.endDate);
-		const program_dates_text = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
+		const program_dates_text = "The team starts on  " + months[startDate.getMonth()] + " " + startDate.getDate();
 		//var program_dates = document.getElementById("program_dates-"+this.currentIndex)
 		//program_dates.innerHTML = "Camp is " + months[startDate.getMonth()] + " " + startDate.getDate() + " to " + months[endDate.getMonth()] + " " + endDate.getDate();
 		
@@ -300,7 +300,7 @@ class AccordionForm {
 		let timer_clock = document.createElement("a");
 		timer_clock.href = "https://logwork.com/countdown-xknf";
 		timer_clock.className = "countdown-timer"; 
-		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", timerDate); timer_clock.setAttribute("data-digitscolor", "#a51c30");
+		timer_clock.setAttribute("data-style", "columns"); timer_clock.setAttribute("data-timezone", "America/Los_Angeles"); timer_clock.setAttribute("data-date", timerDate); timer_clock.setAttribute("data-digitscolor", "#024d84");
 		timer_clock.innerHTML = program_dates_text;
 		
 		let parent = accordionFooter.parentNode;
