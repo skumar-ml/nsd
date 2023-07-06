@@ -1,4 +1,3 @@
-
 /**
  * 	
  * @param name - HTML element name
@@ -64,7 +63,7 @@ class portalForm {
 		var $this = this;
 		  $this.$completedForm = (responseText.formCompletedList) ? responseText.formCompletedList : [];
 		  $this.$invoiceList = responseText.invoiceList;
-		  $this.$classDeatils = responseText.classDeatils;
+		  $this.$classDeatils = responseText.classDetail;
 		  $this.$studentDetail = responseText.studentDetail;
 		  $this.$classLoactionDeatils = responseText.classLoactionDeatils;
 		  $this.$formCompletedList = [];
@@ -94,8 +93,9 @@ class portalForm {
 	 */
 	viewService(){
 		var service = document.getElementById('service');
-		var className = (this.$classDeatils != null) ? this.$classDeatils.className : '';
-		service.innerHTML = this.$studentDetail.studentName+" "+className+" "+this.$classLoactionDeatils.locationName;
+		console.log('this.$classDeatils.classLevel', this.$classDeatils)
+		var classLevel = (this.$classDeatils != null) ? this.$classDeatils.classLevel : '';
+		service.innerHTML = this.$studentDetail.studentName+" - "+classLevel+" - "+this.$classDeatils.startTime+"("+this.$classLoactionDeatils.locationName+")";
 	}
 	
 	/**
@@ -485,10 +485,11 @@ class PortalTabs {
 			if(!is_single){
 				document.getElementById("service-para").style.display = "none";
 				var tabsE = creEl("li", activeliClass, 'li-tab'+currentIndex);
-				var className = (formData.classDeatils != null)? formData.classDeatils.className : '';
-				tabsE.innerHTML = formData.studentDetail.studentName+" - "+className+" "+formData.classLoactionDeatils.locationName;
+				var classLevel = (formData.classDetail != null)? formData.classDetail.classLevel : '';
+				tabsE.innerHTML = formData.studentDetail.studentName+" - "+classLevel+" - "+formData.classDetail.startTime+"("+formData.classLoactionDeatils.locationName+")";
 				tabsE.setAttribute("data-tab-id", 'tab'+currentIndex )
 				tabs.appendChild(tabsE);
+				
 			}
 			
 			var activeClass = (currentIndex == 1 && is_single) ? "active_tab" : "";
@@ -594,5 +595,3 @@ class PortalTabs {
 		}
 	}
 }
-
-
