@@ -19,7 +19,11 @@ function coachResources(coachCampId) {
     coachCampText.textContent = "Philadelphia LD";
     scheduleLink = "https://docs.google.com/spreadsheets/d/13vdr2zF8x-KTI88XV7D3zSFr5CBlZ10lmlUOnIrYsag/edit?usp=sharing";
   }
-  
+  // Minnesota LD
+  else if (coachCampId === "5") {
+    coachCampText.textContent = "Minnesota LD";
+    scheduleLink = "https://docs.google.com/spreadsheets/d/1xd4zkg5wYn6_TbO3JfG2PLrHoVNrkTGsaGvACvAsJAQ/edit?usp=sharing";
+  }  
   var scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Camp Schedule</p></a>';
   coachResourceGrid.insertAdjacentHTML('beforeend', scheduleHTML)
 }
