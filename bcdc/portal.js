@@ -1,6 +1,4 @@
-const webflowMemberId = "6447c1fed6f151000230c426";
-const apiBaseUrl = 'https://73u5k1iw5h.execute-api.us-east-1.amazonaws.com/prod/camp/';
-const accountEmail = 'kooslim@gmail.com';
+
 /**
  * 	
  * @param name - HTML element name
@@ -36,7 +34,7 @@ class ApiClient {
 		}
 	}
 }
-const api = new ApiClient(apiBaseUrl);
+
 
 class portalForm {
 	$completedForm = [];
@@ -598,4 +596,3 @@ class PortalTabs {
 }
 
 
-const renderer = new PortalTabs(api, webflowMemberId, accountEmail);
