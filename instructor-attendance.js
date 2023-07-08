@@ -325,7 +325,7 @@ class checkInForm {
 		var labsSelectBox = creEl('select', 'select-timezones w-select', 'select-timezone')
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
-		defaultoption.text = "Select Timezone";
+		defaultoption.text = "Select Time Slot";
 		labsSelectBox.appendChild(defaultoption);
 		labs.forEach(item => {
 			var option = creEl("option");
