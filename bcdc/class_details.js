@@ -1,4 +1,3 @@
-
 /**
  * 	
  * @param name - HTML element name
@@ -175,7 +174,7 @@ class classLocation{
 				var spinner = document.getElementById('half-circle-spinner');
 				spinner.style.display = 'block';				
 				setTimeout(function() {
-					new classDetails(api, $this.webflowMemberId, $this.accountEmail)
+					new classDetails(api, $this.webflowMemberId, $this.accountEmail, this.levelId)
 				}, 500);
 			},
 			scrolling: true,
@@ -220,5 +219,3 @@ class classDetails {
 		}
 	}
 }
-
-
