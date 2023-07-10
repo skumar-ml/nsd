@@ -35,6 +35,7 @@ class ApiClient {
 		}
 	}
 }
+const api = new ApiClient(apiBaseUrl);
 class classLocation{
 	constructor(webflowMemberId,responseText,currentIndex, accountEmail, levelId, levelName){
 		this.webflowMemberId = webflowMemberId;
