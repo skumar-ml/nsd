@@ -199,7 +199,7 @@ class classDetails {
 	}
 	async renderPortalData(memberId) {
 		try {
-		  const data = await this.apiClient.fetchData('getClassDetails?levelId='+this.levelId);
+		  const data = await this.apiClient.fetchData('getClassDetailByMemberIdAndLevelId?levelId='+this.levelId+'&memberId='+this.webflowMemberId);
 		  var $this = this;
 		  console.log('data', data)
 		  var locationData = data[0][0].location;
