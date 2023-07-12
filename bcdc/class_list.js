@@ -19,6 +19,7 @@ class classLists {
 	}
 	viewClassLocations(classData){
 		var timingElement = document.getElementsByClassName('location-dropdown-day-time');
+		var detailsLinkElement = document.getElementsByClassName('main-button w-button');
 		for(let i=0; i<timingElement.length; i++){
 			let levelId = timingElement[i].getAttribute('levelId');
 			let location = timingElement[i].getAttribute('location');
@@ -32,7 +33,7 @@ class classLists {
 					timingData.forEach((timeData,index)=>{
 						timingText = timingText+' '+timeData.day+" "+timeData.startTime+"-"+timeData.endTime+"&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp";
 					})
-					console.log(levelId, location, timingText)
+					//console.log(levelId, location, timingText)
 					timingText = timingText.replace(/PM/g, "")
 					timingText = timingText.replace(/AM/g, "")
 					timingElement[i].innerHTML = timingText;
@@ -41,6 +42,12 @@ class classLists {
 				}
 			})
 			
+		}
+		for(let j=0; j<detailsLinkElement.length; j++){
+			let linkLevelId = detailsLinkElement[j].getAttribute('levelId');
+			if(linkLevelId){
+				detailsLinkElement[j].href = 'https://www.bergendebate.com/portal/class-details?levelId='+linkLevelId;
+			}
 		}
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'none';
