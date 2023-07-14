@@ -14,6 +14,11 @@ function coachResources(coachCampId) {
     coachCampText.textContent = "Texas LD";
     scheduleLink = "https://docs.google.com/spreadsheets/d/1sRCxAjMODRSbjtewP0ra8iGRTVVs1DyTnKYQw6SxhFc/edit?usp=sharing";
   }
+  // Philadelphia PF
+  else if (coachCampId === "3") {
+    coachCampText.textContent = "Philadelphia PF";
+    scheduleLink = "https://docs.google.com/spreadsheets/d/1ATEdPhP6cyOWhtiM88KWkgR2OBMrlLiYzZUlgnoHZS0/edit?usp=sharing";
+  }
   // Philadelphia LD
   else if (coachCampId === "4") {
     coachCampText.textContent = "Philadelphia LD";
