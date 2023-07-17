@@ -29,6 +29,11 @@ function coachResources(coachCampId) {
     coachCampText.textContent = "Minnesota LD";
     scheduleLink = "https://docs.google.com/spreadsheets/d/1xd4zkg5wYn6_TbO3JfG2PLrHoVNrkTGsaGvACvAsJAQ/edit?usp=sharing";
   }  
+   // Online PF Camp
+  // else if (coachCampId === "8") {
+  //   coachCampText.textContent = "Online PF Camp";
+  //   scheduleLink = "https://docs.google.com/spreadsheets/d/1dTC-_Z7aiHJOoJAlMkLdcFnG-q9dTuZPkmuvlaPzy48/edit#gid=0";
+  // }  
   var scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Camp Schedule</p></a>';
   coachResourceGrid.insertAdjacentHTML('beforeend', scheduleHTML)
 }
