@@ -58,11 +58,11 @@ renderLeaderboard(responseText) {
 	
 			// Create lab and score divs
 			const labDiv = document.createElement('div');
-			scoreDiv.classList.add('div-block-21');
+			labDiv.classList.add('div-block-21');
 	
 			const labText = document.createElement('p');
-			paragraphText.classList.add('center margin-top-10px');
-			paragraphText.textContent(labName);
+			labText.classList.add('center margin-top-10px');
+			labText.textContent(labName);
 	
 			labDiv.appendChild(labText);
 	
@@ -70,8 +70,8 @@ renderLeaderboard(responseText) {
 			scoreDiv.classList.add('div-block-21');
 	
 			const scoreText = document.createElement('p');
-			paragraphText.classList.add('center margin-top-10px');
-			paragraphText.textContent(count);
+			scoreText.classList.add('center margin-top-10px');
+			scoreText.textContent(count);
 	
 			scoreDiv.appendChild(scoreText);
 	
