@@ -24,7 +24,7 @@ function creEl(name,className,idName){
 class showLeaderboard {
 	constructor(webflowMemberId,responseText){
 		this.webflowMemberId = webflowMemberId;
-		renderLeaderboard(responseText);
+		this.renderLeaderboard(responseText);
 	}
   
 renderLeaderboard(responseText) {
