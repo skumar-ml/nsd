@@ -62,7 +62,7 @@ renderLeaderboard(responseText) {
 	
 			const labText = document.createElement('p');
 			labText.classList.add('center',  'margin-top-10px');
-			labText.textContent(labName);
+			labText.textContent= labName;
 	
 			labDiv.appendChild(labText);
 	
@@ -71,7 +71,7 @@ renderLeaderboard(responseText) {
 	
 			const scoreText = document.createElement('p');
 			scoreText.classList.add('center', 'margin-top-10px');
-			scoreText.textContent(count);
+			scoreText.textContent = count;
 	
 			scoreDiv.appendChild(scoreText);
 	
