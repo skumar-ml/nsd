@@ -38,13 +38,15 @@ renderLeaderboard(responseText) {
 	gridDiv.classList.add('w-layout-grid', 'leaderboard-grid');
 
 	// Header Row
-	const paragraphElement = document.createElement('p');
+	const LabHeader = document.createElement('p');
 	paragraphElement.classList.add('center', 'bold-text', 'dm-sans');
 	paragraphElement.textContent = 'Lab';
-	gridDiv.appendChild(paragraphElement);
+	gridDiv.appendChild(LabHeader);
 
+	const ScoreHeader = document.createElement('p');
+	paragraphElement.classList.add('center', 'bold-text', 'dm-sans');
 	paragraphElement.textContent = 'Score';
-	gridDiv.appendChild(paragraphElement);
+	gridDiv.appendChild(ScoreHeader);
 
 	// Lab Score Rows
 	for (const item of output) {
