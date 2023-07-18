@@ -77,5 +77,5 @@ renderLeaderboard(responseText) {
 	// Add to Webflow DOM
 	leaderDiv = document.getElementById('attendanceLeaderboard');
 	leaderDiv.appendChild(gridDiv); 
-
   }
+}
