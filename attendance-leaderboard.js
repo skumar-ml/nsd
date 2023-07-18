@@ -41,13 +41,13 @@ renderLeaderboard(responseText) {
 	
 		// Header Row
 		const LabHeader = document.createElement('p');
-		paragraphElement.classList.add('center', 'bold-text', 'dm-sans');
-		paragraphElement.textContent = 'Lab';
+		LabHeader.classList.add('center', 'bold-text', 'dm-sans');
+		LabHeader.textContent = 'Lab';
 		gridDiv.appendChild(LabHeader);
 	
 		const ScoreHeader = document.createElement('p');
-		paragraphElement.classList.add('center', 'bold-text', 'dm-sans');
-		paragraphElement.textContent = 'Score';
+		ScoreHeader.classList.add('center', 'bold-text', 'dm-sans');
+		ScoreHeader.textContent = 'Score';
 		gridDiv.appendChild(ScoreHeader);
 	
 		// Lab Score Rows
