@@ -30,7 +30,7 @@ class showLeaderboard {
   
 renderLeaderboard(responseText) {
 	console.log(responseText);
-	output = responseText.output;
+	const output = responseText.output;
 	console.log(output);
 
 	// Create Overall Div
@@ -77,7 +77,7 @@ renderLeaderboard(responseText) {
 	}
 
 	// Add to Webflow DOM
-	leaderDiv = document.getElementById('attendanceLeaderboard');
+	const leaderDiv = document.getElementById('attendanceLeaderboard');
 	leaderDiv.appendChild(gridDiv); 
   }
 }
