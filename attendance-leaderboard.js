@@ -23,11 +23,13 @@ function creEl(name,className,idName){
  */
 class showLeaderboard {
 	constructor(webflowMemberId,responseText){
+		this.responseText = responseText;
 		this.webflowMemberId = webflowMemberId;
-		this.renderLeaderboard(responseText);
+		this.renderLeaderboard(this.responseText);
 	}
   
 renderLeaderboard(responseText) {
+	console.log(responseText);
 	output = responseText.output;
 	console.log(output);
 
