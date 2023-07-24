@@ -31,6 +31,18 @@ class checkInForm {
 	}
 	/*Creating pagination array object*/
 	paginatorList(items, page, per_page) {
+		
+		//Alphabetical order sorting
+		items.sort(function (a, b) {
+		  if (a.studentname < b.studentname) {
+			return -1;
+		  }
+		  if (a.studentname > b.studentname) {
+			return 1;
+		  }
+		  return 0;
+		});
+		
 		var page = page || 1,
 		per_page = per_page || 100,
 		offset = (page - 1) * per_page,
