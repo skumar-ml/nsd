@@ -54,7 +54,7 @@ renderLeaderboard(responseText) {
 		for (const item of output) {
 			// Access the properties of each item within the array
 			const labName = item.labName;
-			const count = item.count; 
+			const count = item.percentage; 
 	
 			// Create lab and score divs
 			const labDiv = document.createElement('div');
