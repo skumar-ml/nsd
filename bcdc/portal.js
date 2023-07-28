@@ -44,6 +44,7 @@ class portalForm {
 	$studentDetail = {};
 	$formCompletedList = [];
 	$totalForm = 0;
+	$totalInvoice = 0;
 	$isLiveProgram = true;
 	$completetdInvoice = 0;
 	constructor(webflowMemberId,responseText,currentIndex, accountEmail){
@@ -63,21 +64,22 @@ class portalForm {
 		var $this = this;
 		  $this.$completedForm = (responseText.formCompletedList) ? responseText.formCompletedList : [];
 		  $this.$invoiceList = responseText.invoiceList;
+		  $this.$formList = responseText.formList;
 		  $this.$classDeatils = responseText.classDetail;
 		  $this.$studentDetail = responseText.studentDetail;
 		  $this.$classLoactionDeatils = responseText.classLoactionDeatils;
-		  $this.$formCompletedList = [];
+		  //$this.$formCompletedList = [];
 		  //$this.checkProgramDeadline();
 		  // unhide when form is live
-		  //$this.viewForms();
+		  $this.viewForms();
 		  $this.viewService();
 		  $this.viewInvoice();
 		  // unhide when form is live
-		  //$this.renderAccordionFormsHeader();
+		  $this.renderAccordionFormsHeader();
 		  
 		  ;
 		  // unhide when form is live
-		  //$this.setPercentage();
+		  $this.setPercentage();
 		  if(responseText.invoiceList){
 				$this.renderAccordionInvoiceHeader()
 				$this.setInvoicePercentage();
@@ -103,63 +105,85 @@ class portalForm {
 	 */
 	viewForms(){
 		var $this = this;
-       if(this.$invoiceList){
-			
-		   let parentInvoiceForm = this.$invoiceList;
-		   var accordionDiv = document.getElementById("accordionforms-"+$this.currentIndex);
-		   accordionDiv.innerHTML = "";
-		   var $tabNo = 1;
-		   $this.$totalForm = 0;
-		   parentInvoiceForm.sort(function(r,a){return r.sequence-a.sequence}); // order invoice categories via order specified in MongoDB
-		   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
-			var labelDiv = creEl("div", "label label-"+$this.currentIndex);
-			// check forms for completion and put corresponding icon & text
-			var checkAllForms = $this.checkAllForms(parentInvoiceForm);
-			var imgUncheck = creEl("img",'all-img-status');
-			imgUncheck.src = $this.getCheckedIcon(checkAllForms);
-			var textUncheck = $this.getCheckedText(checkAllForms);
-			labelDiv.innerHTML = 'Forms';
-			labelDiv.prepend(imgUncheck, textUncheck)
-			var accordionContentDiv = document.createElement("div");
-			accordionContentDiv.className="accordion-content";
-			var ul= creEl('ul');
-			// for every form category in parentInvoiceForm, start building accordion
-		   parentInvoiceForm.forEach((invoice, i) => {
-			   //check it's editable
-			   let editable = $this.checkform(invoice.invoice_id);
-			   var li=creEl('li');;
-			   // Added cross line for completed forms
-			   var li_text=creEl('span', 'invoice_name'+((editable)? ' completed_form': ''));
-			   var imgCheck = creEl("img");
-			   imgCheck.src = $this.getCheckedIcon(editable);
-			   li_text.innerHTML = 'Forms '+(i+1);
-			   li.prepend(imgCheck, li_text);
+		if($this.$formList){
+			let parentFormList = this.$formList;
+			var accordionDiv = document.getElementById("accordionforms-"+$this.currentIndex);
+			accordionDiv.innerHTML = "";
+			var $tabNo = 1;
+			$this.$totalForm = 0;
+			parentFormList.sort(function(r,a){return r.sequence-a.sequence}); // order invoice categories via order specified in MongoDB
+			parentFormList.forEach((form) => {
+				console.log('forms', form)
+				var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
+				var labelDiv = creEl("div", "label label-"+$this.currentIndex);
+				// check forms for completion and put corresponding icon & text
+				var checkAllForms = $this.checkAllForms(form.forms);
+				var imgUncheck = creEl("img",'all-img-status');
+				imgUncheck.src = $this.getCheckedIcon(checkAllForms);
+				var textUncheck = $this.getCheckedText(checkAllForms);
+				labelDiv.innerHTML = form.name;
+				labelDiv.prepend(imgUncheck, textUncheck)
+				var accordionContentDiv = document.createElement("div");
+				accordionContentDiv.className="accordion-content";
+				var ul= creEl('ul');
+				
+				// for every form category in parentInvoiceForm, start building accordion
+				form.forms.forEach((cForm, i) => {
+					//check it's editable
+					let editable = $this.checkform(cForm.formId);
+					let is_live = cForm.is_live;
+					var li=creEl('li');;
+					// Added cross line for completed forms
+					var li_text=creEl('span', 'invoice_name'+((editable)? ' completed_form': ''));
+					var imgCheck = creEl("img");
+					imgCheck.src = $this.getCheckedIcon(editable);
+					li_text.innerHTML = cForm.name;
+					li.prepend(imgCheck, li_text);
 
-			   var jotFormUrlLink = invoice.jotFormUrlLink;	
-			   jotFormUrlLink.sort((a,b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-				var linkContainer = creEl('div', 'link-container');   
-				var formLink=creEl('a');
-				formLink.href = 'https://form.jotform.com/231290501951449';
-				//Add iframe when it's live and above certain screenwidth
-				formLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
-				var span=creEl('span', 'invoice_text');
-					span.innerHTML = 'Go to forms';
+				   
+					var linkContainer = creEl('div', 'link-container');   
+					var formLink=creEl('a');
 					
-				formLink.append(span)
-				linkContainer.append(formLink);
-				li.append(linkContainer);
-			   
-			   
-			   ul.appendChild(li);
-			   $this.$totalForm++;
-		   })
-		   accordionContentDiv.appendChild(ul)
-		   accordionContainerDiv.prepend(labelDiv, accordionContentDiv);
-		   accordionDiv.appendChild(accordionContainerDiv);
-		   $tabNo++;
-	   }
-	
-		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+					// display link/text depending on if form is live/editable
+					if(is_live){
+					if(editable){
+					   let dbData = $this.getformData(cForm.formId)
+						if(this.$isLiveProgram  && cForm.is_editable){
+							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId="+$this.webflowMemberId+"&classId="+$this.$classDeatils.classId+"&studentName="+$this.$studentDetail.studentName+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
+						}else{
+						   formLink.href = "https://www.jotform.com/submission/"+dbData.submissionId;
+					   }
+					}else{
+						formLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&classId="+$this.$classDeatils.classId+"&studentName="+$this.$studentDetail.studentName+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification	 : "";
+				    }
+					}
+					//Add iframe when it's live and above certain screenwidth
+					formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+					var span=creEl('span', 'action_text');
+				    if(is_live){
+						span.innerHTML = (editable) ? ((this.$isLiveProgram && cForm.is_editable) ? "Edit form" : "View Form" ): "Go to form";
+					}else{
+						span.innerHTML = "Coming Soon";
+					}	
+						
+						
+						
+					formLink.append(span)
+					linkContainer.append(formLink);
+					
+					
+					
+					li.append(linkContainer);
+					ul.appendChild(li);
+					$this.$totalForm++;
+				})
+				accordionContentDiv.appendChild(ul)
+				accordionContainerDiv.prepend(labelDiv, accordionContentDiv);
+				accordionDiv.appendChild(accordionContainerDiv);
+				$tabNo++;
+			})
+		}
+       let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
 		if(percentageAmount == '100'){
 			accordionDiv.classList.add("all_completed_form")
 		}
@@ -176,7 +200,7 @@ class portalForm {
 		   var accordionDiv = document.getElementById("accordion-"+$this.currentIndex);
 		   accordionDiv.innerHTML = "";
 		   var $tabNo = 1;
-		   $this.$totalForm = 0;
+		   $this.$totalInvoice = 0;
 		   parentInvoiceForm.sort(function(r,a){return r.sequence-a.sequence}); // order invoice categories via order specified in MongoDB
 		   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-invoice-"+$tabNo+$this.currentIndex)
 			var labelDiv = creEl("div", "label label-"+$this.currentIndex);
@@ -236,7 +260,7 @@ class portalForm {
 			   
 			   
 			   ul.appendChild(li);
-			   $this.$totalForm++;
+			   $this.$totalInvoice++;
 		   })
 		   accordionContentDiv.appendChild(ul)
 		   accordionContainerDiv.prepend(labelDiv, accordionContentDiv);
@@ -244,7 +268,7 @@ class portalForm {
 		   $tabNo++;
 	   }
 	
-		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+		let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalInvoice : 0;
 		if(percentageAmount == '100'){
 			accordionDiv.classList.add("all_completed_form")
 		}
@@ -256,7 +280,7 @@ class portalForm {
 	 */
 	checkform($formId){
 		if($formId){
-			const found = this.$formCompletedList.some(el => el.invoice_id == $invoice_id);
+			const found = this.$completedForm.some(el => el.formId == $formId);
 			return found;
 		}
 		return false;
@@ -276,7 +300,6 @@ class portalForm {
 	 * @param forms - forms Array Object
 	 */
 	checkAllForms(forms){
-		return false;
 		if(forms){
 			// showing status only for live forms
 			var form = forms.filter((item => item.is_live));
@@ -284,6 +307,7 @@ class portalForm {
 			//var formsId = forms.map((formItem) => formItem.formId.toString());
 			var completedFormsId = this.$completedForm.map((formItem) => formItem.formId.toString());
 			const compareForm = completedFormsId.filter((obj) => formsId.indexOf(obj) !== -1);
+			console.log('compareForm', compareForm)
 			const uniqueform = compareForm.filter((value, index, self) => self.indexOf(value) === index)
 			return ((formsId.length === uniqueform.length) && (formsId.every(val => uniqueform.includes(val))));
 		}
@@ -374,7 +398,7 @@ class portalForm {
 		
 		
 		// create and set progress bar & percentage
-		let percentageAmount = (this.$completetdInvoice) ? (100 * this.$completetdInvoice) / this.$totalForm : 0;
+		let percentageAmount = (this.$completetdInvoice) ? (100 * this.$completetdInvoice) / this.$totalInvoice : 0;
 		let accordionInvoiceHeader = document.getElementById("accordion-invoice-header-"+this.currentIndex);
 		if(percentageAmount == '100'){
 			accordionInvoiceHeader.classList.add("all_completed_form")
@@ -383,7 +407,7 @@ class portalForm {
 		let progressbar = document.createElement("div");
 		progressbar.className = "form-progressbar";
 		let protext = document.createElement("p");
-		protext.innerHTML = "<span class='percentage-value-invoice-"+this.currentIndex+"'>0%</span> / "+this.$completetdInvoice+" of "+this.$totalForm+" invoices complete &nbsp;";
+		protext.innerHTML = "<span class='percentage-value-invoice-"+this.currentIndex+"'>0%</span> / "+this.$completetdInvoice+" of "+this.$totalInvoice+" invoices complete &nbsp;";
 		let progressContainer = document.createElement("div");
 		progressContainer.className = "progress-container progress-container-invoice-"+this.currentIndex;
 		progressContainer.setAttribute("data-percentage-invoice", (Math.round(percentageAmount)) ? Math.round(percentageAmount) : 0);
