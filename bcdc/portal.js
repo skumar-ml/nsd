@@ -233,7 +233,7 @@ class portalForm {
 				   if(jotFormUrlLink.length > 0){
 					jotFormUrlLink.forEach(link => {
 						var formLink=creEl('a');
-						formLink.href = (link.formid) ? "https://form.jotform.com/"+link.formid+"?memberId="+$this.webflowMemberId+"&invoiceId="+invoice.invoice_id+"&paymentLinkId="+link.paymentLinkId : "";
+						formLink.href = (link.formid) ? "https://form.jotform.com/"+link.formid+"?memberId="+$this.webflowMemberId+"&invoiceId="+invoice.invoice_id+"&paymentLinkId="+link.paymentLinkId+"&paymentId="+$this.$studentDetail.uniqueIdentification : "";
 						//Add iframe when it's live and above certain screenwidth
 						formLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
 						var span=creEl('span', 'invoice_text');
