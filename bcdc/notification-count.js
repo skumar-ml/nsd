@@ -20,7 +20,7 @@ class NotificationCount {
 	getNotificationData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://73u5k1iw5h.execute-api.us-east-1.amazonaws.com/prod/camp/getNotifications//"+$this.webflowMemberId, true)
+		xhr.open("GET", "https://73u5k1iw5h.execute-api.us-east-1.amazonaws.com/prod/camp/getNotifications/"+$this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {
