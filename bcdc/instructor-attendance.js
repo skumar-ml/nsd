@@ -480,7 +480,7 @@ class checkInForm {
   * Class for Handling API for Classs Data
   * @param webflowMemberId - MemberId
   */
-class ClasssData {
+class ClassData {
 	$isLoading = true;
 	$studentData = '';
 	constructor(webflowMemberId){
