@@ -127,7 +127,7 @@ class checkInForm {
 	makeAttendanceFilter(){
 		//var attendanceFilter = document.getElementById("attendance-filter");
 		/*Filter*/
-		var attendanceHeader = creEl('div', 'attendance-header w-layout-grid grid-3', 'attendance-header')
+		var attendanceHeader = creEl('div', 'attendance-header w-layout-grid grid-6', 'attendance-header')
 		var instructorFilter = this.createInstructorCheckInFilter();
 		var searchFilter = this.createSearchFilter();
 		attendanceHeader.appendChild(instructorFilter);
