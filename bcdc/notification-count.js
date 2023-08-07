@@ -29,7 +29,3 @@ class NotificationCount {
 		}
 	}
 }
-
-(function() {
-    new NotificationCount(webflowMemberId)
-})();
