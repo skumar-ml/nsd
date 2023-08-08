@@ -75,7 +75,7 @@ class checkInForm {
 		var $this = this;
 		var col = creEl("div", 'col');
 		var classel = creEl("classel", 'form-field-classel')
-		classel.innerHTML = "Coach";
+		classel.innerHTML = "Status";
 		col.appendChild(classel)
 		
 		var dateFilter = creEl('select', 'ins-checkin-filter w-select', 'ins-checkin-filter');
