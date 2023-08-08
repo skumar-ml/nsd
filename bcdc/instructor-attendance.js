@@ -252,9 +252,7 @@ class checkInForm {
 		var studentlist = document.getElementById('student-list');
 		var btn = document.getElementsByClassName('student-list-head')[0];
 		var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
-		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
-		timeZoneSelect.style.opacity = 0;
 		btn.style.opacity = 0;
 		studentlist.style.opacity = 0;
 		studentlistfilter.style.opacity = 0;
