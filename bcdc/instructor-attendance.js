@@ -228,7 +228,7 @@ class checkInForm {
 		/*Added by default first class and removed select Class option*/
 		var defaultoption = creEl("option");
 		defaultoption.value = "";
-		defaultoption.text = "Select Classs";
+		defaultoption.text = "Select Class";
 		classSelectBox.appendChild(defaultoption);
 		Class.forEach(item => {
 			if(item.classId){
