@@ -246,7 +246,7 @@ class portalForm {
 				   }
 				   
 			   }else{
-					var formLink=creEl('a');
+					var formLink=creEl('a', (editable)? 'completed_form_link': '');
 					//formLink.href = "https://www.jotform.com/submission/"+invoice.submissionId;
 					//Add iframe when it's live and above certain screenwidth
 					//formLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
