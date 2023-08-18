@@ -217,7 +217,7 @@ class portalForm {
 			// for every form category in parentInvoiceForm, start building accordion
 		   parentInvoiceForm.forEach((invoice) => {
 			   //check it's editable
-			   let editable = (invoice.submissionId) ? true : false;
+			   let editable = (invoice.is_completed) ? true : false;
 			   var li=creEl('li');;
 			   // Added cross line for completed forms
 			   var li_text=creEl('span', 'invoice_name'+((editable)? ' completed_form': ''));
@@ -247,11 +247,11 @@ class portalForm {
 				   
 			   }else{
 					var formLink=creEl('a');
-					formLink.href = "https://www.jotform.com/submission/"+invoice.submissionId;
+					//formLink.href = "https://www.jotform.com/submission/"+invoice.submissionId;
 					//Add iframe when it's live and above certain screenwidth
-					formLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+					//formLink.className = (window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
 					var span=creEl('span', 'invoice_text');
-						span.innerHTML = 'View';
+						span.innerHTML = 'Completed';
 					formLink.append(span)
 					linkContainer.append(formLink);
 					li.append(linkContainer);
