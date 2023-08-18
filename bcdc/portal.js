@@ -318,7 +318,7 @@ class portalForm {
 	 */
 	checkAllInvoices(invoices){
 		if(invoices.length > 0){
-		 var submittedInvoice =	invoices.filter(item => item.submissionId);
+		 var submittedInvoice =	invoices.filter(item => item.is_completed);
 		  return (submittedInvoice.length == invoices.length)
 		}else{
 			return false;
