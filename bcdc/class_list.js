@@ -1,8 +1,12 @@
+/*
+* Using this class On the webflow class list page, we demonstrate dynamic time using the API
+*/
 class classLists {
 	constructor(baseUrl) {
 		this.baseUrl = baseUrl;
 		this.renderPortalData();
 	}
+	// Calling API to get all class details like times, days and locations
 	async fetchData(endpoint) {
 		try {
 			const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -17,6 +21,7 @@ class classLists {
 			throw error;
 		}
 	}
+	// Manipulating class timing from API data and rendering in the web page.
 	viewClassLocations(classData){
 		var timingElement = document.getElementsByClassName('location-dropdown-day-time');
 		var detailsLinkElement = document.getElementsByClassName('main-button w-button');
@@ -52,6 +57,7 @@ class classLists {
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'none';
 	}
+	// Passing every class data to the viewClassLocations method and manipulating data there.
 	async renderPortalData() {
 		try {
 		  var spinner = document.getElementById('half-circle-spinner');
