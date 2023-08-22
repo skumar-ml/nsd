@@ -1,11 +1,12 @@
-
+/*
+* Inserting member sign-in record in the database. It is based on a 1-day sign-in count.
+*/
 class SigninActivity {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
-		//this.getNotificationData();
 		this.InsertSignInData();
 	}
-	
+	// Inserting Sign In record in the database
 	InsertSignInData(){
 		var data = {
 			 "memberId" : this.webflowMemberId
