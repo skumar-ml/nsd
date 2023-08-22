@@ -1,8 +1,12 @@
+/*
+* With this script, we are showing a notification count in the menu section. Please find the method description below
+*/
 class NotificationCount {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		this.getNotificationData();
 	}
+	// Manipulating notification count data in dom element based on dom class attribute.
 	displayUnreadMessage(messageData){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
 		var notificationCount = document.getElementsByClassName("notification-count")[0];
@@ -17,6 +21,7 @@ class NotificationCount {
 			notificationBudge.appendChild(notificationMessage)
 		}
 	}
+	// Calling notification API and passing data in displayUnreadMessage method
 	getNotificationData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;
