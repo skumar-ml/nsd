@@ -14,11 +14,14 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
+/*
+* Added new class to manage API call for class details feature
+*/
 class ApiClient {
 	constructor(baseUrl) {
 		this.baseUrl = baseUrl;
 	}
-
+	// Call API url with this method and response as a json
 	async fetchData(endpoint) {
 		try {
 			const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -34,6 +37,7 @@ class ApiClient {
 		}
 	}
 }
+// Initialize api object to use in classLocation class
 const api = new ApiClient(apiBaseUrl);
 class classLocation{
 	constructor(webflowMemberId,responseText,currentIndex, accountEmail, levelId, levelName){
@@ -46,6 +50,7 @@ class classLocation{
 		this.renderClassLocations() // gets mongoDB data from responseText object for specific registrations
 		
 	}
+	// renderClassLocations method used to display location name, select time dropdown and button(payment and waitlist link)
 	renderClassLocations(){
 		var $this = this;
 		var cartLocationDiv = document.getElementById('cart-location-div-'+this.currentIndex);
@@ -53,7 +58,7 @@ class classLocation{
 		var heading = creEl('h2', 'sub-heading center');
 		heading.innerHTML = (this.responseText.locationName) ? this.responseText.locationName : '';
 		
-		
+		// get time and button html
 		var innerContainer = this.getInnerContainer();
 		
 		
@@ -64,12 +69,14 @@ class classLocation{
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'none';
 	}
+	//Creating button and time dom element
 	getInnerContainer(){
 		var $this = this;
 		var registerBtn;
 		var timingContainer = creEl('div', 'main-text center cart-break-spaces timing-data');
 		var buttonDiv = creEl('div', 'button-div margin-top-auto');
 		var timingText = "";
+		// conditionaly we are showing time select box or text
 		if(this.responseText.timing.length == 1){
 			this.responseText.timing.forEach((timeData,index)=>{
 				
@@ -111,6 +118,7 @@ class classLocation{
 		return {'timingContainer': timingContainer, 'buttonDiv':buttonDiv};
 	
 	}
+	// get Register or waitlist button
 	getRegisterBtn(timeData, index){
 		var locationActionDiv = creEl('div','location_action_div '+timeData.oid+' '+(index ? 'hide': '') );
 		
@@ -146,6 +154,7 @@ class classLocation{
         
 		return locationActionDiv;
 	}
+	// Get waitlist alert message
 	getAlertMessage(timeData){
 		var numberOfSpots = timeData.numberOfSpots;
 		var leftSpots = timeData.leftSpots;
@@ -182,6 +191,9 @@ class classLocation{
 		});
 	}
 }
+/*
+* This Class used to get class details based on location and pass the data to classLocation class
+*/
 class classDetails {
 	constructor(apiClient, webflowMemberId,accountEmail, levelId) {
 		this.apiClient = apiClient;
@@ -190,6 +202,7 @@ class classDetails {
 		this.levelId = levelId;
 		this.renderPortalData();
 	}
+	// Creating main dom for location
 	viewClassLocations(locationData){
 		var classLocationContainer = document.getElementById('classLocation');
 		Object.values(locationData).forEach((formData,index) => {
@@ -197,6 +210,7 @@ class classDetails {
 			classLocationContainer.appendChild(locationContainer);
 		})
 	}
+	// get data from api and pass the data to classLocation class
 	async renderPortalData(memberId) {
 		try {
 		  const data = await this.apiClient.fetchData('getClassDetailByMemberIdAndLevelId?levelId='+this.levelId+'&memberId='+this.webflowMemberId);
