@@ -14,11 +14,14 @@ function creEl(name,className,idName){
 	}
 	return el;
 }
+/*
+* Created a new class to call API
+*/
 class ApiClient {
 	constructor(baseUrl) {
 		this.baseUrl = baseUrl;
 	}
-
+	// Calling API with the help of base URL and end URL
 	async fetchData(endpoint) {
 		try {
 			const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -33,7 +36,9 @@ class ApiClient {
 		}
 	}
 }
-
+/*
+* With the help of this class we are managing student's forms and invoice
+*/
 
 class portalForm {
 	$completedForm = [];
@@ -91,7 +96,7 @@ class portalForm {
 		  spinner.style.display = 'none';
 	}
 	/**
-	 * Display Program name for single program
+	 * Display class name for single students
 	 */
 	viewService(){
 		var service = document.getElementById('service');
@@ -101,7 +106,7 @@ class portalForm {
 	}
 	
 	/**
-	 * Display single accordion and invoice data
+	 * Display accordion and forms data
 	 */
 	viewForms(){
 		var $this = this;
