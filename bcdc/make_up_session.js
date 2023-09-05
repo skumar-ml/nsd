@@ -49,7 +49,7 @@ class PortalTabs {
 				
 		var btnSection = creEl('div', 'link-container');
 		var link = creEl('a', 'main-button w-button')
-		link.innerHTML = "Add Make Up Session";
+		link.innerHTML = "Schedule Make Up Session";
 		// Passing dynamic data to acuity scheduling link
 		link.href = 'https://bergendebate.as.me/schedule.php?appointmentType=51374724&field:12876955='+studentData.studentDetail.studentName+'&field:13727280='+studentData.studentDetail.parentEmail;
 		link.target = '_blank';
