@@ -29,6 +29,7 @@ class AccordionForm {
 	$studentDetail = {};
 	$totalForm = 0;
 	$isLiveProgram = true;
+	$uploadedContent = {};
 	constructor(webflowMemberId,responseText,currentIndex, accountEmail){
 		this.webflowMemberId = webflowMemberId;
 		this.currentIndex = currentIndex;
@@ -149,6 +150,7 @@ class AccordionForm {
 		  $this.$programCategory = responseText.programCategory;
 		  $this.$studentDetail = responseText.studentDetail;
 		  $this.$programDetail = responseText.programDetail;
+		  $this.$uploadedContent = responseText.uploadedContent;
 		  $this.checkProgramDeadline();
 		  $this.viewService();
 		  $this.view();
@@ -459,6 +461,15 @@ class AccordionForm {
 		if (infoLink !== "#") {
 			const infoHTML = '<a href=' + infoLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Info Sheet</p></a>';
 			resourceGrid.insertAdjacentHTML('beforeend', infoHTML);
+		}
+		// Added Resources from database
+		if(this.$uploadedContent.length){
+			this.$uploadedContent.forEach((uploadData)=>{
+				if(uploadData.label && uploadData.uploadedFiles[0]){
+					const uploadedHTML = '<a href=' + uploadData.uploadedFiles[0] + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">'+uploadData.label+'</p></a>';
+					resourceGrid.insertAdjacentHTML('beforeend', uploadedHTML);
+				}
+			})
 		}
 
 		// Append resourceGrid and add entire div to DOM
