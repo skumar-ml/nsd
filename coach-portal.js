@@ -1,4 +1,4 @@
-function coachResources(coachCampId) {
+async function coachResources(coachCampId, memberId) {
 
   const coachResourceGrid = document.getElementById('coach-resource-grid');
   const coachCampText = document.getElementById('coach-service');
@@ -41,4 +41,30 @@ function coachResources(coachCampId) {
   // }  
   var scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Camp Schedule</p></a>';
   coachResourceGrid.insertAdjacentHTML('beforeend', scheduleHTML)
+
+  var uploadedContent = await getCoachData(memberId);
+  uploadedContent = uploadedContent[0].uploadedContent;
+  if(uploadedContent.length){
+		uploadedContent.forEach((uploadData)=>{
+			if(uploadData.label && uploadData.uploadedFiles[0]){
+				const uploadedHTML = '<a href=' + uploadData.uploadedFiles[0] + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">'+uploadData.label+'</p></a>';
+				coachResourceGrid.insertAdjacentHTML('beforeend', uploadedHTML);
+			}
+		})
+	}
+}
+
+async function getCoachData(memberId){
+	
+	try {
+		const response = await fetch('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCoachPortalData/'+memberId);
+		if (!response.ok) {
+		throw new Error('Network response was not ok');
+		}
+		const data = await response.json();
+		return data;
+	} catch (error) {
+		console.error('Error fetching data:', error);
+		throw error;
+	}
 }
