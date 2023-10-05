@@ -41,17 +41,18 @@ async function coachResources(coachCampId, memberId) {
   // }  
   var scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Camp Schedule</p></a>';
   coachResourceGrid.insertAdjacentHTML('beforeend', scheduleHTML)
-
-  var uploadedContent = await getCoachData(memberId);
-  uploadedContent = uploadedContent[0].uploadedContent;
-  if(uploadedContent.length){
-		uploadedContent.forEach((uploadData)=>{
-			if(uploadData.label && uploadData.uploadedFiles[0]){
-				const uploadedHTML = '<a href=' + uploadData.uploadedFiles[0] + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">'+uploadData.label+'</p></a>';
-				coachResourceGrid.insertAdjacentHTML('beforeend', uploadedHTML);
-			}
-		})
-	}
+  if(coachCampId){	
+	  var uploadedContent = await getCoachData(memberId);
+	  uploadedContent = uploadedContent[0].uploadedContent;
+	  if(uploadedContent.length){
+			uploadedContent.forEach((uploadData)=>{
+				if(uploadData.label && uploadData.uploadedFiles[0]){
+					const uploadedHTML = '<a href=' + uploadData.uploadedFiles[0] + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">'+uploadData.label+'</p></a>';
+					coachResourceGrid.insertAdjacentHTML('beforeend', uploadedHTML);
+				}
+			})
+		}
+  }
 }
 
 async function getCoachData(memberId){
