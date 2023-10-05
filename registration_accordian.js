@@ -38,6 +38,31 @@ class AccordionForm {
 		this.renderFormData(responseText) // gets mongoDB data from responseText object for specific registrations
 		
 	}
+
+	/*Filter Ivoice Related Forms based on forms id*/
+	filterInvoiceForms(forms){
+		var newForms = forms.filter(item=>{
+			if(item.formId == '231841856559064'){
+				var dFD = this.$completedForm.find(item => item.formId == '223607787179167' && item.isInvoice == 'Yes')
+				if(dFD != undefined){
+				  return true
+				}else{
+				  return false
+				}
+				
+			  }else if(item.formId == '231842107271449'){
+				var aFD = this.$completedForm.find(item=>item.formId == '223122952914150' && item.isInvoice == 'Yes')
+				if(dFD != undefined){
+				  return true
+				}else{
+				  return false
+				}
+			  }else{
+				return true
+			  }
+		})
+		return newForms;
+	}
 	/**
 	 * Display single accordion and form data
 	 */
@@ -52,6 +77,11 @@ class AccordionForm {
 		   parentForm.sort(function(r,a){return r.sequence-a.sequence}); // order form categories via order specified in MongoDB
 		   // for every form category in parentForm, start building accordion
 	       	   parentForm.forEach((form) => {
+			   // Filter invoice Form
+			   form.forms = $this.filterInvoiceForms(form.forms);
+			   if(!form.forms.length){
+				   return;
+			   }
 			   var accordionContainerDiv = creEl("div", "accordion-container", "accordion-container-"+$tabNo+$this.currentIndex)
 			   var labelDiv = creEl("div", "label label-"+$this.currentIndex);
 			   // check forms for completion and put corresponding icon & text
