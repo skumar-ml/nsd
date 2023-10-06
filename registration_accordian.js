@@ -52,7 +52,7 @@ class AccordionForm {
 				
 			  }else if(item.formId == '231842107271449'){
 				var aFD = this.$completedForm.find(item=>item.formId == '223122952914150' && item.isInvoice == 'Yes')
-				if(dFD != undefined){
+				if(aFD != undefined){
 				  return true
 				}else{
 				  return false
