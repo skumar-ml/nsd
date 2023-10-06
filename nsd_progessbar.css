@@ -13,7 +13,13 @@
     box-shadow: 0 4px 11px 0 rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
-
+.main .head p{
+    text-align: left;
+    padding-left: 10px;
+    padding-top: 10px;
+    color: #A51C30;
+    font-weight: 700;
+}
 .main ul{
     display: flex;
     padding-left: 0 !important;
