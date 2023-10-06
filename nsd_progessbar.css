@@ -8,14 +8,6 @@
     
     margin-bottom: 25px;
 }
-
-.main .head p{
-    text-align: left;
-    padding-left: 10px;
-    padding-top: 10px;
-    color: #7C303E;
-    font-weight: 700;
-}
 .container {
     background-color: #FFFFFF;
     box-shadow: 0 4px 11px 0 rgba(0, 0, 0, 0.1);
@@ -88,28 +80,28 @@ li.fade.active{
 
 
 .progress.one{
-    background-color: #7C303E;
+    background-color: #DEAFBB;
 }
 .progress.two{
-    background-color: #894846;
+    background-color: #A51C30;
 }
 .progress.three{
-    background-color: #A8865C;
+    background-color: #72A6CA;
 }
 .progress.four{
-    background-color: #B59E64;
+    background-color: #1B4F72;
 }
 
 /* Progress bar */
 
 .progress.two::after{
-    background-image: linear-gradient(to right, #7C303E,#894846);
+    background-image: linear-gradient(to right, #DEAFBB,#9E1638);
 }
 .progress.three::after{
-    background-image: linear-gradient(to right, #894846, #A8865C);
+    background-image: linear-gradient(to right, #A51C30, #72A6CA);
 }
 .progress.four::after{
-    background-image: linear-gradient(to right, #A8865C, #B59E64);
+    background-image: linear-gradient(to right, #72A6CA, #1B4F72);
 }
 
 /* Media Query */
