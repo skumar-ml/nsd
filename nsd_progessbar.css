@@ -8,12 +8,12 @@
     
     margin-bottom: 25px;
 }
-.container {
+.container_pb {
     background-color: #FFFFFF;
     box-shadow: 0 4px 11px 0 rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
-.main .container .fade img {
+.main .container_pb .fade img {
     width: 40px;
 }
 .main .head p{
@@ -132,7 +132,7 @@ li.fade.active{
     }
 }
 @media (min-width:1230px) and (max-width:1300px){
-    .main .container{
+    .main .container_pb{
         width:740px;
     }
     ul li .progress{
