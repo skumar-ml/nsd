@@ -63,6 +63,9 @@ ul li .progress{
     position: relative;
     cursor: pointer;
 }
+ul li .progress::after{
+        z-index:0;
+}
 .progress::after{
     content: " ";
     position: absolute;
@@ -104,10 +107,10 @@ li.fade.active{
 /* Progress bar */
 
 .progress.two::after{
-    background-image: linear-gradient(to right, #DEAFBB,#DEAFBB);
+    background-image: linear-gradient(to right, #d28d97,#d28d97);
 }
 .progress.three::after{
-    background-image: linear-gradient(to right, #A51C30, #72A6CA);
+    background-image: linear-gradient(to right, #d28d97,#d28d97);
 }
 .progress.four::after{
     background-image: linear-gradient(to right, #72A6CA, #1B4F72);
@@ -178,6 +181,7 @@ li.fade.active{
     ul li .progress::after{
         width: 80px;
         height: 8px;
+        z-index:0;
     }
     .progress::after{
         right: 98px;
@@ -198,7 +202,7 @@ li.fade.active{
         text-align: center;
     }
     ul li .progress::after {
-        width: 58px;
+        width: 80%;
         height: 8px;
     }
     .main ul li {
