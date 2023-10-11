@@ -42,7 +42,7 @@ class AccordionForm {
 	/*Filter Ivoice Related Forms based on forms id*/
 	filterInvoiceForms(forms){
 		var newForms = forms.filter(item=>{
-			if(item.formId == '231841856559064'){
+			if(item.formId == '232817528052153'){
 				var dFD = this.$completedForm.find(item => item.formId == '223607787179167' && item.isInvoice == 'Yes')
 				if(dFD != undefined){
 				  return true
@@ -50,7 +50,7 @@ class AccordionForm {
 				  return false
 				}
 				
-			  }else if(item.formId == '231842107271449'){
+			  }else if(item.formId == '232817521979164'){
 				var aFD = this.$completedForm.find(item=>item.formId == '223122952914150' && item.isInvoice == 'Yes')
 				if(aFD != undefined){
 				  return true
