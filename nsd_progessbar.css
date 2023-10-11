@@ -63,8 +63,8 @@ ul li .progress{
     position: relative;
     cursor: pointer;
 }
-ul li .progress::after{
-        z-index:0;
+ul li .progress {
+    z-index: 1;
 }
 .progress::after{
     content: " ";
@@ -113,7 +113,7 @@ li.fade.active{
     background-image: linear-gradient(to right, #d28d97,#d28d97);
 }
 .progress.four::after{
-    background-image: linear-gradient(to right, #72A6CA, #1B4F72);
+    background-image: linear-gradient(to right, #b8d2e4, #1B4F72);
 }
 
 /* Media Query */
@@ -200,6 +200,7 @@ li.fade.active{
         font-size: 14px;
         line-height: 19px;
         text-align: center;
+        min-height: 40px;
     }
     ul li .progress::after {
         width: 80%;
