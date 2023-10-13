@@ -201,6 +201,7 @@ li.fade.active{
         line-height: 19px;
         text-align: center;
         min-height: 40px;
+        margin-top: 10px;
     }
     ul li .progress::after {
         width: 80%;
