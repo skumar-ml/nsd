@@ -114,7 +114,8 @@ class CheckOutWebflow {
 			"cancelUrl" : "https://www.techment.com",
 			"amount" : 500,
 			"memberId" : "687687g8o7yhdw2", 
-			"programCategoryId" : 1111       
+			"programCategoryId" : 1111,
+			 "supplementaryProgramIds" : [] 
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
