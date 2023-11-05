@@ -115,7 +115,7 @@ class CheckOutWebflow {
 			"amount" : 500,
 			"memberId" : "687687g8o7yhdw2", 
 			"programCategoryId" : 1111,
-			 "supplementaryProgramIds" : [] 
+			 "supplementaryProgramIds" : []  
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
@@ -126,14 +126,43 @@ class CheckOutWebflow {
 			let responseText = JSON.parse(xhr.responseText);
 			console.log('responseText', responseText)
 			if(responseText.success){
+				span.innerHTML = link_title;
 				window.location.href = responseText.stripe_url;
 			}
 
 		}
 	}
+	activateDiv(divId){
+		var divIds = ['checkout_program', 'checkout_student_details', 'checkout_payment'];
+		 // Remove the active class from all div elements
+		divIds.forEach(id => document.getElementById(id).classList.remove('active'));
+		// Add the active class to the div with the specified id
+		document.getElementById(divId).classList.add('active');
+	}
+	addEventForPrevNaxt(){
+		var next_page_1 = document.getElementById('next_page_1');
+		var next_page_2 = document.getElementById('next_page_2');
+		var prev_page_1 = document.getElementById('prev_page_1');
+		var prev_page_2 = document.getElementById('prev_page_2');
+		var $this = this;
+		next_page_1.addEventListener('click', function(){
+			$this.activateDiv('checkout_student_details');
+		})
+		next_page_2.addEventListener('click', function(){
+			$this.activateDiv('checkout_payment');
+		})
+		prev_page_1.addEventListener('click', function(){
+			$this.activateDiv('checkout_program');
+		})
+		prev_page_2.addEventListener('click', function(){
+			$this.activateDiv('checkout_student_details');
+		})
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
+			this.addEventForPrevNaxt();
+		  this.activateDiv('checkout_program')	
 		  const data = await this.fetchData('getSupplementaryProgram/5');
 		  this.displaySupplimentaryProgram(data)
 		} catch (error) {
