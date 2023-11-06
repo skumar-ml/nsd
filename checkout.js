@@ -207,11 +207,11 @@ class CheckOutWebflow {
 		var $this = this;
 		ach_payment.addEventListener('click', function(){
 			ach_payment.innerHTML = "Processing..."
-			$this.initializeStripePayment('card', ach_payment);
+			$this.initializeStripePayment('us_bank_account', ach_payment);
 		})
 		card_payment.addEventListener('click', function(){
 			card_payment.innerHTML = "Processing..."
-			$this.initializeStripePayment('us_bank_account', card_payment);
+			$this.initializeStripePayment('card', card_payment);
 		})
 		paylater_payment.addEventListener('click', function(){
 			paylater_payment.innerHTML = "Processing..."
