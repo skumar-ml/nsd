@@ -135,7 +135,6 @@ class CheckOutWebflow {
 			let responseText = JSON.parse(xhr.responseText);
 			console.log('responseText', responseText)
 			if(responseText.success){
-				span.innerHTML = link_title;
 				window.location.href = responseText.stripe_url;
 			}
 
