@@ -21,21 +21,16 @@ function creEl(name,className,idName){
  */
 class CheckOutWebflow {
 	
-	constructor(apiBaseUrl, webflowMemberId,accountEmail) {
+	constructor(apiBaseUrl, memberData) {
 		this.baseUrl = apiBaseUrl;
-		this.webflowMemberId = webflowMemberId;
-		this.accountEmail = accountEmail;
+		this.memberData = memberData;
 		this.renderPortalData();
 	}
 	// Passing all supplimentary program data and creating cart list
 	displaySupplimentaryProgram(data){
 		// Getting main dom elment object to add student list with link
 		var studentList = document.getElementById('checkout_supplimentary_data');
-		var cardCheckout = document.getElementById('cardCheckout');
-		var $this = this;
-		cardCheckout.addEventListener('click', function(){
-			$this.initializeStripePayment();
-		})
+		var $this = this
 		studentList.innerHTML = "";
 		console.log('data', data)
 		
@@ -55,6 +50,7 @@ class CheckOutWebflow {
 		checkboxS.type ="checkbox";
 		checkboxS.name ="checkbox";
 		checkboxS.value =suppData.amount;
+		checkboxS.setAttribute('programDetailId', suppData.programDetailId)
 		checkboxS.setAttribute('data-name', 'Checkbox')
 		checkboxS.addEventListener('change', function() {
 		 $this.updateAmount(this, suppData.amount)
@@ -78,13 +74,24 @@ class CheckOutWebflow {
 	updateAmount(checkEvent, amount){
 		var totalAmountInput = document.getElementById('totalAmount');
 		var totalPriceText = document.getElementById('totalPrice');
+		var suppProIdE = document.getElementById('suppProIds');
+		var suppId = checkEvent.getAttribute('programDetailId')
+		
 		 if (checkEvent.checked) {
-			 totalPriceText.innerHTML = parseFloat(totalAmountInput.value)+parseFloat(amount) 
-			console.log("Checkbox is checked..", checkEvent.value);
+			 totalPriceText.innerHTML = parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 var arrayIds = JSON.parse(suppProIdE.value);
+			 arrayIds.push(suppId);
+			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
 			console.log("Checkbox is not checked..", checkEvent.value);
-			totalPriceText.innerHTML = parseFloat(totalAmountInput.value)-parseFloat(amount) 
+			totalPriceText.innerHTML = parseFloat(totalAmountInput.value)-parseFloat(amount)
+			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
+			var arrayIds = JSON.parse(suppProIdE.value);
+			var allSupIds =  arrayIds.filter(i => i != suppId)
+			suppProIdE.value = JSON.stringify(allSupIds)			
 		  }
+		 
 	}
 	// Get API data with the help of endpoint
 	async fetchData(endpoint) {
@@ -100,16 +107,18 @@ class CheckOutWebflow {
 			throw error;
 		}
 	}
-	initializeStripePayment(){
+	initializeStripePayment(type){
 		var data = {
 			"email": "drishti.sharma@techment.com",
-			"name" : "Drishti Sharma",
 			"studentEmail" : "dev.narayan@techment.com",
-			"studentName" : "Dev Narayan",
+			"firstName" : "Drishti",
+			"lastName" : "Sharma",
 			"grade" : "11",
-			"label": "Texas Pf", 
+			"label": "Texas Pf",
+			"school": "SSC",
+			"gender": "Male",
 			"programId" : 1,
-			"paymentType" : "card",
+			"paymentType" : type,
 			"successUrl" : "https://www.techment.com",
 			"cancelUrl" : "https://www.techment.com",
 			"amount" : 500,
@@ -144,12 +153,22 @@ class CheckOutWebflow {
 		var next_page_2 = document.getElementById('next_page_2');
 		var prev_page_1 = document.getElementById('prev_page_1');
 		var prev_page_2 = document.getElementById('prev_page_2');
+		var checkoutFormError = document.getElementById('checkout-form-error')
 		var $this = this;
+		var form = $( "#checkout-form" );
 		next_page_1.addEventListener('click', function(){
 			$this.activateDiv('checkout_student_details');
 		})
 		next_page_2.addEventListener('click', function(){
-			$this.activateDiv('checkout_payment');
+			if(form.valid()){
+				var isValidName = $this.checkUniqueStudentName();
+				if(isValidName){
+					checkoutFormError.style.display = 'none'
+					$this.activateDiv('checkout_payment');
+				}else{
+					checkoutFormError.style.display = 'block'
+				}
+			}
 		})
 		prev_page_1.addEventListener('click', function(){
 			$this.activateDiv('checkout_program');
@@ -158,13 +177,44 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_student_details');
 		})
 	}
+
+	checkUniqueStudentName(){
+		var sFNameE = document.getElementById('Student-First-Name');
+		var sLNameE = document.getElementById('Student-Last-Name');
+		var sName = sFNameE.value+sLNameE.value;
+		sName = sName.replace(/\s/g,'');
+		sName = sName.toLowerCase()
+		var pName = this.memberData.name;
+		pName = pName.replace(/\s/g,'');
+		pName = pName.toLowerCase()
+		if(sName == pName){
+			return false;
+		}else{
+			return true
+		}
+	}
+	handlePaymentEvent(){
+		var ach_payment = document.getElementById('ach_payment');
+		var card_payment = document.getElementById('card_payment');
+		var paylater_payment = document.getElementById('paylater_payment');
+		var $this = this;
+		ach_payment.addEventListener('click', function(){
+			$this.initializeStripePayment('card');
+		})
+		card_payment.addEventListener('click', function(){
+			$this.initializeStripePayment('us_bank_account');
+		})
+		paylater_payment.addEventListener('click', function(){
+			$this.initializeStripePayment('paylater');
+		})
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
 			this.addEventForPrevNaxt();
-		  this.activateDiv('checkout_program')	
-		  const data = await this.fetchData('getSupplementaryProgram/5');
-		  this.displaySupplimentaryProgram(data)
+			this.activateDiv('checkout_program')	
+			const data = await this.fetchData('getSupplementaryProgram/5');
+			this.displaySupplimentaryProgram(data)
 		} catch (error) {
 			console.error('Error rendering random number:', error);
 		}
