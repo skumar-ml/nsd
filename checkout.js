@@ -107,7 +107,7 @@ class CheckOutWebflow {
 			throw error;
 		}
 	}
-	initializeStripePayment(type){
+	initializeStripePayment(type, btn){
 		var studentFirstName = document.getElementById('Student-First-Name');
 		var studentLastName = document.getElementById('Student-Last-Name');
 		var studentEmail = document.getElementById('Student-Email');
@@ -128,7 +128,7 @@ class CheckOutWebflow {
 			"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
 			"cancelUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
-			"amount" : 500,
+			"amount" : 500.00,
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value) 
@@ -142,6 +142,7 @@ class CheckOutWebflow {
 			let responseText = JSON.parse(xhr.responseText);
 			console.log('responseText', responseText)
 			if(responseText.success){
+				btn.innerHTML = 'Checkout';
 				window.location.href = responseText.stripe_url;
 			}
 
@@ -205,13 +206,16 @@ class CheckOutWebflow {
 		var paylater_payment = document.getElementById('paylater_payment');
 		var $this = this;
 		ach_payment.addEventListener('click', function(){
-			$this.initializeStripePayment('card');
+			ach_payment.innerHTML = "Processing..."
+			$this.initializeStripePayment('card', ach_payment);
 		})
 		card_payment.addEventListener('click', function(){
-			$this.initializeStripePayment('us_bank_account');
+			card_payment.innerHTML = "Processing..."
+			$this.initializeStripePayment('us_bank_account', card_payment);
 		})
 		paylater_payment.addEventListener('click', function(){
-			$this.initializeStripePayment('paylater');
+			paylater_payment.innerHTML = "Processing..."
+			$this.initializeStripePayment('paylater', paylater_payment);
 		})
 	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
