@@ -108,23 +108,30 @@ class CheckOutWebflow {
 		}
 	}
 	initializeStripePayment(type){
+		var studentFirstName = document.getElementById('Student-First-Name');
+		var studentLastName = document.getElementById('Student-Last-Name');
+		var studentEmail = document.getElementById('Student-Email');
+		var studentGrade = document.getElementById('Student-Grade');
+		var studentSchool = document.getElementById('Student-School');
+		var studentGender = document.getElementById('Student-Gender');
+		var suppProIdE = document.getElementById('suppProIds');
 		var data = {
-			"email": "drishti.sharma@techment.com",
-			"studentEmail" : "dev.narayan@techment.com",
-			"firstName" : "Drishti",
-			"lastName" : "Sharma",
-			"grade" : "11",
+			"email": this.memberData.email,
+			"studentEmail" : studentEmail.value,
+			"firstName" : studentFirstName.value,
+			"lastName" : studentLastName.value,
+			"grade" : studentGrade.value,
 			"label": "Texas Pf",
-			"school": "SSC",
-			"gender": "Male",
-			"programId" : 1,
+			"school": studentSchool.value,
+			"gender": studentGender.value,
+			"programId" : this.memberData.programId,
 			"paymentType" : type,
-			"successUrl" : "https://www.techment.com",
-			"cancelUrl" : "https://www.techment.com",
+			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
+			"cancelUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
 			"amount" : 500,
-			"memberId" : "687687g8o7yhdw2", 
-			"programCategoryId" : 1111,
-			 "supplementaryProgramIds" : []  
+			"memberId" : this.memberData.memberId, 
+			"programCategoryId" : this.memberData.programCategoryId,
+			"supplementaryProgramIds" : JSON.parse(suppProIdE.value) 
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
@@ -176,7 +183,7 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_student_details');
 		})
 	}
-
+	
 	checkUniqueStudentName(){
 		var sFNameE = document.getElementById('Student-First-Name');
 		var sLNameE = document.getElementById('Student-Last-Name');
