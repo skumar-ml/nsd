@@ -211,6 +211,7 @@ class CheckOutWebflow {
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
+			this.handlePaymentEvent();
 			this.addEventForPrevNaxt();
 			this.activateDiv('checkout_program')	
 			const data = await this.fetchData('getSupplementaryProgram/5');
