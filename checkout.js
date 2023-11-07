@@ -186,7 +186,7 @@ class CheckOutWebflow {
 	}
 	
 	checkUniqueStudentName(){
-		var sFNameE = document.getElementById('Student-First-Name');
+		/*var sFNameE = document.getElementById('Student-First-Name');
 		var sLNameE = document.getElementById('Student-Last-Name');
 		var sName = sFNameE.value+sLNameE.value;
 		sName = sName.replace(/\s/g,'');
@@ -195,6 +195,18 @@ class CheckOutWebflow {
 		pName = pName.replace(/\s/g,'');
 		pName = pName.toLowerCase()
 		if(sName == pName){
+			return false;
+		}else{
+			return true
+		}*/
+		var sENameE = document.getElementById('Student-Email');
+		var sEmail = sENameE.value;
+		sEmail = sEmail.replace(/\s/g,'');
+		sEmail = sEmail.toLowerCase()
+		var pEmail = this.memberData.email;
+		pEmail = pEmail.replace(/\s/g,'');
+		pEmail = pEmail.toLowerCase()
+		if(sEmail == pEmail){
 			return false;
 		}else{
 			return true
