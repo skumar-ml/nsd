@@ -156,9 +156,9 @@ class CheckOutWebflow {
 	activateDiv(divId){
 		var divIds = ['checkout_program', 'checkout_student_details', 'checkout_payment'];
 		 // Remove the active class from all div elements
-		divIds.forEach(id => document.getElementById(id).classList.remove('active'));
+		divIds.forEach(id => document.getElementById(id).classList.remove('active_checkout_tab'));
 		// Add the active class to the div with the specified id
-		document.getElementById(divId).classList.add('active');
+		document.getElementById(divId).classList.add('active_checkout_tab');
 	}
 	addEventForPrevNaxt(){
 		var next_page_1 = document.getElementById('next_page_1');
@@ -240,9 +240,12 @@ class CheckOutWebflow {
 		try {
 			this.handlePaymentEvent();
 			this.addEventForPrevNaxt();
-			this.activateDiv('checkout_program')	
+			this.activateDiv('checkout_program')
+			var spinner = document.getElementById('half-circle-spinner');
+			spinner.style.display = 'block';	
 			const data = await this.fetchData('getSupplementaryProgram/5');
 			this.displaySupplimentaryProgram(data)
+			spinner.style.display = 'none';
 		} catch (error) {
 			console.error('Error rendering random number:', error);
 		}
