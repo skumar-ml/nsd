@@ -15,9 +15,9 @@ function creEl(name,className,idName){
 	return el;
 }
 /**
- * Used CheckOutWebflow class name to easily intigrate with portal js.
+ * Used CheckOutWebflow class name to integrate with portal js easily.
  * In this API we pass apiBaseUrl, webflowMemberId, accountEmail.
- * In this class we are manipulating student data and creating make up session link for students
+ * In this class we are manipulating student data and creating make-up session links for students
  */
 class CheckOutWebflow {
 	$suppPro = [];
@@ -97,6 +97,7 @@ class CheckOutWebflow {
 	}
 	updateAmount(checkEvent, amount){
 		var totalAmountInput = document.getElementById('totalAmount');
+		//core_product_price
 		var totalPriceText = document.getElementById('totalPrice');
 		var suppProIdE = document.getElementById('suppProIds');
 		var suppId = checkEvent.getAttribute('programDetailId')
@@ -144,6 +145,8 @@ class CheckOutWebflow {
 		var studentSchool = document.getElementById('Student-School');
 		var studentGender = document.getElementById('Student-Gender');
 		var suppProIdE = document.getElementById('suppProIds');
+		var core_product_price = document.getElementById('core_product_price');
+		
 		var data = {
 			"email": this.memberData.email,
 			"studentEmail" : studentEmail.value,
@@ -156,8 +159,8 @@ class CheckOutWebflow {
 			"programId" : this.memberData.programId,
 			"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
-			"cancelUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
-			"amount" : 500.00,
+			"cancelUrl" : "https://www.nsdebatecamp.com/"+window.location.pathname,
+			"amount" : parseFloat(core_product_price.value),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value) 
@@ -172,7 +175,7 @@ class CheckOutWebflow {
 			console.log('responseText', responseText)
 			if(responseText.success){
 				btn.innerHTML = 'Checkout';
-				window.location.href = responseText.stripe_url;
+				//window.location.href = responseText.stripe_url;
 			}
 
 		}
