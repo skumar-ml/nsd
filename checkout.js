@@ -20,7 +20,7 @@ function creEl(name,className,idName){
  * In this class we are manipulating student data and creating make up session link for students
  */
 class CheckOutWebflow {
-	
+	$suppPro = [];
 	constructor(apiBaseUrl, memberData) {
 		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData;
@@ -28,6 +28,7 @@ class CheckOutWebflow {
 	}
 	// Passing all supplimentary program data and creating cart list
 	displaySupplimentaryProgram(data){
+		this.$suppPro = data;
 		// Getting main dom elment object to add student list with link
 		var studentList = document.getElementById('checkout_supplimentary_data');
 		var $this = this
@@ -75,18 +76,37 @@ class CheckOutWebflow {
 
 		return coreProductContainer;
 	}
-	
+	displaySelectedSuppProgram(suppIds){
+		var selectedSuppPro = document.getElementById('selected_supplimentary_program');
+		selectedSuppPro.innerHTML = "";
+		var selectedData = this.$suppPro.filter(item => suppIds.some(d => d == item.programDetailId))
+		var head = creEl('p', 'dm-sans font-14 order-summary-border');
+		head.innerHTML = "Supplementary Program"
+		selectedSuppPro.appendChild(head);
+		var label = '';
+		selectedData.forEach(sup=>{
+			label = creEl('p', 'dm-sans font-14 bold')
+			label.innerHTML = sup.label
+			selectedSuppPro.appendChild(label);
+			label = creEl('p', 'dm-sans font-14')
+			label.innerHTML = sup.desc
+			selectedSuppPro.appendChild(label);
+		});
+		
+		console.log('selectedData',selectedData)
+	}
 	updateAmount(checkEvent, amount){
 		var totalAmountInput = document.getElementById('totalAmount');
 		var totalPriceText = document.getElementById('totalPrice');
 		var suppProIdE = document.getElementById('suppProIds');
 		var suppId = checkEvent.getAttribute('programDetailId')
-		
+		var selectedIds = [];
 		 if (checkEvent.checked) {
 			 totalPriceText.innerHTML = parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 var arrayIds = JSON.parse(suppProIdE.value);
 			 arrayIds.push(suppId);
+			 selectedIds = arrayIds;
 			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
 			console.log("Checkbox is not checked..", checkEvent.value);
@@ -94,7 +114,11 @@ class CheckOutWebflow {
 			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
 			var arrayIds = JSON.parse(suppProIdE.value);
 			var allSupIds =  arrayIds.filter(i => i != suppId)
+			selectedIds = allSupIds;
 			suppProIdE.value = JSON.stringify(allSupIds)			
+		  }
+		  if(selectedIds.length > 0){
+			  this.displaySelectedSuppProgram(selectedIds);
 		  }
 		 
 	}
