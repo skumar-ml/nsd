@@ -15,9 +15,9 @@ function creEl(name,className,idName){
 	return el;
 }
 /**
- * Used CheckOutWebflow class name to integrate with portal js easily.
+ * Used CheckOutWebflow class name to easily intigrate with portal js.
  * In this API we pass apiBaseUrl, webflowMemberId, accountEmail.
- * In this class we are manipulating student data and creating make-up session links for students
+ * In this class we are manipulating student data and creating make up session link for students
  */
 class CheckOutWebflow {
 	$suppPro = [];
@@ -97,13 +97,14 @@ class CheckOutWebflow {
 	}
 	updateAmount(checkEvent, amount){
 		var totalAmountInput = document.getElementById('totalAmount');
+		var core_product_price = document.getElementById('core_product_price');
 		//core_product_price
 		var totalPriceText = document.getElementById('totalPrice');
 		var suppProIdE = document.getElementById('suppProIds');
 		var suppId = checkEvent.getAttribute('programDetailId')
 		var selectedIds = [];
 		 if (checkEvent.checked) {
-			 totalPriceText.innerHTML = parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 totalPriceText.innerHTML = parseFloat(core_product_price.value)+parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 var arrayIds = JSON.parse(suppProIdE.value);
 			 arrayIds.push(suppId);
@@ -111,7 +112,7 @@ class CheckOutWebflow {
 			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
 			console.log("Checkbox is not checked..", checkEvent.value);
-			totalPriceText.innerHTML = parseFloat(totalAmountInput.value)-parseFloat(amount)
+			totalPriceText.innerHTML = parseFloat(core_product_price.value)+ parseFloat(totalAmountInput.value)-parseFloat(amount)
 			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
 			var arrayIds = JSON.parse(suppProIdE.value);
 			var allSupIds =  arrayIds.filter(i => i != suppId)
