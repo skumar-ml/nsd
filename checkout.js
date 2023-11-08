@@ -160,7 +160,7 @@ class CheckOutWebflow {
 			"programId" : this.memberData.programId,
 			"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
-			"cancelUrl" : "https://www.nsdebatecamp.com/"+window.location.pathname,
+			"cancelUrl" : "https://www.nsdebatecamp.com"+window.location.pathname,
 			"amount" : parseFloat(core_product_price.value),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
@@ -176,7 +176,7 @@ class CheckOutWebflow {
 			console.log('responseText', responseText)
 			if(responseText.success){
 				btn.innerHTML = 'Checkout';
-				//window.location.href = responseText.stripe_url;
+				window.location.href = responseText.stripe_url;
 			}
 
 		}
