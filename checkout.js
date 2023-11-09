@@ -125,9 +125,13 @@ class CheckOutWebflow {
 			selectedIds = allSupIds;
 			suppProIdE.value = JSON.stringify(allSupIds)			
 		  }
+		  var totalPriceDiv = document.getElementById('totalPriceDiv');
 		  if(selectedIds.length > 0){
-			  this.displaySelectedSuppProgram(selectedIds);
+			  totalPriceDiv.style.display = 'block';
+		  }else{
+			  totalPriceDiv.style.display = 'none';
 		  }
+		  this.displaySelectedSuppProgram(selectedIds);
 		 
 	}
 	// Get API data with the help of endpoint
