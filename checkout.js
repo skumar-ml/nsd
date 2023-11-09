@@ -61,9 +61,9 @@ class CheckOutWebflow {
 		coreCheckbox.appendChild(wCheckbox)
 		
 		var coreProductTitle = creEl('div', 'core-product-title')
-		var h1 = creEl('h1', 'offering-heading')
+		var h1 = creEl('h1', 'core-product-title-text')
 		h1.innerHTML = suppData.label;
-		var div = creEl('div', 'offerings-event')
+		var div = creEl('div','core-product-title-subtext')
 		div.innerHTML = suppData.desc;
 		coreProductTitle.prepend(h1, div)
 		
