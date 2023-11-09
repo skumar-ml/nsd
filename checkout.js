@@ -61,9 +61,9 @@ class CheckOutWebflow {
 		coreCheckbox.appendChild(wCheckbox)
 		
 		var coreProductTitle = creEl('div', 'core-product-title')
-		var h1 = creEl('h1', 'core-product-title-text')
+		var h1 = creEl('h1', 'offering-heading')
 		h1.innerHTML = suppData.label;
-		var div = creEl('div')
+		var div = creEl('div', 'offerings-event')
 		div.innerHTML = suppData.desc;
 		coreProductTitle.prepend(h1, div)
 		
@@ -72,7 +72,7 @@ class CheckOutWebflow {
 		productPriceText.innerHTML = '$'+suppData.amount
 		productPriceContainer.appendChild(productPriceText)
 		
-		coreProductContainer.prepend(coreCheckbox, coreProductTitle, productPriceContainer)
+		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
 
 		return coreProductContainer;
 	}
