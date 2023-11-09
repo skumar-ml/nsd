@@ -126,10 +126,10 @@ class CheckOutWebflow {
 			suppProIdE.value = JSON.stringify(allSupIds)			
 		  }
 		  var totalPriceDiv = document.getElementById('totalPriceDiv');
-		  if(selectedIds.length > 0){
-			  totalPriceDiv.style.display = 'block';
+		 if(selectedIds.length > 0){
+			  totalPriceDiv.style.visibility  = 'visible';
 		  }else{
-			  totalPriceDiv.style.display = 'none';
+			  totalPriceDiv.style.visibility  = 'hidden';
 		  }
 		  this.displaySelectedSuppProgram(selectedIds);
 		 
