@@ -224,7 +224,7 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_program');
 		})
 		prev_page_2.addEventListener('click', function(){
-			document.getElementById('w-tabs-0-data-w-tab-0').click();
+			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			$this.activateDiv('checkout_student_details');
 		})
 	}
