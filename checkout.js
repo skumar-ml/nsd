@@ -164,7 +164,7 @@ class CheckOutWebflow {
 			"firstName" : studentFirstName.value,
 			"lastName" : studentLastName.value,
 			"grade" : studentGrade.value,
-			"label": "Texas Pf",
+			"label": this.memberData.programName,
 			"school": studentSchool.value,
 			"gender": studentGender.value,
 			"programId" : this.memberData.programId,
