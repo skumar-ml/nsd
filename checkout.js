@@ -110,7 +110,7 @@ class CheckOutWebflow {
 		var suppId = checkEvent.getAttribute('programDetailId')
 		var selectedIds = [];
 		 if (checkEvent.checked) {
-			 totalPriceText.innerHTML = parseFloat(core_product_price.value)+parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 totalPriceText.innerHTML = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 var arrayIds = JSON.parse(suppProIdE.value);
 			 arrayIds.push(suppId);
@@ -118,7 +118,7 @@ class CheckOutWebflow {
 			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
 			console.log("Checkbox is not checked..", checkEvent.value);
-			totalPriceText.innerHTML = parseFloat(core_product_price.value)+ parseFloat(totalAmountInput.value)-parseFloat(amount)
+			totalPriceText.innerHTML = parseFloat(core_product_price.value.replace(/,/g, ''))+ parseFloat(totalAmountInput.value)-parseFloat(amount)
 			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
 			var arrayIds = JSON.parse(suppProIdE.value);
 			var allSupIds =  arrayIds.filter(i => i != suppId)
@@ -224,6 +224,7 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_program');
 		})
 		prev_page_2.addEventListener('click', function(){
+			document.getElementById('w-tabs-0-data-w-tab-0').click();
 			$this.activateDiv('checkout_student_details');
 		})
 	}
