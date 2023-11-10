@@ -99,7 +99,7 @@ class CheckOutWebflow {
 		var totalPriceText = document.getElementById('totalPrice');
 		var core_product_price = document.getElementById('core_product_price');
 		var totalAmountInput = document.getElementById('totalAmount');
-		totalPriceText.innerHTML = parseFloat(core_product_price.value)+parseFloat(totalAmountInput.value);
+		totalPriceText.innerHTML = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value);
 	}
 	updateAmount(checkEvent, amount){
 		var totalAmountInput = document.getElementById('totalAmount');
