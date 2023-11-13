@@ -171,7 +171,7 @@ class CheckOutWebflow {
 			"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
 			"cancelUrl" : "https://www.nsdebatecamp.com"+window.location.pathname,
-			"amount" : parseFloat(core_product_price.value),
+			"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value) 
