@@ -36,11 +36,13 @@ class CheckOutWebflow {
 		// Remove duplicate data like Supplementary program
 		data = data.filter(item=>item.programDetailId !=this.memberData.programId);
 		console.log('data', data)
-		data.forEach((sData)=>{
-			// Getting single student list
-			var sList = this.createStudentList(sData);
-				studentList.appendChild(sList);
-		})
+		if(data.length > 0){
+			data.forEach((sData)=>{
+				// Getting single student list
+				var sList = this.createStudentList(sData);
+					studentList.appendChild(sList);
+			})
+		}
 	}
 	// Manipulating single student list
 	createStudentList(suppData){
@@ -284,7 +286,7 @@ class CheckOutWebflow {
 			this.activateDiv('checkout_program')
 			var spinner = document.getElementById('half-circle-spinner');
 			spinner.style.display = 'block';	
-			const data = await this.fetchData('getSupplementaryProgram/5');
+			const data = await this.fetchData('getSupplementaryProgram/'+this.memberData.programId);
 			this.displaySupplimentaryProgram(data)
 			spinner.style.display = 'none';
 		} catch (error) {
