@@ -33,8 +33,9 @@ class CheckOutWebflow {
 		var studentList = document.getElementById('checkout_supplimentary_data');
 		var $this = this
 		studentList.innerHTML = "";
+		// Remove duplicate data like Supplementary program
+		data = data.filter(item=>item.programDetailId !=this.memberData.programId);
 		console.log('data', data)
-		
 		data.forEach((sData)=>{
 			// Getting single student list
 			var sList = this.createStudentList(sData);
@@ -174,7 +175,8 @@ class CheckOutWebflow {
 			"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
-			"supplementaryProgramIds" : JSON.parse(suppProIdE.value) 
+			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
+			"productType": this.memberData.productType
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
