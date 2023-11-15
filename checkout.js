@@ -278,9 +278,30 @@ class CheckOutWebflow {
 			$this.initializeStripePayment('paylater', paylater_payment);
 		})
 	}
+	updateSuppData(){
+		var studentFirstName = document.getElementById('Student-First-Name');
+		var studentLastName = document.getElementById('Student-Last-Name');
+		var studentEmail = document.getElementById('Student-Email');
+		var studentGrade = document.getElementById('Student-Grade');
+		var studentSchool = document.getElementById('Student-School');
+		var studentGender = document.getElementById('Student-Gender');
+		var supStuData = localStorage.getItem("supStuEmail");
+		if(supStuData != null){
+			supStuData = JSON.parse(supStuData);
+			studentEmail.value = supStuData.studentEmail;
+			studentEmail.readOnly = true
+			studentFirstName.value = supStuData.studentName.first;
+			studentFirstName.readOnly = true
+			studentLastName.value = supStuData.studentName.last;
+			studentLastName.readOnly = true
+		}
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
+			if(this.memberData.productType == 'supplementary'){
+				this.updateSuppData();
+			}
 			this.handlePaymentEvent();
 			this.addEventForPrevNaxt();
 			this.activateDiv('checkout_program')
