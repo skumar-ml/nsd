@@ -61,6 +61,8 @@ class CheckOutWebflow {
 		});
 		
 		wCheckbox.appendChild(checkboxS)
+		var spantext = creEl('span', 'core-checkbox-label w-form-label')
+		wCheckbox.appendChild(spantext)
 		coreCheckbox.appendChild(wCheckbox)
 		
 		var coreProductTitle = creEl('div', 'core-product-title')
@@ -296,12 +298,19 @@ class CheckOutWebflow {
 			studentLastName.readOnly = true
 		}
 	}
+	// update default checkbox checked always
+	updateDefaultCheckbox(){
+		var dCheckbox = document.getElementById('checkbox');
+		dCheckbox.setAttribute('disabled', true)
+		
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
 			if(this.memberData.productType == 'supplementary'){
 				this.updateSuppData();
 			}
+			this.updateDefaultCheckbox();
 			this.handlePaymentEvent();
 			this.addEventForPrevNaxt();
 			this.activateDiv('checkout_program')
