@@ -428,9 +428,10 @@ function creEl(name,className,idName){
   class SupplementaryTabs {
 	  $activeTabID = "";
 	  $activeMainTabID = "";
-	  constructor(webflowMemberId, accountEmail){
+	  constructor(webflowMemberId, accountEmail, dataType=""){
 		  this.webflowMemberId = webflowMemberId;
 		  this.accountEmail = accountEmail;
+		  this.dataType = dataType;
 		  this.renderFormsData(); // renders data for each stab
 		  
 	  }
@@ -588,7 +589,7 @@ function creEl(name,className,idName){
 	  // calls api using webflow member ID
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
-		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getSupplimentaryForm/"+$this.webflowMemberId, true)
+		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getSupplimentaryForm/"+$this.webflowMemberId+"/"+this.dataType, true)
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {
