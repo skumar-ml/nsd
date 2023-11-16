@@ -402,7 +402,7 @@ function creEl(name,className,idName){
 	  }
 	  /*Call API to get student list with program details*/
 	  callApi(){
-		  var spinner = document.getElementById('half-circle-spinner-2');
+		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'block';
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
