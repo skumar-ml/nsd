@@ -74,12 +74,15 @@ class CheckOutWebflow {
 		
 		var productPriceContainer = creEl('div', 'product-price-container')
 		var productPriceText = creEl('div', 'product-price-text')
-		productPriceText.innerHTML = '$'+suppData.amount
+		productPriceText.innerHTML = '$'+this.numberWithCommas(suppData.amount.toFixed(2));
 		productPriceContainer.appendChild(productPriceText)
 		
 		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
 
 		return coreProductContainer;
+	}
+	numberWithCommas(x) {
+		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
 	displaySelectedSuppProgram(suppIds){
 		var selectedSuppPro = document.getElementById('selected_supplimentary_program');
@@ -115,7 +118,8 @@ class CheckOutWebflow {
 		var suppId = checkEvent.getAttribute('programDetailId')
 		var selectedIds = [];
 		 if (checkEvent.checked) {
-			 totalPriceText.innerHTML = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 var amountHtml = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value)+parseFloat(amount)
+			 totalPriceText.innerHTML = this.numberWithCommas(amountHtml.toFixed(2))
 			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 var arrayIds = JSON.parse(suppProIdE.value);
 			 arrayIds.push(suppId);
@@ -123,7 +127,8 @@ class CheckOutWebflow {
 			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
 			console.log("Checkbox is not checked..", checkEvent.value);
-			totalPriceText.innerHTML = parseFloat(core_product_price.value.replace(/,/g, ''))+ parseFloat(totalAmountInput.value)-parseFloat(amount)
+			var amountHtml = parseFloat(core_product_price.value.replace(/,/g, ''))+ parseFloat(totalAmountInput.value)-parseFloat(amount)
+			totalPriceText.innerHTML = this.numberWithCommas(amountHtml.toFixed(2))
 			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
 			var arrayIds = JSON.parse(suppProIdE.value);
 			var allSupIds =  arrayIds.filter(i => i != suppId)
