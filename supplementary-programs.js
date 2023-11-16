@@ -402,14 +402,15 @@ function creEl(name,className,idName){
 	  }
 	  /*Call API to get student list with program details*/
 	  callApi(){
-		
+		  var spinner = document.getElementById('half-circle-spinner-2');
+		  spinner.style.display = 'block';
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
 		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId+"/current", true)
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {
-		  
+		  	spinner.style.display = 'none';
 			var responseText =  JSON.parse(xhr.responseText);
 			$this.makeList(responseText)
 		var spinner = document.getElementById('half-circle-spinner');
