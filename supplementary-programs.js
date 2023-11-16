@@ -405,7 +405,7 @@ function creEl(name,className,idName){
 		
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
-		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId, true)
+		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId+"/current", true)
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {
