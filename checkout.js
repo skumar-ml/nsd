@@ -180,7 +180,7 @@ class CheckOutWebflow {
 			"gender": studentGender.value,
 			"programId" : this.memberData.programId,
 			"paymentType" : type,
-			"successUrl" : "https://www.nsdebatecamp.com/members/"+this.memberData.memberId,
+			"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation",
 			"cancelUrl" : "https://www.nsdebatecamp.com"+window.location.pathname,
 			"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
 			"memberId" : this.memberData.memberId, 
