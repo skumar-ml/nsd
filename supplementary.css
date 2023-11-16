@@ -163,6 +163,17 @@
       -webkit-animation: half-circle-spinner-animation 1s infinite alternate;
       animation: half-circle-spinner-animation 1s infinite alternate;
   }
+  div.half-circle-spinner:after {
+    content: "Loading....";
+    color: #a51c30;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 32%;
+    bottom: 0;
+    text-align: center;
+    font-weight: 700;
+}
   .iframe-lightbox .backdrop {
       background-color: rgba(0, 0, 0, 0.4) !important;
   }
