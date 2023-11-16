@@ -402,7 +402,7 @@ function creEl(name,className,idName){
 	  }
 	  /*Call API to get student list with program details*/
 	  callApi(){
-		  var spinner = document.getElementById('half-circle-spinner');
+		  var spinner = document.getElementById('half-circle-spinner-2');
 		  spinner.style.display = 'block';
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
@@ -410,6 +410,7 @@ function creEl(name,className,idName){
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {
+			var spinner = document.getElementById('half-circle-spinner-2');  
 		  	spinner.style.display = 'none';
 			var responseText =  JSON.parse(xhr.responseText);
 			$this.makeList(responseText)
