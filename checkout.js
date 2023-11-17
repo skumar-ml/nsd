@@ -306,6 +306,21 @@ class CheckOutWebflow {
 			studentFirstName.readOnly = true
 			studentLastName.value = supStuData.studentName.last;
 			studentLastName.readOnly = true
+
+			if(supStuData.studentGrade){
+				studentGrade.value = supStuData.studentGrade;
+				studentGrade.readOnly = true
+			}
+			if(supStuData.school){
+				studentSchool.value = supStuData.school;
+				studentSchool.readOnly = true
+			}
+			if(supStuData.gender){
+				studentGender.value = supStuData.gender;
+				studentGender.readOnly = true
+			}
+
+			
 		}
 	}
 	// update default checkbox checked always
