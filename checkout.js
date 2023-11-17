@@ -309,7 +309,7 @@ class CheckOutWebflow {
 
 			if(supStuData.studentGrade){
 				studentGrade.value = supStuData.studentGrade;
-				studentGrade.readOnly = true
+				studentGrade.disabled = true;
 			}
 			if(supStuData.school){
 				studentSchool.value = supStuData.school;
@@ -317,10 +317,8 @@ class CheckOutWebflow {
 			}
 			if(supStuData.gender){
 				studentGender.value = supStuData.gender;
-				studentGender.readOnly = true
+				studentGender.disabled = true;
 			}
-
-			
 		}
 	}
 	// update default checkbox checked always
