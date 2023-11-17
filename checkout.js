@@ -308,6 +308,12 @@ class CheckOutWebflow {
 	updateDefaultCheckbox(){
 		var dCheckbox = document.getElementById('checkbox');
 		dCheckbox.setAttribute('disabled', true)
+		// Update default price
+		var cPrice = document.getElementsByClassName('pCorePrice');
+		for (var i = 0; i < cPrice.length; i++) {
+		   let price = parseFloat(cPrice[i].innerHTML.replace(/,/g, '').replace(/\$/g, ''));
+		   cPrice[i].innerHTML = '$'+this.numberWithCommas(price.toFixed(2))
+		}
 		
 	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
