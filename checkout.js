@@ -31,17 +31,21 @@ class CheckOutWebflow {
 		this.$suppPro = data;
 		// Getting main dom elment object to add student list with link
 		var studentList = document.getElementById('checkout_supplimentary_data');
+		var supplementaryProgramHead = document.getElementById('supplementary-program-head');
 		var $this = this
 		studentList.innerHTML = "";
 		// Remove duplicate data like Supplementary program
 		data = data.filter(item=>item.programDetailId !=this.memberData.programId);
 		console.log('data', data)
 		if(data.length > 0){
+			supplementaryProgramHead.style.display = "block"
 			data.forEach((sData)=>{
 				// Getting single student list
 				var sList = this.createStudentList(sData);
 					studentList.appendChild(sList);
 			})
+		}else{
+			supplementaryProgramHead.style.display = "none"
 		}
 	}
 	// Manipulating single student list
