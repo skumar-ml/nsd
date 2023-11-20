@@ -279,6 +279,7 @@ class CheckOutWebflow {
 			document.getElementById('w-tabs-1-data-w-tab-0').click()
 			$(".w-tab-link").removeClass("w--current");
 			$(".w-tab-pane").removeClass("w--tab-active");
+			$(".w-tab-pane").css('opacity', '0')
 			Webflow.require('tabs').redraw();
 			$this.activateDiv('checkout_student_details');
 		})
