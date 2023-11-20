@@ -320,7 +320,7 @@ class CheckOutWebflow {
 		card_payment.addEventListener('click', function(){
 			// card_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('card', card_payment);
-			window.location.href = responseText.$checkoutData.cardUrl;
+			window.location.href = $this.$checkoutData.cardUrl;
 		})
 		paylater_payment.addEventListener('click', function(){
 			// paylater_payment.innerHTML = "Processing..."
