@@ -21,6 +21,7 @@ function creEl(name,className,idName){
  */
 class CheckOutWebflow {
 	$suppPro = [];
+	$checkoutData = "";
 	constructor(apiBaseUrl, memberData) {
 		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData;
@@ -163,7 +164,7 @@ class CheckOutWebflow {
 			throw error;
 		}
 	}
-	initializeStripePayment(type, btn){
+	initializeStripePayment(){
 		var studentFirstName = document.getElementById('Student-First-Name');
 		var studentLastName = document.getElementById('Student-Last-Name');
 		var studentEmail = document.getElementById('Student-Email');
@@ -172,6 +173,17 @@ class CheckOutWebflow {
 		var studentGender = document.getElementById('Student-Gender');
 		var suppProIdE = document.getElementById('suppProIds');
 		var core_product_price = document.getElementById('core_product_price');
+
+		//Payment button
+		var ach_payment = document.getElementById('ach_payment');
+		var card_payment = document.getElementById('card_payment');
+		var paylater_payment = document.getElementById('paylater_payment');
+		ach_payment.innerHTML = "Processing..."
+		ach_payment.disabled = true;
+		card_payment.innerHTML = "Processing..."
+		card_payment.disabled = true;
+		paylater_payment.innerHTML = "Processing..."
+		paylater_payment.disabled = true;
 		
 		var data = {
 			"email": this.memberData.email,
@@ -186,11 +198,13 @@ class CheckOutWebflow {
 			"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation",
 			"cancelUrl" : "https://www.nsdebatecamp.com"+window.location.pathname,
-			"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
+			//"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
-			"productType": this.memberData.productType
+			//"productType": this.memberData.productType,
+			"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
+			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, ''))
 		}
 		// Added paymentId for supplementary program 
 		if(this.memberData.productType == 'supplementary'){
@@ -212,8 +226,17 @@ class CheckOutWebflow {
 			let responseText = JSON.parse(xhr.responseText);
 			console.log('responseText', responseText)
 			if(responseText.success){
-				btn.innerHTML = 'Checkout';
-				window.location.href = responseText.stripe_url;
+				// btn.innerHTML = 'Checkout';
+				// window.location.href = responseText.stripe_url;
+
+				$this.$checkoutData = responseText;
+				
+				ach_payment.innerHTML = "Checkout"
+				ach_payment.disabled = false;
+				card_payment.innerHTML = "Checkout"
+				card_payment.disabled = false;
+				paylater_payment.innerHTML = "Checkout"
+				paylater_payment.disabled = false;
 			}
 
 		}
@@ -242,6 +265,7 @@ class CheckOutWebflow {
 				if(isValidName){
 					checkoutFormError.style.display = 'none'
 					$this.activateDiv('checkout_payment');
+					$this.initializeStripePayment();
 				}else{
 					checkoutFormError.style.display = 'block'
 				}
@@ -289,16 +313,18 @@ class CheckOutWebflow {
 		var paylater_payment = document.getElementById('paylater_payment');
 		var $this = this;
 		ach_payment.addEventListener('click', function(){
-			ach_payment.innerHTML = "Processing..."
-			$this.initializeStripePayment('us_bank_account', ach_payment);
+			// ach_payment.innerHTML = "Processing..."
+			// $this.initializeStripePayment('us_bank_account', ach_payment);
+			window.location.href = $this.$checkoutData.achUrl;
 		})
 		card_payment.addEventListener('click', function(){
-			card_payment.innerHTML = "Processing..."
-			$this.initializeStripePayment('card', card_payment);
+			// card_payment.innerHTML = "Processing..."
+			// $this.initializeStripePayment('card', card_payment);
+			window.location.href = responseText.$checkoutData.cardUrl;
 		})
 		paylater_payment.addEventListener('click', function(){
-			paylater_payment.innerHTML = "Processing..."
-			$this.initializeStripePayment('paylater', paylater_payment);
+			// paylater_payment.innerHTML = "Processing..."
+			// $this.initializeStripePayment('paylater', paylater_payment);
 		})
 	}
 	updateSuppData(){
