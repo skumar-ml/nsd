@@ -192,6 +192,17 @@ class CheckOutWebflow {
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
 			"productType": this.memberData.productType
 		}
+		// Added paymentId for supplementary program 
+		if(this.memberData.productType == 'supplementary'){
+			var supStuData = localStorage.getItem("supStuEmail");
+			if(supStuData != null){
+				supStuData = JSON.parse(supStuData);
+				if(supStuData.uniqueIdentification){
+					data.paymentId = supStuData.uniqueIdentification
+				}
+			}
+		}
+		
 		var xhr = new XMLHttpRequest()
 		var $this = this;
 		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrl", true)
