@@ -219,7 +219,7 @@ class CheckOutWebflow {
 		
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrl", true)
+		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createBothCheckoutUrls", true)
 		xhr.withCredentials = false
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function() {
