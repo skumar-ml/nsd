@@ -30,10 +30,11 @@ class AccordionForm {
 	$totalForm = 0;
 	$isLiveProgram = true;
 	$uploadedContent = {};
-	constructor(webflowMemberId,responseText,currentIndex, accountEmail){
+	constructor(webflowMemberId,responseText,currentIndex, accountEmail, page){
 		this.webflowMemberId = webflowMemberId;
 		this.currentIndex = currentIndex;
 		this.accountEmail = accountEmail;
+		this.page = page;
 		this.$completedForm = [];
 		this.renderFormData(responseText) // gets mongoDB data from responseText object for specific registrations
 		
@@ -190,7 +191,9 @@ class AccordionForm {
 		  $this.initiateLightbox();
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
-		  // $this.initiateCampResources();
+		  if(this.page == 'portal'){
+		  	$this.initiateCampResources();
+		  }
 	}
 	/**
 	 * Display Program name for single program
