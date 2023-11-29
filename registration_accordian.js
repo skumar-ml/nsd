@@ -190,7 +190,7 @@ class AccordionForm {
 		  $this.initiateLightbox();
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
-		  $this.initiateCampResources();
+		  // $this.initiateCampResources();
 	}
 	/**
 	 * Display Program name for single program
