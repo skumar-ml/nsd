@@ -191,8 +191,8 @@ class AccordionForm {
 		  $this.initiateLightbox();
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
-		  if(this.page == 'portal'){
-		  	$this.initiateCampResources();
+		  // if(this.page == 'portal'){
+		  // 	$this.initiateCampResources();
 		  }
 	}
 	/**
