@@ -93,6 +93,9 @@ class CheckOutWebflow {
 		var selectedSuppPro = document.getElementById('selected_supplimentary_program');
 		selectedSuppPro.innerHTML = "";
 		var selectedData = this.$suppPro.filter(item => suppIds.some(d => d == item.programDetailId))
+		if(selectedData.length == 0){
+			return false;
+		}
 		var head = creEl('p', 'dm-sans font-14 order-summary-border bold marginbottom-3');
 		head.innerHTML = "Supplementary Program"
 		selectedSuppPro.appendChild(head);
