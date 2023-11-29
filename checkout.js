@@ -98,10 +98,12 @@ class CheckOutWebflow {
 		if(selectedData.length == 0){
 			respricelabel.innerHTML = "Total Price";
 			respricelabel.innerHTML = "Total Price";
+			selectedSuppPro.classList.remove('added_supp_data')
 			return false;
 		}else{
 			respricelabel.innerHTML = "Price";
 			respricelabel.innerHTML = "Price";
+			selectedSuppPro.classList.add('added_supp_data')
 		}
 		var head = creEl('p', 'dm-sans font-14 order-summary-border bold marginbottom-3');
 		head.innerHTML = "Supplementary Program"
