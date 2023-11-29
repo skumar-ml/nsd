@@ -93,8 +93,15 @@ class CheckOutWebflow {
 		var selectedSuppPro = document.getElementById('selected_supplimentary_program');
 		selectedSuppPro.innerHTML = "";
 		var selectedData = this.$suppPro.filter(item => suppIds.some(d => d == item.programDetailId))
+		var respricelabel = document.getElementById('res-price-label');
+        	var commpricelabel = document.getElementById('comm-price-label');
 		if(selectedData.length == 0){
+			respricelabel.innerHTML = "Total Price";
+			respricelabel.innerHTML = "Total Price";
 			return false;
+		}else{
+			respricelabel.innerHTML = "Price";
+			respricelabel.innerHTML = "Price";
 		}
 		var head = creEl('p', 'dm-sans font-14 order-summary-border bold marginbottom-3');
 		head.innerHTML = "Supplementary Program"
