@@ -193,7 +193,7 @@ class AccordionForm {
 		  spinner.style.display = 'none';
 		  // if(this.page == 'portal'){
 		  // 	$this.initiateCampResources();
-		  }
+		  // }
 	}
 	/**
 	 * Display Program name for single program
