@@ -444,6 +444,10 @@ class CheckOutWebflow {
 					}
 				}
 				this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
+				//update total amount for back button
+				this.updateOnlyTotalAmount()
+				var totalPriceDiv = document.getElementById('totalPriceDiv');
+				totalPriceDiv.style.visibility  = 'visible';
 			}
 			if(paymentData.checkoutData){
 				this.$checkoutData = paymentData.checkoutData;
