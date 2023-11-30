@@ -352,10 +352,10 @@ class CheckOutWebflow {
 			// $this.initializeStripePayment('card', card_payment);
 			window.location.href = $this.$checkoutData.cardUrl;
 		})
-		paylater_payment.addEventListener('click', function(){
+		//paylater_payment.addEventListener('click', function(){
 			// paylater_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('paylater', paylater_payment);
-		})
+		//})
 	}
 	updateSuppData(){
 		var studentFirstName = document.getElementById('Student-First-Name');
