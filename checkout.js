@@ -79,15 +79,14 @@ class CheckOutWebflow {
 		var mobileResponsiveHide = creEl('div', 'mobile-responsive-hide')
 		
 		var productPriceText = creEl('div', 'product-price-text')
-		productPriceText.innerHTML = '$'+this.numberWithCommas(suppData.amount.toFixed(2));
-		setTimeout(function(){
-			mobileResponsiveHide.appendChild(productPriceText)
-			coreProductTitle.prepend(h1, div, mobileResponsiveHide)
-		},0)
-		console.log('productPriceText', productPriceText)
+		productPriceText.innerHTML = '$'+suppData.amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		mobileResponsiveHide.appendChild(productPriceText)
+		coreProductTitle.prepend(h1, div, mobileResponsiveHide)
 		
+		var productPriceText1 = creEl('div', 'product-price-text')
+		productPriceText1.innerHTML = '$'+suppData.amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		var productPriceContainer = creEl('div', 'product-price-container hide-mobile')
-		productPriceContainer.appendChild(productPriceText)
+		productPriceContainer.appendChild(productPriceText1)
 		
 		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
 
