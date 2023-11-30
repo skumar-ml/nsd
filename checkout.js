@@ -77,13 +77,14 @@ class CheckOutWebflow {
 		div.innerHTML = suppData.desc;
 		
 		var mobileResponsiveHide = creEl('div', 'mobile-responsive-hide')
-		var productPriceContainer = creEl('div', 'product-price-container hide-mobile')
+		
 		var productPriceText = creEl('div', 'product-price-text')
 		productPriceText.innerHTML = '$'+this.numberWithCommas(suppData.amount.toFixed(2));
+		mobileResponsiveHide.appendChild(productPriceText)
+		coreProductTitle.prepend(h1, div)
+		coreProductTitle.appendChild(mobileResponsiveHide);
 		
-		coreProductTitle.prepend(h1, div, productPriceText)
-		
-		
+		var productPriceContainer = creEl('div', 'product-price-container hide-mobile')
 		productPriceContainer.appendChild(productPriceText)
 		
 		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
