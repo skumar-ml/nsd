@@ -75,11 +75,15 @@ class CheckOutWebflow {
 		h1.innerHTML = suppData.label;
 		var div = creEl('div','core-product-title-subtext')
 		div.innerHTML = suppData.desc;
-		coreProductTitle.prepend(h1, div)
 		
-		var productPriceContainer = creEl('div', 'product-price-container')
+		var mobileResponsiveHide = creEl('div', 'mobile-responsive-hide')
+		var productPriceContainer = creEl('div', 'product-price-container hide-mobile')
 		var productPriceText = creEl('div', 'product-price-text')
 		productPriceText.innerHTML = '$'+this.numberWithCommas(suppData.amount.toFixed(2));
+		
+		coreProductTitle.prepend(h1, div, productPriceText)
+		
+		
 		productPriceContainer.appendChild(productPriceText)
 		
 		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
@@ -242,6 +246,10 @@ class CheckOutWebflow {
 				// window.location.href = responseText.stripe_url;
 
 				$this.$checkoutData = responseText;
+
+				//Storing data in local storage
+				data.checkoutData = responseText
+				localStorage.setItem("checkOutData", JSON.stringify(data));
 				
 				ach_payment.innerHTML = "Checkout"
 				ach_payment.disabled = false;
@@ -389,6 +397,56 @@ class CheckOutWebflow {
 		}
 		
 	}
+	setUpBackButtonTab(){
+		var query = window.location.search;
+        var urlPar = new URLSearchParams(query);
+        var returnType = urlPar.get('returnType');
+		var checkoutJson= localStorage.getItem("checkOutData");
+		if(returnType == 'back' && checkoutJson != undefined){
+			var paymentData = JSON.parse(checkoutJson);
+			console.log('checkoutData', paymentData)
+			var studentFirstName = document.getElementById('Student-First-Name');
+			var studentLastName = document.getElementById('Student-Last-Name');
+			var studentEmail = document.getElementById('Student-Email');
+			var studentGrade = document.getElementById('Student-Grade');
+			var studentSchool = document.getElementById('Student-School');
+			var studentGender = document.getElementById('Student-Gender');
+			
+			studentEmail.value = paymentData.studentEmail;
+			
+			studentFirstName.value = paymentData.firstName;
+			
+			studentLastName.value = paymentData.lastName;
+			
+			if(paymentData.grade){
+				studentGrade.value = paymentData.grade;
+			}
+			
+			if(paymentData.school){
+				studentSchool.value = paymentData.school;
+			}
+			
+			if(paymentData.gender){
+				studentGender.value = paymentData.gender;
+			}
+			
+			if(paymentData.supplementaryProgramIds.length > 0){
+				var SuppCheckbox = document.getElementsByClassName("suppCheckbox");
+				
+				for (let i = 0; i < SuppCheckbox.length; i++) {
+					var checkBoxProgramdetailid = SuppCheckbox[i].getAttribute('programdetailid');
+					console.log('checkBoxProgramdetailid', checkBoxProgramdetailid)
+					if(paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)){
+						SuppCheckbox[i].checked = true;
+					}
+				}
+			}
+			if(paymentData.checkoutData){
+				this.$checkoutData = paymentData.checkoutData;
+				this.activateDiv('checkout_payment');
+			}
+		}
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
@@ -403,6 +461,7 @@ class CheckOutWebflow {
 			spinner.style.display = 'block';	
 			const data = await this.fetchData('getSupplementaryProgram/'+this.memberData.programId);
 			this.displaySupplimentaryProgram(data)
+			this.setUpBackButtonTab();
 			spinner.style.display = 'none';
 		} catch (error) {
 			console.error('Error rendering random number:', error);
