@@ -195,13 +195,13 @@ class CheckOutWebflow {
 		//Payment button
 		var ach_payment = document.getElementById('ach_payment');
 		var card_payment = document.getElementById('card_payment');
-		var paylater_payment = document.getElementById('paylater_payment');
+		//var paylater_payment = document.getElementById('paylater_payment');
 		ach_payment.innerHTML = "Processing..."
 		ach_payment.disabled = true;
 		card_payment.innerHTML = "Processing..."
 		card_payment.disabled = true;
-		paylater_payment.innerHTML = "Processing..."
-		paylater_payment.disabled = true;
+		//paylater_payment.innerHTML = "Processing..."
+		//paylater_payment.disabled = true;
 		var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 		cancelUrl.searchParams.append('returnType', 'back')
 		var data = {
@@ -258,8 +258,8 @@ class CheckOutWebflow {
 				ach_payment.disabled = false;
 				card_payment.innerHTML = "Checkout"
 				card_payment.disabled = false;
-				paylater_payment.innerHTML = "Checkout"
-				paylater_payment.disabled = false;
+				// paylater_payment.innerHTML = "Checkout"
+				// paylater_payment.disabled = false;
 			}
 
 		}
