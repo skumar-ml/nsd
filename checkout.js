@@ -200,7 +200,8 @@ class CheckOutWebflow {
 		card_payment.disabled = true;
 		paylater_payment.innerHTML = "Processing..."
 		paylater_payment.disabled = true;
-		
+		var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+		cancelUrl.searchParams.append('returnType', 'back')
 		var data = {
 			"email": this.memberData.email,
 			"studentEmail" : studentEmail.value,
@@ -213,7 +214,7 @@ class CheckOutWebflow {
 			"programId" : this.memberData.programId,
 			//"paymentType" : type,
 			"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation",
-			"cancelUrl" : "https://www.nsdebatecamp.com"+window.location.pathname,
+			"cancelUrl" : cancelUrl,
 			//"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
 			"memberId" : this.memberData.memberId, 
 			"programCategoryId" : this.memberData.programCategoryId,
