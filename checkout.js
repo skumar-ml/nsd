@@ -299,7 +299,7 @@ class CheckOutWebflow {
 		})
 		prev_page_2.addEventListener('click', function(){
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
-			document.getElementById('w-tabs-1-data-w-tab-0').click()
+			//document.getElementById('w-tabs-1-data-w-tab-0').click()
 			setTimeout(function(){ 
 				$(".w-tab-link").removeClass("w--current");
 				$(".w-tab-pane").removeClass("w--tab-active");
