@@ -440,17 +440,17 @@ class CheckOutWebflow {
 					var checkBoxProgramdetailid = SuppCheckbox[i].getAttribute('programdetailid');
 					console.log('checkBoxProgramdetailid', checkBoxProgramdetailid)
 					if(paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)){
-						SuppCheckbox[i].checked = true;
+						SuppCheckbox[i].click();
 					}
 				}
-				this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
+				//this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
 				//update total amount for back button
-				this.updateOnlyTotalAmount()
-				var totalPriceDiv = document.getElementById('totalPriceDiv');
-				totalPriceDiv.style.visibility  = 'visible';
+				//this.updateOnlyTotalAmount()
+				//var totalPriceDiv = document.getElementById('totalPriceDiv');
+				//totalPriceDiv.style.visibility  = 'visible';
 				//Updated supp id for back button
-				var suppProIdE = document.getElementById('suppProIds');
-				suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
+				//var suppProIdE = document.getElementById('suppProIds');
+				//suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
 			}
 			if(paymentData.checkoutData){
 				this.$checkoutData = paymentData.checkoutData;
