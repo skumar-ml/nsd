@@ -448,6 +448,9 @@ class CheckOutWebflow {
 				this.updateOnlyTotalAmount()
 				var totalPriceDiv = document.getElementById('totalPriceDiv');
 				totalPriceDiv.style.visibility  = 'visible';
+				//Updated supp id for back button
+				var suppProIdE = document.getElementById('suppProIds');
+				suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
 			}
 			if(paymentData.checkoutData){
 				this.$checkoutData = paymentData.checkoutData;
