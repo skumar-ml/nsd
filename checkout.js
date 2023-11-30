@@ -55,7 +55,7 @@ class CheckOutWebflow {
 		var $this = this;
 		var coreCheckbox = creEl('div', 'core-checkbox');
 		var wCheckbox = creEl('label', 'w-checkbox')
-		var checkboxS = creEl('input', 'w-checkbox-input core-checkbox');
+		var checkboxS = creEl('input', 'w-checkbox-input core-checkbox suppCheckbox');
 		checkboxS.type ="checkbox";
 		checkboxS.name ="checkbox";
 		checkboxS.value =suppData.amount;
