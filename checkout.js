@@ -443,6 +443,7 @@ class CheckOutWebflow {
 						SuppCheckbox[i].checked = true;
 					}
 				}
+				this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
 			}
 			if(paymentData.checkoutData){
 				this.$checkoutData = paymentData.checkoutData;
