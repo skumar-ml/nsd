@@ -202,8 +202,9 @@ class CheckOutWebflow {
 		card_payment.disabled = true;
 		//paylater_payment.innerHTML = "Processing..."
 		//paylater_payment.disabled = true;
-		var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
-		console.log("https://www.nsdebatecamp.com"+window.location.pathname)
+		//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+		var cancelUrl = new URL(window.location.href);
+		console.log(window.location.href)
 		cancelUrl.searchParams.append('returnType', 'back')
 		console.log(cancelUrl)
 		var data = {
