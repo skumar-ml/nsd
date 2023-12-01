@@ -465,6 +465,9 @@ class CheckOutWebflow {
 				this.$checkoutData = paymentData.checkoutData;
 				this.activateDiv('checkout_payment');
 			}
+		}else{
+			// removed local storage when checkout page rendar direct without back button
+			localStorage.removeItem("checkOutData");
 		}
 	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
