@@ -203,7 +203,9 @@ class CheckOutWebflow {
 		//paylater_payment.innerHTML = "Processing..."
 		//paylater_payment.disabled = true;
 		var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+		console.log("https://www.nsdebatecamp.com"+window.location.pathname)
 		cancelUrl.searchParams.append('returnType', 'back')
+		console.log(cancelUrl)
 		var data = {
 			"email": this.memberData.email,
 			"studentEmail" : studentEmail.value,
@@ -341,15 +343,19 @@ class CheckOutWebflow {
 		var ach_payment = document.getElementById('ach_payment');
 		var card_payment = document.getElementById('card_payment');
 		var paylater_payment = document.getElementById('paylater_payment');
+		// Browser back button event hidden fields
+		var ibackbutton = document.getElementById("backbuttonstate");
 		var $this = this;
 		ach_payment.addEventListener('click', function(){
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
+			ibackbutton.value = "1";
 			window.location.href = $this.$checkoutData.achUrl;
 		})
 		card_payment.addEventListener('click', function(){
 			// card_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('card', card_payment);
+			ibackbutton.value = "1";
 			window.location.href = $this.$checkoutData.cardUrl;
 		})
 		//paylater_payment.addEventListener('click', function(){
@@ -402,10 +408,12 @@ class CheckOutWebflow {
 	}
 	setUpBackButtonTab(){
 		var query = window.location.search;
-        var urlPar = new URLSearchParams(query);
-        var returnType = urlPar.get('returnType');
+        	var urlPar = new URLSearchParams(query);
+        	var returnType = urlPar.get('returnType');
 		var checkoutJson= localStorage.getItem("checkOutData");
-		if(returnType == 'back' && checkoutJson != undefined){
+		// Browser back button event hidden fields
+		var ibackbutton = document.getElementById("backbuttonstate");
+		if((returnType == 'back' || ibackbutton.value == 1) && checkoutJson != undefined){
 			var paymentData = JSON.parse(checkoutJson);
 			console.log('checkoutData', paymentData)
 			var studentFirstName = document.getElementById('Student-First-Name');
