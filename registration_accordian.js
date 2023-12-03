@@ -401,11 +401,12 @@ class AccordionForm {
 		[].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
 		  el.lightbox = new IframeLightbox(el, {
 			onClosed: function() {
-				var spinner = document.getElementById('half-circle-spinner');
+				// Discuss with shubham and commented the code
+				/* var spinner = document.getElementById('half-circle-spinner');
 				spinner.style.display = 'block';				
 				setTimeout(function() {
 					new AccordionTabs(this.webflowMemberId, this.accountEmail)
-				}, 500);
+				}, 500); */
 			},
 			scrolling: true,
 		  });
