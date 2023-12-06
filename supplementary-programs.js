@@ -600,6 +600,7 @@ function creEl(name,className,idName){
 			$this.viewstabs(responseText);
 			$this.initiateTabs();
 			if(responseText == "No data Found"){
+				spinner.style.display = 'none';
 				return false;
 			}
 		// formData = responseText[index]
