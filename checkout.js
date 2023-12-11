@@ -15,10 +15,11 @@ function creEl(name,className,idName){
 	return el;
 }
 /**
- * Used CheckOutWebflow class name to easily intigrate with portal js.
- * In this API we pass apiBaseUrl, webflowMemberId, accountEmail.
- * In this class we are manipulating student data and creating make up session link for students
+ * CheckOutWebflow Class is used to intigrate with stripe payment.
+ * In this API we pass baseUrl, memberData.
+ * In this class we are manipulating student form and member data
  */
+
 class CheckOutWebflow {
 	$suppPro = [];
 	$checkoutData = "";
@@ -30,8 +31,9 @@ class CheckOutWebflow {
 	// Passing all supplimentary program data and creating cart list
 	displaySupplimentaryProgram(data){
 		this.$suppPro = data;
-		// Getting main dom elment object to add student list with link
+		// Getting main dom elment object to add supplementary program list with checkbox
 		var studentList = document.getElementById('checkout_supplimentary_data');
+		// Supplementary program heading
 		var supplementaryProgramHead = document.getElementById('supplementary-program-head');
 		var $this = this
 		studentList.innerHTML = "";
@@ -39,20 +41,24 @@ class CheckOutWebflow {
 		data = data.filter(item=>item.programDetailId !=this.memberData.programId);
 		console.log('data', data)
 		if(data.length > 0){
+			// showing supplementary program heading when data in not empty
 			supplementaryProgramHead.style.display = "block"
 			data.forEach((sData)=>{
-				// Getting single student list
-				var sList = this.createStudentList(sData);
+				// Getting single supplementary program cart list
+				var sList = this.createCartList(sData);
 					studentList.appendChild(sList);
 			})
 		}else{
+			// hiding supplementary program heading when data is empty
 			supplementaryProgramHead.style.display = "none"
 		}
 	}
-	// Manipulating single student list
-	createStudentList(suppData){
+	// Manipulating single supplementary program list
+	createCartList(suppData){
 		var coreProductContainer = creEl('div', 'core-product-container');
 		var $this = this;
+		
+		// Creating checkbox for cart
 		var coreCheckbox = creEl('div', 'core-checkbox');
 		var wCheckbox = creEl('label', 'w-checkbox')
 		var checkboxS = creEl('input', 'w-checkbox-input core-checkbox suppCheckbox');
@@ -64,12 +70,12 @@ class CheckOutWebflow {
 		checkboxS.addEventListener('change', function() {
 		 $this.updateAmount(this, suppData.amount)
 		});
-		
 		wCheckbox.appendChild(checkboxS)
 		var spantext = creEl('span', 'core-checkbox-label w-form-label')
 		wCheckbox.appendChild(spantext)
 		coreCheckbox.appendChild(wCheckbox)
 		
+		// Creating heading for supplementary program heading
 		var coreProductTitle = creEl('div', 'core-product-title')
 		var h1 = creEl('h1', 'core-product-title-text')
 		h1.innerHTML = suppData.label;
@@ -77,30 +83,35 @@ class CheckOutWebflow {
 		div.innerHTML = suppData.desc;
 		
 		var mobileResponsiveHide = creEl('div', 'mobile-responsive-hide')
-		
+		// Mobile responsive price text. it will display on mobile
 		var productPriceText = creEl('div', 'product-price-text')
 		productPriceText.innerHTML = '$'+suppData.amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		mobileResponsiveHide.appendChild(productPriceText)
 		coreProductTitle.prepend(h1, div, mobileResponsiveHide)
-		
+		// Desktop responsive price text. it will display on mobile
 		var productPriceText1 = creEl('div', 'product-price-text')
 		productPriceText1.innerHTML = '$'+suppData.amount.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 		var productPriceContainer = creEl('div', 'product-price-container hide-mobile')
 		productPriceContainer.appendChild(productPriceText1)
-		
+		// append title , price and checkbox
 		coreProductContainer.prepend(coreProductTitle, productPriceContainer, coreCheckbox)
 
 		return coreProductContainer;
 	}
+	// formating price in comma based value
 	numberWithCommas(x) {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
+	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppProgram(suppIds){
+		// selected Supplementary program main dom element
 		var selectedSuppPro = document.getElementById('selected_supplimentary_program');
 		selectedSuppPro.innerHTML = "";
+		// Filtering selected Supplementary program id from all Supplementary program data
 		var selectedData = this.$suppPro.filter(item => suppIds.some(d => d == item.programDetailId))
+		//Manipulating price text for with supplementary program and without
 		var respricelabel = document.getElementById('res-price-label');
-        	var commpricelabel = document.getElementById('comm-price-label');
+        var commpricelabel = document.getElementById('comm-price-label');
 		if(selectedData.length == 0){
 			respricelabel.innerHTML = "Total Price";
 			respricelabel.innerHTML = "Total Price";
@@ -111,10 +122,12 @@ class CheckOutWebflow {
 			respricelabel.innerHTML = "Price";
 			selectedSuppPro.classList.add('added_supp_data')
 		}
+		// Selected supplementary program heading 
 		var head = creEl('p', 'dm-sans font-14 order-summary-border bold marginbottom-3');
 		head.innerHTML = "Supplementary Program"
 		selectedSuppPro.appendChild(head);
 		var label = '';
+		// Added single supplementary program heading in sidebar
 		selectedData.forEach(sup=>{
 			label = creEl('p', 'dm-sans font-14 bold')
 			label.innerHTML = sup.label
@@ -126,22 +139,34 @@ class CheckOutWebflow {
 		
 		console.log('selectedData',selectedData)
 	}
+	// Method is use update supplementary program price after tab change
 	updateOnlyTotalAmount(){
+		// Webflow total price dom element
 		var totalPriceText = document.getElementById('totalPrice');
+		// core product price for resdential, commuter and online 
 		var core_product_price = document.getElementById('core_product_price');
+		// total amount price for supplementary program
 		var totalAmountInput = document.getElementById('totalAmount');
+		// manupulating total price based on selected supplementary program and core product price 
 		var amount = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value);
+		// added total price in dom element
 		totalPriceText.innerHTML = this.numberWithCommas(amount.toFixed(2));
 	}
+	// Update total price when checkbox clicked for supplementary program
 	updateAmount(checkEvent, amount){
+		// Sum of supplementary program price
 		var totalAmountInput = document.getElementById('totalAmount');
+		// core product price for resdential, commuter and online
 		var core_product_price = document.getElementById('core_product_price');
-		//core_product_price
+		// Webflow total price dom element
 		var totalPriceText = document.getElementById('totalPrice');
+		// All added supplementary program id input fields
 		var suppProIdE = document.getElementById('suppProIds');
+		// selected supplementary program id
 		var suppId = checkEvent.getAttribute('programDetailId')
 		var selectedIds = [];
 		 if (checkEvent.checked) {
+			 // calulate total amount based on supplementary program price sum and core product price
 			 var amountHtml = parseFloat(core_product_price.value.replace(/,/g, ''))+parseFloat(totalAmountInput.value)+parseFloat(amount)
 			 totalPriceText.innerHTML = this.numberWithCommas(amountHtml.toFixed(2))
 			 totalAmountInput.value = parseFloat(totalAmountInput.value)+parseFloat(amount)
@@ -150,7 +175,7 @@ class CheckOutWebflow {
 			 selectedIds = arrayIds;
 			 suppProIdE.value = JSON.stringify(arrayIds)
 		  } else {
-			console.log("Checkbox is not checked..", checkEvent.value);
+			// calulate total amount based on supplementary program price sum and core product price 
 			var amountHtml = parseFloat(core_product_price.value.replace(/,/g, ''))+ parseFloat(totalAmountInput.value)-parseFloat(amount)
 			totalPriceText.innerHTML = this.numberWithCommas(amountHtml.toFixed(2))
 			totalAmountInput.value	= parseFloat(totalAmountInput.value)-parseFloat(amount)
@@ -159,6 +184,7 @@ class CheckOutWebflow {
 			selectedIds = allSupIds;
 			suppProIdE.value = JSON.stringify(allSupIds)			
 		  }
+		  // Hide and show based on supplementary program length
 		  var totalPriceDiv = document.getElementById('totalPriceDiv');
 		 if(selectedIds.length > 0){
 			  totalPriceDiv.style.visibility  = 'visible';
@@ -182,6 +208,7 @@ class CheckOutWebflow {
 			throw error;
 		}
 	}
+	// API call for checkout URL 
 	initializeStripePayment(){
 		var studentFirstName = document.getElementById('Student-First-Name');
 		var studentLastName = document.getElementById('Student-Last-Name');
@@ -206,7 +233,7 @@ class CheckOutWebflow {
 		var cancelUrl = new URL(window.location.href);
 		console.log(window.location.href)
 		cancelUrl.searchParams.append('returnType', 'back')
-		console.log(cancelUrl)
+		//console.log(cancelUrl)
 		var data = {
 			"email": this.memberData.email,
 			"studentEmail" : studentEmail.value,
@@ -267,6 +294,7 @@ class CheckOutWebflow {
 
 		}
 	}
+	// Hide and show tab for program selection, student infor and checkout payment
 	activateDiv(divId){
 		var divIds = ['checkout_program', 'checkout_student_details', 'checkout_payment'];
 		 // Remove the active class from all div elements
@@ -274,6 +302,7 @@ class CheckOutWebflow {
 		// Add the active class to the div with the specified id
 		document.getElementById(divId).classList.add('active_checkout_tab');
 	}
+	// Managing next and previous button 
 	addEventForPrevNaxt(){
 		var next_page_1 = document.getElementById('next_page_1');
 		var next_page_2 = document.getElementById('next_page_2');
@@ -287,7 +316,8 @@ class CheckOutWebflow {
 		})
 		next_page_2.addEventListener('click', function(){
 			if(form.valid()){
-				var isValidName = $this.checkUniqueStudentName();
+				// validation for student email different form Parent email
+				var isValidName = $this.checkUniqueStudentEmail();
 				if(isValidName){
 					checkoutFormError.style.display = 'none'
 					$this.activateDiv('checkout_payment');
@@ -301,6 +331,7 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_program');
 		})
 		prev_page_2.addEventListener('click', function(){
+			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
 			setTimeout(function(){ 
@@ -312,21 +343,9 @@ class CheckOutWebflow {
 			$this.activateDiv('checkout_student_details');
 		})
 	}
-	
-	checkUniqueStudentName(){
-		/*var sFNameE = document.getElementById('Student-First-Name');
-		var sLNameE = document.getElementById('Student-Last-Name');
-		var sName = sFNameE.value+sLNameE.value;
-		sName = sName.replace(/\s/g,'');
-		sName = sName.toLowerCase()
-		var pName = this.memberData.name;
-		pName = pName.replace(/\s/g,'');
-		pName = pName.toLowerCase()
-		if(sName == pName){
-			return false;
-		}else{
-			return true
-		}*/
+	// validating duplicate email 
+	checkUniqueStudentEmail(){
+		
 		var sENameE = document.getElementById('Student-Email');
 		var sEmail = sENameE.value;
 		sEmail = sEmail.replace(/\s/g,'');
@@ -340,6 +359,7 @@ class CheckOutWebflow {
 			return true
 		}
 	}
+	// handle payment button click
 	handlePaymentEvent(){
 		var ach_payment = document.getElementById('ach_payment');
 		var card_payment = document.getElementById('card_payment');
@@ -364,6 +384,7 @@ class CheckOutWebflow {
 			// $this.initializeStripePayment('paylater', paylater_payment);
 		//})
 	}
+	// Update student data for addon supplementary program purchase
 	updateSuppData(){
 		var studentFirstName = document.getElementById('Student-First-Name');
 		var studentLastName = document.getElementById('Student-Last-Name');
@@ -407,23 +428,26 @@ class CheckOutWebflow {
 		}
 		
 	}
+	// Setup back stripe button and browser back button
 	setUpBackButtonTab(){
 		var query = window.location.search;
-        	var urlPar = new URLSearchParams(query);
-        	var returnType = urlPar.get('returnType');
+        var urlPar = new URLSearchParams(query);
+        var returnType = urlPar.get('returnType');
+		// Get local storage data for back button
 		var checkoutJson= localStorage.getItem("checkOutData");
 		// Browser back button event hidden fields
 		var ibackbutton = document.getElementById("backbuttonstate");
 		if((returnType == 'back' || ibackbutton.value == 1) && checkoutJson != undefined){
 			var paymentData = JSON.parse(checkoutJson);
-			console.log('checkoutData', paymentData)
+			//console.log('checkoutData', paymentData)
+			
 			var studentFirstName = document.getElementById('Student-First-Name');
 			var studentLastName = document.getElementById('Student-Last-Name');
 			var studentEmail = document.getElementById('Student-Email');
 			var studentGrade = document.getElementById('Student-Grade');
 			var studentSchool = document.getElementById('Student-School');
 			var studentGender = document.getElementById('Student-Gender');
-			
+			// Update all local storage data
 			studentEmail.value = paymentData.studentEmail;
 			
 			studentFirstName.value = paymentData.firstName;
@@ -473,18 +497,28 @@ class CheckOutWebflow {
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
+			// Update student data for purchase addon Supplementary program
 			if(this.memberData.productType == 'supplementary'){
 				this.updateSuppData();
 			}
+			// Update readOnly for core program
 			this.updateDefaultCheckbox();
+			// Handle checkout button
 			this.handlePaymentEvent();
+			// Handle previous and next button
 			this.addEventForPrevNaxt();
+			// activate program tab
 			this.activateDiv('checkout_program')
+			// loader icon code
 			var spinner = document.getElementById('half-circle-spinner');
-			spinner.style.display = 'block';	
+			spinner.style.display = 'block';
+			// API call
 			const data = await this.fetchData('getSupplementaryProgram/'+this.memberData.programId);
+			// Display supplementary program
 			this.displaySupplimentaryProgram(data)
+			// Setup back button for browser and stripe checkout page
 			this.setUpBackButtonTab();
+			// Hide spinner 
 			spinner.style.display = 'none';
 		} catch (error) {
 			console.error('Error rendering random number:', error);
