@@ -253,7 +253,8 @@ class CheckOutWebflow {
 			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
 			"productType": this.memberData.productType,
 			"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
-			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, ''))
+			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
+			"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, ''))
 		}
 		// Added paymentId for supplementary program 
 		if(this.memberData.productType == 'supplementary'){
