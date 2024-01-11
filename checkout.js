@@ -222,13 +222,13 @@ class CheckOutWebflow {
 		//Payment button
 		var ach_payment = document.getElementById('ach_payment');
 		var card_payment = document.getElementById('card_payment');
-		//var paylater_payment = document.getElementById('paylater_payment');
+		var paylater_payment = document.getElementById('paylater_payment');
 		ach_payment.innerHTML = "Processing..."
 		ach_payment.disabled = true;
 		card_payment.innerHTML = "Processing..."
 		card_payment.disabled = true;
-		//paylater_payment.innerHTML = "Processing..."
-		//paylater_payment.disabled = true;
+		paylater_payment.innerHTML = "Processing..."
+		paylater_payment.disabled = true;
 		//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 		var cancelUrl = new URL(window.location.href);
 		console.log(window.location.href)
@@ -288,8 +288,8 @@ class CheckOutWebflow {
 				ach_payment.disabled = false;
 				card_payment.innerHTML = "Checkout"
 				card_payment.disabled = false;
-				// paylater_payment.innerHTML = "Checkout"
-				// paylater_payment.disabled = false;
+				paylater_payment.innerHTML = "Checkout"
+				paylater_payment.disabled = false;
 			}
 
 		}
@@ -379,10 +379,12 @@ class CheckOutWebflow {
 			ibackbutton.value = "1";
 			window.location.href = $this.$checkoutData.cardUrl;
 		})
-		//paylater_payment.addEventListener('click', function(){
+		paylater_payment.addEventListener('click', function(){
 			// paylater_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('paylater', paylater_payment);
-		//})
+			ibackbutton.value = "1";
+			window.location.href = $this.$checkoutData.payLaterUrl;
+		})
 	}
 	// Update student data for addon supplementary program purchase
 	updateSuppData(){
