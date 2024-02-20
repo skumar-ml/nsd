@@ -516,6 +516,8 @@ class AccordionTabs {
 		  if(responseText.length > 0){
 					 responseText =  responseText.reverse();
 					 console.log('te', responseText)
+		  }else{
+			  spinner.style.display = 'none';
 		  }
 		  $this.viewtabs(responseText);
 		  $this.initiateTabs();
