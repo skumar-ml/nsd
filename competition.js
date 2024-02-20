@@ -507,7 +507,7 @@ class AccordionTabs {
     // calls api using webflow member ID
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/639ae841e3d1790004f29b80", true)
+		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/"+$this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {
