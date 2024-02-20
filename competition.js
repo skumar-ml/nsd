@@ -425,7 +425,7 @@ class AccordionTabs {
 			  contentSection.appendChild(tabContent);
 			  }
 			  //else{
-				  is_notification = true;
+				  is_notification = false;
 				  //formData.failedPayment.forEach(item => {
 					let noText = creEl('span', 'noti_text');
 					noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+formData.programDetail.programName+', and points are up for grabs!';
