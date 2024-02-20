@@ -423,14 +423,15 @@ class AccordionTabs {
 			  var accordionFooter = creEl("div","accordion-footer","accordion-footer-"+currentIndex)
 			  tabContent.prepend(program_dates, accordionFooter, accordion)
 			  contentSection.appendChild(tabContent);
-			  }else{
-				  is_notification = true;
-				  formData.failedPayment.forEach(item => {
-					let noText = creEl('span', 'noti_text');
-					noText.innerHTML = 'A recent payment for '+item['Student Name']+' register for the program '+item['Program Name']+' has failed.';
-					notificationDiv.appendChild(noText);
-				 })
 			  }
+			  //else{
+				  is_notification = true;
+				  //formData.failedPayment.forEach(item => {
+					let noText = creEl('span', 'noti_text');
+					noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+formData.programDetail.programName+', and points are up for grabs!';
+					notificationDiv.appendChild(noText);
+				 //})
+			 // }
 		})
 		if(is_notification){
 			tabsContainer.prepend(notificationDiv, tabs,contentSection)
