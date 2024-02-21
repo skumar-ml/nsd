@@ -306,7 +306,7 @@ class checkInForm {
 		}, 0);*/
 		labsSelectBox.addEventListener('change', function () {
 			var session = labs.find(item => item.labid == this.value);
-			$this.$timezones = session.sessions;
+			$this.$timezones = (session.sessions != undefined) ? session.sessions : [];
 			$this.getSessions();
 			$this.displayStudentList(this.value, 'init');
 			$this.resetFilter();
