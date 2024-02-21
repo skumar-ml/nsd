@@ -71,7 +71,7 @@ class selfCheckInForm {
 		
 		labsSelectBox.addEventListener('change', function () {
 			var session = labs.find(item => item.id == this.value);
-			$this.$timezones = session.sessions;
+			$this.$timezones = (session.sessions != undefined) ? session.sessions : [];
 			$this.getSessions();
 			$this.displayCheckInBtn(this.value);
 			if(!this.value){
