@@ -108,7 +108,7 @@ class selfCheckInForm {
 		
 		labs.forEach(item => {
 			var option = creEl("option");
-			option.value = item.id;
+			option.value = item._id;
 			option.text = item.labTypeName+' '+item.count;
 				sessionSelectBox.appendChild(option);
 		})
