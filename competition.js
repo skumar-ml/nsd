@@ -551,6 +551,10 @@ class AccordionTabs {
 				let noText = creEl('span', 'noti_text');
 				noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+item.programName+', and points are up for grabs!';
 				notificationDiv.appendChild(noText);
+
+				var live_com_budge = document.getElementsByClassName("live_com_budge")[0];
+				var blink = creEl('span', 'blink');
+				live_com_budge.appendChild(blink)
 			}
 		})
 		
