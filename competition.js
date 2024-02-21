@@ -425,11 +425,11 @@ class AccordionTabs {
 			  contentSection.appendChild(tabContent);
 			  }
 			  //else{
-				  is_notification = false;
+				  is_notification = true;
 				  //formData.failedPayment.forEach(item => {
-					let noText = creEl('span', 'noti_text');
-					noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+formData.programDetail.programName+', and points are up for grabs!';
-					notificationDiv.appendChild(noText);
+					//let noText = creEl('span', 'noti_text');
+					//noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+formData.programDetail.programName+', and points are up for grabs!';
+					//notificationDiv.appendChild(noText);
 				 //})
 			 // }
 		})
@@ -438,6 +438,7 @@ class AccordionTabs {
 		}else{
 			tabsContainer.prepend(tabs,contentSection)
 		}
+		this.getLiveCheckInData()
 	}
 	/**
 	 * initialize  Tabs feature - adds toggle function for folders in accordion 
@@ -538,6 +539,34 @@ class AccordionTabs {
 		  setTimeout(function(){
 		  $this.setCurrentActiveTag();
 		  },500) // YY: may remove timeout
+		}
+	}
+	displayNotification(notification){
+		if(notification.length < 0){
+			return false;
+		}
+		var notificationDiv = document.getElementById('notification_container');
+		notification.forEach(item=>{
+			if(item.inTimeRange){
+				let noText = creEl('span', 'noti_text');
+				noText.innerHTML = 'Exciting news!  Self-check-in is live for  '+item.programName+', and points are up for grabs!';
+				notificationDiv.appendChild(noText);
+			}
+		})
+		
+	}
+	async getLiveCheckInData(){
+		try {
+			const response = await fetch('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/checkForLiveAttendanceTime/'+this.webflowMemberId);
+			if (!response.ok) {
+			throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			this.displayNotification(data)
+			//return data;
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			throw error;
 		}
 	}
 }
