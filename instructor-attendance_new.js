@@ -276,7 +276,8 @@ function creEl(name,className,idName){
 		  
 		  var $this = this;
 		  var labs = this.labsData;
-		  var labsSelectBox = creEl('select', 'select-labs w-select', 'select-labs')
+		  var select =  creEl('div', 'select')
+		  var labsSelectBox = creEl('select', 'select-labs', 'select-labs')
 		  /*Added by default first lab and removed select labs option*/
 		  var defaultoption = creEl("option");
 		  defaultoption.value = "";
@@ -304,7 +305,8 @@ function creEl(name,className,idName){
 			  $this.hideStudentListList();
 		  })
 		  
-		  return labsSelectBox;
+		  select.appendChild(labsSelectBox)
+		  return select;
 	  }
 	  hideStudentListList(){
 		var studentList = document.getElementById('student-list');
@@ -343,7 +345,8 @@ function creEl(name,className,idName){
 		  var timezones = this.$selected_labs;
 		  var sessionFilter = document.getElementById('sessionFilter');
 		  sessionFilter.innerHTML = '';
-		  var sessionSelectBox = creEl('select', 'select-timezones w-select', 'select-timezone')
+		  var select =  creEl('div', 'select')
+		  var sessionSelectBox = creEl('select', 'select-timezones', 'select-timezone')
 		  var defaultoption = creEl("option");
 		  defaultoption.value = "";
 		  defaultoption.text = "Select Lab";
@@ -360,7 +363,8 @@ function creEl(name,className,idName){
 			  $this.displayStudentList(this.value, 'init');
 			  $this.resetFilter();
 		  })
-		  sessionFilter.appendChild(sessionSelectBox);
+		  select.appendChild(sessionSelectBox)
+		  sessionFilter.appendChild(select)
 	  }
 	  /*Creating dom element message list header*/
 	  createAttendanceTitle(){
