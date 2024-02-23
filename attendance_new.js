@@ -76,12 +76,19 @@ function creEl(name,className,idName){
 			if(!this.value){
 				$this.hideShowUI();
 			}
-			
+			$this.hideLabAndBtn()
 			  
 		  })
 		  
 		  return labsSelectBox;
 	  }
+	hideLabAndBtn(){
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		var btn = document.getElementsByClassName('check-in-btn')[0];
+		if(!timeZoneSelect.value){
+			btn.style.display = 'none';
+		}
+	}
 	hideShowUI(){
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
 		var selectLabs = document.getElementById('select-labs');
