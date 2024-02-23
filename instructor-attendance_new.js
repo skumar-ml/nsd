@@ -299,24 +299,42 @@ function creEl(name,className,idName){
 			  //$this.displayStudentList(this.value, 'init');
 			  $this.resetFilter();
 			  if(!this.value){
-				  $this.hideShowUI();
+				$this.hideShowUI();
 			  }
+			  $this.hideStudentListList();
 		  })
 		  
 		  return labsSelectBox;
 	  }
+	  hideStudentListList(){
+		var studentList = document.getElementById('student-list');
+		var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
+		var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
+		var btn = document.getElementsByClassName('student-list-head')[0];
+		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		console.log('timeZoneSelect', timeZoneSelect.value)
+		if(!timeZoneSelect.value){
+			studentList.style.display = 'none';
+			studentlistfilter.style.display = 'none';
+			paginationStudentList.style.display = 'none';
+			btn.style.display = 'none';
+		}
+	 }
 	  hideShowUI(){
 		  console.log("Hide and SHow")
 		  var studentlist = document.getElementById('student-list');
 		  var btn = document.getElementsByClassName('student-list-head')[0];
 		  var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
 		  var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		  var selectLabs = document.getElementsByClassName('select-labs')[0];
 		  var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
-		  timeZoneSelect.style.opacity = 0;
-		  btn.style.opacity = 0;
-		  studentlist.style.opacity = 0;
-		  studentlistfilter.style.opacity = 0;
-		  paginationStudentList.style.opacity = 0;
+		  if(timeZoneSelect.value == '' || selectLabs.value == ''){
+			timeZoneSelect.style.display = 'none';
+			btn.style.display = 'none';
+			studentlist.style.display = 'none';
+			studentlistfilter.style.display = 'none';
+			paginationStudentList.style.display = 'none';
+		  }
 	  }
 	  // Create labs select box html element 
 	  get_Labs(){
