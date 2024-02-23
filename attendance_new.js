@@ -93,6 +93,7 @@ function creEl(name,className,idName){
 	}
 	hideShowUI(){
 		var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		var _timeZoneSelect = document.getElementsByClassName('select_timezones')[0];
 		var selectLabs = document.getElementById('select-labs');
 		var btn = document.getElementsByClassName('check-in-btn')[0];
 		console.log('Hide and Show', timeZoneSelect.value, selectLabs.value)
@@ -101,7 +102,7 @@ function creEl(name,className,idName){
 			timeZoneSelect.disabled = true;
 			btn.disabled = true;
 			btn.style.display = 'none';
-			timeZoneSelect.style.display = 'none';
+			_timeZoneSelect.style.display = 'none';
 		}
 		
 	}
@@ -113,7 +114,7 @@ function creEl(name,className,idName){
   
 		  var sessionFilter = document.getElementById('sessionFilter');
 		  sessionFilter.innerHTML = '';
-  		  var select =  creEl('div', 'select')
+  		  var select =  creEl('div', 'select select_timezones')
 		  var sessionSelectBox = creEl('select', 'select-timezones', 'select-labs')
 		  
 		  //default option
