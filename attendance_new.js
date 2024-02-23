@@ -236,6 +236,8 @@ function creEl(name,className,idName){
 		  this.get_sessionData();
 	  }
 	  get_sessionData(){
+		  var spinner = document.getElementById('half-circle-spinner');
+		  spinner.style.display = 'block';
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
 		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getAttendanceDetailsByMemberId/"+$this.webflowMemberId, true)
@@ -243,7 +245,8 @@ function creEl(name,className,idName){
 		  xhr.send()
 		  xhr.onload = function() {
 			  let responseText =  JSON.parse(xhr.responseText);
-			  new selfCheckInForm($this.webflowMemberId, responseText); 			
+			  new selfCheckInForm($this.webflowMemberId, responseText);
+			  spinner.style.display = 'none';
 		  }
 	  }
   }
