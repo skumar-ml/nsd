@@ -328,10 +328,11 @@ function creEl(name,className,idName){
 		  var btn = document.getElementsByClassName('student-list-head')[0];
 		  var studentlistfilter = document.getElementsByClassName('student-list-filter')[0];
 		  var timeZoneSelect = document.getElementsByClassName('select-timezones')[0];
+		  var _timeZoneSelect = document.getElementsByClassName('select_timezones')[0];
 		  var selectLabs = document.getElementsByClassName('select-labs')[0];
 		  var paginationStudentList = document.getElementsByClassName('pagination-student-list')[0];
 		  if(timeZoneSelect.value == '' || selectLabs.value == ''){
-			timeZoneSelect.style.display = 'none';
+			_timeZoneSelect.style.display = 'none';
 			btn.style.display = 'none';
 			studentlist.style.display = 'none';
 			studentlistfilter.style.display = 'none';
@@ -345,7 +346,7 @@ function creEl(name,className,idName){
 		  var timezones = this.$selected_labs;
 		  var sessionFilter = document.getElementById('sessionFilter');
 		  sessionFilter.innerHTML = '';
-		  var select =  creEl('div', 'select')
+		  var select =  creEl('div', 'select select_timezones')
 		  var sessionSelectBox = creEl('select', 'select-timezones', 'select-timezone')
 		  var defaultoption = creEl("option");
 		  defaultoption.value = "";
