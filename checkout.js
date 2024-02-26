@@ -317,6 +317,7 @@ class CheckOutWebflow {
 		})
 		next_page_2.addEventListener('click', function(){
 			if(form.valid()){
+				$this.storeBasicData();
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
 				if(isValidName){
@@ -497,6 +498,58 @@ class CheckOutWebflow {
 			localStorage.removeItem("checkOutData");
 		}
 	}
+	// Store student basic forms data
+	storeBasicData(){
+		var studentFirstName = document.getElementById('Student-First-Name');
+		var studentLastName = document.getElementById('Student-Last-Name');
+		var studentEmail = document.getElementById('Student-Email');
+		var studentGrade = document.getElementById('Student-Grade');
+		var studentSchool = document.getElementById('Student-School');
+		var studentGender = document.getElementById('Student-Gender');
+		var suppProIdE = document.getElementById('suppProIds');
+		//save data in local storage
+		var data = {
+			"studentEmail" : studentEmail.value,
+			"firstName" : studentFirstName.value,
+			"lastName" : studentLastName.value,
+			"grade" : studentGrade.value,
+			"label": this.memberData.programName,
+			"school": studentSchool.value,
+			"gender": studentGender.value,
+		}
+		localStorage.setItem("checkOutBasicData", JSON.stringify(data));
+	}
+	// Update Basic data after reload
+	updateBasicData(){
+		var checkoutJson= localStorage.getItem("checkOutBasicData");
+		if(checkoutJson != undefined){
+			var paymentData = JSON.parse(checkoutJson);
+			var studentFirstName = document.getElementById('Student-First-Name');
+			var studentLastName = document.getElementById('Student-Last-Name');
+			var studentEmail = document.getElementById('Student-Email');
+			var studentGrade = document.getElementById('Student-Grade');
+			var studentSchool = document.getElementById('Student-School');
+			var studentGender = document.getElementById('Student-Gender');
+			
+			studentEmail.value = paymentData.studentEmail;
+				
+			studentFirstName.value = paymentData.firstName;
+			
+			studentLastName.value = paymentData.lastName;
+			
+			if(paymentData.grade){
+				studentGrade.value = paymentData.grade;
+			}
+			
+			if(paymentData.school){
+				studentSchool.value = paymentData.school;
+			}
+			
+			if(paymentData.gender){
+				studentGender.value = paymentData.gender;
+			}
+		}
+	}
 	// After API response we call the createMakeUpSession method to manipulate student data 
 	async renderPortalData(memberId) {
 		try {
@@ -521,6 +574,8 @@ class CheckOutWebflow {
 			this.displaySupplimentaryProgram(data)
 			// Setup back button for browser and stripe checkout page
 			this.setUpBackButtonTab();
+			// Update basic data
+			this.updateBasicData();
 			// Hide spinner 
 			spinner.style.display = 'none';
 		} catch (error) {
