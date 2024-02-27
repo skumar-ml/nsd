@@ -608,5 +608,8 @@ function creEl(name,className,idName){
 			  new checkInForm($this.webflowMemberId, responseText);
 			  spinner.style.display = 'none'; 			
 		  }
+		  xhr.onerror = function() { // only triggers if the request couldn't be made at all
+			spinner.style.display = 'none';
+		  };
 	  }
   }
