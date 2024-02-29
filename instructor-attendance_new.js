@@ -1,4 +1,20 @@
 /**
+ * 	
+ * @param name - HTML element name
+ * @param className - HTML element class attribute
+ * @param idName - HTML element id attribute
+ */
+function creEl(name, className, idName) {
+	var el = document.createElement(name);
+	if (className) {
+		el.className = className;
+	}
+	if (idName) {
+		el.setAttribute("id", idName)
+	}
+	return el;
+}
+/**
  * Class for handling instructor checkInForm form
  * @param webflowMemberId - memberId
  * @param messageData - instructor checkInForm data by API
