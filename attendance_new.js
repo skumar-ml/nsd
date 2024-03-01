@@ -214,6 +214,7 @@ class selfCheckInForm {
 			checkInBtn.innerHTML = 'Checked In Successfully';
 			checkInBtn.prepend(checkInIcon)
 			$this.updateCurrentData();
+			$this.updatedCompetitionLocalData();
 		}
 
 	}
@@ -234,6 +235,25 @@ class selfCheckInForm {
 			return item;
 		})
 		this.labsData = labsData;
+	}
+	// Get API data with the help of endpoint
+	async fetchData(url) {
+		try {
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			throw error;
+		}
+	}
+	//Update competition local data
+	async updatedCompetitionLocalData(){
+		const bgData = await $this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+		localStorage.setItem("competitionData", JSON.stringify(bgData));
 	}
 }
 /**
