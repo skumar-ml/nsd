@@ -171,7 +171,8 @@ class AccordionTabs {
 	constructor(webflowMemberId, accountEmail) {
 		this.webflowMemberId = webflowMemberId;
 		this.accountEmail = accountEmail;
-		this.renderCompetitionsData(); // renders data for each tab
+		//this.renderCompetitionsData(); // renders data for each tab
+		this.getCompetitionsData();
 
 	}
 	/**
@@ -251,7 +252,67 @@ class AccordionTabs {
 		});
 	}
 
+	// Get API data with the help of endpoint
+	async fetchData(url) {
+		try {
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			return data;
+		} catch (error) {
+			console.error('Error fetching data:', error);
+			throw error;
+		}
+	}
+	// Get competition data form Backend and local storage
+	async getCompetitionsData(){
+		var spinner = document.getElementById('half-circle-spinner');
+		spinner.style.display = 'block';
+		var competitionLocalData =  localStorage.getItem("competitionData");
+		var $this =this;
+		if(competitionLocalData != undefined){
+			var responseText = JSON.parse(competitionLocalData);
+			$this.renderLocalCompetitionsData(responseText)
+			spinner.style.display = 'none';
+		}else {
+			try {
+				const data = await $this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+				$this.renderLocalCompetitionsData(data)
+				spinner.style.display = 'none';
+				
+			} catch (error) {
+				console.error('Error fetching data:', error);
+				throw error;
+			}
+		}
+		const bgData = await $this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+		localStorage.setItem("competitionData", JSON.stringify(bgData));
+	}
+	// Render local storage data
+    renderLocalCompetitionsData(responseText){
+		var $this = this;
+		if (responseText.length > 0) {
+			responseText = responseText.reverse();
+			console.log('te', responseText)
+		}
+		$this.viewTabs(responseText);
+		$this.initiateTabs();
+		if (responseText == "No data Found") {
+			return false;
+		}
 
+		responseText.forEach((formData, index) => {
+			setTimeout(function () {
+				console.log('formData.failedPayment', formData.failedPayment)
+				if (formData.failedPayment == undefined) {
+					let currentIndex = index + 1;
+					new AccordionCompetition($this.webflowMemberId, formData, currentIndex, $this.accountEmail);
+				}
+			}, 30)
+		})
+	}
 	/**
 	 * Render multiple competitions data
 	 */
