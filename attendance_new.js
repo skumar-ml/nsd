@@ -252,7 +252,7 @@ class selfCheckInForm {
 	}
 	//Update competition local data
 	async updatedCompetitionLocalData(){
-		const bgData = await this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+		const bgData = await this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + this.webflowMemberId);
 		localStorage.setItem("competitionData", JSON.stringify(bgData));
 	}
 }
