@@ -184,7 +184,7 @@ class AccordionTabs {
 		tabsContainer.innerHTML = "";
 		var tabs = creEl("ul", "tabs")
 		var notificationDiv = creEl('div', 'notification_container', 'notification_container');
-		var is_notification = false;
+		var is_notification = true;
 		var contentSection = creEl("div", "content-section");
 		// if free student, show free resources
 		if (responseText == "No data Found") {
