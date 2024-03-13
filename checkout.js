@@ -254,7 +254,9 @@ class CheckOutWebflow {
 			"productType": this.memberData.productType,
 			"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
 			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
-			"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, ''))
+			"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
+			"device": (/Mobi|Android/i.test(navigator.userAgent))? 'Mobile': 'Desktop',
+			"deviceUserAgent": navigator.userAgent
 		}
 		// Added paymentId for supplementary program 
 		if(this.memberData.productType == 'supplementary'){
