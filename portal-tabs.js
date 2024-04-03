@@ -134,6 +134,26 @@ class AccordionTabs {
 		}
 	}
 	/**
+	 * Update Member first name in portal after user profile update
+	 */
+	updateMemberFirstName(){
+		var elements = document.getElementsByClassName("ms-portal-exit");
+		var myFunctionNew = function() {
+		var memberstack = localStorage.getItem("memberstack");
+		var memberstackData = JSON.parse(memberstack);
+		var webflowMemberId = memberstackData.information.id;
+		var firstName = memberstackData.information['first-name'];
+		var userFirstName2 = document.getElementById('userFirstName2');
+		var userFirstName1 = document.getElementById('userFirstName1');
+		userFirstName1.innerHTML = firstName;
+		userFirstName2.innerHTML = firstName;
+		console.log('firstName', firstName)
+		};
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].addEventListener('click', myFunctionNew, false);
+		}
+	}
+	/**
 	 * Render multiple forms data
 	 */
 	renderFormsData(){
@@ -154,6 +174,9 @@ class AccordionTabs {
 			  spinner.style.display = 'none';
 			  return false;
 		  }
+		if(responseText.length == 0){
+			$this.updateMemberFirstName();
+		}
       // formData = responseText[index]
 		  responseText.forEach((formData,index) => {
 			  setTimeout(function(){
