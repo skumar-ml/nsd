@@ -175,7 +175,10 @@ class AccordionTabs {
 			  return false;
 		  }
 		if(responseText.length == 0){
-			$this.updateMemberFirstName();
+			setTimeout(() => {
+			 console.log( "ready!" );
+			 $this.updateMemberFirstName();
+		        }, "5000");
 		}
       // formData = responseText[index]
 		  responseText.forEach((formData,index) => {
