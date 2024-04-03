@@ -191,10 +191,33 @@ class AccordionForm {
 		  $this.initiateLightbox();
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
+		  $this.updateMemberFirstName();
 		  // if(this.page == 'portal'){
 		  // 	$this.initiateCampResources();
 		  // }
 	}
+
+	/**
+	 * Update Member's first name in portal after user profile update
+	 */
+	updateMemberFirstName(){
+		var elements = document.getElementsByClassName("ms-portal-exit");
+		var myFunctionNew = function() {
+		var memberstack = localStorage.getItem("memberstack");
+		var memberstackData = JSON.parse(memberstack);
+		var webflowMemberId = memberstackData.information.id;
+		var firstName = memberstackData.information['first-name'];
+		var userFirstName2 = document.getElementById('userFirstName2');
+		var userFirstName1 = document.getElementById('userFirstName1');
+		userFirstName1.innerHTML = firstName;
+		userFirstName2.innerHTML = firstName;
+		console.log('firstName', firstName)
+		};
+		for (var i = 0; i < elements.length; i++) {
+			elements[i].addEventListener('click', myFunctionNew, false);
+		}
+	}
+	
 	/**
 	 * Display Program name for single program
 	 */
