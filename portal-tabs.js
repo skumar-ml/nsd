@@ -175,14 +175,14 @@ class AccordionTabs {
 			 setTimeout(() => {
 				console.log( "ready!" );
 			 	$this.updateMemberFirstName();
-		       	}, "5000");
+		       	}, "3000");
 			  return false;
 		  }
 		if(responseText.length == 0){
 			setTimeout(() => {
 			console.log( "ready!" );
 			 $this.updateMemberFirstName();
-		       }, "5000");
+		       }, "3000");
 		}
       // formData = responseText[index]
 		  responseText.forEach((formData,index) => {
