@@ -172,13 +172,17 @@ class AccordionTabs {
 		  $this.initiateTabs();
 		  if(responseText == "No data Found"){
 			  spinner.style.display = 'none';
-			  $this.updateMemberFirstName();
+			 setTimeout(() => {
+				console.log( "ready!" );
+			 	$this.updateMemberFirstName();
+		       	}, "5000");
 			  return false;
 		  }
 		if(responseText.length == 0){
-			//setTimeout(() => {
+			setTimeout(() => {
+			console.log( "ready!" );
 			 $this.updateMemberFirstName();
-		       //}, "5000");
+		       }, "5000");
 		}
       // formData = responseText[index]
 		  responseText.forEach((formData,index) => {
