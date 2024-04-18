@@ -35,6 +35,7 @@ class CheckOutWebflow {
     var studentList = document.getElementById("checkout_supplimentary_data");
     // Supplementary program heading
     var supplementaryProgramHead = document.getElementById("supplementary-program-head");
+    var eduCopy = document.querySelector("#checkout_program .edu-prg001");
     var $this = this;
     studentList.innerHTML = "";
     // Remove duplicate data like Supplementary program
@@ -51,6 +52,9 @@ class CheckOutWebflow {
     } else {
       // hiding supplementary program heading when data is empty
       supplementaryProgramHead.style.display = "none";
+
+      // Hide Limited Time Offer copy
+      eduCopy && (eduCopy.style.display = "none");
     }
   }
 
