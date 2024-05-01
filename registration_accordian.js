@@ -43,16 +43,16 @@ class AccordionForm {
 	/*Filter Ivoice Related Forms based on forms id*/
 	filterInvoiceForms(forms){
 		var newForms = forms.filter(item=>{
-			if(item.formId == '232817528052153'){
-				var dFD = this.$completedForm.find(item => (item.formId == '223607787179167' || item.formId == '233136722642149') && item.isInvoice == 'Yes')
+			if(item.form_sub_type == 'dropoff_invoice'){
+				var dFD = this.$completedForm.find(item => item.form_sub_type == 'dropoff' && item.isInvoice == 'Yes')
 				if(dFD != undefined){
 				  return true
 				}else{
 				  return false
 				}
 				
-			  }else if(item.formId == '232817521979164'){
-				var aFD = this.$completedForm.find(item=> (item.formId == '223122952914150' || item.formId == '233125897995171') && item.isInvoice == 'Yes')
+			  }else if(item.form_sub_type == 'pickup_invoice'){
+				var aFD = this.$completedForm.find(item=> item.form_sub_type == 'pickup' && item.isInvoice == 'Yes')
 				if(aFD != undefined){
 				  return true
 				}else{
