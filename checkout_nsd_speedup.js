@@ -445,7 +445,7 @@ function creEl(name, className, idName) {
 		  "school": studentSchool.value,
 		  "gender": studentGender.value,
 		  "memberId" : this.memberData.memberId,
-		  "checkoutUrl":  checkoutUrl,
+		  "checkoutUrls":  checkoutUrl,
 		  
 	  }
 	  var checkoutData = localStorage.getItem('checkOutData');
@@ -494,7 +494,8 @@ function creEl(name, className, idName) {
 		  if (isValidName) {
 			checkoutFormError.style.display = "none";
 			$this.activateDiv("checkout_payment");
-			$this.updateStudentDetails($this.$checkoutData); 
+			  var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
+			$this.updateStudentDetails(checkoutData); 
 		  } else {
 			checkoutFormError.style.display = "block";
 		  }
