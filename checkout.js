@@ -39,7 +39,7 @@ class CheckOutWebflow {
 		studentList.innerHTML = "";
 		// Remove duplicate data like Supplementary program
 		data = data.filter(item=>item.programDetailId !=this.memberData.programId);
-		console.log('data', data)
+		
 		if(data.length > 0){
 			// showing supplementary program heading when data in not empty
 			supplementaryProgramHead.style.display = "block"
@@ -137,7 +137,7 @@ class CheckOutWebflow {
 			selectedSuppPro.appendChild(label);
 		});
 		
-		console.log('selectedData',selectedData)
+		
 	}
 	// Method is use update supplementary program price after tab change
 	updateOnlyTotalAmount(){
@@ -209,7 +209,82 @@ class CheckOutWebflow {
 		}
 	}
 	// API call for checkout URL 
-	initializeStripePayment(){
+	  initializeStripePayment(){
+		  
+		  var suppProIdE = document.getElementById('suppProIds');
+		  var core_product_price = document.getElementById('core_product_price');
+  
+		  //Payment button
+		  var ach_payment = document.getElementById('ach_payment');
+		  var card_payment = document.getElementById('card_payment');
+		  var paylater_payment = document.getElementById('paylater_payment');
+		  ach_payment.innerHTML = "Processing..."
+		  ach_payment.disabled = true;
+		  card_payment.innerHTML = "Processing..."
+		  card_payment.disabled = true;
+		  paylater_payment.innerHTML = "Processing..."
+		  paylater_payment.disabled = true;
+		  //var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+		  var cancelUrl = new URL(window.location.href);
+		  cancelUrl.searchParams.append('returnType', 'back')
+		  var data = {
+			  "email": this.memberData.email,
+			  "label": this.memberData.programName,
+			  "programId" : this.memberData.programId,
+			  "successUrl" : "https://www.nsdebatecamp.com/payment-confirmation?programName="+this.memberData.programName,
+			  //"cancelUrl" : "https://www.nsdebatecamp.com/payment-confirmation?programName="+this.memberData.programName,
+			  "cancelUrl" : cancelUrl.href,
+			  "memberId" : this.memberData.memberId, 
+			  "programCategoryId" : this.memberData.programCategoryId,
+			  "supplementaryProgramIds" : JSON.parse(suppProIdE.value),
+			  "productType": this.memberData.productType,
+			  "achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
+			  "cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
+			  "payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
+			  "device": (/Mobi|Android/i.test(navigator.userAgent))? 'Mobile': 'Desktop',
+			  "deviceUserAgent": navigator.userAgent
+		  }
+		  // Added paymentId for supplementary program 
+		  if(this.memberData.productType == 'supplementary'){
+			  var supStuData = localStorage.getItem("supStuEmail");
+			  if(supStuData != null){
+				  supStuData = JSON.parse(supStuData);
+				  if(supStuData.uniqueIdentification){
+					  data.paymentId = supStuData.uniqueIdentification
+				  }
+			  }
+		  }
+		  
+		  var xhr = new XMLHttpRequest()
+		  var $this = this;
+		  xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrlsByProgram", true)
+		  xhr.withCredentials = false
+		  xhr.send(JSON.stringify(data))
+		  xhr.onload = function() {
+			  let responseText = JSON.parse(xhr.responseText);
+			  if(responseText.success){
+				  // btn.innerHTML = 'Checkout';
+				  // window.location.href = responseText.stripe_url;
+  
+				  $this.$checkoutData = responseText;
+  
+				  //Storing data in local storage
+				  data.checkoutData = responseText
+				  localStorage.setItem("checkOutData", JSON.stringify(data));
+				  
+				  ach_payment.innerHTML = "Checkout"
+				  ach_payment.disabled = false;
+				  card_payment.innerHTML = "Checkout"
+				  card_payment.disabled = false;
+				  paylater_payment.innerHTML = "Checkout"
+				  paylater_payment.disabled = false;
+			  }
+  
+		  }
+	  }
+
+	  // API call for checkout URL 
+	  updateStudentDetails(checkoutUrl){
 		var studentFirstName = document.getElementById('Student-First-Name');
 		var studentLastName = document.getElementById('Student-Last-Name');
 		var studentEmail = document.getElementById('Student-Email');
@@ -231,11 +306,8 @@ class CheckOutWebflow {
 		paylater_payment.disabled = true;
 		//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 		var cancelUrl = new URL(window.location.href);
-		console.log(window.location.href)
 		cancelUrl.searchParams.append('returnType', 'back')
-		//console.log(cancelUrl)
 		var data = {
-			"email": this.memberData.email,
 			"studentEmail" : studentEmail.value,
 			"firstName" : studentFirstName.value,
 			"lastName" : studentLastName.value,
@@ -243,58 +315,20 @@ class CheckOutWebflow {
 			"label": this.memberData.programName,
 			"school": studentSchool.value,
 			"gender": studentGender.value,
-			"programId" : this.memberData.programId,
-			//"paymentType" : type,
-			"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation?programName="+this.memberData.programName,
-			"cancelUrl" : cancelUrl.href,
-			//"amount" : parseFloat(core_product_price.value.replace(/,/g, '')),
-			"memberId" : this.memberData.memberId, 
-			"programCategoryId" : this.memberData.programCategoryId,
-			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
-			"productType": this.memberData.productType,
-			"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
-			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
-			"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
-			"device": (/Mobi|Android/i.test(navigator.userAgent))? 'Mobile': 'Desktop',
-			"deviceUserAgent": navigator.userAgent
+			"memberId" : this.memberData.memberId,
+			"checkoutUrl":  checkoutUrl,
+			
 		}
-		// Added paymentId for supplementary program 
-		if(this.memberData.productType == 'supplementary'){
-			var supStuData = localStorage.getItem("supStuEmail");
-			if(supStuData != null){
-				supStuData = JSON.parse(supStuData);
-				if(supStuData.uniqueIdentification){
-					data.paymentId = supStuData.uniqueIdentification
-				}
-			}
-		}
-		
+		var checkoutData = localStorage.getItem('checkOutData');
+		var mergedData = {...data, ...JSON.parse(checkoutData)}
+		localStorage.setItem("checkOutData", JSON.stringify(mergedData));
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createBothCheckoutUrls", true)
+		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
 		xhr.withCredentials = false
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function() {
-			let responseText = JSON.parse(xhr.responseText);
-			console.log('responseText', responseText)
-			if(responseText.success){
-				// btn.innerHTML = 'Checkout';
-				// window.location.href = responseText.stripe_url;
-
-				$this.$checkoutData = responseText;
-
-				//Storing data in local storage
-				data.checkoutData = responseText
-				localStorage.setItem("checkOutData", JSON.stringify(data));
-				
-				ach_payment.innerHTML = "Checkout"
-				ach_payment.disabled = false;
-				card_payment.innerHTML = "Checkout"
-				card_payment.disabled = false;
-				paylater_payment.innerHTML = "Checkout"
-				paylater_payment.disabled = false;
-			}
-
+				window.location.href = checkoutUrl;
 		}
 	}
 	// Hide and show tab for program selection, student infor and checkout payment
@@ -316,6 +350,7 @@ class CheckOutWebflow {
 		var form = $( "#checkout-form" );
 		next_page_1.addEventListener('click', function(){
 			$this.activateDiv('checkout_student_details');
+			$this.initializeStripePayment();
 		})
 		next_page_2.addEventListener('click', function(){
 			if(form.valid()){
@@ -325,7 +360,7 @@ class CheckOutWebflow {
 				if(isValidName){
 					checkoutFormError.style.display = 'none'
 					$this.activateDiv('checkout_payment');
-					$this.initializeStripePayment();
+					//$this.initializeStripePayment();
 				}else{
 					checkoutFormError.style.display = 'block'
 				}
@@ -375,19 +410,22 @@ class CheckOutWebflow {
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
 			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.achUrl;
+			$this.updateStudentDetails($this.$checkoutData.achUrl);
+			//window.location.href = $this.$checkoutData.achUrl;
 		})
 		card_payment.addEventListener('click', function(){
 			// card_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('card', card_payment);
 			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.cardUrl;
+			$this.updateStudentDetails($this.$checkoutData.cardUrl); 
+			//window.location.href = $this.$checkoutData.cardUrl;
 		})
 		paylater_payment.addEventListener('click', function(){
 			// paylater_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('paylater', paylater_payment);
 			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.payLaterUrl;
+			$this.updateStudentDetails($this.$checkoutData.payLaterUrl);
+			//window.location.href = $this.$checkoutData.payLaterUrl;
 		})
 	}
 	// Update student data for addon supplementary program purchase
@@ -445,7 +483,6 @@ class CheckOutWebflow {
 		var ibackbutton = document.getElementById("backbuttonstate");
 		if((returnType == 'back' || ibackbutton.value == 1) && checkoutJson != undefined){
 			var paymentData = JSON.parse(checkoutJson);
-			//console.log('checkoutData', paymentData)
 			
 			var studentFirstName = document.getElementById('Student-First-Name');
 			var studentLastName = document.getElementById('Student-Last-Name');
@@ -477,7 +514,7 @@ class CheckOutWebflow {
 				
 				for (let i = 0; i < SuppCheckbox.length; i++) {
 					var checkBoxProgramdetailid = SuppCheckbox[i].getAttribute('programdetailid');
-					console.log('checkBoxProgramdetailid', checkBoxProgramdetailid)
+					
 					if(paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)){
 						SuppCheckbox[i].click();
 					}
