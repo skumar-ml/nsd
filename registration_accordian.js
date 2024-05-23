@@ -113,26 +113,34 @@ class AccordionForm {
 				   li.prepend(imgCheck, li_text);
 				   var formLink=creEl('a');
 				   // display link/text depending on if form is live/editable
+				   var added_by_admin = false;
 				   if(is_live){
 				   if(editable){
 					   let dbData = $this.getformData(cForm.formId)
+					   if(dbData.submissionId){
 						if(this.$isLiveProgram  && cForm.is_editable){
 							formLink.href = (cForm.formId) ? "https://www.jotform.com/edit/"+dbData.submissionId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification+"&programDetailId="+$this.$programDetail.programDetailId : "";
 						}else{
 						   formLink.href = "https://www.jotform.com/submission/"+dbData.submissionId;
+					   }
+					   }else{
+						   added_by_admin = true;
 					   }
 				   }else{
 					formLink.href = (cForm.formId) ? "https://form.jotform.com/"+cForm.formId+"?memberId="+$this.webflowMemberId+"&studentEmail="+$this.$studentDetail.studentEmail+"&accountEmail="+$this.accountEmail+"&paymentId="+$this.$studentDetail.uniqueIdentification+"&programDetailId="+$this.$programDetail.programDetailId : "";
 				    }
 				   }
 				   //Add iframe when it's live and above certain screenwidth
-				   formLink.className = (is_live && window.innerWidth > 1200) ? "iframe-lightbox-link" : "";
+				   formLink.className = (is_live && window.innerWidth > 1200 && !added_by_admin) ? "iframe-lightbox-link" : "";
 				   var span=creEl('span', 'action_text');
-				    if(is_live){
-						span.innerHTML = (editable) ? ((this.$isLiveProgram && cForm.is_editable) ? "Edit form" : "View Form" ): "Go to form";
-					}else{
-						span.innerHTML = "Coming Soon";
-					}
+				    if(added_by_admin){
+					span.innerHTML = "Completed";
+					formLink.className = "admin_completed_form";
+				    }else if(is_live){
+					span.innerHTML = (editable) ? ((this.$isLiveProgram && cForm.is_editable) ? "Edit form" : "View Form" ): "Go to form";
+				    }else{
+					span.innerHTML = "Coming Soon";
+				    }
 				   formLink.append(span)
 				   li.append(formLink);
 				   
