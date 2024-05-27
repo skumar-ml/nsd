@@ -200,9 +200,9 @@ class AccordionForm {
 		  var spinner = document.getElementById('half-circle-spinner');
 		  spinner.style.display = 'none';
 		  $this.updateMemberFirstName();
-		  // if(this.page == 'portal'){
-		  // 	$this.initiateCampResources();
-		  // }
+		  if(this.page == 'portal'){
+		  	$this.initiateCampResources();
+		  }
 	}
 
 	/**
@@ -452,27 +452,27 @@ class AccordionForm {
 		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
 		const debateEvent = this.$programDetail.debateEvent;
 
-		// create Topic div
-		const topicDiv = document.createElement('div');
-		topicDiv.classList.add('portal-dash-resources');
+		// // create Topic div
+		// const topicDiv = document.createElement('div');
+		// topicDiv.classList.add('portal-dash-resources');
 
-		// Topic heading
-		var headingEl = document.createElement('p');
-		headingEl.classList.add('portal-subheader');
-		headingEl.textContent = "Camp Topic";
-		topicDiv.appendChild(headingEl);
+		// // Topic heading
+		// var headingEl = document.createElement('p');
+		// headingEl.classList.add('portal-subheader');
+		// headingEl.textContent = "Camp Topic";
+		// topicDiv.appendChild(headingEl);
 
-		// Topic text
-		const topicText = document.createElement('p');
-		topicText.classList.add('dm-sans', 'bold');
-		if (debateEvent === "Lincoln-Douglas") {
-			topicText.textContent = "Resolved: The United States ought to guarantee the right to housing.";
-		}
-		else if (debateEvent === "Public Forum") {
-			topicText.textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
-		}
-		topicDiv.appendChild(topicText);
-		parentAccordionDiv.appendChild(topicDiv);
+		// // Topic text
+		// const topicText = document.createElement('p');
+		// topicText.classList.add('dm-sans', 'bold');
+		// if (debateEvent === "Lincoln-Douglas") {
+		// 	topicText.textContent = "Resolved: The United States ought to guarantee the right to housing.";
+		// }
+		// else if (debateEvent === "Public Forum") {
+		// 	topicText.textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
+		// }
+		// topicDiv.appendChild(topicText);
+		// parentAccordionDiv.appendChild(topicDiv);
 
 		// create Resources div
 		const resourcesDiv = document.createElement('div');
@@ -489,45 +489,45 @@ class AccordionForm {
 		resourceGrid.classList.add('w-layout-grid', 'portal-resources-grid');
 
 		// Packing List
-		const packingHTML = '<a href="https://global-uploads.webflow.com/6271a4bf060d543533060f47/645c80eecc019a3d39d67ce6_2023%20NSD%20Packing%20List.pdf" target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Packing List</p></a>';
-		resourceGrid.insertAdjacentHTML('beforeend', packingHTML);
+		// const packingHTML = '<a href="https://global-uploads.webflow.com/6271a4bf060d543533060f47/645c80eecc019a3d39d67ce6_2023%20NSD%20Packing%20List.pdf" target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Packing List</p></a>';
+		// resourceGrid.insertAdjacentHTML('beforeend', packingHTML);
 
 		// Skill Builder
-		var skillBuilderLink = "#";
-		if (debateEvent === "Lincoln-Douglas") {
-			skillBuilderLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
-		}
-		else if (debateEvent === "Public Forum") {
-			skillBuilderLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
-		}
-		else if (debateEvent === "All Events" || debateEvent === "Worlds School") {
-			var allEventSkillLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
-			var allEventSkillHTML = '<a href=' + allEventSkillLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">LD Skill Builder</p></a>';
-			resourceGrid.insertAdjacentHTML('beforeend', allEventSkillHTML);
+		// var skillBuilderLink = "#";
+		// if (debateEvent === "Lincoln-Douglas") {
+		// 	skillBuilderLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
+		// }
+		// else if (debateEvent === "Public Forum") {
+		// 	skillBuilderLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
+		// }
+		// else if (debateEvent === "All Events" || debateEvent === "Worlds School") {
+		// 	var allEventSkillLink = "https://drive.google.com/drive/folders/1xaIDK1lEBSYXMH86mIs1M7-Wlu2sBXCl?usp=sharing";
+		// 	var allEventSkillHTML = '<a href=' + allEventSkillLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">LD Skill Builder</p></a>';
+		// 	resourceGrid.insertAdjacentHTML('beforeend', allEventSkillHTML);
 
-			allEventSkillLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
-			allEventSkillHTML = '<a href=' + allEventSkillLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">PF Skill Builder</p></a>';
-			resourceGrid.insertAdjacentHTML('beforeend', allEventSkillHTML);
-		}
+		// 	allEventSkillLink = "https://drive.google.com/drive/folders/1ePKoI9HiyyDlJx0oKwQE1MZW81FejpDu?usp=sharing";
+		// 	allEventSkillHTML = '<a href=' + allEventSkillLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">PF Skill Builder</p></a>';
+		// 	resourceGrid.insertAdjacentHTML('beforeend', allEventSkillHTML);
+		// }
 			
-		if (skillBuilderLink !== "#") {
-			const skillBuilderHTML = '<a href=' + skillBuilderLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">NSD Skill Builder</p></a>';
-			resourceGrid.insertAdjacentHTML('beforeend', skillBuilderHTML);
-		}
+		// if (skillBuilderLink !== "#") {
+		// 	const skillBuilderHTML = '<a href=' + skillBuilderLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">NSD Skill Builder</p></a>';
+		// 	resourceGrid.insertAdjacentHTML('beforeend', skillBuilderHTML);
+		// }
 
 		// Schedule
-		const scheduleLink = this.$programDetail.scheduleLink;
-		if (scheduleLink !== "#") {
-			const scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Daily Schedule</p></a>';
-			resourceGrid.insertAdjacentHTML('beforeend', scheduleHTML);
-		}
+		// const scheduleLink = this.$programDetail.scheduleLink;
+		// if (scheduleLink !== "#") {
+		// 	const scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Daily Schedule</p></a>';
+		// 	resourceGrid.insertAdjacentHTML('beforeend', scheduleHTML);
+		// }
 
 		// Info Sheet
-		const infoLink = this.$programDetail.logisticLink;
-		if (infoLink !== "#") {
-			const infoHTML = '<a href=' + infoLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Info Sheet</p></a>';
-			resourceGrid.insertAdjacentHTML('beforeend', infoHTML);
-		}
+		// const infoLink = this.$programDetail.logisticLink;
+		// if (infoLink !== "#") {
+		// 	const infoHTML = '<a href=' + infoLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Info Sheet</p></a>';
+		// 	resourceGrid.insertAdjacentHTML('beforeend', infoHTML);
+		// }
 		// Added Resources from database
 		if(this.$uploadedContent.length){
 			this.$uploadedContent.forEach((uploadData)=>{
