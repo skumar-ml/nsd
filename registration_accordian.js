@@ -479,7 +479,7 @@ class AccordionForm {
 		resourcesDiv.classList.add('portal-dash-resources');
 
 		// Resources heading
-		headingEl = document.createElement('p');
+		var headingEl = document.createElement('p');
 		headingEl.classList.add('portal-subheader');
 		headingEl.textContent = "Resources";
 		resourcesDiv.appendChild(headingEl);
