@@ -400,7 +400,7 @@ function creEl(name, className, idName) {
 				//Storing data in local storage
 				data.checkoutData = responseText
 				localStorage.setItem("checkOutData", JSON.stringify(data));
-				
+				$this.addSessionId()
 				ach_payment.innerHTML = "Checkout"
 				ach_payment.disabled = false;
 				card_payment.innerHTML = "Checkout"
@@ -411,7 +411,29 @@ function creEl(name, className, idName) {
 
 		}
 	}
-
+	/**
+	 * For automation testing updating checkout url in hidden field
+	 */
+	addSessionId(){
+		var localCheckOutData = localStorage.getItem('checkOutData')
+		if(localCheckOutData != undefined){
+			console.log('localCheckOutData', localCheckOutData)
+			var localCheckOutData = JSON.parse(localCheckOutData);
+			var achUrlSession = creEl("input", "achUrlSession", "achUrlSession");
+			achUrlSession.type = "hidden";
+			achUrlSession.value = localCheckOutData.checkoutData.achUrl;
+			var cardUrlSession = creEl("input", "cardUrlSession", "cardUrlSession");
+			cardUrlSession.type = "hidden";
+			cardUrlSession.value = localCheckOutData.checkoutData.cardUrl;
+			var payLaterSession = creEl("input", "payLaterUrlSession", "payLaterUrlSession");
+			payLaterSession.type = "hidden";
+			payLaterSession.value = localCheckOutData.checkoutData.payLaterUrl;
+			var checkout_student_details = document.getElementById('checkout_student_details');
+			checkout_student_details.appendChild(achUrlSession)
+			checkout_student_details.appendChild(cardUrlSession)
+			checkout_student_details.appendChild(payLaterSession)
+		}
+	}
 	// API call for checkout URL 
 	updateStudentDetails(checkoutUrl){
 	  var studentFirstName = document.getElementById('Student-First-Name');
@@ -613,7 +635,7 @@ function creEl(name, className, idName) {
 	  var ibackbutton = document.getElementById("backbuttonstate");
 	  if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
 		var paymentData = JSON.parse(checkoutJson);
-  
+  		this.addSessionId()
 		var studentFirstName = document.getElementById("Student-First-Name");
 		var studentLastName = document.getElementById("Student-Last-Name");
 		var studentEmail = document.getElementById("Student-Email");
