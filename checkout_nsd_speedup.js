@@ -23,6 +23,7 @@ function creEl(name, className, idName) {
   class CheckOutWebflow {
 	$suppPro = [];
 	$checkoutData = "";
+	$checkOutResponse = false;
 	constructor(apiBaseUrl, memberData) {
 	  this.baseUrl = apiBaseUrl;
 	  this.memberData = memberData;
@@ -407,6 +408,7 @@ function creEl(name, className, idName) {
 				card_payment.disabled = false;
 				paylater_payment.innerHTML = "Checkout"
 				paylater_payment.disabled = false;
+				$this.$checkOutResponse = true;
 			}
 
 		}
@@ -417,7 +419,6 @@ function creEl(name, className, idName) {
 	addSessionId(){
 		var localCheckOutData = localStorage.getItem('checkOutData')
 		if(localCheckOutData != undefined){
-			console.log('localCheckOutData', localCheckOutData)
 			var localCheckOutData = JSON.parse(localCheckOutData);
 			var achUrlSession = creEl("input", "achUrlSession", "achUrlSession");
 			achUrlSession.type = "hidden";
@@ -517,7 +518,10 @@ function creEl(name, className, idName) {
 			checkoutFormError.style.display = "none";
 			$this.activateDiv("checkout_payment");
 			  var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
-			$this.updateStudentDetails(checkoutData); 
+			  while ($this.$checkOutResponse == false) {
+				console.log('Got API response')
+			  }
+			  $this.updateStudentDetails(checkoutData); 
 		  } else {
 			checkoutFormError.style.display = "block";
 		  }
