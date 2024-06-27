@@ -349,6 +349,10 @@ function creEl(name, className, idName) {
 		var ach_payment = document.getElementById('ach_payment');
 		var card_payment = document.getElementById('card_payment');
 		var paylater_payment = document.getElementById('paylater_payment');
+		
+		var next_page_2 = document.getElementById("next_page_2");
+		next_page_2.disabled = true;
+		
 		ach_payment.innerHTML = "Processing..."
 		ach_payment.disabled = true;
 		card_payment.innerHTML = "Processing..."
@@ -409,6 +413,7 @@ function creEl(name, className, idName) {
 				paylater_payment.innerHTML = "Checkout"
 				paylater_payment.disabled = false;
 				$this.$checkOutResponse = true;
+				next_page_2.disabled = false;
 			}
 
 		}
@@ -518,9 +523,6 @@ function creEl(name, className, idName) {
 			checkoutFormError.style.display = "none";
 			$this.activateDiv("checkout_payment");
 			  var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
-			  while ($this.$checkOutResponse == false) {
-				console.log('Got API response')
-			  }
 			  $this.updateStudentDetails(checkoutData); 
 		  } else {
 			checkoutFormError.style.display = "block";
