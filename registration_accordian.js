@@ -452,27 +452,27 @@ class AccordionForm {
 		const parentAccordionDiv = document.getElementById('tab'+this.currentIndex);
 		const debateEvent = this.$programDetail.debateEvent;
 
-		// // create Topic div
-		// const topicDiv = document.createElement('div');
-		// topicDiv.classList.add('portal-dash-resources');
+		// create Topic div
+		const topicDiv = document.createElement('div');
+		topicDiv.classList.add('portal-dash-resources');
 
-		// // Topic heading
-		// var headingEl = document.createElement('p');
-		// headingEl.classList.add('portal-subheader');
-		// headingEl.textContent = "Camp Topic";
-		// topicDiv.appendChild(headingEl);
+		// Topic heading
+		var headingEl = document.createElement('p');
+		headingEl.classList.add('portal-subheader');
+		headingEl.textContent = "Camp Topic";
+		topicDiv.appendChild(headingEl);
 
-		// // Topic text
-		// const topicText = document.createElement('p');
-		// topicText.classList.add('dm-sans', 'bold');
-		// if (debateEvent === "Lincoln-Douglas") {
-		// 	topicText.textContent = "Resolved: The United States ought to guarantee the right to housing.";
-		// }
-		// else if (debateEvent === "Public Forum") {
-		// 	topicText.textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
-		// }
-		// topicDiv.appendChild(topicText);
-		// parentAccordionDiv.appendChild(topicDiv);
+		// Topic text
+		const topicText = document.createElement('p');
+		topicText.classList.add('dm-sans', 'bold');
+		if (debateEvent === "Lincoln-Douglas") {
+			topicText.textContent = "Resolved: The United States ought to adopt carbon pricing.";
+		}
+		else if (debateEvent === "Public Forum") {
+			topicText.textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
+		}
+		topicDiv.appendChild(topicText);
+		parentAccordionDiv.appendChild(topicDiv);
 
 		// create Resources div
 		const resourcesDiv = document.createElement('div');
