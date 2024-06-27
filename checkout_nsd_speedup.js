@@ -341,82 +341,82 @@ function creEl(name, className, idName) {
 	}
 	// API call for checkout URL 
 	initializeStripePayment(){
-		  
-		var suppProIdE = document.getElementById('suppProIds');
-		var core_product_price = document.getElementById('core_product_price');
-
-		//Payment button
-		var ach_payment = document.getElementById('ach_payment');
-		var card_payment = document.getElementById('card_payment');
-		var paylater_payment = document.getElementById('paylater_payment');
-		
-		var next_page_2 = document.getElementById("next_page_2");
-		next_page_2.style.pointerEvents = "none";
-		
-		ach_payment.innerHTML = "Processing..."
-		ach_payment.disabled = true;
-		card_payment.innerHTML = "Processing..."
-		card_payment.disabled = true;
-		paylater_payment.innerHTML = "Processing..."
-		paylater_payment.disabled = true;
-		//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
-		var cancelUrl = new URL(window.location.href);
-		cancelUrl.searchParams.append('returnType', 'back')
-		var data = {
-			"email": this.memberData.email,
-			"label": this.memberData.programName,
-			"programId" : this.memberData.programId,
-			"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation?programName="+this.memberData.programName,
-			"cancelUrl" : cancelUrl.href,
-			"memberId" : this.memberData.memberId, 
-			"programCategoryId" : this.memberData.programCategoryId,
-			"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
-			"productType": this.memberData.productType,
-			"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
-			"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
-			"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
-			"device": (/Mobi|Android/i.test(navigator.userAgent))? 'Mobile': 'Desktop',
-			"deviceUserAgent": navigator.userAgent
-		}
-		// Added paymentId for supplementary program 
-		if(this.memberData.productType == 'supplementary'){
-			var supStuData = localStorage.getItem("supStuEmail");
-			if(supStuData != null){
-				supStuData = JSON.parse(supStuData);
-				if(supStuData.uniqueIdentification){
-					data.paymentId = supStuData.uniqueIdentification
+		return new Promise((resolve, reject) => {  
+			var suppProIdE = document.getElementById('suppProIds');
+			var core_product_price = document.getElementById('core_product_price');
+	
+			//Payment button
+			var ach_payment = document.getElementById('ach_payment');
+			var card_payment = document.getElementById('card_payment');
+			var paylater_payment = document.getElementById('paylater_payment');
+			
+			ach_payment.innerHTML = "Processing..."
+			ach_payment.disabled = true;
+			card_payment.innerHTML = "Processing..."
+			card_payment.disabled = true;
+			paylater_payment.innerHTML = "Processing..."
+			paylater_payment.disabled = true;
+			//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+			var cancelUrl = new URL(window.location.href);
+			cancelUrl.searchParams.append('returnType', 'back')
+			var data = {
+				"email": this.memberData.email,
+				"label": this.memberData.programName,
+				"programId" : this.memberData.programId,
+				"successUrl" : "https://www.nsdebatecamp.com/payment-confirmation?programName="+this.memberData.programName,
+				"cancelUrl" : cancelUrl.href,
+				"memberId" : this.memberData.memberId, 
+				"programCategoryId" : this.memberData.programCategoryId,
+				"supplementaryProgramIds" : JSON.parse(suppProIdE.value),
+				"productType": this.memberData.productType,
+				"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
+				"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
+				"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
+				"device": (/Mobi|Android/i.test(navigator.userAgent))? 'Mobile': 'Desktop',
+				"deviceUserAgent": navigator.userAgent
+			}
+			// Added paymentId for supplementary program 
+			if(this.memberData.productType == 'supplementary'){
+				var supStuData = localStorage.getItem("supStuEmail");
+				if(supStuData != null){
+					supStuData = JSON.parse(supStuData);
+					if(supStuData.uniqueIdentification){
+						data.paymentId = supStuData.uniqueIdentification
+					}
 				}
 			}
-		}
-		
-		var xhr = new XMLHttpRequest()
-		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrlsByProgram", true)
-		xhr.withCredentials = false
-		xhr.send(JSON.stringify(data))
-		xhr.onload = function() {
-			let responseText = JSON.parse(xhr.responseText);
-			if(responseText.success){
-				// btn.innerHTML = 'Checkout';
-				// window.location.href = responseText.stripe_url;
-
-				$this.$checkoutData = responseText;
-
-				//Storing data in local storage
-				data.checkoutData = responseText
-				localStorage.setItem("checkOutData", JSON.stringify(data));
-				$this.addSessionId()
-				ach_payment.innerHTML = "Checkout"
-				ach_payment.disabled = false;
-				card_payment.innerHTML = "Checkout"
-				card_payment.disabled = false;
-				paylater_payment.innerHTML = "Checkout"
-				paylater_payment.disabled = false;
-				$this.$checkOutResponse = true;
-				next_page_2.style.pointerEvents = "auto";
+			
+			var xhr = new XMLHttpRequest()
+			var $this = this;
+			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrlsByProgram", true)
+			xhr.withCredentials = false
+			xhr.send(JSON.stringify(data))
+			xhr.onload = function() {
+				let responseText = JSON.parse(xhr.responseText);
+				if(responseText.success){
+					// btn.innerHTML = 'Checkout';
+					// window.location.href = responseText.stripe_url;
+	
+					$this.$checkoutData = responseText;
+	
+					//Storing data in local storage
+					data.checkoutData = responseText
+					localStorage.setItem("checkOutData", JSON.stringify(data));
+					$this.addSessionId()
+					ach_payment.innerHTML = "Checkout"
+					ach_payment.disabled = false;
+					card_payment.innerHTML = "Checkout"
+					card_payment.disabled = false;
+					paylater_payment.innerHTML = "Checkout"
+					paylater_payment.disabled = false;
+					$this.$checkOutResponse = true;
+					resolve(responseText);
+				}else{
+					reject(new Error('API call failed'));
+				}
+	
 			}
-
-		}
+		});
 	}
 	/**
 	 * For automation testing updating checkout url in hidden field
@@ -503,6 +503,7 @@ function creEl(name, className, idName) {
 	}
 	// Managing next and previous button
 	addEventForPrevNaxt() {
+	  var initialCheckout = null
 	  var next_page_1 = document.getElementById("next_page_1");
 	  var next_page_2 = document.getElementById("next_page_2");
 	  var prev_page_1 = document.getElementById("prev_page_1");
@@ -512,7 +513,7 @@ function creEl(name, className, idName) {
 	  var form = $("#checkout-form");
 	  next_page_1.addEventListener("click", function () {
 		$this.activateDiv("checkout_student_details");
-		$this.initializeStripePayment();
+		initialCheckout = $this.initializeStripePayment();
 	  });
 	  next_page_2.addEventListener("click", function () {
 		if (form.valid()) {
@@ -522,8 +523,12 @@ function creEl(name, className, idName) {
 		  if (isValidName) {
 			checkoutFormError.style.display = "none";
 			$this.activateDiv("checkout_payment");
-			  var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
-			  $this.updateStudentDetails(checkoutData); 
+			  if(initialCheckout){
+				initialCheckout.then(()=>{
+					var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
+					$this.updateStudentDetails($this.$checkoutData);
+				})
+			 }
 		  } else {
 			checkoutFormError.style.display = "block";
 		  }
