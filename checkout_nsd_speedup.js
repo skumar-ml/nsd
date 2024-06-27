@@ -526,7 +526,7 @@ function creEl(name, className, idName) {
 			  if(initialCheckout){
 				initialCheckout.then(()=>{
 					var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl ];
-					$this.updateStudentDetails($this.$checkoutData);
+					$this.updateStudentDetails(checkoutData);
 				})
 			 }
 		  } else {
