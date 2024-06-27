@@ -351,7 +351,7 @@ function creEl(name, className, idName) {
 		var paylater_payment = document.getElementById('paylater_payment');
 		
 		var next_page_2 = document.getElementById("next_page_2");
-		next_page_2.disabled = true;
+		next_page_2.style.pointerEvents = "none";
 		
 		ach_payment.innerHTML = "Processing..."
 		ach_payment.disabled = true;
@@ -413,7 +413,7 @@ function creEl(name, className, idName) {
 				paylater_payment.innerHTML = "Checkout"
 				paylater_payment.disabled = false;
 				$this.$checkOutResponse = true;
-				next_page_2.disabled = false;
+				next_page_2.style.pointerEvents = "auto";
 			}
 
 		}
