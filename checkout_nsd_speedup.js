@@ -402,7 +402,7 @@ function creEl(name, className, idName) {
 					//Storing data in local storage
 					data.checkoutData = responseText
 					localStorage.setItem("checkOutData", JSON.stringify(data));
-					$this.addSessionId()
+					
 					ach_payment.innerHTML = "Checkout"
 					ach_payment.disabled = false;
 					card_payment.innerHTML = "Checkout"
@@ -481,6 +481,7 @@ function creEl(name, className, idName) {
 	  localStorage.setItem("checkOutData", JSON.stringify(mergedData));
 	  var xhr = new XMLHttpRequest()
 	  var $this = this;
+	  
 	  xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
 	  xhr.withCredentials = false
 	  xhr.send(JSON.stringify(data))
@@ -491,6 +492,7 @@ function creEl(name, className, idName) {
 				card_payment.disabled = false;
 				paylater_payment.innerHTML = "Checkout"
 				paylater_payment.disabled = false;
+		  		$this.addSessionId()
 	  }
   }
 	// Hide and show tab for program selection, student infor and checkout payment
