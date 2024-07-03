@@ -7,12 +7,15 @@ class NSDPortal {
     $totalForm = 0;
     $isLiveProgram = true;
     $uploadedContent = {};
+    $startDate = '';
+    $endDate = '';
     constructor(webflowMemberId, accountEmail, apiBaseUrl, duringCampData) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
         this.baseUrl = apiBaseUrl;
         this.duringCampData = duringCampData;
         this.getPortalData();
+        this.getSuppPortalData();
     }
     // Get API data with the help of endpoint
     async fetchData(endpoint) {
@@ -22,32 +25,46 @@ class NSDPortal {
                 throw new Error("Network response was not ok");
             }
             const data = await response.json();
-            this.hidePortalData(data)
             return data;
         } catch (error) {
-            this.hidePortalData("No data Found")
             //console.error("Error fetching data:", error);
             //throw error;
         }
     }
     async getPortalData() {
         // API call
+        const nsdSuppDataPortal = document.getElementById('nsdSuppDataPortal');
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
         const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
-        console.log('data', data)
+        // Hide free and paid resources
+        this.hidePortalData(data)
+        // hide spinner
         spinner.style.display = 'none';
+        // display supplementary program dom element 
+        nsdSuppDataPortal.style.display = 'block';
+        // create portal student program tabs
         this.createPortalTabs(data);
         // Re initialize webflow tabs after API call 
         Webflow.require('tabs').redraw();
     }
+    // Hide free and paid resources after api response data
     hidePortalData(responseText) {
         if (responseText == "No data Found") {
             document.getElementById("free-resources").style.display = "block";
-            return false;
-            // else, show form accordion
+            // commented for update profile modal 
+            // setTimeout(() => {
+            //     console.log("ready!");
+            //     this.updateMemberFirstName();
+            // }, "3000");
+        } else if (responseText.length == 0) {
+            document.getElementById("free-resources").style.display = "block";
+            // commented for update profile modal 
+            // setTimeout(() => {
+            //     console.log("ready!");
+            //     this.updateMemberFirstName();
+            // }, "3000");
         } else {
-            // remove locat if exists (parent has paid)
             if (!(localStorage.getItem('locat') === null)) {
                 localStorage.removeItem('locat');
             }
@@ -56,6 +73,8 @@ class NSDPortal {
     }
     createPortalTabs(tabsData) {
         const nsd_portal_container = document.getElementById('nsdPortal');
+        var is_notification = false;
+        var notificationDiv = this.creEl('div', 'notification_container');
         // Create the main portal tab container
         const portalTabs = document.createElement('div');
         portalTabs.className = 'portal-tab w-tabs';
@@ -75,45 +94,62 @@ class NSDPortal {
 
         // Loop through the tab data to create each tab and its content
         tabsData.forEach((tab, index) => {
-
-            const tabIndex = index + 1;
-            const isActive = index === 0 ? 'w--current' : '';
-            const isTabActive = index === 0 ? 'w--tab-active' : '';
-            this.updateGlobalVariable(tab);
-            // Create the tab header
-            const tabHeader = document.createElement('a');
-            tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`;
-            tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-            tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
-            tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
-            tabHeader.setAttribute('role', 'tab');
-            tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
-            tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-            tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
-            let startDate = new Date(this.$programDetail.startDate);
-            let endDate = new Date(this.$programDetail.endDate);
-            tabHeader.innerHTML = `
+            if (tab.failedPayment == undefined) {
+                const tabIndex = index + 1;
+                const isActive = index === 0 ? 'w--current' : '';
+                const isTabActive = index === 0 ? 'w--tab-active' : '';
+                this.updateGlobalVariable(tab);
+                // Create the tab header
+                const tabHeader = document.createElement('a');
+                tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`;
+                tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+                tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
+                tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
+                tabHeader.setAttribute('role', 'tab');
+                tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
+                tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+                tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
+                tabHeader.innerHTML = `
                 <div>
                     <div class="current-program_content-div">
                         <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()} - ${ endDate.toLocaleString('default', { month: 'long' })} ${endDate.getDate()} </div>
+                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()} </div>
                     </div>
                 </div>
             `;
-            var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
-            // Append the tab header and content to their respective containers
-            tabMenus.appendChild(tabHeader);
-            tabContent.appendChild(tabPane);
+                var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
+                // Append the tab header and content to their respective containers
+                tabMenus.appendChild(tabHeader);
+                tabContent.appendChild(tabPane);
+            } else {
+                is_notification = true;
+                tab.failedPayment.forEach(item => {
+                    let noText = this.creEl('span', 'noti_text');
+                    noText.innerHTML = 'A recent payment for ' + item['Student Name'] + ' register for the program ' + item['Program Name'] + ' has failed.';
+                    notificationDiv.appendChild(noText);
+                })
+            }
         });
 
         // Append the tab menus and content to the main portal tab container
-        portalTabs.appendChild(tabMenus);
-        portalTabs.appendChild(tabContent);
-
+        if (tabMenus) {
+            portalTabs.appendChild(tabMenus);
+        }
+        if (tabContent) {
+            portalTabs.appendChild(tabContent);
+        }
         // Append the portal tabs to the body or a specific container
-        nsd_portal_container.appendChild(portalTabs);
+        if (tabMenus && tabContent) {
+            if (is_notification) {
+                nsd_portal_container.prepend(notificationDiv, portalTabs);
+            } else {
+                nsd_portal_container.appendChild(portalTabs);
+            }
+        }
         //Initiate lightbox after dom element added
         this.initiateLightbox()
+        // Update memberStack firstname after update modal closed
+        this.updateMemberFirstName();
 
     }
     updateGlobalVariable(tab) {
@@ -124,6 +160,9 @@ class NSDPortal {
         this.$programDetail = tab.programDetail;
         this.$uploadedContent = tab.uploadedContent;
         this.$totalForm = 0;
+        this.checkProgramDeadline();
+        this.$startDate = new Date(this.$programDetail.startDate);
+        this.$endDate = new Date(this.$programDetail.endDate);
     }
     tabPane(index, tabIndex, isTabActive, tab) {
         // Update global data
@@ -156,16 +195,12 @@ class NSDPortal {
            </div>
        `;
         }
-        
+
         return tabPane
     }
     createPreCampContent(formList) {
         const preCampDiv = document.createElement('div');
         preCampDiv.className = 'pre-camp_div';
-        console.log('this.$formsList', this.$formsList)
-
-        let startDate = new Date(this.$programDetail.startDate);
-
         preCampDiv.innerHTML = `
             <div class="pre-camp_title-content-wrapper">
                 <div class="pre-camp_title-div bg-blue">
@@ -177,7 +212,7 @@ class NSDPortal {
                 <!--Add Cross Icon -->
             </div>
             <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Needs to be completed by ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()+this.getOrdinalSuffix(startDate.getDate())}</div>
+                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()+this.getOrdinalSuffix(this.$startDate.getDate())}</div>
                 <div class="pre-camp_progress-container">
                 ${this.progressBar()}
                 </div>
@@ -326,7 +361,6 @@ class NSDPortal {
         var newForms = forms.filter(item => {
             if (item.form_sub_type == 'dropoff_invoice') {
                 var dFD = this.$completedForm.find(item => item.form_sub_type == 'dropoff' && item.isInvoice == 'Yes')
-                console.log('dFD', dFD)
                 if (dFD != undefined) {
                     return true
                 } else {
@@ -335,7 +369,6 @@ class NSDPortal {
 
             } else if (item.form_sub_type == 'pickup_invoice') {
                 var aFD = this.$completedForm.find(item => item.form_sub_type == 'pickup' && item.isInvoice == 'Yes')
-                console.log('aFD', aFD)
                 if (aFD != undefined) {
                     return true
                 } else {
@@ -388,6 +421,16 @@ class NSDPortal {
         }
     }
     /**
+     * Check Program Deadline
+     */
+    checkProgramDeadline() {
+        var deadlineDate = this.$programDetail.deadlineDate.replace(/\\/g, '');
+        deadlineDate = deadlineDate.replace(/"/g, '')
+        var formatedDeadlineDate = new Date(deadlineDate);
+        var currentDate = new Date();
+        this.$isLiveProgram = (currentDate < formatedDeadlineDate) ? true : false;
+    }
+    /**
      * initialize Lightbox and rerender accordion after close the lightbox
      */
     initiateLightbox() {
@@ -400,5 +443,124 @@ class NSDPortal {
                 scrolling: true,
             });
         });
+    }
+    /** Update Member Data using iframe code */
+    /**
+     * Update Member first name in portal after user profile update
+     */
+    updateMemberFirstName() {
+        var elements = document.getElementsByClassName("ms-portal-exit");
+        var myFunctionNew = function () {
+            var memberstack = localStorage.getItem("memberstack");
+            var memberstackData = JSON.parse(memberstack);
+            var webflowMemberId = memberstackData.information.id;
+            var firstName = memberstackData.information['first-name'];
+            var userFirstName2 = document.getElementById('userFirstName2');
+            var userFirstName1 = document.getElementById('userFirstName1');
+            userFirstName1.innerHTML = firstName;
+            userFirstName2.innerHTML = firstName;
+            console.log('firstName', firstName)
+        };
+        for (var i = 0; i < elements.length; i++) {
+            elements[i].addEventListener('click', myFunctionNew, false);
+        }
+    }
+    /** Supplementary Program Code */
+    async getSuppPortalData() {
+        // API call
+        const tabsData = await this.fetchData("getSupplimentaryForm/" + this.webflowMemberId + "/current");
+
+        this.createSuppPortalTabs(tabsData);
+
+    }
+    createSuppPortalTabs(tabsData) {
+        const nsd_portal_container = document.getElementById('nsdSuppDataPortal');
+        if (tabsData != "No data Found") {
+            // Create the main portal tab container
+            const portalTabs = document.createElement('div');
+            portalTabs.className = 'portal-tab w-tabs';
+            portalTabs.setAttribute('data-current', 'Tab 1');
+            portalTabs.setAttribute('data-easing', 'ease');
+            portalTabs.setAttribute('data-duration-in', '300');
+            portalTabs.setAttribute('data-duration-out', '100');
+
+            // Create the tab menu container
+            const tabMenus = document.createElement('div');
+            tabMenus.className = 'portal-tab-menus w-tab-menu';
+            tabMenus.setAttribute('role', 'tablist');
+
+            // Create the tab content container
+            const tabContent = document.createElement('div');
+            tabContent.className = 'portal-tab-content w-tab-content';
+
+            // Loop through the tab data to create each tab and its content
+            tabsData.forEach((tab, index) => {
+
+                const tabIndex = index + 1;
+                const isActive = index === 0 ? 'w--current' : '';
+                const isTabActive = index === 0 ? 'w--tab-active' : '';
+                var startDate = new Date(tab.programDetail.startDate);
+                var endDate = new Date(tab.programDetail.endDate);
+
+                // Create the tab header
+                const tabHeader = document.createElement('a');
+                tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link`;
+                tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+                tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
+                tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
+                tabHeader.setAttribute('role', 'tab');
+                tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
+                tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+                tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
+                tabHeader.innerHTML = `
+                    <div>
+                        <div class="current-program_content-div">
+                            <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
+                            <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()} - ${ endDate.toLocaleString('default', { month: 'long' })} ${endDate.getDate()} </div>
+                        </div>
+                    </div>
+                `;
+                var tabPane = this.suppTabPane(index, tabIndex, isTabActive);
+                tabMenus.appendChild(tabHeader);
+                tabContent.appendChild(tabPane);
+            });
+
+            // Append the tab menus and content to the main portal tab container
+            portalTabs.appendChild(tabMenus);
+            portalTabs.appendChild(tabContent);
+
+            // Append the portal tabs to the body or a specific container
+            nsd_portal_container.appendChild(portalTabs);
+            //Initiate lightbox after dom element added
+            this.initiateLightbox()
+        } else {
+            nsd_portal_container.innerHTML = "No Records found"
+        }
+    }
+    suppTabPane(index, tabIndex, isTabActive) {
+        // Update global data
+        // Create the tab content
+        const tabPane = document.createElement('div');
+        tabPane.className = `w-tab-pane`;
+        tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        tabPane.setAttribute('id', `w-tabs-0-data-w-pane-${index}`);
+        tabPane.setAttribute('role', 'tabpanel');
+        tabPane.setAttribute('aria-labelledby', `w-tabs-0-data-w-tab-${index}`);
+        tabPane.innerHTML = `
+           <div>
+               <!-- Pre camp content will come conditionally here -->
+           </div>`;
+
+        return tabPane
+    }
+    creEl(name, className, idName) {
+        var el = document.createElement(name);
+        if (className) {
+            el.className = className;
+        }
+        if (idName) {
+            el.setAttribute("id", idName)
+        }
+        return el;
     }
 }
