@@ -225,9 +225,10 @@ class NSDPortal {
         return preCampDiv;
     }
     formCategoryList(formCategory) {
-        var isInvoiceForm = this.filterInvoiceForms(formCategory.forms);
-        if (!isInvoiceForm.length) {
+        formCategory.forms = this.filterInvoiceForms(formCategory.forms);
+        if (!formCategory.forms.length) {
             return;
+
         }
         var formCategory = `<div>
                 <div class="pre-camp_subtitle">${formCategory.name}</div>
