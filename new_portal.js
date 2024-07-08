@@ -303,7 +303,7 @@ class NSDPortal {
         if (added_by_admin) {
             link_text = "Completed";
         } else if (is_live) {
-            link_text = (editable) ? ((this.$isLiveProgram && form.is_editable) ? "Edit form" : "View Form") : "Go to form";
+            link_text = (editable) ? ((this.$isLiveProgram && form.is_editable) ? "Edit form" : "View Form") : ((form.form_sub_type) ? 'Go to Invoice' : "Go to form");
         } else {
             link_text = "Coming Soon";
         }
