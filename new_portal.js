@@ -148,9 +148,28 @@ class NSDPortal {
         }
         //Initiate lightbox after dom element added
         this.initiateLightbox()
+        // Cross Icon code
+        this.crossEvent();
         // Update memberStack firstname after update modal closed
         this.updateMemberFirstName();
 
+    }
+    crossEvent() {
+        var crossIcon = document.querySelectorAll('.cross-icon')
+        crossIcon.forEach(e =>{
+            e.addEventListener("click", function (event) {
+                event.preventDefault();
+                const panLink = document.querySelectorAll('.w-tab-link');
+                panLink.forEach(element => {
+                    element.classList.remove('w--current');
+                });
+                const tabPan = document.querySelectorAll('.w-tab-pane');
+                tabPan.forEach(element => {
+                    element.classList.remove('w--tab-active');
+                });
+                Webflow.require('tabs').redraw();
+            });
+        })
     }
     updateGlobalVariable(tab) {
         this.$completedForm = tab.formCompletedList;
@@ -209,7 +228,9 @@ class NSDPortal {
                 <div>
                     <div class="pre-camp_title-text">Registration Forms & Resources</div>
                 </div>
-                <!--Add Cross Icon -->
+                <div class="cross-icon" id="cross-icon"><img
+                src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
+                loading="lazy" alt=""></div>
             </div>
             <div class="pre-camp_subtitle-wrapper">
                 <div class="pre-camp_subtitle">Needs to be completed by ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()+this.getOrdinalSuffix(this.$startDate.getDate())}</div>
