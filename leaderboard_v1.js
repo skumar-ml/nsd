@@ -24,14 +24,14 @@ class NDFLeaderBoard {
     async getLeaderboardData() {
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
-        var competitionLocalData = localStorage.getItem("competitionData");
+        // var competitionLocalData = localStorage.getItem("competitionData");
         var $this = this;
-        console.log('competitionLocalData', competitionLocalData)
-        if (competitionLocalData != "undefined" && competitionLocalData != null) {
-            var responseText = JSON.parse(competitionLocalData);
-            $this.createPortalTabs(responseText)
-            spinner.style.display = 'none';
-        } else {
+        // console.log('competitionLocalData', competitionLocalData)
+        // if (competitionLocalData != "undefined" && competitionLocalData != null) {
+        //     var responseText = JSON.parse(competitionLocalData);
+        //     $this.createPortalTabs(responseText)
+        //     spinner.style.display = 'none';
+        // } else {
             try {
                 const data = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
                 $this.createPortalTabs(data)
@@ -41,9 +41,9 @@ class NDFLeaderBoard {
                 console.error('Error fetching data:', error);
                 throw error;
             }
-        }
-        const bgData = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
-        localStorage.setItem("competitionData", JSON.stringify(bgData));
+        // }
+        // const bgData = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
+        // localStorage.setItem("competitionData", JSON.stringify(bgData));
     }
     createProgressBarHTML(title, progressPercentage, currentDay, totalDays) {
         return `
@@ -106,7 +106,7 @@ class NDFLeaderBoard {
         // Round up to the next whole number
         var roundedDifferenceInDays = Math.ceil(differenceInDays);
 
-        return roundedDifferenceInDays;
+        return (roundedDifferenceInDays > 0 )? roundedDifferenceInDays: 0;
     }
     getPercentageComDay(){
         var completedDay = this.getCompletedComDays();
@@ -193,6 +193,7 @@ class NDFLeaderBoard {
         if (tabMenus && tabContent) {
             nsd_portal_container.appendChild(portalTabs);
         }
+        Webflow.require('tabs').redraw();
     }
     createLeaderboardRow(rank, title, points, myTeam) {
         var trophyUrl = this.getTrophyUrl(rank, points);
