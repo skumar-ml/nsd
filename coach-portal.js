@@ -14,8 +14,8 @@ async function coachResources(coachCampId, memberId) {
     coachCampText.textContent = "Texas LD";
     scheduleLink = "https://calendar.google.com/calendar/embed?src=66f1fdbfd5235514cb5f1c1faf0a1d3c3066eb0b8efb64d6ae44c65ad0ed0b20%40group.calendar.google.com&ctz=America%2FChicago";
   }
-  // Philadelphia PF
-  else if (coachCampId === "3") {
+  // Philadelphia PF Session 1
+  else if (coachCampId === "15") {
     coachCampText.textContent = "Philadelphia PF Session 1";
     scheduleLink = "https://calendar.google.com/calendar/embed?src=287e33ec1e3bf1ccea3e84481a3d594eb3d5906f177b7967993013b497f8dd29%40group.calendar.google.com&ctz=America%2FIndiana%2FIndianapolis";
   }
@@ -27,18 +27,24 @@ async function coachResources(coachCampId, memberId) {
   // Minnesota LD
   else if (coachCampId === "5") {
     coachCampText.textContent = "Minnesota LD";
-    // scheduleLink = "https://docs.google.com/spreadsheets/d/1xd4zkg5wYn6_TbO3JfG2PLrHoVNrkTGsaGvACvAsJAQ/edit?usp=sharing";
-  }  
+    scheduleLink = "https://docs.google.com/spreadsheets/d/1xCvxFXme9stRzbYbpJ0HBciOOq4dNqkXMILz9POa00w/edit?usp=sharing";
+  } 
+  // Philadelphia PF Session 2
+  else if (coachCampId === "3") {
+    coachCampText.textContent = "Philadelphia PF Session 2";
+    // scheduleLink = "https://docs.google.com/spreadsheets/d/1xCvxFXme9stRzbYbpJ0HBciOOq4dNqkXMILz9POa00w/edit?usp=sharing";
+  }
+	  
      // Online LD Camp
   else if (coachCampId === "7") {
     coachCampText.textContent = "Online LD Camp";
     // scheduleLink = "https://docs.google.com/spreadsheets/d/1v6A-0xbqEq562VC72QbEFEfRJfFrg8jajbK3FN0R5oQ/edit?usp=sharing";
   }  
-   // Online PF Camp
-  // else if (coachCampId === "8") {
-  //   coachCampText.textContent = "Online PF Camp";
-  //   scheduleLink = "https://calendar.google.com/calendar/embed?src=9aaf227f1b5184079588883e3b512c53504825638023a74ee30d8488b9dc22e8%40group.calendar.google.com&ctz=America%2FIndiana%2FIndianapolis";
-  // }  
+   Online PF Camp
+  else if (coachCampId === "8") {
+    coachCampText.textContent = "Online PF Camp";
+    scheduleLink = "https://calendar.google.com/calendar/embed?src=9aaf227f1b5184079588883e3b512c53504825638023a74ee30d8488b9dc22e8%40group.calendar.google.com&ctz=America%2FIndiana%2FIndianapolis";
+  }  
   var scheduleHTML = '<a href=' + scheduleLink + ' target="_blank" class="portal-resource-card portal-div-shadow w-inline-block"><p class="portal-card-text">Camp Schedule</p></a>';
   coachResourceGrid.insertAdjacentHTML('beforeend', scheduleHTML)
   if(coachCampId){	
