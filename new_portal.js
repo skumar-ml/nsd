@@ -117,7 +117,7 @@ class NSDPortal {
                 <div>
                     <div class="current-program_content-div">
                         <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last},  ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()} </div>
+                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()} </div>
                     </div>
                 </div>
             `;
@@ -543,7 +543,7 @@ class NSDPortal {
                     <div>
                         <div class="current-program_content-div">
                             <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                            <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last},  ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()} - ${ endDate.toLocaleString('default', { month: 'long' })} ${endDate.getDate()} </div>
+                            <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()} - ${ endDate.toLocaleString('default', { month: 'long' })} ${endDate.getDate()} </div>
                         </div>
                     </div>
                 `;
