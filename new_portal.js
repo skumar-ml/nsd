@@ -210,7 +210,9 @@ class NSDPortal {
                ${pre_camp_html.innerHTML || ''}
            </div>
        `;
-        } else {
+        } 
+        
+        if(this.checkProgramStartDate()){
             tabPane.innerHTML = `
            <div class="during-camp_div">
                <!-- During camp content will come conditionally here -->
@@ -221,6 +223,13 @@ class NSDPortal {
 
         return tabPane
     }
+    /**
+     * check program is started or not based on current date
+     */
+	checkProgramStartDate(){
+		var currentDate = new Date(); 
+		return (currentDate >= this.$startDate) ? true : false;
+	}
     createPreCampContent(formList) {
         const preCampDiv = document.createElement('div');
         preCampDiv.className = 'pre-camp_div';
