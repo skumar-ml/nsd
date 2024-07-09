@@ -55,7 +55,7 @@ class NDFLeaderBoard {
                         <div id="progress-bar" class="progress-bar" style="width: ${this.getPercentageComDay()}%;"></div>
                     </div>
                     <div class="day-text-wrapper">
-                        <div><p id="current-day" class="day-text">Day ${this.getCompletedComDays()}</p></div>
+                        <div><p id="current-day" class="day-text">Day 1</p></div>
                         <div><p id="total-days" class="day-text">Day ${this.getTotalComDays()}</p></div>
                     </div>
                 </div>
