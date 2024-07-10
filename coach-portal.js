@@ -40,7 +40,7 @@ async function coachResources(coachCampId, memberId) {
     coachCampText.textContent = "Online LD Camp";
     // scheduleLink = "https://docs.google.com/spreadsheets/d/1v6A-0xbqEq562VC72QbEFEfRJfFrg8jajbK3FN0R5oQ/edit?usp=sharing";
   }  
-   Online PF Camp
+   // Online PF Camp
   else if (coachCampId === "8") {
     coachCampText.textContent = "Online PF Camp";
     scheduleLink = "https://calendar.google.com/calendar/embed?src=9aaf227f1b5184079588883e3b512c53504825638023a74ee30d8488b9dc22e8%40group.calendar.google.com&ctz=America%2FIndiana%2FIndianapolis";
