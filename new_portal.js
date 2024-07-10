@@ -201,7 +201,7 @@ class NSDPortal {
         });
         var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
         var pre_camp_html = this.createPreCampContent(formList);
-        var during_camp_html = this.createDuringCampContent(duringCampData);
+        var during_camp_html = this.createDuringCampContent(this.duringCampData);
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
         if (percentageAmount != 100) {
             tabPane.innerHTML = `
