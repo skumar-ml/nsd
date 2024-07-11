@@ -397,9 +397,9 @@ class NSDPortal {
         let textContent = ''
         const debateEvent = this.$programDetail.debateEvent;
         if (debateEvent === "Lincoln-Douglas") {
-            textContent = "Resolved: The United States ought to guarantee the right to housing.";
+            textContent = "Resolved: The United States ought to adopt carbon pricing."
         } else if (debateEvent === "Public Forum") {
-            textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
+            textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
         }
         console.log('debateEvent', debateEvent)
         if(textContent){
