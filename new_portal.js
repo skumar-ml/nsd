@@ -9,11 +9,10 @@ class NSDPortal {
     $uploadedContent = {};
     $startDate = '';
     $endDate = '';
-    constructor(webflowMemberId, accountEmail, apiBaseUrl, duringCampData) {
+    constructor(webflowMemberId, accountEmail, apiBaseUrl) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
         this.baseUrl = apiBaseUrl;
-        this.duringCampData = duringCampData;
         this.getPortalData();
         this.getSuppPortalData();
     }
@@ -201,7 +200,7 @@ class NSDPortal {
         });
         var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
         var pre_camp_html = this.createPreCampContent(formList);
-        var during_camp_html = this.createDuringCampContent(this.duringCampData);
+        var during_camp_html = this.createDuringCampContent();
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
         if (percentageAmount != 100) {
             tabPane.innerHTML = `
@@ -212,7 +211,7 @@ class NSDPortal {
        `;
         } 
         
-        if(this.checkProgramStartDate()){
+        if (this.checkProgramStartDate() || percentageAmount == 100) {
             tabPane.innerHTML = `
            <div class="during-camp_div">
                <!-- During camp content will come conditionally here -->
@@ -338,7 +337,7 @@ class NSDPortal {
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
     }
-    createDuringCampContent(duringCampData) {
+    createDuringCampContent() {
         const duringCampDiv = document.createElement('div');
         duringCampDiv.className = 'during-camp_div';
 
@@ -348,18 +347,12 @@ class NSDPortal {
                     <div class="dm-sans line-height-20">During camp</div>
                 </div>
                 <div class="pre-camp_title-div">
-                    <div class="pre-camp_title-text">${duringCampData.resourcesTitle}</div>
+                    <div class="pre-camp_title-text">Resources</div>
                 </div>
             </div>
             <div>
-                <div class="resources_wrapper during-camp">
-                    ${this.duringCampData.duringCampResources.map(resource => `
-                        <a href="${resource.link}" class="resources-link-block w-inline-block">
-                            <div class="resources-div">
-                                <div class="resources-text">${resource.title}</div>
-                            </div>
-                        </a>
-                    `).join('')}
+                <div class="">
+                   ${this.getCampTopicData()}
                 </div>
                 <div class="resources_wrapper">
                     ${this.$uploadedContent.map(uploadData => this.resourceLink(uploadData)).join('')}
@@ -373,6 +366,9 @@ class NSDPortal {
         if (this.$uploadedContent.length) {
             return `<div>
                 <div class="pre-camp_subtitle">Resources</div>
+		<div class="">
+                   ${this.getCampTopicData()}
+                </div>
                 <div class="resources_wrapper">
                     ${this.$uploadedContent.map(uploadData => this.resourceLink(uploadData)).join('')}
                 </div>
@@ -391,6 +387,21 @@ class NSDPortal {
         } else {
             return '';
         }
+    }
+    /**
+     * Get Camp topic data 
+     */
+    getCampTopicData() {
+        let textContent = ''
+        const debateEvent = this.$programDetail.debateEvent;
+        if (debateEvent === "Lincoln-Douglas") {
+            textContent = "Resolved: The United States ought to guarantee the right to housing.";
+        } else if (debateEvent === "Public Forum") {
+            textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
+        }
+        return `<div class="pre-camp_subtitle-wrapper">
+                <div class="pre-camp_subtitle">CampTopic: ${textContent} </div>
+            </div>`;
     }
     /*Filter Ivoice Related Forms based on forms id*/
     filterInvoiceForms(forms) {
