@@ -143,11 +143,11 @@ class NSDPortal {
         }
         // Append the portal tabs to the body or a specific container
         if (tabMenus && tabContent) {
-            if (is_notification) {
-                nsd_portal_container.prepend(notificationDiv, portalTabs);
-            } else {
+            // if (is_notification) {
+            //     nsd_portal_container.prepend(notificationDiv, portalTabs);
+            // } else {
                 nsd_portal_container.appendChild(portalTabs);
-            }
+            // }
         }
         //Initiate lightbox after dom element added
         this.initiateLightbox()
