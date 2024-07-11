@@ -338,41 +338,43 @@ class NSDPortal {
                 </div>`;
     }
     createDuringCampContent() {
+        const debateEvent = this.$programDetail.debateEvent;
         const duringCampDiv = document.createElement('div');
         duringCampDiv.className = 'during-camp_div';
-
+        
         duringCampDiv.innerHTML = `
             <div class="pre-camp_title-content-wrapper">
                 <div id="w-node-_8e292b85-7013-e53b-a349-66617a361c36-b55b4cc9" class="pre-camp_title-div bg-blue">
                     <div class="dm-sans line-height-20">During camp</div>
                 </div>
                 <div class="pre-camp_title-div">
-                    <div class="pre-camp_title-text">Resources</div>
+                    <div class="pre-camp_title-text">Resources/Camp Topic</div>
                 </div>
             </div>
-            <div>
-                <div class="">
-                   ${this.getCampTopicData()}
-                </div>
-                <div class="resources_wrapper">
-                    ${this.$uploadedContent.map(uploadData => this.resourceLink(uploadData)).join('')}
-                </div>
-            </div>
+            ${ this.getCampTopicData() ? this.getCampTopicData() : 'Resources not available for this camp'}
+            ${this.getAllResources()}
         `;
 
         return duringCampDiv;
     }
-    resourceList() {
-        if (this.$uploadedContent.length) {
-            return `<div>
-                <div class="pre-camp_subtitle">Resources</div>
-		<div class="">
-                   ${this.getCampTopicData()}
-                </div>
+    getAllResources(){
+        if(this.$uploadedContent.length == 0){
+            return '';
+        }
+        return `<div>
+                <div class="pre-camp_subtitle-wrapper">
+                        <div class="pre-camp_subtitle">Resources</div>
+                    </div>
                 <div class="resources_wrapper">
                     ${this.$uploadedContent.map(uploadData => this.resourceLink(uploadData)).join('')}
                 </div>
             </div>`;
+    }
+    resourceList() {
+        const debateEvent = this.$programDetail.debateEvent;
+        if (this.$uploadedContent.length || debateEvent == 'Lincoln-Douglas' ||  debateEvent == 'Public Forum') {
+            return `${this.getCampTopicData()}
+                    ${this.getAllResources()}`;
         } else {
             return '';
         }
@@ -399,9 +401,18 @@ class NSDPortal {
         } else if (debateEvent === "Public Forum") {
             textContent = "Resolved: The United States federal government should substantially increase its military presence in the Arctic.";
         }
-        return `<div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">CampTopic: ${textContent} </div>
-            </div>`;
+        console.log('debateEvent', debateEvent)
+        if(textContent){
+            return `<div>
+                        <div class="pre-camp_subtitle-wrapper">
+                            <div class="pre-camp_subtitle">Camp Topic</div>
+                        </div>
+                        ${textContent}
+                    </div>`;
+        }else{
+            return "";
+        }
+        
     }
     /*Filter Ivoice Related Forms based on forms id*/
     filterInvoiceForms(forms) {
