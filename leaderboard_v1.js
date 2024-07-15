@@ -36,8 +36,9 @@ class NDFLeaderBoard {
         // } else {
             try {
                 const data = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
-                $this.createPortalTabs(data)
                 spinner.style.display = 'none';
+                $this.createPortalTabs(data)
+                
 
             } catch (error) {
                 console.error('Error fetching data:', error);
