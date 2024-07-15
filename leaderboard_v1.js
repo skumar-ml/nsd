@@ -2,9 +2,10 @@ class NDFLeaderBoard {
     $competition = [];
     $allCompetition = [];
     $programDetail = {};
-    constructor(webflowMemberId, accountEmail, apiBaseUrl, duringCampData) {
+    constructor(webflowMemberId, accountEmail, apiBaseUrl, accountType) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
+        this.accountType = accountType;
         this.baseUrl = apiBaseUrl;
         this.getLeaderboardData();
     }
@@ -199,8 +200,17 @@ class NDFLeaderBoard {
     }
     createLeaderboardRow(rank, title, points, myTeam) {
         var trophyUrl = this.getTrophyUrl(rank, points);
-        
-        var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true))
+        var $this = this;
+        if($this.accountType == 'parent'){
+            console.log('test 1')
+            var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true))
+        }else{
+            console.log('test 2')
+            var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true) && item.email == $this.accountEmail)
+        }
+        console.log('myTeamData', myTeamData)
+
+
         myTeam = (myTeamData.length > 0) ? true :false;
         const trophyIcon = trophyUrl ? `<img src="${trophyUrl}" alt="Trophy Icon">` : rank;
         var myTeamClass = (myTeam) ? 'my_team_points' : '';
