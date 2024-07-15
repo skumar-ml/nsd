@@ -197,10 +197,11 @@ class NDFLeaderBoard {
         }
         Webflow.require('tabs').redraw();
     }
-    createLeaderboardRow(rank, title, points, myTeam) 
+    createLeaderboardRow(rank, title, points, myTeam) {
+        var trophyUrl = this.getTrophyUrl(rank, points);
+        
         var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true))
         myTeam = (myTeamData.length > 0) ? true :false;
-        var trophyUrl = this.getTrophyUrl(rank, points);
         const trophyIcon = trophyUrl ? `<img src="${trophyUrl}" alt="Trophy Icon">` : rank;
         var myTeamClass = (myTeam) ? 'my_team_points' : '';
         return `
