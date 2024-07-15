@@ -195,7 +195,9 @@ class NDFLeaderBoard {
         }
         Webflow.require('tabs').redraw();
     }
-    createLeaderboardRow(rank, title, points, myTeam) {
+    createLeaderboardRow(rank, title, points, myTeam) 
+        var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true))
+        myTeam = (myTeamData.length > 0) ? true :false;
         var trophyUrl = this.getTrophyUrl(rank, points);
         const trophyIcon = trophyUrl ? `<img src="${trophyUrl}" alt="Trophy Icon">` : rank;
         var myTeamClass = (myTeam) ? 'my_team_points' : '';
@@ -211,7 +213,7 @@ class NDFLeaderBoard {
         this.$competition.points.sort(function (r, a) {
             return Object.values(a)[0] - Object.values(r)[0]
         });
-        const rows = this.$competition.points.map((data, i) => this.createLeaderboardRow(i + 1, Object.keys(data)[0], Object.values(data)[0], Object.values(data)[1])).join('');
+        const rows = this.$competition.points.map((data, i) => this.createLeaderboardRow(i + 1, data.teamName, data.point, data.myTeam)).join('');
         return `
             <div class="leaderboard-wrapper">
                 <h1 class="dm-sans table-heading">Leaderboard</h1>
