@@ -1,5 +1,6 @@
 class NDFLeaderBoard {
     $competition = [];
+    $allCompetition = [];
     $programDetail = {};
     constructor(webflowMemberId, accountEmail, apiBaseUrl, duringCampData) {
         this.webflowMemberId = webflowMemberId;
@@ -64,6 +65,7 @@ class NDFLeaderBoard {
     }
     updateGlobalVariable(tab) {
         this.$competition = tab.competition.find(item => item.is_live == true);
+        this.$allCompetition = tab.competition.filter(item => item.is_live == true);
         this.$programDetail = tab.programDetail;;
         this.$startDate = new Date(this.$programDetail.startDate);
         this.$endDate = new Date(this.$programDetail.endDate);
