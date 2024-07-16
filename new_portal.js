@@ -202,8 +202,9 @@ class NSDPortal {
         var pre_camp_html = this.createPreCampContent(formList);
         var during_camp_html = this.createDuringCampContent();
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+	    tabPane.innerHTML = ``;
        if (percentageAmount != 100) {
-	      tabPane.innerHTML = `
+	      tabPane.innerHTML += `
             <div class="pre-camp_div">
                 <!-- Pre camp content will come conditionally here -->
                 ${pre_camp_html.innerHTML || ''}
@@ -212,7 +213,7 @@ class NSDPortal {
          } 
         
          if (this.checkProgramStartDate() || percentageAmount == 100) {
-             tabPane.innerHTML = `
+             tabPane.innerHTML += `
             <div class="during-camp_div">
                 <!-- During camp content will come conditionally here -->
                 ${during_camp_html.innerHTML || ''}
