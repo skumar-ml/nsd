@@ -464,8 +464,10 @@ function creEl(name, className, idName) {
 	  //var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 	  var cancelUrl = new URL(window.location.href);
 	  cancelUrl.searchParams.append('returnType', 'back')
+	  let studentEmailValue = studentEmail.value;
+	  let lowercaseStudentEmailValue = studentEmailValue.toLowerCase()
 	  var data = {
-		  "studentEmail" : studentEmail.value,
+		  "studentEmail" : lowercaseStudentEmailValue,
 		  "firstName" : studentFirstName.value,
 		  "lastName" : studentLastName.value,
 		  "grade" : studentGrade.value,
