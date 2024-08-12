@@ -225,7 +225,11 @@ class NDFLeaderBoard {
     }
     createLeaderboard() {
        this.$competition.points.sort(function (r, a) {
-            return a.point - r.point
+            //return a.point - r.point
+            if (r.point === a.point) {
+                return a.longestStreak - r.longestStreak; // Second priority
+            }
+            return a.point - r.point; // First priority
         });
         const rows = this.$competition.points.map((data, i) => this.createLeaderboardRow(i + 1, data.teamName, data.point, data.myTeam)).join('');
         return `
