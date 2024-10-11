@@ -1,10 +1,13 @@
 class NSDPortal {
     $completedForm = [];
+    $completedFormOnly = [];
+    $completedInvoiceOnly = [];
     $formsList = [];
     $programCategory = {};
     $programDetail = {};
     $studentDetail = {};
     $totalForm = 0;
+    $totalInvoice = 0;	 
     $isLiveProgram = true;
     $uploadedContent = {};
     $startDate = '';
@@ -37,7 +40,14 @@ class NSDPortal {
         const supp_dashboard_title = document.getElementById('supp_dashboard_title');
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
-        const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
+        // const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
+	
+	//Invoice Changes, Calling invoice and form API 
+        const [data, invoiceData] = await Promise.all(
+            [this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current"),
+                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
+            ]
+        );
         // Hide free and paid resources
         this.hidePortalData(data)
         // hide spinner
@@ -47,7 +57,13 @@ class NSDPortal {
         curr_dashboard_title.style.display = 'block';
         supp_dashboard_title.style.display = 'block';
         // create portal student program tabs
-        this.createPortalTabs(data);
+        //this.createPortalTabs(data);
+
+	//Invoice Changes
+        this.createPortalTabs(data, invoiceData);
+        setTimeout(this.updateInvoiceData(invoiceData), 1000)
+        this.initializeToolTips();
+	
         // Re initialize webflow tabs after API call 
         Webflow.require('tabs').redraw();
     }
@@ -74,7 +90,7 @@ class NSDPortal {
             document.getElementById("paid-resources").style.display = "block";
         }
     }
-    createPortalTabs(tabsData) {
+    createPortalTabs(tabsData, invoiceData) {
         const nsd_portal_container = document.getElementById('nsdPortal');
         var is_notification = false;
         var notificationDiv = this.creEl('div', 'notification_container');
@@ -120,6 +136,10 @@ class NSDPortal {
                     </div>
                 </div>
             `;
+		
+		//Invoice Changes, Getting current tab invoice data
+                this.$invoices = invoiceData.find(i => i.paymentId == tab.studentDetail.uniqueIdentification)
+		    
                 var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
                 // Append the tab header and content to their respective containers
                 tabMenus.appendChild(tabHeader);
@@ -176,6 +196,12 @@ class NSDPortal {
     }
     updateGlobalVariable(tab) {
         this.$completedForm = tab.formCompletedList;
+	    
+	//Invoice Changes, Only getting form and invoice related completed form
+        this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No");
+        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => i.isInvoice == "Yes");
+        this.invoiceData = []
+	    
         this.$formsList = tab.formList;
         this.$programCategory = tab.programCategory;
         this.$studentDetail = tab.studentDetail;
@@ -186,6 +212,7 @@ class NSDPortal {
         this.$startDate = new Date(this.$programDetail.startDate);
         this.$endDate = new Date(this.$programDetail.endDate);
     }
+	
     tabPane(index, tabIndex, isTabActive, tab) {
         // Update global data
         // Create the tab content
@@ -240,6 +267,196 @@ class NSDPortal {
 
         return tabPane
     }
+
+
+   //Invoice Changes
+    updateInvoiceData(invoiceData) {
+        invoiceData.forEach(item => {
+            if (item.invoiceList != null) {
+                var invoiceContainer = document.getElementById('invoice_' + item.paymentId)
+                var duringInvoiceContainer = document.getElementById('during_invoice_' + item.paymentId)
+                if (invoiceContainer != null) {
+                    item.invoiceList.forEach(invoice => {
+
+                        let preCampRow = this.singleInvoiceForm(invoice, item.paymentId)
+                        invoiceContainer.appendChild(preCampRow);
+
+                        let duringCampRow = this.singleInvoiceForm(invoice, item.paymentId)
+                        duringInvoiceContainer.appendChild(duringCampRow)
+                    })
+                }
+            }
+        })
+    }
+    //Invoice Changes
+    singleInvoiceForm(invoice, paymentId) {
+        var $this = this;
+
+        // Create the main container div with class 'pre-camp_row'
+        const preCampRow = document.createElement('div');
+        preCampRow.classList.add('pre-camp_row');
+
+
+        let editable = (invoice.is_completed) ? true : false;
+        let completed = (editable && (invoice.status == 'Complete' || !invoice.status));
+        let failed = (invoice.status == 'Failed');
+        let processing = (invoice.status == 'Processing');
+        let paymentProcessMsg = (invoice.paymentProcessMsg != '');
+        let checkedInIcon = this.getCheckedInvoiceIcon(completed, failed, processing);
+
+        // Create the image element
+        const img = document.createElement('img');
+        img.setAttribute('width', '20');
+        img.setAttribute('src', checkedInIcon);
+        img.setAttribute('loading', 'lazy');
+        img.setAttribute('alt', '');
+
+        // Create the div with the text 'Dropoff Invoice Form'
+        let comClass = (completed)? "completed_form": 'inprogress';
+        const completedForm = document.createElement('div');
+        completedForm.classList.add('dm-sans', 'bold-500', comClass );
+        completedForm.textContent = invoice.invoiceName;
+
+        // Create the linkContainer div
+        const linkContainer = document.createElement('div');
+        linkContainer.classList.add('linkContainer');
+        var jotFormUrlLink = invoice.jotFormUrlLink;
+        var paymentLink;
+
+        let info_text = this.creEl('span', 'info_text')
+        info_text.innerHTML = 'i';
+        if (!editable || failed) {
+            jotFormUrlLink.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+            if (jotFormUrlLink.length > 0) {
+                jotFormUrlLink.forEach(link => {
+                    paymentLink = document.createElement('a');
+                    paymentLink.classList.add('dashboard_link-block', 'w-inline-block', link.paymentType);
+                    const paymentText = document.createElement('div');
+                    paymentText.classList.add('dm-sans', 'opacity-70');
+                    paymentText.textContent = link.title;
+                    paymentLink.appendChild(paymentText);
+
+                    paymentLink.addEventListener('click', function () {
+                        paymentLink.innerHTML = "Processing..."
+                        $this.initializeStripePayment(invoice.invoice_id, invoice.invoiceName, link.amount, link.paymentLinkId, paymentLink, link.title, link.paymentType, paymentId)
+                    })
+                    linkContainer.appendChild(paymentLink)
+                })
+            }
+        } else {
+            paymentLink = document.createElement('a');
+            paymentLink.classList.add('dashboard_link-block', 'w-inline-block');
+            const paymentText = document.createElement('div');
+            paymentText.classList.add('dm-sans', 'opacity-70');
+            paymentText.textContent = (processing)? 'Processing...' : 'Completed';
+            paymentLink.appendChild(paymentText);
+            linkContainer.appendChild(paymentLink)
+        }
+        // Append image, completedForm, and linkContainer to preCampRow
+        preCampRow.appendChild(img);
+        preCampRow.appendChild(completedForm);
+
+        if (paymentProcessMsg) {
+            linkContainer.prepend(info_text)
+            info_text.setAttribute('tip', invoice.paymentProcessMsg)
+
+            info_text.setAttribute('tip-top', '')
+            info_text.setAttribute('tip-left', '')
+        }
+
+        preCampRow.appendChild(linkContainer);
+        return preCampRow;
+    }
+    //Invoice Changes
+    /**  Initialize tooltip */
+    initializeToolTips() {
+        const elements = [...document.querySelectorAll('[tip]')]
+        var i = 0;
+        for (const el of elements) {
+            console.log('el', el)
+            const tip = document.createElement('div')
+            tip.innerHTML = '';
+            tip.classList.add('tooltip')
+            tip.textContent = el.getAttribute('tip')
+            const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px'
+            const y = el.hasAttribute('tip-top') ? '-100%' : '0'
+            tip.style.transform = `translate(${x}, ${y})`
+            el.appendChild(tip)
+            el.onpointermove = e => {
+                if (e.target !== e.currentTarget) return
+
+                const rect = tip.getBoundingClientRect()
+                const rectWidth = rect.width + 16
+                const vWidth = window.innerWidth - rectWidth
+                const rectX = el.hasAttribute('tip-left') ? e.clientX - rectWidth : e.clientX + rectWidth
+                const minX = el.hasAttribute('tip-left') ? 0 : rectX
+                const maxX = el.hasAttribute('tip-left') ? vWidth : window.innerWidth
+                const x = rectX < minX ? rectWidth : rectX > maxX ? vWidth : e.clientX
+                tip.style.left = `${x}px`
+                tip.style.top = `${e.clientY}px`
+            }
+        }
+    }
+    /**
+     * Get Checkbox icon for form complete or complete
+     */
+    getCheckedInvoiceIcon(status, failed, processing) {
+
+        if (processing) {
+            return "https://uploads-ssl.webflow.com/64091ce7166e6d5fb836545e/653a046b720f1634ea7288cc_loading-circles.gif";
+        } else if (failed) {
+            return "https://uploads-ssl.webflow.com/64091ce7166e6d5fb836545e/6539ec996a84c0196f6009bc_circle-xmark-regular.png";
+        } else if (status) {
+            return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png";
+        } else {
+            return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png";
+        }
+    }
+
+    /** Initialize stripe payment for invoice */
+    initializeStripePayment(invoice_id, title, amount, paymentLinkId, span, link_title, paymentType, paymentId) {
+        //var centAmount = (amount*100).toFixed(2);
+        var centAmount = 0;
+        var data = {
+            "email": this.accountEmail,
+            "name": this.$allStudentData.find(d => d.studentDetail.uniqueIdentification == paymentId).studentDetail.studentName,
+            "label": title,
+            "paymentType": paymentType,
+            "amount": parseFloat(centAmount),
+            "invoiceId": invoice_id,
+            "paymentId": paymentId,
+            "paymentLinkId": paymentLinkId,
+            "memberId": this.webflowMemberId,
+            "successUrl": encodeURI("https://www.nsdebatecamp.com/members/" + this.webflowMemberId + "?programName=" + title),
+            "cancelUrl": "https://www.nsdebatecamp.com/members/" + this.webflowMemberId,
+        }
+        // console.log('data', data)
+        // return;
+        var xhr = new XMLHttpRequest()
+        var $this = this;
+        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true)
+        xhr.withCredentials = false
+        xhr.send(JSON.stringify(data))
+        xhr.onload = function () {
+            let responseText = JSON.parse(xhr.responseText);
+            console.log('responseText', responseText)
+            if (responseText.success) {
+                span.innerHTML = link_title;
+                window.location.href = responseText.stripe_url;
+            }
+
+        }
+    }
+
+    progressBarInvoice() {
+        let percentageAmount = (this.$completedInvoiceOnly.length) ? (100 * this.$completedInvoiceOnly.length) / this.$totalInvoice : 0;
+        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly.length} of ${this.$totalInvoice} forms complete</div>
+                <div class="pre-camp_progress-bar">
+                    <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
+                </div>`;
+    }
+
+	
     /**
      * check program is started or not based on current date
      */
@@ -276,29 +493,68 @@ class NSDPortal {
         return preCampDiv;
     }
     formCategoryList(formCategory) {
+        let invoiceForm = formCategory.name;
+        let invoiceClass = (invoiceForm == 'Invoice') ? "invoice_grid" : "form_grid";
         formCategory.forms = this.filterInvoiceForms(formCategory.forms);
+        //Invoice Changes, Added div for preCamp section, when no form invoice present.
+        if (invoiceForm == 'Invoice' && !formCategory.forms.length) {
+            if (this.$invoices.invoiceList != null) {
+
+                return `<div>
+                    <div class="pre-camp_subtitle-wrapper">
+                        <div class="pre-camp_subtitle">Invoices</div>
+                        <div class="pre-camp_progress-container">
+                        ${this.progressBarInvoice()}
+                        </div>
+                    </div>
+                    <div class="pre-camp_grid ${invoiceClass}" id="invoice_${this.$studentDetail.uniqueIdentification}">
+                    </div>
+                </div>`;
+            }
+        }
+
         if (!formCategory.forms.length) {
             return;
 
         }
+        //*Invoice Changes, updated grid item div class below, to append invoice related forms
+        let gridItem = (invoiceForm == 'Invoice') ? `invoice_${this.$studentDetail.uniqueIdentification}` : `form_${this.$studentDetail.uniqueIdentification}`;
+        
+        
+        if(invoiceForm == "Invoice"){
+            this.$totalInvoice = formCategory.forms.length + this.$invoices.invoiceList.length;
+            return `
+            <div>
+            <div class="pre-camp_subtitle-wrapper">
+                <div class="pre-camp_subtitle">Invoices</div>
+                <div class="pre-camp_progress-container">
+                ${this.progressBarInvoice()}
+                </div>
+            </div>
+            <div class="pre-camp_grid ${invoiceClass}" id="${gridItem}">
+                    ${this.formsList(formCategory,'invoices')}
+                </div>
+            </div>
+            `;
+        }
         var formCategory = `<div>
                 <div class="pre-camp_subtitle">${formCategory.name}</div>
-                <div class="pre-camp_grid">
-                    ${this.formsList(formCategory)}
+                <div class="pre-camp_grid ${invoiceClass}" id="${gridItem}">
+                    ${this.formsList(formCategory, 'forms')}
                 </div>
             </div>`;
         return formCategory;
     }
-    formsList(formCategory) {
+    formsList(formCategory, type) {
         if (formCategory.forms.length == 0) {
             return ''
         }
         var forms = formCategory.forms.sort(function (r, a) {
             return r.sequence - a.sequence
-        }).map(form => this.singleForm(form)).join('')
+        }).map(form => this.singleForm(form, type)).join('')
         return forms;
     }
-    singleForm(form) {
+    singleForm(form, type) {
         //check it's editable
         let editable = this.checkForm(form.formId);
         let is_live = form.is_live;
@@ -334,7 +590,7 @@ class NSDPortal {
         } else {
             link_text = "Coming Soon";
         }
-        if (is_live) {
+        if (is_live && type == 'forms') {
             this.$totalForm++;
         }
         var singleForm = `
@@ -349,8 +605,8 @@ class NSDPortal {
         return singleForm;
     }
     progressBar() {
-        let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
-        return `<div class="pre-camp_subtitle opacity-50">${parseInt(percentageAmount)+'%'} / ${this.$completedForm.length} of ${this.$totalForm} forms complete</div>
+        let percentageAmount = (this.$completedFormOnly.length) ? (100 * this.$completedFormOnly.length) / this.$totalForm : 0;
+        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedFormOnly.length} of ${this.$totalForm} forms complete</div>
                 <div class="pre-camp_progress-bar">
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
