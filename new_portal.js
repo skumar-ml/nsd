@@ -60,6 +60,7 @@ class NSDPortal {
         //this.createPortalTabs(data);
 
 	//Invoice Changes
+	this.$allStudentData = data;
         this.createPortalTabs(data, invoiceData);
         setTimeout(this.updateInvoiceData(invoiceData), 1000)
         this.initializeToolTips();
@@ -415,8 +416,7 @@ class NSDPortal {
 
     /** Initialize stripe payment for invoice */
     initializeStripePayment(invoice_id, title, amount, paymentLinkId, span, link_title, paymentType, paymentId) {
-        //var centAmount = (amount*100).toFixed(2);
-        var centAmount = 0;
+        var centAmount = (amount*100).toFixed(2);
         var data = {
             "email": this.accountEmail,
             "name": this.$allStudentData.find(d => d.studentDetail.uniqueIdentification == paymentId).studentDetail.studentName,
