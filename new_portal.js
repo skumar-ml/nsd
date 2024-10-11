@@ -322,7 +322,6 @@ class NSDPortal {
         const linkContainer = document.createElement('div');
         linkContainer.classList.add('linkContainer');
         var jotFormUrlLink = invoice.jotFormUrlLink;
-        var paymentLink;
 
         let info_text = this.creEl('span', 'info_text')
         info_text.innerHTML = 'i';
@@ -330,7 +329,7 @@ class NSDPortal {
             jotFormUrlLink.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
             if (jotFormUrlLink.length > 0) {
                 jotFormUrlLink.forEach(link => {
-                    paymentLink = document.createElement('a');
+                    let paymentLink = document.createElement('a');
                     paymentLink.classList.add('dashboard_link-block', 'w-inline-block', link.paymentType);
                     const paymentText = document.createElement('div');
                     paymentText.classList.add('dm-sans', 'opacity-70');
