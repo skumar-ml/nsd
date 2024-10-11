@@ -615,7 +615,7 @@ class NSDPortal {
         const debateEvent = this.$programDetail.debateEvent;
         const duringCampDiv = document.createElement('div');
         duringCampDiv.className = 'during-camp_div';
-        
+
         duringCampDiv.innerHTML = `
             <div class="pre-camp_title-content-wrapper">
                 <div id="w-node-_8e292b85-7013-e53b-a349-66617a361c36-b55b4cc9" class="pre-camp_title-div bg-blue">
@@ -626,6 +626,11 @@ class NSDPortal {
                 </div>
             </div>
             ${ this.getCampTopicData() ? this.getCampTopicData() : 'Resources not available for this camp'}
+            <div>
+                    <div class="pre-camp_subtitle">Invoice</div>
+                    <div class="pre-camp_grid" id="during_invoice_${this.$studentDetail.uniqueIdentification}">
+                    </div>
+                </div>
             ${this.getAllResources()}
         `;
 
