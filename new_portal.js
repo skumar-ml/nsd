@@ -12,6 +12,8 @@ class NSDPortal {
     $uploadedContent = {};
     $startDate = '';
     $endDate = '';
+    /**New Variable */
+    $allStudentData = []
     constructor(webflowMemberId, accountEmail, apiBaseUrl) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
@@ -206,7 +208,7 @@ class NSDPortal {
         this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No");
         this.$completedInvoiceOnly = tab.formCompletedList.filter(i => i.isInvoice == "Yes").length;
         this.invoiceData = []
-	    
+	this.$totalInvoice = 0;    
         this.$formsList = tab.formList;
         this.$programCategory = tab.programCategory;
         this.$studentDetail = tab.studentDetail;
