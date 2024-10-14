@@ -227,6 +227,12 @@ class NSDPortal {
             return r.sequence - a.sequence
         });
         var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
+
+	// for online program invoice list
+        if(this.$programCategory.programCategoryId == 3333){
+            formList += this.invoiceList()
+        }
+	
         var pre_camp_html = this.createPreCampContent(formList);
         var during_camp_html = this.createDuringCampContent();
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
@@ -491,6 +497,20 @@ class NSDPortal {
 
         return preCampDiv;
     }
+
+   invoiceList() {
+        return `<div>
+                    <div class="pre-camp_subtitle-wrapper">
+                        <div class="pre-camp_subtitle">Invoices</div>
+                        <div class="pre-camp_progress-container">
+                        ${this.progressBarInvoice()}
+                        </div>
+                    </div>
+                    <div class="pre-camp_grid invoice_grid" id="invoice_${this.$studentDetail.uniqueIdentification}">
+                    </div>
+                </div>`;
+    }	
+   
     formCategoryList(formCategory) {
         let invoiceForm = formCategory.name;
         let invoiceClass = (invoiceForm == 'Invoice') ? "invoice_grid" : "form_grid";
@@ -499,16 +519,7 @@ class NSDPortal {
         if (invoiceForm == 'Invoice' && !formCategory.forms.length) {
             if (this.$invoices.invoiceList != null) {
 
-                return `<div>
-                    <div class="pre-camp_subtitle-wrapper">
-                        <div class="pre-camp_subtitle">Invoices</div>
-                        <div class="pre-camp_progress-container">
-                        ${this.progressBarInvoice()}
-                        </div>
-                    </div>
-                    <div class="pre-camp_grid ${invoiceClass}" id="invoice_${this.$studentDetail.uniqueIdentification}">
-                    </div>
-                </div>`;
+                return this.invoiceList();
             }
         }
 
