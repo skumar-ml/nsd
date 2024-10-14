@@ -140,6 +140,10 @@ class NSDPortal {
 		
 		//Invoice Changes, Getting current tab invoice data
                 this.$invoices = invoiceData.find(i => i.paymentId == tab.studentDetail.uniqueIdentification)
+		if(this.$invoices.invoiceList != null){
+                    this.$completedInvoiceOnly = this.$completedInvoiceOnly + this.$invoices.invoiceList.filter(i=> i.is_completed == true).length
+                    console.log('this.$completedInvoiceOnly', this.$completedInvoiceOnly)
+                }
 		    
                 var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
                 // Append the tab header and content to their respective containers
@@ -200,7 +204,7 @@ class NSDPortal {
 	    
 	//Invoice Changes, Only getting form and invoice related completed form
         this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No");
-        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => i.isInvoice == "Yes");
+        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => i.isInvoice == "Yes").length;
         this.invoiceData = []
 	    
         this.$formsList = tab.formList;
@@ -455,8 +459,8 @@ class NSDPortal {
     }
 
    progressBarInvoice() {
-        let percentageAmount = (this.$completedInvoiceOnly.length) ? (100 * this.$completedInvoiceOnly.length) / this.$totalInvoice : 0;
-        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly.length} of ${(this.$totalInvoice)? this.$totalInvoice : 1} invoices complete</div>
+        let percentageAmount = (this.$completedInvoiceOnly) ? (100 * this.$completedInvoiceOnly) / this.$totalInvoice : 0;
+        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly} of ${(this.$totalInvoice)? this.$totalInvoice : 1} invoices complete</div>
                 <div class="pre-camp_progress-bar">
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
