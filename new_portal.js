@@ -229,7 +229,7 @@ class NSDPortal {
         var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
 
 	// for online program invoice list
-        if(this.$programCategory.programCategoryId == 3333){
+        if(this.$programCategory.programCategoryId == 3333 && this.$invoices.invoiceList != null){
             formList += this.invoiceList()
         }
 	
@@ -350,6 +350,7 @@ class NSDPortal {
                 })
             }
         } else {
+	    let paymentLink = document.createElement('a');
             paymentLink = document.createElement('a');
             paymentLink.classList.add('dashboard_link-block', 'w-inline-block');
             const paymentText = document.createElement('div');
