@@ -447,9 +447,9 @@ class NSDPortal {
         }
     }
 
-    progressBarInvoice() {
+   progressBarInvoice() {
         let percentageAmount = (this.$completedInvoiceOnly.length) ? (100 * this.$completedInvoiceOnly.length) / this.$totalInvoice : 0;
-        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly.length} of ${this.$totalInvoice} forms complete</div>
+        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly.length} of ${(this.$totalInvoice)? this.$totalInvoice : 1} invoices complete</div>
                 <div class="pre-camp_progress-bar">
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
