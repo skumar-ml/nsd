@@ -504,6 +504,7 @@ class NSDPortal {
     }
 
    invoiceList() {
+	   this.$totalInvoice +=  this.$invoices.invoiceList.length;
         return `<div>
                     <div class="pre-camp_subtitle-wrapper">
                         <div class="pre-camp_subtitle">Invoices</div>
