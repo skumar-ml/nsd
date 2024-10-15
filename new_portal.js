@@ -131,11 +131,12 @@ class NSDPortal {
                 tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
                 tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
                 tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
+		let dateString = "| "+this.$startDate.toLocaleString('default', { month: 'long' }) +" "+this.$startDate.getDate()+" - "+this.$endDate.toLocaleString('default', { month: 'long' })+" "+this.$endDate.getDate()
                 tabHeader.innerHTML = `
                 <div>
                     <div class="current-program_content-div">
                         <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()} </div>
+                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} ${ (!tab.programDetail.hideDates) ? dateString: "" } </div>
                     </div>
                 </div>
             `;
