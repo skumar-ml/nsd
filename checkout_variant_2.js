@@ -7,20 +7,20 @@
 function creEl(name, className, idName) {
 	var el = document.createElement(name);
 	if (className) {
-	  el.className = className;
+		el.className = className;
 	}
 	if (idName) {
-	  el.setAttribute("id", idName);
+		el.setAttribute("id", idName);
 	}
 	return el;
-  }
-  /**
-   * CheckOutWebflow Class is used to intigrate with stripe payment.
-   * In this API we pass baseUrl, memberData.
-   * In this class we are manipulating student form and member data
-   */
-  
-  class CheckOutWebflow {
+}
+/**
+ * CheckOutWebflow Class is used to intigrate with stripe payment.
+ * In this API we pass baseUrl, memberData.
+ * In this class we are manipulating student form and member data
+ */
+
+class CheckOutWebflow {
 	$suppPro = [];
 	$checkoutData = "";
 	$checkOutResponse = false;
@@ -512,7 +512,6 @@ function creEl(name, className, idName) {
 	  var next_page_2 = document.getElementById("next_page_2");
 	  var prev_page_1 = document.getElementById("prev_page_1");
 	  var prev_page_2 = document.getElementById("prev_page_2");
-      var skip_page_2 = document.getElementById("skip_page_2");
 	  var checkoutFormError = document.getElementById("checkout-form-error");
 	  var $this = this;
 	  var form = $("#checkout-form");
@@ -534,6 +533,7 @@ function creEl(name, className, idName) {
 					$this.updateStudentDetails(checkoutData);
 				})
 			 }
+			 $this.displayUpSellModal();
 		  } else {
 			checkoutFormError.style.display = "block";
 		  }
@@ -541,9 +541,6 @@ function creEl(name, className, idName) {
 	  });
 	  prev_page_1.addEventListener("click", function () {
 		$this.activateDiv("checkout_program");
-	  });
-      skip_page_2.addEventListener("click", function () {
-		$this.activateDiv("checkout_payment");
 	  });
 	  prev_page_2.addEventListener("click", function () {
 		// click on back button reinitialze payment tab
@@ -773,22 +770,164 @@ function creEl(name, className, idName) {
 		// Handle previous and next button
 		this.addEventForPrevNaxt();
 		// activate program tab
-		this.activateDiv("checkout_program");
+		this.activateDiv("checkout_student_details");
 		// loader icon code
 		var spinner = document.getElementById("half-circle-spinner");
 		spinner.style.display = "block";
 		// API call
-		const data = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
+		//const data = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
 		// Display supplementary program
-		this.displaySupplimentaryProgram(data);
+		//this.displaySupplimentaryProgram(data);
 		// Setup back button for browser and stripe checkout page
 		this.setUpBackButtonTab();
 		// Update basic data
 		this.updateBasicData();
 		// Hide spinner
 		spinner.style.display = "none";
+		this.updateOldStudentList();
 	  } catch (error) {
 		console.error("Error rendering random number:", error);
 	  }
 	}
-  }
+
+
+	/**New Code for select old student */
+
+	//updateOldStudentList
+	async updateOldStudentList() {
+		const selectBox = document.getElementById('old-student')
+		var $this = this;
+		try {
+			const data = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId);
+			//finding unique value and sorting by firstName
+			const filterData = data.filter((item, index, self) =>
+				index === self.findIndex(obj => obj.studentEmail === item.studentEmail)
+			  ).sort(function(a, b){ return a.firstName.trim().localeCompare(b.firstName.trim())})
+			// Clear existing options
+			selectBox.innerHTML = '';
+			// Add a "Please select" option
+			const defaultOption = document.createElement('option');
+			defaultOption.value = '';
+			defaultOption.textContent = 'Please select';
+			selectBox.appendChild(defaultOption);
+			// Add new options from the API data
+			filterData.forEach((item, index) => {
+				const option = document.createElement('option');
+				option.value = index; 
+				option.textContent = `${item.firstName} ${item.lastName}`;
+				selectBox.appendChild(option);
+			});
+			selectBox.addEventListener('change',function(event){
+				var checkoutJson = localStorage.getItem("checkOutBasicData");
+				var data = {
+					studentEmail: filterData[event.target.value].studentEmail,
+					firstName: filterData[event.target.value].firstName,
+					lastName: filterData[event.target.value].lastName,
+					grade: filterData[event.target.value].studentGrade,
+					school: filterData[event.target.value].school,
+					gender: filterData[event.target.value].gender,
+				};
+				localStorage.setItem("checkOutBasicData", JSON.stringify(data));
+				$this.updateBasicData();
+			})
+		} catch (error) {
+			console.error('Error fetching API data:', error);
+
+			// Handle errors (optional)
+			selectBox.innerHTML = '<option value="">Failed to load options</option>';
+		}
+	}
+	displayUpSellModal(){
+		if(this.memberData.productType != 'core'){
+			return;
+		}
+		const modal = document.getElementById('upsell-modal-1');
+		var $this = this;
+		const noThanks = document.getElementsByClassName('no-thanks');
+		   
+			  if (modal) {
+				  console.log('Showing modal on page load');
+				   this.showUpSellModal(modal);
+			  } else {
+				   console.log('Modal element not found.');
+			   }
+			if(noThanks){
+				for (let index = 0; index < noThanks.length; index++) {
+					const element = noThanks[index];
+					element.addEventListener('click', function (){
+						$this.hideUpSellModal(modal)
+						
+					})
+					
+				}
+			}
+			this.addToCart()
+		   
+	}
+	showUpSellModal(modal){
+		const check_up_sell = this.checkUpSellModalOpen();
+		console.log('check_up_sell', check_up_sell)
+		if(check_up_sell){
+			return;
+		}
+		modal.classList.add('show');
+		modal.style.display = 'flex';
+		document.querySelector('.student-info_modal-bg').setAttribute('aria-hidden', 'false');
+	}
+	checkUpSellModalOpen(){
+		let isOpen = false;
+		const addToCartButtons = document.querySelectorAll(".add-to-card");
+		addToCartButtons.forEach(button => {
+			const parent = button.closest(".btn-reserve-spot");
+			if (parent) {
+				const checkbox = parent.querySelector(".suppCheckbox");
+				isOpen = checkbox.checked
+			}
+		})
+		return isOpen;
+	}
+	hideUpSellModal(modal){
+		modal.classList.remove('show');
+		modal.style.display = 'none';
+		document.querySelector('.student-info_modal-bg').removeAttribute('aria-hidden');
+	}
+	addToCart(){
+		// Select all 'add-to-card' buttons
+		const addToCartButtons = document.querySelectorAll(".add-to-card");
+		var $this = this;
+		addToCartButtons.forEach(button => {
+		  button.addEventListener("click", function (event) {
+			event.preventDefault(); // Prevent default link behavior
+	  
+			// Find the parent container with the 'btn-reserve-spot' class
+			const parent = button.closest(".btn-reserve-spot");
+	  
+			if (parent) {
+			  // Locate the child checkbox within the parent container
+			  const checkbox = parent.querySelector(".suppCheckbox");
+	  
+			  if (checkbox) {
+				// Toggle the checkbox state
+				checkbox.checked = !checkbox.checked;
+				//if(checkbox.checked){
+					$this.updateAmount(checkbox, '715.5');
+				//}
+	  
+				// Update the button text based on the checkbox state
+				button.textContent = checkbox.checked ? "Added" : "Add to Cart";
+	  
+				// Optional: Add or remove a disabled class (if needed)
+				button.classList.toggle("disabled", checkbox.checked);
+				setTimeout(() => {
+					const modal = document.getElementById('upsell-modal-1');
+					$this.hideUpSellModal(modal)	
+				}, 1000);
+				
+			  }
+			}
+		  });
+		});
+	}
+
+
+}
