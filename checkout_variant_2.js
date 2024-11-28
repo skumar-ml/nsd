@@ -983,7 +983,7 @@ class CheckOutWebflow {
 		var $this = this;
 		input.addEventListener("change",function(){
 			this.checked ? outerDiv.classList.add('border-red') : outerDiv.classList.remove('border-red') 
-			$this.updateAmount(this, suppData.amount);
+			$this.updateAmount(this, item.amount);
 		})
 
 		const span = document.createElement("span");
