@@ -364,7 +364,8 @@ class CheckOutWebflow {
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
 				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programName=" + this.memberData.programName,
-				"cancelUrl": cancelUrl.href,
+				//"cancelUrl": cancelUrl.href,
+				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
@@ -520,11 +521,12 @@ class CheckOutWebflow {
 		var form = $("#checkout-form");
 		next_page_1.addEventListener("click", function () {
 			$this.activateDiv("checkout_student_details");
-			initialCheckout = $this.initializeStripePayment();
+			//initialCheckout = $this.initializeStripePayment();
 		});
 		next_page_2.addEventListener("click", function () {
 			
 			if (form.valid()) {
+				initialCheckout = $this.initializeStripePayment();
 				$this.displaySupplementaryProgram();
 				$this.storeBasicData();
 				// validation for student email different form Parent email
@@ -846,7 +848,7 @@ class CheckOutWebflow {
 		}
 	}
 	displayUpSellModal() {
-		if (this.memberData.productType != 'core') {
+		if (this.memberData.hide_upsell) {
 			return;
 		}
 		const modal = document.getElementById('upsell-modal-1');
