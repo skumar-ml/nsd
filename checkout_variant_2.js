@@ -905,10 +905,11 @@ class CheckOutWebflow {
 		var $this = this;
 		addToCartButtons.forEach(button => {
 			button.addEventListener("click", function (event) {
+				
 				event.preventDefault(); // Prevent default link behavior
 
 				// Find the parent container with the 'btn-reserve-spot' class
-				const parent = button.closest(".btn-reserve-spot");
+				const parent = button.closest(".button_add-to-card");
 
 				if (parent) {
 					// Locate the child checkbox within the parent container
@@ -926,10 +927,14 @@ class CheckOutWebflow {
 
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
+						
+						while ($this.$suppPro.length == 0) {
+							console.log("$this.$suppPro.length", $this.$suppPro.length)	
+						}
 						setTimeout(() => {
 							const modal = document.getElementById('upsell-modal-1');
 							$this.hideUpSellModal(modal)
-						}, 1000);
+						}, 100);
 
 					}
 				}
@@ -937,10 +942,15 @@ class CheckOutWebflow {
 		});
 	}
 	async displaySupplementaryProgram() {
+
+		if (this.$suppPro.length > 0) return;
 		// Get the container element
 		let container = document.getElementById("checkout-supplimentary-data");
 		container.innerHTML = "loading..."
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
+		// Added in our Local Data
+		this.$suppPro = apiData;
+		
 		apiData = apiData.filter(i=>i.programDetailId != 12)
 		container.innerHTML = ""
 		apiData.forEach(item => {
@@ -1083,3 +1093,4 @@ class CheckOutWebflow {
 	}
 
 }
+
