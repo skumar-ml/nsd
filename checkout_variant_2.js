@@ -14,7 +14,6 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
-
 /**
  * CheckOutWebflow Class is used to intigrate with stripe payment.
  * In this API we pass baseUrl, memberData.
@@ -206,7 +205,7 @@ class CheckOutWebflow {
 			let offeringType = creEl("div", "dm-sans offering-type");
 			offeringType.innerHTML = sup.label;
 			let OfferingPrice = creEl("div", "dm-sans offering-price")
-			OfferingPrice.innerHTML = sup.amount
+			OfferingPrice.innerHTML = "$"+sup.amount
 			suppProDiv.prepend(offeringType, OfferingPrice)
 		});
 		selectedSuppPro.appendChild(suppProDiv);
@@ -1107,4 +1106,3 @@ class CheckOutWebflow {
 	}
 
 }
-
