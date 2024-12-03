@@ -191,7 +191,7 @@ class CheckOutWebflow {
 		// Selected supplementary program list
 		// Heading for supplementary program with icon
 		let headContainer = creEl('div', 'horizontal-div supp-program')
-		let head = creEl("p", "dm-sans font-14 ");
+		let head = creEl("p", "dm-sans bold-700 ");
 		head.innerHTML = "Supplementary Program";
 		let headIcon = creEl("img");
 		headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
