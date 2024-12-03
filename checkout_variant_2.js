@@ -191,7 +191,7 @@ class CheckOutWebflow {
 		// Selected supplementary program list
 		// Heading for supplementary program with icon
 		let headContainer = creEl('div', 'horizontal-div supp-program')
-		let head = creEl("p", "dm-sans bold-700 ");
+		let head = creEl("p", "dm-sans bold-700");
 		head.innerHTML = "Supplementary Program";
 		let headIcon = creEl("img");
 		headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
@@ -200,15 +200,17 @@ class CheckOutWebflow {
 		selectedSuppPro.appendChild(headContainer);
 		
 		// Supplementary program name and price list
-		var suppProDiv = creEl('div', 'horizontal-div align-left');
+		
 		selectedData.forEach((sup) => {
+			var suppProDiv = creEl('div', 'horizontal-div align-left');
 			let offeringType = creEl("div", "dm-sans offering-type");
 			offeringType.innerHTML = sup.label;
 			let OfferingPrice = creEl("div", "dm-sans offering-price")
 			OfferingPrice.innerHTML = "$"+sup.amount
 			suppProDiv.prepend(offeringType, OfferingPrice)
+			selectedSuppPro.appendChild(suppProDiv);
 		});
-		selectedSuppPro.appendChild(suppProDiv);
+		
 
 	}
 	// This method use to display selected supplementary program in sidebar
