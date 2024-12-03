@@ -14,6 +14,7 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+
 /**
  * CheckOutWebflow Class is used to intigrate with stripe payment.
  * In this API we pass baseUrl, memberData.
@@ -185,20 +186,31 @@ class CheckOutWebflow {
 			respricelabel.innerHTML = "Price";
 			selectedSuppPro.classList.add("added_supp_data");
 		}
-		// Selected supplementary program heading
-		var head = creEl("p", "dm-sans font-14 order-summary-border bold marginbottom-3");
+        
+		
+
+		// Selected supplementary program list
+		// Heading for supplementary program with icon
+		let headContainer = creEl('div', 'horizontal-div supp-program')
+		let head = creEl("p", "dm-sans font-14 ");
 		head.innerHTML = "Supplementary Program";
-		selectedSuppPro.appendChild(head);
-		var label = "";
-		// Added single supplementary program heading in sidebar
+		let headIcon = creEl("img");
+		headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
+		headIcon.setAttribute('loading', "lazy")
+		headContainer.prepend(head,headIcon);
+		selectedSuppPro.appendChild(headContainer);
+		
+		// Supplementary program name and price list
+		var suppProDiv = creEl('div', 'horizontal-div align-left');
 		selectedData.forEach((sup) => {
-			label = creEl("p", "dm-sans font-14 bold program-bottom-margin");
-			label.innerHTML = sup.label;
-			selectedSuppPro.appendChild(label);
-			// label = creEl("p", "dm-sans font-14");
-			// label.innerHTML = sup.desc;
-			// selectedSuppPro.appendChild(label);
+			let offeringType = creEl("div", "dm-sans offering-type");
+			offeringType.innerHTML = sup.label;
+			let OfferingPrice = creEl("div", "dm-sans offering-price")
+			OfferingPrice.innerHTML = sup.amount
+			suppProDiv.prepend(offeringType, OfferingPrice)
 		});
+		selectedSuppPro.appendChild(suppProDiv);
+
 	}
 	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppProgramMobile(suppIds) {
@@ -231,7 +243,7 @@ class CheckOutWebflow {
 			// Added single supplementary program heading in sidebar
 			selectedData.forEach((sup) => {
 				label = creEl("p", "dm-sans font-14 bold program-bottom-margin");
-				label.innerHTML = sup.label;
+				label.innerHTML = sup.label+" "+sup.amount;
 				selectedSuppPro.appendChild(label);
 				// label = creEl("p", "dm-sans font-14");
 				// label.innerHTML = sup.desc;
@@ -364,8 +376,8 @@ class CheckOutWebflow {
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
 				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programName=" + this.memberData.programName,
-				"cancelUrl": cancelUrl.href,
-				//"cancelUrl": "https://www.nsdebatecamp.com/",
+				//"cancelUrl": cancelUrl.href,
+				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
