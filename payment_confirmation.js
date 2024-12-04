@@ -192,8 +192,8 @@ class PaymentConfirmation {
         const data = {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
-            "successUrl": "https://nsd-webflow-subdomain-ccf6529d61db54e28.webflow.io/members/" + this.webFlowMemberId,
-            "cancelUrl": "https://nsd-webflow-subdomain-ccf6529d61db54e28.webflow.io/payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
+            "successUrl": "https://www.nsdebatecamp.com/members/" + this.webFlowMemberId,
+            "cancelUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
             "label": programName,
             "amount": parseFloat(amount*100)
         };
