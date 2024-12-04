@@ -1026,7 +1026,7 @@ class CheckOutWebflow {
 				}
 				//_care_package_add_to_card
 				if(this.classList.contains('care_package_add_to_card ')){
-					const _care_package_add_to_card = document.querySelectorAll("care_package_add_to_card ");
+					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
 					_care_package_add_to_card.forEach(add_to_card_btn => {
 						add_to_card_btn.textContent = "Added";
 						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
