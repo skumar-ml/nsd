@@ -376,7 +376,7 @@ class CheckOutWebflow {
 				"email": this.memberData.email,
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
-				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programName=" + this.memberData.programName,
+				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId="+this.memberData.programId+"&programName=" + this.memberData.programName,
 				//"cancelUrl": cancelUrl.href,
 				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
@@ -456,63 +456,66 @@ class CheckOutWebflow {
 	}
 	// API call for checkout URL 
 	updateStudentDetails(checkoutUrl) {
-		var studentFirstName = document.getElementById('Student-First-Name');
-		var studentLastName = document.getElementById('Student-Last-Name');
-		var studentEmail = document.getElementById('Student-Email');
-		var studentGrade = document.getElementById('Student-Grade');
-		var studentSchool = document.getElementById('Student-School');
-		var studentGender = document.getElementById('Student-Gender');
-		var suppProIdE = document.getElementById('suppProIds');
-		var core_product_price = document.getElementById('core_product_price');
+		return new Promise((resolve, reject) => {
+			var studentFirstName = document.getElementById('Student-First-Name');
+			var studentLastName = document.getElementById('Student-Last-Name');
+			var studentEmail = document.getElementById('Student-Email');
+			var studentGrade = document.getElementById('Student-Grade');
+			var studentSchool = document.getElementById('Student-School');
+			var studentGender = document.getElementById('Student-Gender');
+			var suppProIdE = document.getElementById('suppProIds');
+			var core_product_price = document.getElementById('core_product_price');
 
-		//Payment button
-		var ach_payment = document.getElementById('ach_payment');
-		var card_payment = document.getElementById('card_payment');
-		var paylater_payment = document.getElementById('paylater_payment');
-		ach_payment.innerHTML = "Processing..."
-		ach_payment.disabled = true;
-		card_payment.innerHTML = "Processing..."
-		card_payment.disabled = true;
-		paylater_payment.innerHTML = "Processing..."
-		paylater_payment.disabled = true;
-		//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
-		var cancelUrl = new URL(window.location.href);
-		cancelUrl.searchParams.append('returnType', 'back')
-		let studentEmailValue = studentEmail.value;
-		let lowercaseStudentEmailValue = studentEmailValue.toLowerCase()
-		var data = {
-			"studentEmail": lowercaseStudentEmailValue,
-			"firstName": studentFirstName.value,
-			"lastName": studentLastName.value,
-			"grade": studentGrade.value,
-			"label": this.memberData.programName,
-			"school": studentSchool.value,
-			"gender": studentGender.value,
-			"memberId": this.memberData.memberId,
-			"checkoutUrls": checkoutUrl,
+			//Payment button
+			var ach_payment = document.getElementById('ach_payment');
+			var card_payment = document.getElementById('card_payment');
+			var paylater_payment = document.getElementById('paylater_payment');
+			ach_payment.innerHTML = "Processing..."
+			ach_payment.disabled = true;
+			card_payment.innerHTML = "Processing..."
+			card_payment.disabled = true;
+			paylater_payment.innerHTML = "Processing..."
+			paylater_payment.disabled = true;
+			//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
+			var cancelUrl = new URL(window.location.href);
+			cancelUrl.searchParams.append('returnType', 'back')
+			let studentEmailValue = studentEmail.value;
+			let lowercaseStudentEmailValue = studentEmailValue.toLowerCase()
+			var data = {
+				"studentEmail": lowercaseStudentEmailValue,
+				"firstName": studentFirstName.value,
+				"lastName": studentLastName.value,
+				"grade": studentGrade.value,
+				"label": this.memberData.programName,
+				"school": studentSchool.value,
+				"gender": studentGender.value,
+				"memberId": this.memberData.memberId,
+				"checkoutUrls": checkoutUrl,
 
-		}
-		var checkoutData = localStorage.getItem('checkOutData');
-		var mergedData = {
-			...data,
-			...JSON.parse(checkoutData)
-		}
-		localStorage.setItem("checkOutData", JSON.stringify(mergedData));
-		var xhr = new XMLHttpRequest()
-		var $this = this;
+			}
+			var checkoutData = localStorage.getItem('checkOutData');
+			var mergedData = {
+				...data,
+				...JSON.parse(checkoutData)
+			}
+			localStorage.setItem("checkOutData", JSON.stringify(mergedData));
+			var xhr = new XMLHttpRequest()
+			var $this = this;
 
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
-		xhr.withCredentials = false
-		xhr.send(JSON.stringify(data))
-		xhr.onload = function () {
-			ach_payment.innerHTML = "Checkout"
-			ach_payment.disabled = false;
-			card_payment.innerHTML = "Checkout"
-			card_payment.disabled = false;
-			paylater_payment.innerHTML = "Checkout"
-			paylater_payment.disabled = false;
-			$this.addSessionId()
-		}
+			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
+			xhr.withCredentials = false
+			xhr.send(JSON.stringify(data))
+			xhr.onload = function () {
+				ach_payment.innerHTML = "Checkout"
+				ach_payment.disabled = false;
+				card_payment.innerHTML = "Checkout"
+				card_payment.disabled = false;
+				paylater_payment.innerHTML = "Checkout"
+				paylater_payment.disabled = false;
+				$this.addSessionId()
+				resolve(true);
+			}
+		});
 	}
 	// Hide and show tab for program selection, student infor and checkout payment
 	activateDiv(divId) {
@@ -564,6 +567,7 @@ class CheckOutWebflow {
 		prev_page_2.addEventListener("click", function () {
 			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
+			document.getElementById('pay-now-link').closest('div').style.display = "none";
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
 			setTimeout(function () {
 				$(".w-tab-link").removeClass("w--current");
@@ -600,8 +604,16 @@ class CheckOutWebflow {
 		ach_payment.addEventListener("click", function () {
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
-			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.achUrl;
+			let initialCheckout = $this.initializeStripePayment();
+			if (initialCheckout) {
+				initialCheckout.then(() => {
+					var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
+					return $this.updateStudentDetails(checkoutData);
+				}).then(()=>{
+					ibackbutton.value = "1";
+					window.location.href = $this.$checkoutData.achUrl;
+				})
+			}
 		});
 		card_payment.addEventListener("click", function () {
 			// card_payment.innerHTML = "Processing..."
@@ -922,7 +934,7 @@ class CheckOutWebflow {
 			const parent = button.closest(".button_add-to-card");
 			if (parent) {
 				const checkbox = parent.querySelector(".suppCheckbox");
-				if(checkbox.checked){
+				if (checkbox.checked) {
 					isOpen = checkbox.checked
 				}
 			}
@@ -954,7 +966,7 @@ class CheckOutWebflow {
 						// Toggle the checkbox state
 						checkbox.checked = !checkbox.checked;
 						//if(checkbox.checked){
-						$this.updateAmount(checkbox, '715.5');
+						$this.updateAmount(checkbox, checkbox.value);
 						//}
 
 						// Update the button text based on the checkbox state
@@ -988,7 +1000,7 @@ class CheckOutWebflow {
 		let prep_week_searchText = "topic prep week";
 		let tutoring_week_searchText = "5 hours";
 		//let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
-		let variant_type = this.memberData.variant_type
+		let variant_type = this.getVariant();
 		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
 		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
@@ -1011,19 +1023,20 @@ class CheckOutWebflow {
 		if (prep_week_data.length > 0) {
 			var tpwAmount = document.getElementById('tpw-amount');
 			if (tpwAmount != undefined) {
-				tpwAmount.innerHTML = "$"+parseFloat(prep_week_data[0].amount).toFixed(2);
+				tpwAmount.innerHTML = "$" + parseFloat(prep_week_data[0].amount).toFixed(2);
 			}
 			var tpwSaveAmount = document.getElementById('tpw-save-amount');
 			if (tpwSaveAmount != undefined) {
-				tpwSaveAmount.innerHTML = "$"+parseFloat(prep_week_data[0].disc_amount - prep_week_data[0].amount).toFixed(2)
+				tpwSaveAmount.innerHTML = "$" + parseFloat(prep_week_data[0].disc_amount - prep_week_data[0].amount).toFixed(2)
 			}
 			var tpwDescAmount = document.getElementById('tpw-desc-amount');
 			if (tpwDescAmount != undefined) {
-				tpwDescAmount.innerHTML = "$"+parseFloat(prep_week_data[0].disc_amount).toFixed(2)
+				tpwDescAmount.innerHTML = "$" + parseFloat(prep_week_data[0].disc_amount).toFixed(2)
 			}
 			var upsellTpwProgranId = document.getElementById('upsellTpwProgranId');
 			if (upsellTpwProgranId != undefined) {
 				upsellTpwProgranId.setAttribute('programdetailid', prep_week_data[0].programDetailId)
+				upsellTpwProgranId.value = prep_week_data[0].amount
 			}
 		}
 
@@ -1031,19 +1044,20 @@ class CheckOutWebflow {
 		if (tutoring_data.length > 0) {
 			var tutoAmount = document.getElementById('tuto-amount');
 			if (tutoAmount != undefined) {
-				tutoAmount.innerHTML = "$"+parseFloat(tutoring_data[0].amount).toFixed(2);
+				tutoAmount.innerHTML = "$" + parseFloat(tutoring_data[0].amount).toFixed(2);
 			}
 			var tutoSaveAmount = document.getElementById('tuto-save-amount');
 			if (tutoSaveAmount != undefined) {
-				tutoSaveAmount.innerHTML = "$"+parseFloat(tutoring_data[0].disc_amount - tutoring_data[0].amount).toFixed(2)
+				tutoSaveAmount.innerHTML = "$" + parseFloat(tutoring_data[0].disc_amount - tutoring_data[0].amount).toFixed(2)
 			}
 			var tutoDescAmount = document.getElementById('tuto-desc-amount');
 			if (tutoDescAmount != undefined) {
-				tutoDescAmount.innerHTML = "$"+parseFloat(tutoring_data[0].disc_amount).toFixed(2)
+				tutoDescAmount.innerHTML = "$" + parseFloat(tutoring_data[0].disc_amount).toFixed(2)
 			}
 			var upsellTutoProgranId = document.getElementById('upsellTutoProgranId');
 			if (upsellTutoProgranId != undefined) {
 				upsellTutoProgranId.setAttribute('programdetailid', tutoring_data[0].programDetailId)
+				upsellTutoProgranId.value = tutoring_data[0].amount
 			}
 
 		}
@@ -1179,6 +1193,15 @@ class CheckOutWebflow {
 		outerDiv.appendChild(gridDiv);
 
 		return outerDiv;
+	}
+	getVariant(){
+		let variant = 1;
+		//let topicPripUpSellModal = document.querySelector('.topic-prep_modal-container')
+		let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
+		if (window.getComputedStyle(tutoringUpSellModal).display === 'block') {
+			variant = 2;
+		}
+		return variant
 	}
 
 }
