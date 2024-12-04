@@ -1058,7 +1058,7 @@ class CheckOutWebflow {
 		} else {
 			apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
 		}
-
+		apiData = apiData.filter(i => i.programDetailId != 21);
 		container.innerHTML = ""
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
