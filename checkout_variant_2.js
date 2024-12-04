@@ -185,8 +185,8 @@ class CheckOutWebflow {
 			respricelabel.innerHTML = "Price";
 			selectedSuppPro.classList.add("added_supp_data");
 		}
-        
-		
+
+
 
 		// Selected supplementary program list
 		// Heading for supplementary program with icon
@@ -196,21 +196,21 @@ class CheckOutWebflow {
 		let headIcon = creEl("img");
 		headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
 		headIcon.setAttribute('loading', "lazy")
-		headContainer.prepend(head,headIcon);
+		headContainer.prepend(head, headIcon);
 		selectedSuppPro.appendChild(headContainer);
-		
+
 		// Supplementary program name and price list
-		
+
 		selectedData.forEach((sup) => {
 			var suppProDiv = creEl('div', 'horizontal-div align-left');
 			let offeringType = creEl("div", "dm-sans offering-type");
 			offeringType.innerHTML = sup.label;
-			let OfferingPrice = creEl("div", "dm-sans offering-price")
-			OfferingPrice.innerHTML = "$"+sup.amount
-			suppProDiv.prepend(offeringType, OfferingPrice)
+			let OfferingPrice = creEl("div", "dm-sans offering-price");
+			OfferingPrice.innerHTML = "$" + parseFloat(sup.amount).toFixed(2);
+			suppProDiv.prepend(offeringType, OfferingPrice);
 			selectedSuppPro.appendChild(suppProDiv);
 		});
-		
+
 
 	}
 	// This method use to display selected supplementary program in sidebar
@@ -244,7 +244,7 @@ class CheckOutWebflow {
 			// Added single supplementary program heading in sidebar
 			selectedData.forEach((sup) => {
 				label = creEl("p", "dm-sans font-14 bold program-bottom-margin");
-				label.innerHTML = sup.label+" "+sup.amount;
+				label.innerHTML = sup.label + " " + sup.amount;
 				selectedSuppPro.appendChild(label);
 				// label = creEl("p", "dm-sans font-14");
 				// label.innerHTML = sup.desc;
@@ -537,10 +537,9 @@ class CheckOutWebflow {
 			//initialCheckout = $this.initializeStripePayment();
 		});
 		next_page_2.addEventListener("click", function () {
-			
+
 			if (form.valid()) {
 				initialCheckout = $this.initializeStripePayment();
-				$this.displaySupplementaryProgram();
 				$this.storeBasicData();
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
@@ -798,20 +797,39 @@ class CheckOutWebflow {
 			//const data = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
 			// Display supplementary program
 			//this.displaySupplimentaryProgram(data);
-			
+
 			// Setup back button for browser and stripe checkout page
 			this.setUpBackButtonTab();
 			// Update basic data
 			this.updateBasicData();
 			// Hide spinner
 			spinner.style.display = "none";
+			this.displaySupplementaryProgram();
 			this.updateOldStudentList();
+			this.eventForPayNowBtn()
 		} catch (error) {
 			console.error("Error rendering random number:", error);
 		}
 	}
 
 
+	eventForPayNowBtn() {
+		let payNowLink = document.getElementById('pay-now-link');
+		payNowLink.addEventListener("click", function (e) {
+			e.preventDefault();
+			console.log("click payNow Button")
+			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
+			activePaymentLink.click();
+		})
+
+		var allTabs = document.getElementsByClassName("checkout-tab-link");
+		for (var i = 0; i < allTabs.length; i++) {
+			var tab = allTabs[i];
+			tab.addEventListener('click', function () {
+				payNowLink.closest('div').style.display = "block"
+			})
+		}
+	}
 	/**New Code for select old student */
 
 	//updateOldStudentList
@@ -901,10 +919,12 @@ class CheckOutWebflow {
 		let isOpen = false;
 		const addToCartButtons = document.querySelectorAll(".add-to-card");
 		addToCartButtons.forEach(button => {
-			const parent = button.closest(".btn-reserve-spot");
+			const parent = button.closest(".button_add-to-card");
 			if (parent) {
 				const checkbox = parent.querySelector(".suppCheckbox");
-				isOpen = checkbox.checked
+				if(checkbox.checked){
+					isOpen = checkbox.checked
+				}
 			}
 		})
 		return isOpen;
@@ -920,7 +940,7 @@ class CheckOutWebflow {
 		var $this = this;
 		addToCartButtons.forEach(button => {
 			button.addEventListener("click", function (event) {
-				
+
 				event.preventDefault(); // Prevent default link behavior
 
 				// Find the parent container with the 'btn-reserve-spot' class
@@ -942,9 +962,9 @@ class CheckOutWebflow {
 
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
-						
+
 						while ($this.$suppPro.length == 0) {
-							console.log("$this.$suppPro.length", $this.$suppPro.length)	
+							console.log("$this.$suppPro.length", $this.$suppPro.length)
 						}
 						setTimeout(() => {
 							const modal = document.getElementById('upsell-modal-1');
@@ -965,14 +985,68 @@ class CheckOutWebflow {
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
 		// Added in our Local Data
 		this.$suppPro = apiData;
-		
-		apiData = apiData.filter(i=>i.programDetailId != 12)
+		let prep_week_searchText = "topic prep week";
+		let tutoring_week_searchText = "5 hours";
+		//let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
+		let variant_type = this.memberData.variant_type
+		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
+		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
+		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
+		this.updateUpSellModal(prep_week_data, tutoring_data)
+		if (variant_type == 1) {
+			apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
+		} else {
+			apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
+		}
+
 		container.innerHTML = ""
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
 			const outerShadowDiv = this.displaySingleSuppProgram(item);
 			container.appendChild(outerShadowDiv);
 		});
+	}
+	updateUpSellModal(prep_week_data, tutoring_data) {
+
+		if (prep_week_data.length > 0) {
+			var tpwAmount = document.getElementById('tpw-amount');
+			if (tpwAmount != undefined) {
+				tpwAmount.innerHTML = "$"+parseFloat(prep_week_data[0].amount).toFixed(2);
+			}
+			var tpwSaveAmount = document.getElementById('tpw-save-amount');
+			if (tpwSaveAmount != undefined) {
+				tpwSaveAmount.innerHTML = "$"+parseFloat(prep_week_data[0].disc_amount - prep_week_data[0].amount).toFixed(2)
+			}
+			var tpwDescAmount = document.getElementById('tpw-desc-amount');
+			if (tpwDescAmount != undefined) {
+				tpwDescAmount.innerHTML = "$"+parseFloat(prep_week_data[0].disc_amount).toFixed(2)
+			}
+			var upsellTpwProgranId = document.getElementById('upsellTpwProgranId');
+			if (upsellTpwProgranId != undefined) {
+				upsellTpwProgranId.setAttribute('programdetailid', prep_week_data[0].programDetailId)
+			}
+		}
+
+
+		if (tutoring_data.length > 0) {
+			var tutoAmount = document.getElementById('tuto-amount');
+			if (tutoAmount != undefined) {
+				tutoAmount.innerHTML = "$"+parseFloat(tutoring_data[0].amount).toFixed(2);
+			}
+			var tutoSaveAmount = document.getElementById('tuto-save-amount');
+			if (tutoSaveAmount != undefined) {
+				tutoSaveAmount.innerHTML = "$"+parseFloat(tutoring_data[0].disc_amount - tutoring_data[0].amount).toFixed(2)
+			}
+			var tutoDescAmount = document.getElementById('tuto-desc-amount');
+			if (tutoDescAmount != undefined) {
+				tutoDescAmount.innerHTML = "$"+parseFloat(tutoring_data[0].disc_amount).toFixed(2)
+			}
+			var upsellTutoProgranId = document.getElementById('upsellTutoProgranId');
+			if (upsellTutoProgranId != undefined) {
+				upsellTutoProgranId.setAttribute('programdetailid', tutoring_data[0].programDetailId)
+			}
+
+		}
 	}
 	// New UpSell Program / Supplementary
 	displaySingleSuppProgram(item) {
@@ -1006,8 +1080,8 @@ class CheckOutWebflow {
 		input.setAttribute("programdetailid", item.programDetailId);
 		input.setAttribute("data-name", "Checkbox");
 		var $this = this;
-		input.addEventListener("change",function(){
-			this.checked ? outerDiv.classList.add('border-red') : outerDiv.classList.remove('border-red') 
+		input.addEventListener("change", function () {
+			this.checked ? outerDiv.classList.add('border-red') : outerDiv.classList.remove('border-red')
 			$this.updateAmount(this, item.amount);
 		})
 
@@ -1082,7 +1156,7 @@ class CheckOutWebflow {
 
 		const originalPrice = document.createElement("div");
 		originalPrice.classList.add("original-price");
-		originalPrice.textContent = "$"+item.disc_amount;
+		originalPrice.textContent = "$" + item.disc_amount;
 		originalPriceDiv1.appendChild(originalPrice);
 
 		const discountedPriceDiv = document.createElement("div");
@@ -1090,7 +1164,7 @@ class CheckOutWebflow {
 
 		const discountedPrice = document.createElement("div");
 		discountedPrice.classList.add("discounted-price", "text-blue");
-		discountedPrice.textContent = "$"+item.amount;
+		discountedPrice.textContent = "$" + item.amount;
 		discountedPriceDiv.appendChild(discountedPrice);
 
 		priceWrapper1.appendChild(originalPriceDiv1);
