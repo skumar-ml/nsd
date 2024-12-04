@@ -18,6 +18,7 @@ class PaymentConfirmation {
             $this.displayUpSellModal();
         })
     }
+    
     displayUpSellModal() {
         const modal = document.getElementById('upsell-modal-1');
         var $this = this;
@@ -39,6 +40,16 @@ class PaymentConfirmation {
                 })
 
             }
+        }
+        const closeLinks = document.querySelectorAll('.close-link-2');
+        if(closeLinks != undefined){
+            closeLinks.forEach(function (closeLink) {
+                console.log("SignIn Click Event Called");
+                closeLink.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    $this.hideUpSellModal(modal)
+                });
+            });
         }
         this.buyNow()
     }
@@ -157,15 +168,11 @@ class PaymentConfirmation {
                                 amount = checkbox.value;
                             $this.getPaymentUrl(programId, programName, amount);
                         }
-
                         // Update the button text based on the checkbox state
                         button.textContent = checkbox.checked ? "Processing..." : "Buy Now";
 
                         // Optional: Add or remove a disabled class (if needed)
                         button.classList.toggle("disabled", checkbox.checked);
-
-
-
                     }
                 }
             });
@@ -185,13 +192,13 @@ class PaymentConfirmation {
         const data = {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
-            "successUrl": "https://www.nsdebatecamp.com/members/" + this.webFlowMemberId,
-            "cancelUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
+            "successUrl": "https://nsd-webflow-subdomain-ccf6529d61db54e28.webflow.io/members/" + this.webFlowMemberId,
+            "cancelUrl": "https://nsd-webflow-subdomain-ccf6529d61db54e28.webflow.io/payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
             "label": programName,
-            "amount": parseFloat(amount)
+            "amount": parseFloat(amount*100)
         };
         // Create the POST request
-        fetch(this.apiBaseUrl+"/createCheckoutUrlForSupplementary", {
+        fetch(this.apiBaseUrl+"createCheckoutUrlForSupplementary", {
                 method: 'POST', // Specify the method
                 headers: {
                     'Content-Type': 'application/json' // Specify the content type
