@@ -353,7 +353,7 @@ class CheckOutWebflow {
 		}
 	}
 	// API call for checkout URL 
-	initializeStripePayment() {
+	initializeStripePayment(paymentType = "", checkoutID = "") {
 		return new Promise((resolve, reject) => {
 			var suppProIdE = document.getElementById('suppProIds');
 			var core_product_price = document.getElementById('core_product_price');
@@ -376,7 +376,7 @@ class CheckOutWebflow {
 				"email": this.memberData.email,
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
-				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId="+this.memberData.programId+"&programName=" + this.memberData.programName,
+				"successUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId=" + this.memberData.programId + "&programName=" + this.memberData.programName,
 				//"cancelUrl": cancelUrl.href,
 				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
@@ -398,6 +398,10 @@ class CheckOutWebflow {
 						data.paymentId = supStuData.uniqueIdentification
 					}
 				}
+			}
+			if (checkoutID) {
+				data.checkoutId = checkoutID
+				data.paymentType = [paymentType]
 			}
 
 			var xhr = new XMLHttpRequest()
@@ -601,31 +605,65 @@ class CheckOutWebflow {
 		// Browser back button event hidden fields
 		var ibackbutton = document.getElementById("backbuttonstate");
 		var $this = this;
+		let payNowLink = document.getElementById('pay-now-link');
 		ach_payment.addEventListener("click", function () {
+			let suppProIdE = document.getElementById('suppProIds');
+			let suppProIds = JSON.parse(suppProIdE.value)
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
-			let initialCheckout = $this.initializeStripePayment();
-			if (initialCheckout) {
-				initialCheckout.then(() => {
-					var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
-					return $this.updateStudentDetails(checkoutData);
-				}).then(()=>{
-					ibackbutton.value = "1";
-					window.location.href = $this.$checkoutData.achUrl;
-				})
+			if (suppProIds.length > 0) {
+				payNowLink.innerHTML = "Processing.."
+				let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId);
+				if (initialCheckout) {
+					initialCheckout.then(() => {
+						ibackbutton.value = "1";
+						payNowLink.innerHTML = "Pay Now"
+						window.location.href = $this.$checkoutData.achUrl;
+						
+					})
+				}
+			} else {
+				ibackbutton.value = "1";
+				window.location.href = $this.$checkoutData.achUrl;
 			}
 		});
 		card_payment.addEventListener("click", function () {
+			let suppProIdE = document.getElementById('suppProIds');
+			let suppProIds = JSON.parse(suppProIdE.value)
 			// card_payment.innerHTML = "Processing..."
-			// $this.initializeStripePayment('card', card_payment);
-			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.cardUrl;
+			if (suppProIds.length > 0) {
+				payNowLink.innerHTML = "Processing.."
+				let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId);
+				if (initialCheckout) {
+					initialCheckout.then(() => {
+						ibackbutton.value = "1";
+						payNowLink.innerHTML = "Pay Now"
+						window.location.href = $this.$checkoutData.cardUrl;
+					})
+				}
+			} else {
+				ibackbutton.value = "1";
+				window.location.href = $this.$checkoutData.cardUrl;
+			}
 		});
 		paylater_payment.addEventListener("click", function () {
+			let suppProIdE = document.getElementById('suppProIds');
+			let suppProIds = JSON.parse(suppProIdE.value)
 			// paylater_payment.innerHTML = "Processing..."
-			// $this.initializeStripePayment('paylater', paylater_payment);
-			ibackbutton.value = "1";
-			window.location.href = $this.$checkoutData.payLaterUrl;
+			if (suppProIds.length > 0) {
+				payNowLink.innerHTML = "Processing.."
+				let initialCheckout = $this.initializeStripePayment('paylater', $this.$checkoutData.checkoutId);
+				if (initialCheckout) {
+					initialCheckout.then(() => {
+						ibackbutton.value = "1";
+						payNowLink.innerHTML = "Pay Now"
+						window.location.href = $this.$checkoutData.payLaterUrl;
+					})
+				}
+			} else {
+				ibackbutton.value = "1";
+				window.location.href = $this.$checkoutData.payLaterUrl;
+			}
 		});
 	}
 	// Update student data for addon supplementary program purchase
@@ -929,9 +967,9 @@ class CheckOutWebflow {
 	}
 	checkUpSellModalOpen() {
 		let isOpen = false;
-		const addToCartButtons = document.querySelectorAll(".add-to-card");
+		const addToCartButtons = document.querySelectorAll(".add-to-card._upsell_add_to_card");
 		addToCartButtons.forEach(button => {
-			const parent = button.closest(".button_add-to-card");
+			const parent = button.closest("div");
 			if (parent) {
 				const checkbox = parent.querySelector(".suppCheckbox");
 				if (checkbox.checked) {
@@ -956,7 +994,7 @@ class CheckOutWebflow {
 				event.preventDefault(); // Prevent default link behavior
 
 				// Find the parent container with the 'btn-reserve-spot' class
-				const parent = button.closest(".button_add-to-card");
+				const parent = button.closest("div");
 
 				if (parent) {
 					// Locate the child checkbox within the parent container
@@ -984,6 +1022,16 @@ class CheckOutWebflow {
 						}, 100);
 
 					}
+					
+				}
+				//_care_package_add_to_card
+				if(this.classList.contains('_care_package_add_to_card')){
+					const _care_package_add_to_card = document.querySelectorAll("_care_package_add_to_card");
+					addToCartButtons.forEach(add_to_card_btn => {
+						add_to_card_btn.textContent = "Added";
+						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
+						add_to_card_btn.style.color = 'gray';
+					})
 				}
 			});
 		});
@@ -1194,7 +1242,7 @@ class CheckOutWebflow {
 
 		return outerDiv;
 	}
-	getVariant(){
+	getVariant() {
 		let variant = 1;
 		//let topicPripUpSellModal = document.querySelector('.topic-prep_modal-container')
 		let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
