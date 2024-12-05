@@ -193,10 +193,10 @@ class CheckOutWebflow {
 		let headContainer = creEl('div', 'horizontal-div supp-program')
 		let head = creEl("p", "dm-sans bold-700");
 		head.innerHTML = "Supplementary Program";
-		// let headIcon = creEl("img");
-		// headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
-		// headIcon.setAttribute('loading', "lazy")
-		// headContainer.prepend(head, headIcon);
+		//let headIcon = creEl("img");
+		//headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
+		//headIcon.setAttribute('loading', "lazy")
+		//headContainer.prepend(head, headIcon);
 		headContainer.prepend(head);
 		selectedSuppPro.appendChild(headContainer);
 
@@ -1059,7 +1059,9 @@ class CheckOutWebflow {
 		} else {
 			apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
 		}
+
 		apiData = apiData.filter(i => i.programDetailId != 21);
+
 		container.innerHTML = ""
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
@@ -1138,6 +1140,7 @@ class CheckOutWebflow {
 		const input = document.createElement("input");
 		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox");
 		input.type = "checkbox";
+		input.id = item.label.replace(/\s+/g, '-').toLowerCase();
 		input.name = "checkbox";
 		input.value = item.amount;
 		input.setAttribute("programdetailid", item.programDetailId);
@@ -1155,8 +1158,9 @@ class CheckOutWebflow {
 		label.appendChild(span);
 		checkboxDiv.appendChild(label);
 
-		const campNameDiv = document.createElement("div");
+		const campNameDiv = document.createElement("label");
 		campNameDiv.classList.add("camp-name", "margin-bottom-0");
+		campNameDiv.setAttribute("for", item.label.replace(/\s+/g, '-').toLowerCase())
 		campNameDiv.textContent = item.label;
 
 		upsellDiv.appendChild(checkboxDiv);
@@ -1189,7 +1193,7 @@ class CheckOutWebflow {
 
 		const saveDiv2 = document.createElement("div");
 		saveDiv2.classList.add("save-amount");
-		saveDiv2.textContent = parseFloat(item.disc_amount) - parseFloat(item.amount);
+		saveDiv2.textContent = "$"+(parseFloat(item.disc_amount) - parseFloat(item.amount));
 
 		priceItem.appendChild(saveDiv1);
 		priceItem.appendChild(saveDiv2);
