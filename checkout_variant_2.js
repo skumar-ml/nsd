@@ -193,10 +193,11 @@ class CheckOutWebflow {
 		let headContainer = creEl('div', 'horizontal-div supp-program')
 		let head = creEl("p", "dm-sans bold-700");
 		head.innerHTML = "Supplementary Program";
-		let headIcon = creEl("img");
-		headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
-		headIcon.setAttribute('loading', "lazy")
-		headContainer.prepend(head, headIcon);
+		// let headIcon = creEl("img");
+		// headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
+		// headIcon.setAttribute('loading', "lazy")
+		// headContainer.prepend(head, headIcon);
+		headContainer.prepend(head);
 		selectedSuppPro.appendChild(headContainer);
 
 		// Supplementary program name and price list
