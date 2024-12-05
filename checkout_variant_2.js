@@ -1089,6 +1089,12 @@ class CheckOutWebflow {
 				upsellTpwProgranId.setAttribute('programdetailid', prep_week_data[0].programDetailId)
 				upsellTpwProgranId.value = prep_week_data[0].amount
 			}
+
+			let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
+			if(tpwTitle != undefined){
+				tpwTitle.innerHTML = prep_week_data[0].label
+			}
+			
 		}
 
 
@@ -1110,7 +1116,11 @@ class CheckOutWebflow {
 				upsellTutoProgranId.setAttribute('programdetailid', tutoring_data[0].programDetailId)
 				upsellTutoProgranId.value = tutoring_data[0].amount
 			}
-
+			//tutoring title
+			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
+			if(tutoringTitle != undefined){
+				tutoringTitle.innerHTML = tutoring_data[0].label
+			}
 		}
 	}
 	// New UpSell Program / Supplementary
