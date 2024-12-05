@@ -324,9 +324,9 @@ class CheckOutWebflow {
 		// Hide and show based on supplementary program length
 		var totalPriceDiv = document.getElementById("totalPriceDiv");
 		if (selectedIds.length > 0) {
-			totalPriceDiv.style.display = "block";
+			totalPriceDiv.classList.add('show');
 		} else {
-			totalPriceDiv.style.display = "none";
+			totalPriceDiv.classList.remove('show');
 		}
 		// Hide and show based on supplementary program length
 		var totalPriceDiv = document.getElementById("totalPriceDivMob");
