@@ -117,6 +117,10 @@ class PaymentConfirmation {
                 upSellTpwProgramId.setAttribute('programName', prep_week_data[0].label)
                 upSellTpwProgramId.value = prep_week_data[0].amount
             }
+            let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
+			if(tpwTitle != undefined){
+				tpwTitle.innerHTML = prep_week_data[0].label
+			}
         }
 
 
@@ -140,6 +144,11 @@ class PaymentConfirmation {
                 upSellTutoringProgramId.value = tutoring_data[0].amount
             }
 
+            //tutoring title
+			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
+			if(tutoringTitle != undefined){
+				tutoringTitle.innerHTML = tutoring_data[0].label
+			}
         }
     }
 
