@@ -968,7 +968,7 @@ class CheckOutWebflow {
 	}
 	checkUpSellModalOpen() {
 		let isOpen = false;
-		const addToCartButtons = document.querySelectorAll(".add-to-card._upsell_add_to_card");
+		const addToCartButtons = document.querySelectorAll(".add-to-card.upsell_add_to_card");
 		addToCartButtons.forEach(button => {
 			const parent = button.closest("div");
 			if (parent) {
