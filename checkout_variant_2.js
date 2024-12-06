@@ -767,7 +767,7 @@ class CheckOutWebflow {
 			}
 			if (paymentData.checkoutData) {
 				this.$checkoutData = paymentData.checkoutData;
-				this.activateDiv("checkout_payment");
+				//this.activateDiv("checkout_payment");
 			}
 		} else {
 			// removed local storage when checkout page rendar direct without back button
