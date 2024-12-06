@@ -378,8 +378,8 @@ class CheckOutWebflow {
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
 				"successUrl": this.memberData.site_url+"payment-confirmation?programId=" + this.memberData.programId + "&programName=" + this.memberData.programName,
-				"cancelUrl": cancelUrl.href,
-				//"cancelUrl": "https://www.nsdebatecamp.com/",
+				//"cancelUrl": cancelUrl.href,
+				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
@@ -936,7 +936,8 @@ class CheckOutWebflow {
 		const modal = document.getElementById('upsell-modal-1');
 		var $this = this;
 		const noThanks = document.getElementsByClassName('no-thanks');
-
+		let variant = this.getVariant();
+		localStorage.setItem('_ab_test_variant', variant)
 		if (modal) {
 			console.log('Showing modal on page load');
 			this.showUpSellModal(modal);
