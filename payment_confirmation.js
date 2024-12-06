@@ -35,7 +35,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
-                    let memberUrl = this.site_url + $this.webFlowMemberId;
+                    let memberUrl = $this.site_url + $this.webFlowMemberId;
                     //$this.hideUpSellModal(modal)
                     window.location.href = memberUrl;
                 })
@@ -48,7 +48,10 @@ class PaymentConfirmation {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
                     event.preventDefault();
-                    $this.hideUpSellModal(modal)
+                   // $this.hideUpSellModal(modal)
+                   let memberUrl = $this.site_url + $this.webFlowMemberId;
+                    //$this.hideUpSellModal(modal)
+                    window.location.href = memberUrl;
                 });
             });
         }
