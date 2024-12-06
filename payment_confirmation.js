@@ -1,6 +1,7 @@
 class PaymentConfirmation {
-    constructor(webFlowMemberId, apiBaseUrl) {
+    constructor(webFlowMemberId, apiBaseUrl, site_url) {
         this.apiBaseUrl = apiBaseUrl;
+        this.site_url = site_url;
         this.webFlowMemberId = webFlowMemberId;
         this.programId = this.getURLParam('programId')
         this.sessionId = this.getURLParam('transactionID')
@@ -34,7 +35,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
-                    let memberUrl = "https://www.nsdebatecamp.com/members/" + $this.webFlowMemberId;
+                    let memberUrl = this.site_url + $this.webFlowMemberId;
                     //$this.hideUpSellModal(modal)
                     window.location.href = memberUrl;
                 })
@@ -201,8 +202,8 @@ class PaymentConfirmation {
         const data = {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
-            "successUrl": "https://www.nsdebatecamp.com/members/" + this.webFlowMemberId,
-            "cancelUrl": "https://www.nsdebatecamp.com/payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
+            "successUrl": this.site_url+ this.webFlowMemberId,
+            "cancelUrl": this.site_url+"payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
             "label": programName,
             "amount": parseFloat(amount*100)
         };
