@@ -25,11 +25,11 @@ class PaymentConfirmation {
             let topicPrepUpSellModal = document.querySelector('.topic-prep_modal-container')
 		    let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
             if(cart_page_variant == 2){
+                tutoringUpSellModal.style.display = "none";
+                topicPrepUpSellModal.style.display = "flex";
+            }else{
                 tutoringUpSellModal.style.display = "flex";
                 topicPrepUpSellModal.style.display = "none";
-            }else{
-                tutoringUpSellModal.style.display = "none";
-                topicPrepUpSellModal.style.display = "flexr";
             }
         }
     }
