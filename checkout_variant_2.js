@@ -1135,7 +1135,8 @@ class CheckOutWebflow {
 
 			//slider div
 			let swiperSlide = creEl('div', 'swiper-slide you-might')
-			swiperSlide.appendChild(outerShadowDiv)
+			const outerShadowDiv1 = this.displaySingleSuppProgram(item);
+			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
 		});
 		
