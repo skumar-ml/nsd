@@ -1136,9 +1136,9 @@ class CheckOutWebflow {
 			//slider div
 			let swiperSlide = creEl('div', 'swiper-slide you-might')
 			swiperSlide.appendChild(outerShadowDiv)
-			swiperSlideWrapper.appendChild(swiperSlide);
+			swiperSlideWrapper.prepend(swiperSlide)
 		});
-		container2.prepend(swiperSlideWrapper)
+		
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
