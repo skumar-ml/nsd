@@ -165,6 +165,7 @@ class CheckOutWebflow {
 	}
 	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppProgram(suppIds) {
+		var $this = this;
 		// selected Supplementary program main dom element
 		var selectedSuppPro = document.getElementById("selected_supplimentary_program");
 		selectedSuppPro.innerHTML = "";
@@ -204,15 +205,65 @@ class CheckOutWebflow {
 
 		selectedData.forEach((sup) => {
 			var suppProDiv = creEl('div', 'horizontal-div align-left');
+			let suppleHeadingDiv = creEl('div', 'horizontal-div supplementary')
+
 			let offeringType = creEl("div", "dm-sans offering-type");
 			offeringType.innerHTML = sup.label;
+
+			let removeIcon = creEl("img");
+			removeIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/67569ca8d0fc0b3c2afed1b9_Remove.svg'
+			removeIcon.setAttribute('loading', "lazy")
+			removeIcon.addEventListener("click", function () {
+				console.log('sup', sup.programDetailId)
+				$this.removeSuppProgram(sup.programDetailId)
+			})
+
+			suppleHeadingDiv.prepend(offeringType, removeIcon)
+
 			let OfferingPrice = creEl("div", "dm-sans offering-price");
 			OfferingPrice.innerHTML = "$" + parseFloat(sup.amount).toFixed(2);
-			suppProDiv.prepend(offeringType, OfferingPrice);
+			suppProDiv.prepend(suppleHeadingDiv, OfferingPrice);
 			selectedSuppPro.appendChild(suppProDiv);
 		});
 
 
+	}
+	removeSuppProgram(suppId) {
+		var suppProIdE = document.getElementById("suppProIds");
+		var arrayIds = JSON.parse(suppProIdE.value);
+		if (arrayIds.length > 0) {
+			arrayIds.push(suppId);
+			arrayIds = arrayIds.filter(i => i != suppId)
+			suppProIdE.value = JSON.stringify(arrayIds);
+			this.displaySelectedSuppProgram(arrayIds);
+			this.displaySelectedSuppProgramMobile(arrayIds);
+			const checkboxEl = document.querySelectorAll(".suppCheckbox");
+			checkboxEl.forEach(checkbox => {
+				let programDetailId = checkbox.getAttribute('programdetailid')
+				if (programDetailId == suppId) {
+					checkbox.checked = !checkbox.checked
+					// Find the closest parent div
+					const parentDiv = checkbox.closest('div').parentElement;
+
+					// Find the corresponding "add-to-card" button inside the same parent div
+					const addToCardButton = parentDiv.querySelector('.add-to-card');
+
+					// Change the button's innerHTML based on the checkbox state
+					//if (!checkbox.checked) {
+						addToCardButton.innerHTML = 'Add to Cart';
+						addToCardButton.classList.remove('disabled');
+						addToCardButton.style.pointerEvents = 'auto';
+						addToCardButton.style.color = '';
+					// } else {
+					// 	addToCardButton.innerHTML = 'Added';
+					// 	addToCardButton.classList.add('disabled');
+					// 	addToCardButton.style.pointerEvents = 'none';
+					// 	addToCardButton.style.color = 'gray';
+					// }
+				}
+
+			})
+		}
 	}
 	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppProgramMobile(suppIds) {
@@ -331,14 +382,14 @@ class CheckOutWebflow {
 		}
 		// Hide and show based on supplementary program length
 		var totalPriceDiv = document.getElementById("totalPriceDivMob");
-		if(totalPriceDiv != undefined){
+		if (totalPriceDiv != undefined) {
 			if (selectedIds.length > 0) {
 				totalPriceDiv.style.visibility = "visible";
 			} else {
 				totalPriceDiv.style.visibility = "hidden";
 			}
 		}
-		
+
 		this.displaySelectedSuppProgram(selectedIds);
 		this.displaySelectedSuppProgramMobile(selectedIds);
 	}
@@ -380,7 +431,7 @@ class CheckOutWebflow {
 				"email": this.memberData.email,
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
-				"successUrl": this.memberData.site_url+"payment-confirmation?programId=" + this.memberData.programId + "&programName=" + this.memberData.programName,
+				"successUrl": this.memberData.site_url + "payment-confirmation?programId=" + this.memberData.programId + "&programName=" + this.memberData.programName,
 				//"cancelUrl": cancelUrl.href,
 				"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
@@ -627,7 +678,7 @@ class CheckOutWebflow {
 						ibackbutton.value = "1";
 						payNowLink.innerHTML = "Pay Now"
 						window.location.href = $this.$checkoutData.achUrl;
-						
+
 					})
 				}
 			} else {
@@ -1031,10 +1082,10 @@ class CheckOutWebflow {
 						}, 100);
 
 					}
-					
+
 				}
 				//_care_package_add_to_card
-				if(this.classList.contains('care_package_add_to_card')){
+				if (this.classList.contains('care_package_add_to_card')) {
 					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
 					_care_package_add_to_card.forEach(add_to_card_btn => {
 						add_to_card_btn.textContent = "Added";
@@ -1099,16 +1150,16 @@ class CheckOutWebflow {
 			}
 
 			let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
-			if(tpwTitle != undefined){
+			if (tpwTitle != undefined) {
 				tpwTitle.innerHTML = prep_week_data[0].label
 			}
 			let tpwReadMore = document.querySelectorAll("[upsell-modal='tpw_read-more']")
-			if(tpwReadMore.length > 0){
-				tpwReadMore.forEach(read_more_link=>{
-					read_more_link.href = this.memberData.site_url+"topic-prep-week";
+			if (tpwReadMore.length > 0) {
+				tpwReadMore.forEach(read_more_link => {
+					read_more_link.href = this.memberData.site_url + "topic-prep-week";
 				})
 			}
-			
+
 		}
 
 
@@ -1132,14 +1183,14 @@ class CheckOutWebflow {
 			}
 			//tutoring title
 			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
-			if(tutoringTitle != undefined){
+			if (tutoringTitle != undefined) {
 				tutoringTitle.innerHTML = tutoring_data[0].label
 			}
 
 			let tutoringReadMore = document.querySelectorAll("[upsell-modal='tutoring_read-more']")
-			if(tutoringReadMore.length > 0){
-				tutoringReadMore.forEach(read_more_link=>{
-					read_more_link.href = this.memberData.site_url+"debate-tutoring";
+			if (tutoringReadMore.length > 0) {
+				tutoringReadMore.forEach(read_more_link => {
+					read_more_link.href = this.memberData.site_url + "debate-tutoring";
 				})
 			}
 		}
@@ -1224,7 +1275,7 @@ class CheckOutWebflow {
 
 		const saveDiv2 = document.createElement("div");
 		saveDiv2.classList.add("save-amount");
-		saveDiv2.textContent = "$"+(parseFloat(item.disc_amount) - parseFloat(item.amount));
+		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount));
 
 		priceItem.appendChild(saveDiv1);
 		priceItem.appendChild(saveDiv2);
@@ -1287,17 +1338,17 @@ class CheckOutWebflow {
 		}
 		return variant
 	}
-	hideShowCartVideo(visibility){
+	hideShowCartVideo(visibility) {
 		let videoEl = document.querySelector('.cart-sidebar .w-embed-youtubevideo');
-		if(visibility == "show"){
+		if (visibility == "show") {
 			videoEl.style.display = "block"
-		}else{
+		} else {
 			videoEl.style.display = "none"
 		}
 	}
-	activeBreadCrumb(activeId){
+	activeBreadCrumb(activeId) {
 		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
-		breadCrumbList.forEach(element=>element.classList.remove('active'))
+		breadCrumbList.forEach(element => element.classList.remove('active'))
 		document.getElementById(activeId).classList.add('active')
 
 	}
