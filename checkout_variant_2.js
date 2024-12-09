@@ -1138,7 +1138,7 @@ class CheckOutWebflow {
 			swiperSlide.appendChild(outerShadowDiv)
 			swiperSlideWrapper.appendChild(swiperSlide);
 		});
-		container2.appendChild(swiperSlideWrapper)
+		container2.prepend(swiperSlideWrapper)
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
