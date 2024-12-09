@@ -614,6 +614,7 @@ class CheckOutWebflow {
 							$this.updateStudentDetails(checkoutData);
 						})
 					}
+					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('forms-&-tuition')
 					$this.displayUpSellModal();
@@ -629,6 +630,7 @@ class CheckOutWebflow {
 			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
+			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
@@ -1122,11 +1124,21 @@ class CheckOutWebflow {
 		apiData = apiData.filter(i => i.programDetailId != 21);
 
 		container.innerHTML = ""
+
+		let container2 = document.getElementById("checkout-supplimentary-data-2");
+		let swiperSlideWrapper = container2.querySelector('.swiper-wrapper')
+		swiperSlideWrapper.innerHTML = "";
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
 			const outerShadowDiv = this.displaySingleSuppProgram(item);
 			container.appendChild(outerShadowDiv);
+
+			//slider div
+			let swiperSlide = creEl('div', 'swiper-slide you-might')
+			swiperSlide.appendChild(outerShadowDiv)
+			swiperSlideWrapper.appendChild(swiperSlide);
 		});
+		container2.appendChild(swiperSlideWrapper)
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
@@ -1344,6 +1356,11 @@ class CheckOutWebflow {
 			videoEl.style.display = "block"
 		} else {
 			videoEl.style.display = "none"
+		}
+	}
+	hideShowDivById(Id, display){
+		if(Id){
+			document.getElementById(Id).style.display = display
 		}
 	}
 	activeBreadCrumb(activeId) {
