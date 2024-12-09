@@ -331,11 +331,14 @@ class CheckOutWebflow {
 		}
 		// Hide and show based on supplementary program length
 		var totalPriceDiv = document.getElementById("totalPriceDivMob");
-		if (selectedIds.length > 0) {
-			totalPriceDiv.style.visibility = "visible";
-		} else {
-			totalPriceDiv.style.visibility = "hidden";
+		if(totalPriceDiv != undefined){
+			if (selectedIds.length > 0) {
+				totalPriceDiv.style.visibility = "visible";
+			} else {
+				totalPriceDiv.style.visibility = "hidden";
+			}
 		}
+		
 		this.displaySelectedSuppProgram(selectedIds);
 		this.displaySelectedSuppProgramMobile(selectedIds);
 	}
