@@ -560,6 +560,8 @@ class CheckOutWebflow {
 							$this.updateStudentDetails(checkoutData);
 						})
 					}
+					$this.hideShowCartVideo('hide');
+					$this.activeBreadCrumb('forms-&-tuition')
 					$this.displayUpSellModal();
 				} else {
 					checkoutFormError.style.display = "block";
@@ -573,6 +575,8 @@ class CheckOutWebflow {
 			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
+			$this.hideShowCartVideo('show');
+			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
 			setTimeout(function () {
 				$(".w-tab-link").removeClass("w--current");
@@ -1095,6 +1099,12 @@ class CheckOutWebflow {
 			if(tpwTitle != undefined){
 				tpwTitle.innerHTML = prep_week_data[0].label
 			}
+			let tpwReadMore = document.querySelectorAll("[upsell-modal='tpw_read-more']")
+			if(tpwReadMore.length > 0){
+				tpwReadMore.forEach(read_more_link=>{
+					read_more_link.href = this.memberData.site_url+"topic-prep-week";
+				})
+			}
 			
 		}
 
@@ -1121,6 +1131,13 @@ class CheckOutWebflow {
 			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
 			if(tutoringTitle != undefined){
 				tutoringTitle.innerHTML = tutoring_data[0].label
+			}
+
+			let tutoringReadMore = document.querySelectorAll("[upsell-modal='tutoring_read-more']")
+			if(tutoringReadMore.length > 0){
+				tutoringReadMore.forEach(read_more_link=>{
+					read_more_link.href = this.memberData.site_url+"debate-tutoring";
+				})
 			}
 		}
 	}
@@ -1266,6 +1283,20 @@ class CheckOutWebflow {
 			variant = 2;
 		}
 		return variant
+	}
+	hideShowCartVideo(visibility){
+		let videoEl = document.querySelector('.cart-sidebar .w-embed-youtubevideo');
+		if(visibility == "show"){
+			videoEl.style.display = "block"
+		}else{
+			videoEl.style.display = "none"
+		}
+	}
+	activeBreadCrumb(activeId){
+		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
+		breadCrumbList.forEach(element=>element.classList.remove('active'))
+		document.getElementById(activeId).classList.add('active')
+
 	}
 
 }
