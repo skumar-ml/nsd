@@ -245,6 +245,7 @@ class CheckOutWebflow {
 					// Find the closest parent div
 					const parentDiv = checkbox.closest('div').parentElement;
 					if (checkbox.checked) {
+						this.updateAmount(checkbox, checkbox.value);
 						checkbox.checked = !checkbox.checked
 					}
 
