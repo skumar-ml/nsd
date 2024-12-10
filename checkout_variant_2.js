@@ -29,35 +29,6 @@ class CheckOutWebflow {
 		this.memberData = memberData;
 		this.renderPortalData();
 	}
-	// Passing all supplimentary program data and creating cart list
-	displaySupplimentaryProgram(data) {
-		this.$suppPro = data;
-		// Getting main dom elment object to add supplementary program list with checkbox
-		var studentList = document.getElementById("checkout_supplimentary_data");
-		// Supplementary program heading
-		var supplementaryProgramHead = document.getElementById("supplementary-program-head");
-		var eduCopy = document.querySelector("#checkout_program .edu-prg001");
-		var $this = this;
-		studentList.innerHTML = "";
-		// Remove duplicate data like Supplementary program
-		data = data.filter((item) => item.programDetailId != this.memberData.programId);
-		if (data.length > 0) {
-			// showing supplementary program heading when data in not empty
-			supplementaryProgramHead.style.display = "block";
-			data.forEach((sData) => {
-				// Getting single supplementary program cart list
-				var sList = this.createCartList(sData);
-				studentList.appendChild(sList);
-			});
-		} else {
-			// hiding supplementary program heading when data is empty
-			supplementaryProgramHead.style.display = "none";
-
-			// Hide Limited Time Offer copy
-			eduCopy && (eduCopy.style.display = "none");
-		}
-	}
-
 	// Create tags
 	createTags(suppData) {
 		var html = "";
@@ -163,12 +134,16 @@ class CheckOutWebflow {
 	numberWithCommas(x) {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
-	// This method use to display selected supplementary program in sidebar
-	displaySelectedSuppProgram(suppIds) {
-		var $this = this;
-		// selected Supplementary program main dom element
+
+	displaySelectedSuppProgram(selectedIds){
 		var selectedSuppPro = document.getElementById("selected_supplimentary_program");
-		selectedSuppPro.innerHTML = "";
+		var selectedSuppProMob = document.getElementById("selected_supplimentary_program_mob");
+		this.displaySelectedSuppPrograms(selectedIds, selectedSuppPro);
+		this.displaySelectedSuppPrograms(selectedIds, selectedSuppProMob);
+	}
+	// This method use to display selected supplementary program in sidebar
+	displaySelectedSuppPrograms(suppIds, selectedSuppPro) {
+		var $this = this;
 		// Filtering selected Supplementary program id from all Supplementary program data
 		var selectedData = this.$suppPro.filter((item) =>
 			suppIds.some((d) => d == item.programDetailId)
@@ -194,10 +169,6 @@ class CheckOutWebflow {
 		let headContainer = creEl('div', 'horizontal-div supp-program')
 		let head = creEl("p", "dm-sans bold-700");
 		head.innerHTML = "Supplementary Program";
-		//let headIcon = creEl("img");
-		//headIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/674ea6ed605359d5b79786df_check_box.svg'
-		//headIcon.setAttribute('loading', "lazy")
-		//headContainer.prepend(head, headIcon);
 		headContainer.prepend(head);
 		selectedSuppPro.appendChild(headContainer);
 
@@ -214,7 +185,6 @@ class CheckOutWebflow {
 			removeIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/67569ca8d0fc0b3c2afed1b9_Remove.svg'
 			removeIcon.setAttribute('loading', "lazy")
 			removeIcon.addEventListener("click", function () {
-				console.log('sup', sup.programDetailId)
 				$this.removeSuppProgram(sup.programDetailId)
 			})
 
@@ -236,7 +206,6 @@ class CheckOutWebflow {
 			arrayIds = arrayIds.filter(i => i != suppId)
 			suppProIdE.value = JSON.stringify(arrayIds);
 			this.displaySelectedSuppProgram(arrayIds);
-			this.displaySelectedSuppProgramMobile(arrayIds);
 			const checkboxEl = document.querySelectorAll(".suppCheckbox");
 			checkboxEl.forEach(checkbox => {
 				let programDetailId = checkbox.getAttribute('programdetailid')
@@ -270,46 +239,6 @@ class CheckOutWebflow {
 				}
 
 			})
-		}
-	}
-	// This method use to display selected supplementary program in sidebar
-	displaySelectedSuppProgramMobile(suppIds) {
-		// selected Supplementary program main dom element
-		var selectedSuppPro = document.getElementById("selected_supplimentary_program_mob");
-		if (selectedSuppPro) {
-			selectedSuppPro.innerHTML = "";
-			// Filtering selected Supplementary program id from all Supplementary program data
-			var selectedData = this.$suppPro.filter((item) =>
-				suppIds.some((d) => d == item.programDetailId)
-			);
-			//Manipulating price text for with supplementary program and without
-			var respricelabel = document.getElementById("res-price-label");
-			var commpricelabel = document.getElementById("comm-price-label");
-			if (selectedData.length == 0) {
-				respricelabel.innerHTML = "Total Price";
-				respricelabel.innerHTML = "Total Price";
-				selectedSuppPro.classList.remove("added_supp_data");
-				return false;
-			} else {
-				respricelabel.innerHTML = "Price";
-				respricelabel.innerHTML = "Price";
-				selectedSuppPro.classList.add("added_supp_data");
-			}
-			// Selected supplementary program heading
-			var head = creEl("p", "dm-sans font-14 order-summary-border bold marginbottom-3");
-			head.innerHTML = "Supplementary Program";
-			selectedSuppPro.appendChild(head);
-			var label = "";
-			// Added single supplementary program heading in sidebar
-			selectedData.forEach((sup) => {
-				label = creEl("p", "dm-sans font-14 bold program-bottom-margin");
-				label.innerHTML = sup.label + " " + sup.amount;
-				selectedSuppPro.appendChild(label);
-				// label = creEl("p", "dm-sans font-14");
-				// label.innerHTML = sup.desc;
-				// selectedSuppPro.appendChild(label);
-			});
-
 		}
 	}
 	// Method is use update supplementary program price after tab change
@@ -396,9 +325,7 @@ class CheckOutWebflow {
 				totalPriceDiv.classList.remove('show');
 			}
 		}
-
 		this.displaySelectedSuppProgram(selectedIds);
-		this.displaySelectedSuppProgramMobile(selectedIds);
 	}
 	// Get API data with the help of endpoint
 	async fetchData(endpoint) {
@@ -911,11 +838,7 @@ class CheckOutWebflow {
 			// loader icon code
 			var spinner = document.getElementById("half-circle-spinner");
 			spinner.style.display = "block";
-			// API call
-			//const data = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
-			// Display supplementary program
-			//this.displaySupplimentaryProgram(data);
-
+	
 			// Setup back button for browser and stripe checkout page
 			this.setUpBackButtonTab();
 			// Update basic data
@@ -1359,7 +1282,7 @@ class CheckOutWebflow {
 		return variant
 	}
 	hideShowCartVideo(visibility) {
-		let videoEl = document.querySelector('.order-details_main-div .w-embed-youtubevideo');
+		let videoEl = document.querySelector('.cart-sidebar .w-embed-youtubevideo');
 		if (visibility == "show") {
 			videoEl.style.display = "block"
 		} else {
