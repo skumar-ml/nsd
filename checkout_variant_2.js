@@ -1358,7 +1358,7 @@ class CheckOutWebflow {
 		return variant
 	}
 	hideShowCartVideo(visibility) {
-		let videoEl = document.querySelector('.cart-sidebar .w-embed-youtubevideo');
+		let videoEl = document.querySelector('.order-details_main-div .w-embed-youtubevideo');
 		if (visibility == "show") {
 			videoEl.style.display = "block"
 		} else {
