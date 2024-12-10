@@ -549,6 +549,7 @@ class CheckOutWebflow {
 							$this.updateStudentDetails(checkoutData);
 						})
 					}
+					$this.hideAndShowByClass('why-families-div', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
@@ -566,7 +567,9 @@ class CheckOutWebflow {
 			// click on back button reinitialze payment tab
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
+			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
+			$this.hideAndShowByClass('why-families-div', 'block')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
@@ -603,6 +606,7 @@ class CheckOutWebflow {
 		var ibackbutton = document.getElementById("backbuttonstate");
 		var $this = this;
 		let payNowLink = document.getElementById('pay-now-link');
+		let payNowLinkMob = document.getElementById('pay-now-link-2');
 		ach_payment.addEventListener("click", function () {
 			let suppProIdE = document.getElementById('suppProIds');
 			let suppProIds = JSON.parse(suppProIdE.value)
@@ -610,6 +614,7 @@ class CheckOutWebflow {
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
+				payNowLinkMob.innerHTML = "Processing.."
 				let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId);
 				if (initialCheckout) {
 					initialCheckout.then(() => {
@@ -630,6 +635,7 @@ class CheckOutWebflow {
 			// card_payment.innerHTML = "Processing..."
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
+				payNowLinkMob.innerHTML = "Processing.."
 				let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId);
 				if (initialCheckout) {
 					initialCheckout.then(() => {
@@ -649,6 +655,7 @@ class CheckOutWebflow {
 			// paylater_payment.innerHTML = "Processing..."
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
+				payNowLinkMob.innerHTML = "Processing.."
 				let initialCheckout = $this.initializeStripePayment('paylater', $this.$checkoutData.checkoutId);
 				if (initialCheckout) {
 					initialCheckout.then(() => {
@@ -864,12 +871,21 @@ class CheckOutWebflow {
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
+		// Mobile PayNow link
+		let payNowLinkMo = document.getElementById('pay-now-link-2');
+		payNowLinkMo.addEventListener("click", function (e) {
+			e.preventDefault();
+			console.log("click payNow Button")
+			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
+			activePaymentLink.click();
+		})
 
 		var allTabs = document.getElementsByClassName("checkout-tab-link");
 		for (var i = 0; i < allTabs.length; i++) {
 			var tab = allTabs[i];
 			tab.addEventListener('click', function () {
 				payNowLink.closest('div').style.display = "block"
+				payNowLinkMo.closest('div').style.display = "block"
 			})
 		}
 	}
@@ -1343,6 +1359,12 @@ class CheckOutWebflow {
 			document.getElementById(Id).style.display = display
 		}
 	}
+	hideAndShowByClass(classs, display) {
+		if (classs) {
+			document.querySelector(classs).style.display = display
+		}
+	}
+	
 	activeBreadCrumb(activeId) {
 		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
 		breadCrumbList.forEach(element => element.classList.remove('active'))
