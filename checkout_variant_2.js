@@ -549,7 +549,7 @@ class CheckOutWebflow {
 							$this.updateStudentDetails(checkoutData);
 						})
 					}
-					$this.hideAndShowByClass('why-families-div', 'none')
+					$this.hideAndShowWhyFamilies('why-families-div', 'hidden')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
@@ -569,7 +569,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
-			$this.hideAndShowByClass('why-families-div', 'block')
+			$this.hideAndShowWhyFamilies('why-families-div', 'visible')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
@@ -1359,9 +1359,9 @@ class CheckOutWebflow {
 			document.getElementById(Id).style.display = display
 		}
 	}
-	hideAndShowByClass(classs, display) {
+	hideAndShowWhyFamilies(classs, display) {
 		if (classs) {
-			document.querySelector('.'+classs).style.display = display
+			document.querySelector('.'+classs).style.visibility = display
 		}
 	}
 	
