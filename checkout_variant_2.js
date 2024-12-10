@@ -550,6 +550,7 @@ class CheckOutWebflow {
 						})
 					}
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
+					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('forms-&-tuition')
 					$this.displayUpSellModal();
@@ -1073,10 +1074,6 @@ class CheckOutWebflow {
 			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
 		});
-
-		setTimeout(() => {
-			this.initSlickSlider();
-		}, 1000);
 
 	}
 	initSlickSlider(){
