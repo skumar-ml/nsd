@@ -1074,6 +1074,36 @@ class CheckOutWebflow {
 			swiperSlideWrapper.prepend(swiperSlide)
 		});
 
+		setTimeout(() => {
+			this.initSlickSlider();
+		}, 1000);
+
+	}
+	initSlickSlider(){
+		var slickSettings = {
+			speed: 300,
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			infinite: true,
+			centerMode: false,
+			variableWidth: false,
+			arrows: false,
+		};
+
+		// Initialize both sliders
+		//var $sliderFamilies = $('.why-families_slick-slider').slick(slickSettings);
+		var $sliderYouMight = $('.you-might_slick-slider').slick(slickSettings);
+
+		// Shared navigation logic for the "You Might" slider
+		$('.left-arrow-slick').click(function () {
+			console.log("You Might: Left arrow clicked.");
+			$sliderYouMight.slick('slickPrev');
+		});
+
+		$('.right-arrow-slick').click(function () {
+			console.log("You Might: Right arrow clicked.");
+			$sliderYouMight.slick('slickNext');
+		});
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
