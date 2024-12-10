@@ -245,14 +245,14 @@ class CheckOutWebflow {
 					// Find the closest parent div
 					const parentDiv = checkbox.closest('div').parentElement;
 					if (checkbox.checked) {
-						this.updateAmount(checkbox, checkbox.value);
 						checkbox.checked = !checkbox.checked
+						this.updateAmount(checkbox, checkbox.value);
 					}
 
 					// Find the corresponding "add-to-card" button inside the same parent div
 					const addToCardButton = parentDiv.querySelector('.add-to-card');
 					if (addToCardButton != undefined) {
-						checkbox.checked = !checkbox.checked
+						//checkbox.checked = !checkbox.checked
 						// Change the button's innerHTML based on the checkbox state
 						//if (!checkbox.checked) {
 						addToCardButton.innerHTML = 'Add to Cart';
