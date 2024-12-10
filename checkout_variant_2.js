@@ -1361,7 +1361,7 @@ class CheckOutWebflow {
 	}
 	hideAndShowByClass(classs, display) {
 		if (classs) {
-			document.querySelector(classs).style.display = display
+			document.querySelector('.'+classs).style.display = display
 		}
 	}
 	
