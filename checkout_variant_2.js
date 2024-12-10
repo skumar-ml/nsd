@@ -1001,48 +1001,51 @@ class CheckOutWebflow {
 		var $this = this;
 		addToCartButtons.forEach(button => {
 			button.addEventListener("click", function (event) {
+				if (!checkbox.checked) {
 
-				event.preventDefault(); // Prevent default link behavior
 
-				// Find the parent container with the 'btn-reserve-spot' class
-				const parent = button.closest("div");
+					event.preventDefault(); // Prevent default link behavior
 
-				if (parent) {
-					// Locate the child checkbox within the parent container
-					const checkbox = parent.querySelector(".suppCheckbox");
+					// Find the parent container with the 'btn-reserve-spot' class
+					const parent = button.closest("div");
 
-					if (checkbox) {
-						// Toggle the checkbox state
-						checkbox.checked = !checkbox.checked;
-						//if(checkbox.checked){
-						$this.updateAmount(checkbox, checkbox.value);
-						//}
+					if (parent) {
+						// Locate the child checkbox within the parent container
+						const checkbox = parent.querySelector(".suppCheckbox");
 
-						// Update the button text based on the checkbox state
-						button.textContent = checkbox.checked ? "Added" : "Add to Cart";
+						if (checkbox) {
+							// Toggle the checkbox state
+							checkbox.checked = !checkbox.checked;
+							//if(checkbox.checked){
+							$this.updateAmount(checkbox, checkbox.value);
+							//}
 
-						// Optional: Add or remove a disabled class (if needed)
-						button.classList.toggle("disabled", checkbox.checked);
+							// Update the button text based on the checkbox state
+							button.textContent = checkbox.checked ? "Added" : "Add to Cart";
 
-						while ($this.$suppPro.length == 0) {
-							console.log("$this.$suppPro.length", $this.$suppPro.length)
+							// Optional: Add or remove a disabled class (if needed)
+							button.classList.toggle("disabled", checkbox.checked);
+
+							while ($this.$suppPro.length == 0) {
+								console.log("$this.$suppPro.length", $this.$suppPro.length)
+							}
+							setTimeout(() => {
+								const modal = document.getElementById('upsell-modal-1');
+								$this.hideUpSellModal(modal)
+							}, 100);
+
 						}
-						setTimeout(() => {
-							const modal = document.getElementById('upsell-modal-1');
-							$this.hideUpSellModal(modal)
-						}, 100);
 
 					}
-
-				}
-				//_care_package_add_to_card
-				if (this.classList.contains('care_package_add_to_card')) {
-					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
-					_care_package_add_to_card.forEach(add_to_card_btn => {
-						add_to_card_btn.textContent = "Added";
-						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-						add_to_card_btn.style.color = 'gray';
-					})
+					//_care_package_add_to_card
+					if (this.classList.contains('care_package_add_to_card')) {
+						const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
+						_care_package_add_to_card.forEach(add_to_card_btn => {
+							add_to_card_btn.textContent = "Added";
+							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
+							add_to_card_btn.style.color = 'gray';
+						})
+					}
 				}
 			});
 		});
