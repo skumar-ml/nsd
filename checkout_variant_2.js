@@ -1126,6 +1126,13 @@ class CheckOutWebflow {
 				upsellTpwProgranId.setAttribute('programdetailid', prep_week_data[0].programDetailId)
 				upsellTpwProgranId.value = prep_week_data[0].amount
 			}
+			// For mobile upsellTpwProgranId-1
+			var upsellTpwProgranIdMob = document.getElementById('upsellTpwProgranId-1');
+			if (upsellTpwProgranIdMob != undefined) {
+				upsellTpwProgranIdMob.setAttribute('programdetailid', prep_week_data[0].programDetailId)
+				upsellTpwProgranIdMob.value = prep_week_data[0].amount
+			}
+
 
 			let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
 			if (tpwTitle != undefined) {
@@ -1159,6 +1166,13 @@ class CheckOutWebflow {
 				upsellTutoProgranId.setAttribute('programdetailid', tutoring_data[0].programDetailId)
 				upsellTutoProgranId.value = tutoring_data[0].amount
 			}
+			// Mobile div id upsellTutoProgranId-1
+			var upsellTutoProgranIdMob = document.getElementById('upsellTutoProgranId-1');
+			if (upsellTutoProgranIdMob != undefined) {
+				upsellTutoProgranIdMob.setAttribute('programdetailid', tutoring_data[0].programDetailId)
+				upsellTutoProgranIdMob.value = tutoring_data[0].amount
+			}
+
 			//tutoring title
 			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
 			if (tutoringTitle != undefined) {
