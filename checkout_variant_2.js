@@ -138,12 +138,13 @@ class CheckOutWebflow {
 	displaySelectedSuppProgram(selectedIds) {
 		var selectedSuppPro = document.getElementById("selected_supplimentary_program");
 		var selectedSuppProMob = document.getElementById("selected_supplimentary_program_mob");
+		selectedSuppPro.innerHTML = "";
+		selectedSuppProMob.innerHTML = "";
 		this.displaySelectedSuppPrograms(selectedIds, selectedSuppPro);
 		this.displaySelectedSuppPrograms(selectedIds, selectedSuppProMob);
 	}
 	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppPrograms(suppIds, selectedSuppPro) {
-		selectedSuppPro.innerHTML = "";
 		var $this = this;
 		// Filtering selected Supplementary program id from all Supplementary program data
 		var selectedData = this.$suppPro.filter((item) =>
@@ -1275,7 +1276,7 @@ class CheckOutWebflow {
 		});
 
 		const priceItem = document.createElement("div");
-		priceItem.classList.add("price-item");
+		priceItem.classList.add("price-item", 'align-end');
 
 		const saveDiv1 = document.createElement("div");
 		saveDiv1.classList.add("save-amount");
