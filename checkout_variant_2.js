@@ -143,6 +143,7 @@ class CheckOutWebflow {
 	}
 	// This method use to display selected supplementary program in sidebar
 	displaySelectedSuppPrograms(suppIds, selectedSuppPro) {
+		selectedSuppPro.innerHTML = "";
 		var $this = this;
 		// Filtering selected Supplementary program id from all Supplementary program data
 		var selectedData = this.$suppPro.filter((item) =>
@@ -1057,16 +1058,17 @@ class CheckOutWebflow {
 
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		if(container2 == undefined) return;
-		let swiperSlideWrapper = container2.querySelector('.swiper-wrapper')
+		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
 		if(swiperSlideWrapper == undefined ) return
+
 		swiperSlideWrapper.innerHTML = "";
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
-			const outerShadowDiv = this.displaySingleSuppProgram(item, 'mobile');
-			container.appendChild(outerShadowDiv);
+			//const outerShadowDiv = this.displaySingleSuppProgram(item, 'mobile');
+			//container.appendChild(outerShadowDiv);
 
 			//slider div
-			let swiperSlide = creEl('div', 'swiper-slide you-might')
+			let swiperSlide = creEl('div', 'you-might_slide-item')
 			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop');
 			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
