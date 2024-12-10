@@ -1056,7 +1056,9 @@ class CheckOutWebflow {
 		container.innerHTML = ""
 
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
+		if(container2 == undefined) return;
 		let swiperSlideWrapper = container2.querySelector('.swiper-wrapper')
+		if(swiperSlideWrapper == undefined ) return
 		swiperSlideWrapper.innerHTML = "";
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
