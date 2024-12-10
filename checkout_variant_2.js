@@ -135,7 +135,7 @@ class CheckOutWebflow {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
 
-	displaySelectedSuppProgram(selectedIds){
+	displaySelectedSuppProgram(selectedIds) {
 		var selectedSuppPro = document.getElementById("selected_supplimentary_program");
 		var selectedSuppProMob = document.getElementById("selected_supplimentary_program_mob");
 		this.displaySelectedSuppPrograms(selectedIds, selectedSuppPro);
@@ -211,7 +211,7 @@ class CheckOutWebflow {
 			checkboxEl.forEach(checkbox => {
 				let programDetailId = checkbox.getAttribute('programdetailid')
 				if (programDetailId == suppId) {
-					
+
 					// Find the closest parent div
 					const parentDiv = checkbox.closest('div').parentElement;
 					if (checkbox.checked) {
@@ -840,7 +840,7 @@ class CheckOutWebflow {
 			// loader icon code
 			var spinner = document.getElementById("half-circle-spinner");
 			spinner.style.display = "block";
-	
+
 			// Setup back button for browser and stripe checkout page
 			this.setUpBackButtonTab();
 			// Update basic data
@@ -1058,9 +1058,9 @@ class CheckOutWebflow {
 		container.innerHTML = ""
 
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
-		if(container2 == undefined) return;
+		if (container2 == undefined) return;
 		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
-		if(swiperSlideWrapper == undefined ) return
+		if (swiperSlideWrapper == undefined) return
 
 		swiperSlideWrapper.innerHTML = "";
 		apiData.forEach(item => {
@@ -1070,37 +1070,41 @@ class CheckOutWebflow {
 
 			//slider div
 			let swiperSlide = creEl('div', 'you-might_slide-item')
-			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop');
+			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
 			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
 		});
 
 	}
-	initSlickSlider(){
-		var slickSettings = {
-			speed: 300,
-			slidesToShow: 1,
-			slidesToScroll: 1,
-			infinite: true,
-			centerMode: false,
-			variableWidth: false,
-			arrows: false,
-		};
+	initSlickSlider() {
+		var $slider = $('.you-might_slick-slider');
+		// Check if the slider is already initialized
+		if (!$slider.hasClass('slick-initialized')) {
 
-		// Initialize both sliders
-		//var $sliderFamilies = $('.why-families_slick-slider').slick(slickSettings);
-		var $sliderYouMight = $('.you-might_slick-slider').slick(slickSettings);
+			var slickSettings = {
+				speed: 300,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+				infinite: true,
+				centerMode: false,
+				variableWidth: false,
+				arrows: false,
+			};
+			// Initialize you might slider
+			var $sliderYouMight = $slider.slick(slickSettings);
 
-		// Shared navigation logic for the "You Might" slider
-		$('.left-arrow-slick').click(function () {
-			console.log("You Might: Left arrow clicked.");
-			$sliderYouMight.slick('slickPrev');
-		});
+			// Shared navigation logic for the "You Might" slider
+			$('.left-arrow-slick').click(function () {
+				console.log("You Might: Left arrow clicked.");
+				$sliderYouMight.slick('slickPrev');
+			});
 
-		$('.right-arrow-slick').click(function () {
-			console.log("You Might: Right arrow clicked.");
-			$sliderYouMight.slick('slickNext');
-		});
+			$('.right-arrow-slick').click(function () {
+				console.log("You Might: Right arrow clicked.");
+				$sliderYouMight.slick('slickNext');
+			});
+		}
+
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
@@ -1170,11 +1174,11 @@ class CheckOutWebflow {
 		}
 	}
 	// New UpSell Program / Supplementary
-	displaySingleSuppProgram(item, size) {
+	displaySingleSuppProgram(item, size, slideDiv) {
 		var $this = this;
 		// Create the outer-shadow div
-		const outerDiv = document.createElement("div");
-		outerDiv.classList.add("div-block-93", "outer-shadow");
+		//const outerDiv = document.createElement("div");
+		//outerDiv.classList.add("div-block-93", "outer-shadow");
 		// Create the grid container
 		const gridDiv = document.createElement("div");
 		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "upsell");
@@ -1203,7 +1207,7 @@ class CheckOutWebflow {
 		input.setAttribute("data-name", "Checkbox");
 		var $this = this;
 		input.addEventListener("change", function () {
-			this.checked ? outerDiv.classList.add('border-red') : outerDiv.classList.remove('border-red')
+			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
 			$this.updateAmount(this, item.amount);
 		})
 
@@ -1299,9 +1303,9 @@ class CheckOutWebflow {
 		gridDiv.appendChild(courseInfoDiv);
 		gridDiv.appendChild(priceDiv);
 
-		outerDiv.appendChild(gridDiv);
+		//outerDiv.appendChild(gridDiv);
 
-		return outerDiv;
+		return gridDiv;
 	}
 	getVariant() {
 		let variant = 1;
