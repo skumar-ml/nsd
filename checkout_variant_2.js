@@ -241,25 +241,31 @@ class CheckOutWebflow {
 			checkboxEl.forEach(checkbox => {
 				let programDetailId = checkbox.getAttribute('programdetailid')
 				if (programDetailId == suppId) {
-					checkbox.checked = !checkbox.checked
+					
 					// Find the closest parent div
 					const parentDiv = checkbox.closest('div').parentElement;
+					if (checkbox.checked) {
+						checkbox.checked = !checkbox.checked
+					}
 
 					// Find the corresponding "add-to-card" button inside the same parent div
 					const addToCardButton = parentDiv.querySelector('.add-to-card');
-
-					// Change the button's innerHTML based on the checkbox state
-					//if (!checkbox.checked) {
+					if (addToCardButton != undefined) {
+						checkbox.checked = !checkbox.checked
+						// Change the button's innerHTML based on the checkbox state
+						//if (!checkbox.checked) {
 						addToCardButton.innerHTML = 'Add to Cart';
 						addToCardButton.classList.remove('disabled');
 						addToCardButton.style.pointerEvents = 'auto';
 						addToCardButton.style.color = '';
-					// } else {
-					// 	addToCardButton.innerHTML = 'Added';
-					// 	addToCardButton.classList.add('disabled');
-					// 	addToCardButton.style.pointerEvents = 'none';
-					// 	addToCardButton.style.color = 'gray';
-					// }
+						// } else {
+						// 	addToCardButton.innerHTML = 'Added';
+						// 	addToCardButton.classList.add('disabled');
+						// 	addToCardButton.style.pointerEvents = 'none';
+						// 	addToCardButton.style.color = 'gray';
+						// }
+					}
+
 				}
 
 			})
@@ -1130,16 +1136,16 @@ class CheckOutWebflow {
 		swiperSlideWrapper.innerHTML = "";
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
-			const outerShadowDiv = this.displaySingleSuppProgram(item);
+			const outerShadowDiv = this.displaySingleSuppProgram(item, 'mobile');
 			container.appendChild(outerShadowDiv);
 
 			//slider div
 			let swiperSlide = creEl('div', 'swiper-slide you-might')
-			const outerShadowDiv1 = this.displaySingleSuppProgram(item);
+			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop');
 			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
 		});
-		
+
 	}
 	updateUpSellModal(prep_week_data, tutoring_data) {
 
@@ -1209,7 +1215,7 @@ class CheckOutWebflow {
 		}
 	}
 	// New UpSell Program / Supplementary
-	displaySingleSuppProgram(item) {
+	displaySingleSuppProgram(item, size) {
 		var $this = this;
 		// Create the outer-shadow div
 		const outerDiv = document.createElement("div");
@@ -1235,7 +1241,7 @@ class CheckOutWebflow {
 		const input = document.createElement("input");
 		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox");
 		input.type = "checkbox";
-		input.id = item.label.replace(/\s+/g, '-').toLowerCase();
+		input.id = size + item.label.replace(/\s+/g, '-').toLowerCase();
 		input.name = "checkbox";
 		input.value = item.amount;
 		input.setAttribute("programdetailid", item.programDetailId);
@@ -1255,7 +1261,7 @@ class CheckOutWebflow {
 
 		const campNameDiv = document.createElement("label");
 		campNameDiv.classList.add("camp-name", "margin-bottom-0");
-		campNameDiv.setAttribute("for", item.label.replace(/\s+/g, '-').toLowerCase())
+		campNameDiv.setAttribute("for", size + item.label.replace(/\s+/g, '-').toLowerCase())
 		campNameDiv.textContent = item.label;
 
 		upsellDiv.appendChild(checkboxDiv);
@@ -1359,8 +1365,8 @@ class CheckOutWebflow {
 			videoEl.style.display = "none"
 		}
 	}
-	hideShowDivById(Id, display){
-		if(Id){
+	hideShowDivById(Id, display) {
+		if (Id) {
 			document.getElementById(Id).style.display = display
 		}
 	}
