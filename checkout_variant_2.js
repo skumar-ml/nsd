@@ -900,7 +900,7 @@ class CheckOutWebflow {
 				this.updateSuppData();
 			}
 			// Update readOnly for core program
-			this.updateDefaultCheckbox();
+			//this.updateDefaultCheckbox();
 			// Handle checkout button
 			this.handlePaymentEvent();
 			// Handle previous and next button
