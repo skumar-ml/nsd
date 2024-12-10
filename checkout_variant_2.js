@@ -391,9 +391,9 @@ class CheckOutWebflow {
 		var totalPriceDiv = document.getElementById("totalPriceDivMob");
 		if (totalPriceDiv != undefined) {
 			if (selectedIds.length > 0) {
-				totalPriceDiv.style.visibility = "visible";
+				totalPriceDiv.classList.add('show');
 			} else {
-				totalPriceDiv.style.visibility = "hidden";
+				totalPriceDiv.classList.remove('show');
 			}
 		}
 
