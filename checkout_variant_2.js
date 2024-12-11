@@ -1059,7 +1059,8 @@ class CheckOutWebflow {
 		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
 		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
-		this.updateUpSellModal(prep_week_data, tutoring_data)
+		let care_package_data = apiData.find(i => i.programDetailId == 21);
+		this.updateUpSellModal(prep_week_data, tutoring_data, care_package_data)
 		if (variant_type == 1) {
 			apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
 		} else {
@@ -1114,7 +1115,7 @@ class CheckOutWebflow {
 		}
 
 	}
-	updateUpSellModal(prep_week_data, tutoring_data) {
+	updateUpSellModal(prep_week_data, tutoring_data, care_package_data) {
 
 		if (prep_week_data.length > 0) {
 			var tpwAmount = document.getElementById('tpw-amount');
@@ -1191,6 +1192,22 @@ class CheckOutWebflow {
 			if (tutoringReadMore.length > 0) {
 				tutoringReadMore.forEach(read_more_link => {
 					read_more_link.href = this.memberData.site_url + "debate-tutoring";
+				})
+			}
+		}
+		// Care Package Data Update
+		if(care_package_data != undefined){
+			let carePackagePrice = document.querySelectorAll("[data-care-package='price']")
+			if (carePackagePrice.length > 0) {
+				carePackagePrice.forEach(cp_price => {
+					cp_price.innerHTML = "$"+care_package_data.amount;
+				})
+			}
+			let carePackageCheckbox = document.querySelectorAll("[data-care-package='checkbox']")
+			if (carePackageCheckbox.length > 0) {
+				carePackageCheckbox.forEach(cp_checkbox => {
+					cp_checkbox.setAttribute('programdetailid', care_package_data.programDetailId)
+					cp_checkbox.value = care_package_data.amount
 				})
 			}
 		}
