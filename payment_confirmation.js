@@ -135,6 +135,14 @@ class PaymentConfirmation {
                 upSellTpwProgramId.setAttribute('programName', prep_week_data[0].label)
                 upSellTpwProgramId.value = prep_week_data[0].amount
             }
+            // For mobile upsellTpwProgranId-1
+			var upsellTpwProgranIdMob = document.getElementById('upsellTpwProgranId-1');
+			if (upsellTpwProgranIdMob != undefined) {
+				upsellTpwProgranIdMob.setAttribute('programdetailid', prep_week_data[0].programDetailId)
+                upsellTpwProgranIdMob.setAttribute('programName', prep_week_data[0].label)
+                upsellTpwProgranIdMob.value = prep_week_data[0].amount
+			}
+
             let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
 			if(tpwTitle != undefined){
 				tpwTitle.innerHTML = prep_week_data[0].label
@@ -167,6 +175,13 @@ class PaymentConfirmation {
                 upSellTutoringProgramId.setAttribute('programName', tutoring_data[0].label)
                 upSellTutoringProgramId.value = tutoring_data[0].amount
             }
+            // Mobile div id upsellTutoProgranId-1
+			var upsellTutoProgranIdMob = document.getElementById('upsellTutoProgranId-1');
+			if (upsellTutoProgranIdMob != undefined) {
+				upsellTutoProgranIdMob.setAttribute('programdetailid', tutoring_data[0].programDetailId)
+                upsellTutoProgranIdMob.setAttribute('programName', tutoring_data[0].label)
+                upsellTutoProgranIdMob.value = tutoring_data[0].amount
+			}
 
             //tutoring title
 			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
