@@ -1268,7 +1268,7 @@ class CheckOutWebflow {
 		});
 
 		const priceItem = document.createElement("div");
-		priceItem.classList.add("price-item", 'align-end');
+		priceItem.classList.add("price-item", "align-end");
 
 		const saveDiv1 = document.createElement("div");
 		saveDiv1.classList.add("save-amount");
@@ -1282,7 +1282,7 @@ class CheckOutWebflow {
 		priceItem.appendChild(saveDiv2);
 
 		upsellDiv2.appendChild(textBlockWrapper);
-		upsellDiv2.appendChild(priceItem);
+		//upsellDiv2.appendChild(priceItem);
 
 		courseInfoDiv.appendChild(upsellDiv);
 		courseInfoDiv.appendChild(forumTypeDiv);
@@ -1319,6 +1319,8 @@ class CheckOutWebflow {
 
 		priceWrapper1.appendChild(originalPriceDiv1);
 		priceWrapper1.appendChild(discountedPriceDiv);
+		
+		priceWrapper1.appendChild(priceItem);
 
 		priceDiv.appendChild(discountPriceDiv);
 		priceDiv.appendChild(priceWrapper1);
