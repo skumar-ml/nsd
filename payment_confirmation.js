@@ -139,6 +139,12 @@ class PaymentConfirmation {
 			if(tpwTitle != undefined){
 				tpwTitle.innerHTML = prep_week_data[0].label
 			}
+            let tpwReadMore = document.querySelectorAll("[upsell-modal='tpw_read-more']")
+			if (tpwReadMore.length > 0) {
+				tpwReadMore.forEach(read_more_link => {
+					read_more_link.href = this.memberData.site_url + "topic-prep-week";
+				})
+			}
         }
 
 
@@ -167,6 +173,13 @@ class PaymentConfirmation {
 			if(tutoringTitle != undefined){
 				tutoringTitle.innerHTML = tutoring_data[0].label
 			}
+
+            let tutoringReadMore = document.querySelectorAll("[upsell-modal='tutoring_read-more']")
+			if (tutoringReadMore.length > 0) {
+				tutoringReadMore.forEach(read_more_link => {
+					read_more_link.href = this.memberData.site_url + "debate-tutoring";
+				})
+			} 
         }
     }
 
