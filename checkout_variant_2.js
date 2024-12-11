@@ -183,14 +183,13 @@ class CheckOutWebflow {
 			let offeringType = creEl("div", "dm-sans offering-type");
 			offeringType.innerHTML = sup.label;
 
-			let removeIcon = creEl("img");
-			removeIcon.src = 'https://cdn.prod.website-files.com/67173abfccca086eb4890d89/67569ca8d0fc0b3c2afed1b9_Remove.svg'
-			removeIcon.setAttribute('loading', "lazy")
-			removeIcon.addEventListener("click", function () {
+			let offeringRemove = creEl("div", "dm-sans offering-remove");
+			offeringRemove.innerHTML = "Remove";
+			offeringRemove.addEventListener("click", function () {
 				$this.removeSuppProgram(sup.programDetailId)
 			})
 
-			suppleHeadingDiv.prepend(offeringType, removeIcon)
+			suppleHeadingDiv.prepend(offeringType, offeringRemove)
 
 			let OfferingPrice = creEl("div", "dm-sans offering-price");
 			OfferingPrice.innerHTML = "$" + parseFloat(sup.amount).toFixed(2);
