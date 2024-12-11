@@ -1249,9 +1249,9 @@ class CheckOutWebflow {
 		upsellDiv.appendChild(checkboxDiv);
 		upsellDiv.appendChild(campNameDiv);
 
-		const forumTypeDiv = document.createElement("div");
-		forumTypeDiv.classList.add("dm-sans");
-		forumTypeDiv.textContent = item.forumType;
+		// const forumTypeDiv = document.createElement("div");
+		// forumTypeDiv.classList.add("dm-sans");
+		// forumTypeDiv.textContent = item.forumType;
 
 		const upsellDiv2 = document.createElement("div");
 		upsellDiv2.classList.add("upsell-div", "margin-top-16");
@@ -1285,7 +1285,7 @@ class CheckOutWebflow {
 		//upsellDiv2.appendChild(priceItem);
 
 		courseInfoDiv.appendChild(upsellDiv);
-		courseInfoDiv.appendChild(forumTypeDiv);
+		//courseInfoDiv.appendChild(forumTypeDiv);
 		courseInfoDiv.appendChild(upsellDiv2);
 
 		// Create the price details div (right column)
@@ -1319,7 +1319,7 @@ class CheckOutWebflow {
 
 		priceWrapper1.appendChild(originalPriceDiv1);
 		priceWrapper1.appendChild(discountedPriceDiv);
-		
+
 		priceWrapper1.appendChild(priceItem);
 
 		priceDiv.appendChild(discountPriceDiv);
@@ -1356,10 +1356,10 @@ class CheckOutWebflow {
 	}
 	hideAndShowWhyFamilies(classs, display) {
 		if (classs) {
-			document.querySelector('.'+classs).style.visibility = display
+			document.querySelector('.' + classs).style.visibility = display
 		}
 	}
-	
+
 	activeBreadCrumb(activeId) {
 		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
 		breadCrumbList.forEach(element => element.classList.remove('active'))
