@@ -343,7 +343,7 @@ class CheckOutWebflow {
 		}
 	}
 	// API call for checkout URL 
-	initializeStripePayment(paymentType = "", checkoutID = "") {
+	initializeStripePayment(paymentType = "", checkoutID = "", $baseUrl="createCheckoutUrlsByProgram") {
 		return new Promise((resolve, reject) => {
 			var suppProIdE = document.getElementById('suppProIds');
 			var core_product_price = document.getElementById('core_product_price');
@@ -362,13 +362,14 @@ class CheckOutWebflow {
 			//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 			var cancelUrl = new URL(window.location.href);
 			cancelUrl.searchParams.append('returnType', 'back')
+			
 			var data = {
 				"email": this.memberData.email,
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
-				"successUrl": this.memberData.site_url + "payment-confirmation?programId=" + this.memberData.programId + "&programName=" + this.memberData.programName,
-				//"cancelUrl": cancelUrl.href,
-				"cancelUrl": "https://www.nsdebatecamp.com/",
+				"successUrl": this.memberData.site_url + "payment-confirmation?programId=" + this.memberData.programId,
+				"cancelUrl": cancelUrl.href,
+				//"cancelUrl": "https://www.nsdebatecamp.com/",
 				"memberId": this.memberData.memberId,
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
@@ -391,12 +392,14 @@ class CheckOutWebflow {
 			}
 			if (checkoutID) {
 				data.checkoutId = checkoutID
-				data.paymentType = [paymentType]
+				data.paymentType = paymentType
+				//console.log('data', data)
+				//return true;
 			}
-
+			
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrlsByProgram", true)
+			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/"+$baseUrl, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -615,7 +618,7 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
 				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId);
+				let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 				if (initialCheckout) {
 					initialCheckout.then(() => {
 						ibackbutton.value = "1";
@@ -636,7 +639,7 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
 				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId);
+				let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 				if (initialCheckout) {
 					initialCheckout.then(() => {
 						ibackbutton.value = "1";
@@ -656,7 +659,7 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
 				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('paylater', $this.$checkoutData.checkoutId);
+				let initialCheckout = $this.initializeStripePayment('paylater', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 				if (initialCheckout) {
 					initialCheckout.then(() => {
 						ibackbutton.value = "1";
