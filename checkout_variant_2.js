@@ -553,6 +553,7 @@ class CheckOutWebflow {
 						})
 					}
 					$this.hideAndShowWhyFamilies('why-families-div', 'hidden')
+					$this.hideAndShowByClass('banner', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
@@ -573,6 +574,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'visible')
+			$this.hideAndShowByClass('banner', 'block')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
@@ -1378,7 +1380,11 @@ class CheckOutWebflow {
 			document.querySelector('.' + classs).style.visibility = display
 		}
 	}
-
+	hideAndShowByClass(classs, display) {
+		if (classs) {
+			document.querySelector('.' + classs).style.display = display
+		}
+	}
 	activeBreadCrumb(activeId) {
 		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
 		breadCrumbList.forEach(element => element.classList.remove('active'))
