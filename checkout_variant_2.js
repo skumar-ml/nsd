@@ -949,7 +949,7 @@ class CheckOutWebflow {
 			console.error('Error fetching API data:', error);
 
 			// Handle errors (optional)
-			selectBox.innerHTML = '<option value="">Student details not available</option>';
+			selectBox.innerHTML = '<option value="">Student Details not available</option>';
 		}
 	}
 	displayUpSellModal() {
@@ -1239,10 +1239,9 @@ class CheckOutWebflow {
 
 		// Create the course-info div (left column)
 		const courseInfoDiv = document.createElement("div");
-		courseInfoDiv.classList.add("course-info");
 
 		const upsellDiv = document.createElement("div");
-		upsellDiv.classList.add("upsell-div", "align-left");
+		upsellDiv.classList.add("upsell-div");
 
 		// Create the checkbox
 		const checkboxDiv = document.createElement("div");
@@ -1271,21 +1270,16 @@ class CheckOutWebflow {
 		label.appendChild(input);
 		label.appendChild(span);
 		checkboxDiv.appendChild(label);
-
+		const labelWrapper = creEl('div')
 		const campNameDiv = document.createElement("label");
 		campNameDiv.classList.add("camp-name", "margin-bottom-0");
 		campNameDiv.setAttribute("for", size + item.label.replace(/\s+/g, '-').toLowerCase())
 		campNameDiv.textContent = item.label;
+		labelWrapper.appendChild(campNameDiv)
+		courseInfoDiv.appendChild(labelWrapper)
+		//upsellDiv.appendChild(checkboxDiv);
+		///upsellDiv.appendChild(campNameDiv);
 
-		upsellDiv.appendChild(checkboxDiv);
-		upsellDiv.appendChild(campNameDiv);
-
-		// const forumTypeDiv = document.createElement("div");
-		// forumTypeDiv.classList.add("dm-sans");
-		// forumTypeDiv.textContent = item.forumType;
-
-		const upsellDiv2 = document.createElement("div");
-		upsellDiv2.classList.add("upsell-div", "margin-top-16");
 
 		const textBlockWrapper = document.createElement("div");
 		textBlockWrapper.classList.add("text-block-wrapper");
@@ -1299,7 +1293,7 @@ class CheckOutWebflow {
 		});
 
 		const priceItem = document.createElement("div");
-		priceItem.classList.add("price-item", "align-end");
+		priceItem.classList.add("price-item");
 
 		const saveDiv1 = document.createElement("div");
 		saveDiv1.classList.add("save-amount");
@@ -1311,13 +1305,11 @@ class CheckOutWebflow {
 
 		priceItem.appendChild(saveDiv1);
 		priceItem.appendChild(saveDiv2);
+		
+		slideDiv.appendChild(upsellDiv);
+		upsellDiv.appendChild(textBlockWrapper);
 
-		upsellDiv2.appendChild(textBlockWrapper);
-		//upsellDiv2.appendChild(priceItem);
-
-		courseInfoDiv.appendChild(upsellDiv);
-		//courseInfoDiv.appendChild(forumTypeDiv);
-		courseInfoDiv.appendChild(upsellDiv2);
+		
 
 		// Create the price details div (right column)
 		const priceDiv = document.createElement("div");
@@ -1348,16 +1340,19 @@ class CheckOutWebflow {
 		discountedPrice.textContent = "$" + item.amount;
 		discountedPriceDiv.appendChild(discountedPrice);
 
+		priceWrapper1.appendChild(priceItem);
 		priceWrapper1.appendChild(originalPriceDiv1);
 		priceWrapper1.appendChild(discountedPriceDiv);
 
-		priceWrapper1.appendChild(priceItem);
+		
 
 		priceDiv.appendChild(discountPriceDiv);
-		priceDiv.appendChild(priceWrapper1);
+		courseInfoDiv.appendChild(priceWrapper1);
+		
 
 		gridDiv.appendChild(courseInfoDiv);
-		gridDiv.appendChild(priceDiv);
+		gridDiv.appendChild(checkboxDiv)
+		//gridDiv.appendChild(priceDiv);
 
 		//outerDiv.appendChild(gridDiv);
 
