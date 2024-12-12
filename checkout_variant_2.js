@@ -574,7 +574,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'visible')
-			$this.hideAndShowByClass('rated-debate-banner', 'block')
+			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
