@@ -949,7 +949,7 @@ class CheckOutWebflow {
 			console.error('Error fetching API data:', error);
 
 			// Handle errors (optional)
-			selectBox.innerHTML = '<option value="">Failed to load options</option>';
+			selectBox.innerHTML = '<option value="">Student details not available</option>';
 		}
 	}
 	displayUpSellModal() {
