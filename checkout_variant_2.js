@@ -574,7 +574,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'visible')
-			$this.hideAndShowByClass('rated-debate-banner', 'flex')
+			$this.hideAndShowByClass('rated-debate-banner', 'block')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
@@ -891,6 +891,16 @@ class CheckOutWebflow {
 			tab.addEventListener('click', function () {
 				payNowLink.closest('div').style.display = "block"
 				payNowLinkMo.closest('div').style.display = "block"
+				if (this.classList.contains('bank-transfer-tab')) {
+					payNowLink.innerHTML = "Pay Now With Bank Transfer"
+					payNowLinkMo.innerHTML = "Pay Now With Bank Transfer"
+				}else if (this.classList.contains('credit-card-tab')) {
+					payNowLink.innerHTML = "Pay Now With Credit Card"
+					payNowLinkMo.innerHTML = "Pay Now With Credit Card"
+				}else if (this.classList.contains('pay-later')) {
+					payNowLink.innerHTML = "Pay Now With BNPL"
+					payNowLinkMo.innerHTML = "Pay Now With BNPL"
+				}
 			})
 		}
 	}
