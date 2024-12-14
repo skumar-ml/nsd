@@ -1304,7 +1304,7 @@ class CheckOutWebflow {
 
 		const saveDiv2 = document.createElement("div");
 		saveDiv2.classList.add("save-amount");
-		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount));
+		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
 
 		priceItem.appendChild(saveDiv1);
 		priceItem.appendChild(saveDiv2);
