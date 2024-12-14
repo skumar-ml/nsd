@@ -953,6 +953,7 @@ class CheckOutWebflow {
 		}
 	}
 	displayUpSellModal() {
+		this.addToCart()
 		if (this.memberData.hide_upsell) {
 			return;
 		}
@@ -977,7 +978,7 @@ class CheckOutWebflow {
 
 			}
 		}
-		this.addToCart()
+		
 
 	}
 	showUpSellModal(modal) {
