@@ -978,8 +978,6 @@ class CheckOutWebflow {
 
 			}
 		}
-		
-
 	}
 	showUpSellModal(modal) {
 		const check_up_sell = this.checkUpSellModalOpen();
@@ -989,7 +987,7 @@ class CheckOutWebflow {
 		}
 		modal.classList.add('show');
 		modal.style.display = 'flex';
-		document.querySelector('.student-info_modal-bg').setAttribute('aria-hidden', 'false');
+		document.querySelector('.upsell-modal-bg').setAttribute('aria-hidden', 'false');
 	}
 	checkUpSellModalOpen() {
 		let isOpen = false;
@@ -1008,7 +1006,7 @@ class CheckOutWebflow {
 	hideUpSellModal(modal) {
 		modal.classList.remove('show');
 		modal.style.display = 'none';
-		document.querySelector('.student-info_modal-bg').removeAttribute('aria-hidden');
+		document.querySelector('.upsell-modal-bg').removeAttribute('aria-hidden');
 	}
 	addToCart() {
 		// Select all 'add-to-card' buttons
