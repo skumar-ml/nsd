@@ -30,7 +30,7 @@ class PaymentConfirmation {
         if(this.cart_page_variant != undefined){
             let topicPrepUpSellModal = document.querySelector('.topic-prep_modal-container')
 		    let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
-            if(cart_page_variant == 2){
+            if(this.cart_page_variant == 2){
                 tutoringUpSellModal.style.display = "none";
                 topicPrepUpSellModal.style.display = "flex";
             }else{
