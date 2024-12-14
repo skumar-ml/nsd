@@ -18,19 +18,19 @@ class PaymentConfirmation {
         var $this = this;
         upSellModalBtn.addEventListener("click", function (event) {
             event.preventDefault()
-            if(this.cart_page_variant != undefined){
+            if($this.cart_page_variant != undefined){
                 $this.displayUpSellModal();
             }else{
-                window.location.href = this.memberUrl;
+                window.location.href = $this.memberUrl;
             }
             
         })
 
         // Showing up-sell modal content based on cart page modal variant
-        if(this.cart_page_variant != undefined){
+        if($this.cart_page_variant != undefined){
             let topicPrepUpSellModal = document.querySelector('.topic-prep_modal-container')
 		    let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
-            if(this.cart_page_variant == 2){
+            if($this.cart_page_variant == 2){
                 tutoringUpSellModal.style.display = "none";
                 topicPrepUpSellModal.style.display = "flex";
             }else{
@@ -47,7 +47,7 @@ class PaymentConfirmation {
 
         if (modal) {
             console.log('Showing modal on page load');
-            this.showUpSellModal(modal);
+            $this.showUpSellModal(modal);
         } else {
             console.log('Modal element not found.');
         }
@@ -55,7 +55,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
-                    window.location.href = this.memberUrl;
+                    window.location.href = $this.memberUrl;
                 })
 
             }
@@ -66,11 +66,11 @@ class PaymentConfirmation {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
                     event.preventDefault();
-                    window.location.href = this.memberUrl;
+                    window.location.href = $this.memberUrl;
                 });
             });
         }
-        this.buyNow()
+        $this.buyNow()
     }
 
     showUpSellModal(modal) {
