@@ -5,6 +5,8 @@ class PaymentConfirmation {
         this.webFlowMemberId = webFlowMemberId;
         this.programId = this.getURLParam('programId')
         this.sessionId = this.getURLParam('transactionID')
+        this.cart_page_variant = localStorage.getItem('_ab_test_variant');
+        this.memberUrl = site_url +"members/"+ webFlowMemberId;
         if(!this.programId || !this.sessionId){
             return false;
         }
@@ -16,12 +18,16 @@ class PaymentConfirmation {
         var $this = this;
         upSellModalBtn.addEventListener("click", function (event) {
             event.preventDefault()
-            $this.displayUpSellModal();
+            if(this.cart_page_variant != undefined){
+                $this.displayUpSellModal();
+            }else{
+                window.location.href = this.memberUrl;
+            }
+            
         })
 
-        const cart_page_variant = localStorage.getItem('_ab_test_variant')
         // Showing up-sell modal content based on cart page modal variant
-        if(cart_page_variant != undefined){
+        if(this.cart_page_variant != undefined){
             let topicPrepUpSellModal = document.querySelector('.topic-prep_modal-container')
 		    let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
             if(cart_page_variant == 2){
@@ -49,9 +55,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
-                    let memberUrl = $this.site_url +"members/"+ $this.webFlowMemberId;
-                    //$this.hideUpSellModal(modal)
-                    window.location.href = memberUrl;
+                    window.location.href = this.memberUrl;
                 })
 
             }
@@ -62,10 +66,7 @@ class PaymentConfirmation {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
                     event.preventDefault();
-                   // $this.hideUpSellModal(modal)
-                   let memberUrl = $this.site_url +"members/"+ $this.webFlowMemberId;
-                    //$this.hideUpSellModal(modal)
-                    window.location.href = memberUrl;
+                    window.location.href = this.memberUrl;
                 });
             });
         }
@@ -75,13 +76,13 @@ class PaymentConfirmation {
     showUpSellModal(modal) {
         modal.classList.add('show');
         modal.style.display = 'flex';
-        document.querySelector('.student-info_modal-bg').setAttribute('aria-hidden', 'false');
+        document.querySelector('.upsell-modal-bg').setAttribute('aria-hidden', 'false');
     }
 
     hideUpSellModal(modal) {
         modal.classList.remove('show');
         modal.style.display = 'none';
-        document.querySelector('.student-info_modal-bg').removeAttribute('aria-hidden');
+        document.querySelector('.upsell-modal-bg').removeAttribute('aria-hidden');
     }
 
     // Get API data with the help of endpoint
