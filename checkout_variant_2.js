@@ -1363,7 +1363,7 @@ class CheckOutWebflow {
 	getVariant() {
 		let variant = 1;
 		//let topicPripUpSellModal = document.querySelector('.topic-prep_modal-container')
-		let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
+		let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
 		if (window.getComputedStyle(tutoringUpSellModal).display === 'block') {
 			variant = 2;
 		}
