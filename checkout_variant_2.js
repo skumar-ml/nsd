@@ -1060,6 +1060,7 @@ class CheckOutWebflow {
 		});
 	}
 	async displaySupplementaryProgram() {
+		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
@@ -1086,7 +1087,7 @@ class CheckOutWebflow {
 
 		apiData = apiData.filter(i => i.programDetailId != 21);
 
-		let container2 = document.getElementById("checkout-supplimentary-data-2");
+		
 		if (container2 == undefined) return;
 		
 		if (swiperSlideWrapper == undefined) return
