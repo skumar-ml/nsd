@@ -1079,10 +1079,12 @@ class CheckOutWebflow {
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
 		let care_package_data = apiData.find(i => i.programDetailId == 21);
 		this.updateUpSellModal(prep_week_data, tutoring_data, care_package_data)
-		if (variant_type == 1) {
-			apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
-		} else {
-			apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
+		if(!hide_upsell ){
+			if (variant_type == 1) {
+				apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
+			} else {
+				apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
+			}
 		}
 
 		apiData = apiData.filter(i => i.programDetailId != 21);
