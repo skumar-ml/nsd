@@ -28,8 +28,8 @@ class PaymentConfirmation {
 
         // Showing up-sell modal content based on cart page modal variant
         if($this.cart_page_variant != undefined){
-            let topicPrepUpSellModal = document.querySelector('.topic-prep_modal-container')
-		    let tutoringUpSellModal = document.querySelector('.tutoring-modal-container')
+            let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
+		    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
             if($this.cart_page_variant == 2){
                 tutoringUpSellModal.style.display = "none";
                 topicPrepUpSellModal.style.display = "flex";
