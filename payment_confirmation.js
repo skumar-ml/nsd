@@ -60,7 +60,7 @@ class PaymentConfirmation {
 
             }
         }
-        const closeLinks = document.querySelectorAll('.close-link-2');
+        const closeLinks = document.querySelectorAll('.upsell-close-link');
         if(closeLinks != undefined){
             closeLinks.forEach(function (closeLink) {
                 console.log("SignIn Click Event Called");
@@ -204,7 +204,7 @@ class PaymentConfirmation {
         const addToCartButtons = document.querySelectorAll(".add-to-card");
         var $this = this;
         addToCartButtons.forEach(button => {
-	    button.innerHTML = "Buy Now";
+            button.innerHTML = "Buy Now";
             button.addEventListener("click", function (event) {
 
                 event.preventDefault(); // Prevent default link behavior
