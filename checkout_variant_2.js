@@ -1060,10 +1060,13 @@ class CheckOutWebflow {
 		});
 	}
 	async displaySupplementaryProgram() {
-
+		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
+		if(!apiData.length){
+			swiperSlideWrapper.style.display="none";
+		}
 		// Added in our Local Data
 		this.$suppPro = apiData;
 		let prep_week_searchText = "topic prep week";
@@ -1085,7 +1088,7 @@ class CheckOutWebflow {
 
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		if (container2 == undefined) return;
-		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
+		
 		if (swiperSlideWrapper == undefined) return
 
 		swiperSlideWrapper.innerHTML = "";
