@@ -204,6 +204,7 @@ class PaymentConfirmation {
         const addToCartButtons = document.querySelectorAll(".add-to-card");
         var $this = this;
         addToCartButtons.forEach(button => {
+	    button.innerHTML = "Buy Now";
             button.addEventListener("click", function (event) {
 
                 event.preventDefault(); // Prevent default link behavior
