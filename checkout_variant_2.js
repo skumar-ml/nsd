@@ -1065,9 +1065,7 @@ class CheckOutWebflow {
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
-		if(!apiData.length){
-			swiperSlideWrapper.style.display="none";
-		}
+		
 		// Added in our Local Data
 		this.$suppPro = apiData;
 		let prep_week_searchText = "topic prep week";
@@ -1079,16 +1077,19 @@ class CheckOutWebflow {
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
 		let care_package_data = apiData.find(i => i.programDetailId == 21);
 		this.updateUpSellModal(prep_week_data, tutoring_data, care_package_data)
-		if(!hide_upsell ){
+		
+		if(!this.memberData.hide_upsell ){
 			if (variant_type == 1) {
 				apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
 			} else {
 				apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
 			}
 		}
-
 		apiData = apiData.filter(i => i.programDetailId != 21);
 
+		if(!apiData.length){
+			swiperSlideWrapper.style.display="none";
+		}
 		
 		if (container2 == undefined) return;
 		
