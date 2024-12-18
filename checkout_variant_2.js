@@ -661,7 +661,7 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				payNowLink.innerHTML = "Processing.."
 				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('paylater', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
+				let initialCheckout = $this.initializeStripePayment('affirm', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 				if (initialCheckout) {
 					initialCheckout.then(() => {
 						ibackbutton.value = "1";
