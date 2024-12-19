@@ -730,6 +730,7 @@ class CheckOutWebflow {
 		if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
 			var paymentData = JSON.parse(checkoutJson);
 			this.addSessionId()
+			this.uncheckAllCardCheckbox();
 			var studentFirstName = document.getElementById("Student-First-Name");
 			var studentLastName = document.getElementById("Student-Last-Name");
 			var studentEmail = document.getElementById("Student-Email");
@@ -1002,6 +1003,18 @@ class CheckOutWebflow {
 			}
 		})
 		return isOpen;
+	}
+	uncheckAllCardCheckbox() {
+		const addToCartButtons = document.querySelectorAll(".add-to-card");
+		addToCartButtons.forEach(button => {
+			const parent = button.closest("div");
+			if (parent) {
+				const checkbox = parent.querySelector(".suppCheckbox");
+				if (checkbox.checked) {
+					checkbox.checked = !checkbox.checked;
+				}
+			}
+		})
 	}
 	hideUpSellModal(modal) {
 		modal.classList.remove('show');
