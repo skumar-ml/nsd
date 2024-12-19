@@ -1005,16 +1005,18 @@ class CheckOutWebflow {
 		return isOpen;
 	}
 	uncheckAllCardCheckbox() {
-		const addToCartButtons = document.querySelectorAll(".add-to-card");
-		addToCartButtons.forEach(button => {
-			const parent = button.closest("div");
-			if (parent) {
-				const checkbox = parent.querySelector(".suppCheckbox");
-				if (checkbox.checked) {
+		setTimeout(() => {
+			const addToCartButtons = document.querySelectorAll(".add-to-card");
+			addToCartButtons.forEach(button => {
+				const parent = button.closest("div");
+				if (parent) {
+					const checkbox = parent.querySelector(".suppCheckbox");
+					//if (checkbox.checked) {
 					checkbox.checked = !checkbox.checked;
+					//}
 				}
-			}
-		})
+			})
+		}, 100);
 	}
 	hideUpSellModal(modal) {
 		modal.classList.remove('show');
