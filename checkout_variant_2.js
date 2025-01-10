@@ -727,7 +727,8 @@ class CheckOutWebflow {
 		var checkoutJson = localStorage.getItem("checkOutData");
 		// Browser back button event hidden fields
 		var ibackbutton = document.getElementById("backbuttonstate");
-		if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
+		//if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
+		if (checkoutJson != undefined) {
 			var paymentData = JSON.parse(checkoutJson);
 			this.addSessionId()
 			this.uncheckAllCardCheckbox();
