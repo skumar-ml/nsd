@@ -7,7 +7,7 @@ class PaymentConfirmation {
         this.sessionId = this.getURLParam('transactionID')
         this.cart_page_variant = localStorage.getItem('_ab_test_variant');
         this.memberUrl = site_url +"members/"+ webFlowMemberId;
-	this.portal_home = site_url +"portal/home";
+	this.portal_home = site_url +"portal/home?from=success";
         if(!this.programId || !this.sessionId){
             return false;
         }
