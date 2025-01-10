@@ -7,6 +7,7 @@ class PaymentConfirmation {
         this.sessionId = this.getURLParam('transactionID')
         this.cart_page_variant = localStorage.getItem('_ab_test_variant');
         this.memberUrl = site_url +"members/"+ webFlowMemberId;
+	this.portal_home = site_url +"portal/home";
         if(!this.programId || !this.sessionId){
             return false;
         }
@@ -21,7 +22,7 @@ class PaymentConfirmation {
             if($this.cart_page_variant != undefined){
                 $this.displayUpSellModal();
             }else{
-                window.location.href = $this.memberUrl;
+                window.location.href = $this.portal_home;
             }
             
         })
@@ -55,7 +56,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
-                    window.location.href = $this.memberUrl;
+                    window.location.href = $this.portal_home;
                 })
 
             }
@@ -66,7 +67,7 @@ class PaymentConfirmation {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
                     event.preventDefault();
-                    window.location.href = $this.memberUrl;
+                    window.location.href = $this.portal_home;
                 });
             });
         }
