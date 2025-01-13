@@ -1136,6 +1136,7 @@ class CheckOutWebflow {
 				centerMode: false,
 				variableWidth: false,
 				arrows: false,
+				dots: true,
 			};
 			// Initialize you might slider
 			var $sliderYouMight = $slider.slick(slickSettings);
