@@ -552,7 +552,7 @@ class CheckOutWebflow {
 							$this.updateStudentDetails(checkoutData);
 						})
 					}
-					$this.hideAndShowWhyFamilies('why-families-div', 'hidden')
+					$this.hideAndShowWhyFamilies('why-families-div', 'none')
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
@@ -573,7 +573,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
-			$this.hideAndShowWhyFamilies('why-families-div', 'visible')
+			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
 			$this.activeBreadCrumb('pay-deposite')
@@ -1407,6 +1407,35 @@ class CheckOutWebflow {
 	hideAndShowWhyFamilies(classs, display) {
 		if (classs) {
 			document.querySelector('.' + classs).style.visibility = display
+		}
+		if(classs == "block"){
+			// Shared Slick slider settings
+			var $slider =  $('.why-families_slick-slider');
+			$slider.slick('destroy');
+			var slickSettings = {
+				speed: 300,
+				slidesToShow: 1,
+				slidesToScroll: 1,
+				infinite: true,
+				centerMode: false,
+				variableWidth: false,
+				arrows: false,
+				dots: true,
+			};
+	 
+			// Initialize both sliders
+			var $sliderFamilies = $slider.slick(slickSettings);
+		   
+			// Shared navigation logic for the "Why Families" slider
+			$('.families-left-arrow').click(function () {
+				console.log("Why Families: Left arrow clicked.");
+				$sliderFamilies.slick('slickPrev');
+			});
+	 
+			$('.families-right-arrow').click(function () {
+				console.log("Why Families: Right arrow clicked.");
+				$sliderFamilies.slick('slickNext');
+			});
 		}
 	}
 	hideAndShowByClass(classs, display) {
