@@ -1406,7 +1406,7 @@ class CheckOutWebflow {
 	}
 	hideAndShowWhyFamilies(classs, display) {
 		if (classs) {
-			document.querySelector('.' + classs).style.visibility = display
+			document.querySelector('.' + classs).style.display = display
 		}
 		if(classs == "block"){
 			// Shared Slick slider settings
