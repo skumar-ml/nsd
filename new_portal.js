@@ -692,11 +692,11 @@ class NSDPortal {
      * Get Camp topic data 
      */
     getCampTopicData() {
-        let textContent = ''
+        let textContent = (this.$programDetail.campTopic) ? this.$programDetail.campTopic : "";
         const debateEvent = this.$programDetail.debateEvent;
-        if (debateEvent === "Lincoln-Douglas") {
+        if (!textContent && debateEvent === "Lincoln-Douglas") {
             textContent = "Resolved: The United States ought to adopt carbon pricing."
-        } else if (debateEvent === "Public Forum") {
+        } else if (!textContent && debateEvent === "Public Forum") {
             textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
         }
         console.log('debateEvent', debateEvent)
