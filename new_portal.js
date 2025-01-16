@@ -693,13 +693,13 @@ class NSDPortal {
      */
     getCampTopicData() {
         let textContent = (this.$programDetail.campTopic) ? this.$programDetail.campTopic : "";
-        const debateEvent = this.$programDetail.debateEvent;
-        if (!textContent && debateEvent === "Lincoln-Douglas") {
-            textContent = "Resolved: The United States ought to adopt carbon pricing."
-        } else if (!textContent && debateEvent === "Public Forum") {
-            textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
-        }
-        console.log('debateEvent', debateEvent)
+        // const debateEvent = this.$programDetail.debateEvent;
+        // if (!textContent && debateEvent === "Lincoln-Douglas") {
+        //     textContent = "Resolved: The United States ought to adopt carbon pricing."
+        // } else if (!textContent && debateEvent === "Public Forum") {
+        //     textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
+        // }
+        // console.log('debateEvent', debateEvent)
         if(textContent){
             return `<div>
                         <div class="pre-camp_subtitle-wrapper">
