@@ -24,6 +24,7 @@ class CheckOutWebflow {
 	$suppPro = [];
 	$checkoutData = "";
 	$checkOutResponse = false;
+	$initCheckout = null;
 	constructor(apiBaseUrl, memberData) {
 		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData;
@@ -549,7 +550,9 @@ class CheckOutWebflow {
 					if (initialCheckout) {
 						initialCheckout.then(() => {
 							var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
-							$this.updateStudentDetails(checkoutData);
+							$this.updateStudentDetails(checkoutData).then(()=>{
+								$this.$initCheckout = true;
+							});
 						})
 					}
 					$this.hideAndShowWhyFamilies('why-families-div', 'none')
@@ -572,6 +575,7 @@ class CheckOutWebflow {
 			document.getElementsByClassName("bank-transfer-tab")[0].click();
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
+			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
@@ -610,28 +614,36 @@ class CheckOutWebflow {
 		// Browser back button event hidden fields
 		var ibackbutton = document.getElementById("backbuttonstate");
 		var $this = this;
-		let payNowLink = document.getElementById('pay-now-link');
-		let payNowLinkMob = document.getElementById('pay-now-link-2');
+		// let payNowLink = document.getElementById('pay-now-link');
+		// let payNowLinkMob = document.getElementById('pay-now-link-2');
 		ach_payment.addEventListener("click", function () {
 			let suppProIdE = document.getElementById('suppProIds');
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
 			if (suppProIds.length > 0) {
-				payNowLink.innerHTML = "Processing.."
-				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
-				if (initialCheckout) {
-					initialCheckout.then(() => {
-						ibackbutton.value = "1";
-						payNowLink.innerHTML = "Pay Now"
-						window.location.href = $this.$checkoutData.achUrl;
+				// payNowLink.innerHTML = "Processing.."
+				// payNowLinkMob.innerHTML = "Processing.."
+				setInterval(() => {
+					if($this.$initCheckout){
+						let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
+						if (initialCheckout) {
+							initialCheckout.then(() => {
+								ibackbutton.value = "1";
+								//payNowLink.innerHTML = "Pay Now"
+								window.location.href = $this.$checkoutData.achUrl;
 
-					})
-				}
+							})
+						}
+					}
+				}, 1000);
 			} else {
-				ibackbutton.value = "1";
-				window.location.href = $this.$checkoutData.achUrl;
+				setInterval(() => {
+					if($this.$initCheckout){
+						ibackbutton.value = "1";
+						window.location.href = $this.$checkoutData.achUrl;
+					}
+				}, 1000);
 			}
 		});
 		card_payment.addEventListener("click", function () {
@@ -639,19 +651,27 @@ class CheckOutWebflow {
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// card_payment.innerHTML = "Processing..."
 			if (suppProIds.length > 0) {
-				payNowLink.innerHTML = "Processing.."
-				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
-				if (initialCheckout) {
-					initialCheckout.then(() => {
-						ibackbutton.value = "1";
-						payNowLink.innerHTML = "Pay Now"
-						window.location.href = $this.$checkoutData.cardUrl;
-					})
-				}
+				// payNowLink.innerHTML = "Processing.."
+				// payNowLinkMob.innerHTML = "Processing.."
+				setInterval(() => {
+					if($this.$initCheckout){
+						let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
+						if (initialCheckout) {
+							initialCheckout.then(() => {
+								ibackbutton.value = "1";
+								//payNowLink.innerHTML = "Pay Now"
+								window.location.href = $this.$checkoutData.cardUrl;
+							})
+						}
+					}
+				}, 1000);
 			} else {
-				ibackbutton.value = "1";
-				window.location.href = $this.$checkoutData.cardUrl;
+				setInterval(() => {
+					if($this.$initCheckout){
+						ibackbutton.value = "1";
+						window.location.href = $this.$checkoutData.cardUrl;
+					}
+				}, 1000);
 			}
 		});
 		paylater_payment.addEventListener("click", function () {
@@ -659,19 +679,27 @@ class CheckOutWebflow {
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// paylater_payment.innerHTML = "Processing..."
 			if (suppProIds.length > 0) {
-				payNowLink.innerHTML = "Processing.."
-				payNowLinkMob.innerHTML = "Processing.."
-				let initialCheckout = $this.initializeStripePayment('affirm', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
-				if (initialCheckout) {
-					initialCheckout.then(() => {
-						ibackbutton.value = "1";
-						payNowLink.innerHTML = "Pay Now"
-						window.location.href = $this.$checkoutData.payLaterUrl;
-					})
-				}
+				// payNowLink.innerHTML = "Processing.."
+				// payNowLinkMob.innerHTML = "Processing.."
+				setInterval(() => {
+					if($this.$initCheckout){
+						let initialCheckout = $this.initializeStripePayment('affirm', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
+						if (initialCheckout) {
+							initialCheckout.then(() => {
+								ibackbutton.value = "1";
+								//payNowLink.innerHTML = "Pay Now"
+								window.location.href = $this.$checkoutData.payLaterUrl;
+							})
+						}
+					}
+				}, 1000);
 			} else {
-				ibackbutton.value = "1";
-				window.location.href = $this.$checkoutData.payLaterUrl;
+				setInterval(() => {
+					if($this.$initCheckout){
+						ibackbutton.value = "1";
+						window.location.href = $this.$checkoutData.payLaterUrl;
+					}
+				}, 1000);
 			}
 		});
 	}
@@ -874,6 +902,7 @@ class CheckOutWebflow {
 		let payNowLink = document.getElementById('pay-now-link');
 		payNowLink.addEventListener("click", function (e) {
 			e.preventDefault();
+			payNowLink.innerHTML = "Processing..";
 			console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
@@ -882,6 +911,17 @@ class CheckOutWebflow {
 		let payNowLinkMo = document.getElementById('pay-now-link-2');
 		payNowLinkMo.addEventListener("click", function (e) {
 			e.preventDefault();
+			payNowLinkMo.innerHTML = "Processing..";
+			console.log("click payNow Button")
+			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
+			activePaymentLink.click();
+		})
+
+		// New desktop button link
+		let payNowLink3 = document.getElementById('pay-now-link-3');
+		payNowLink3.addEventListener("click", function (e) {
+			e.preventDefault();
+			payNowLink3.innerHTML = "Processing..";
 			console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
@@ -893,15 +933,19 @@ class CheckOutWebflow {
 			tab.addEventListener('click', function () {
 				payNowLink.closest('div').style.display = "block"
 				payNowLinkMo.closest('div').style.display = "block"
+				payNowLink3.closest('div').style.display = "block"
 				if (this.classList.contains('bank-transfer-tab')) {
 					payNowLink.innerHTML = "Pay Now With Bank Transfer"
 					payNowLinkMo.innerHTML = "Pay Now With Bank Transfer"
+					payNowLink3.innerHTML = "Pay Now With Bank Transfer"
 				}else if (this.classList.contains('credit-card-tab')) {
 					payNowLink.innerHTML = "Pay Now With Credit Card"
 					payNowLinkMo.innerHTML = "Pay Now With Credit Card"
+					payNowLink3.innerHTML = "Pay Now With Credit Card"
 				}else if (this.classList.contains('pay-later')) {
 					payNowLink.innerHTML = "Pay Now With BNPL"
 					payNowLinkMo.innerHTML = "Pay Now With BNPL"
+					payNowLink3.innerHTML = "Pay Now With BNPL"
 				}
 			})
 		}
