@@ -624,22 +624,24 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
-				setInterval(() => {
+				var myInterval1 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval1);
 						let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 						if (initialCheckout) {
 							initialCheckout.then(() => {
 								ibackbutton.value = "1";
 								//payNowLink.innerHTML = "Pay Now"
 								window.location.href = $this.$checkoutData.achUrl;
-
+								
 							})
 						}
 					}
 				}, 1000);
 			} else {
-				setInterval(() => {
+				var myInterval2 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval2);
 						ibackbutton.value = "1";
 						window.location.href = $this.$checkoutData.achUrl;
 					}
@@ -653,8 +655,9 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
-				setInterval(() => {
+				var myInterval3 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval3);
 						let initialCheckout = $this.initializeStripePayment('card', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 						if (initialCheckout) {
 							initialCheckout.then(() => {
@@ -666,8 +669,9 @@ class CheckOutWebflow {
 					}
 				}, 1000);
 			} else {
-				setInterval(() => {
+				var myInterval4 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval4);
 						ibackbutton.value = "1";
 						window.location.href = $this.$checkoutData.cardUrl;
 					}
@@ -681,8 +685,9 @@ class CheckOutWebflow {
 			if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
-				setInterval(() => {
+				var myInterval5 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval5);
 						let initialCheckout = $this.initializeStripePayment('affirm', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 						if (initialCheckout) {
 							initialCheckout.then(() => {
@@ -694,8 +699,9 @@ class CheckOutWebflow {
 					}
 				}, 1000);
 			} else {
-				setInterval(() => {
+				var myInterval6 =  setInterval(() => {
 					if($this.$initCheckout){
+						clearInterval(myInterval6);
 						ibackbutton.value = "1";
 						window.location.href = $this.$checkoutData.payLaterUrl;
 					}
