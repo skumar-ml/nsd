@@ -463,7 +463,8 @@ class CheckOutWebflow {
 			var studentGender = document.getElementById('Student-Gender');
 			var suppProIdE = document.getElementById('suppProIds');
 			var core_product_price = document.getElementById('core_product_price');
-
+			//Utm Source
+			let localUtmSource = localStorage.getItem("utm_source");
 			//Payment button
 			var ach_payment = document.getElementById('ach_payment');
 			var card_payment = document.getElementById('card_payment');
@@ -489,7 +490,7 @@ class CheckOutWebflow {
 				"gender": studentGender.value,
 				"memberId": this.memberData.memberId,
 				"checkoutUrls": checkoutUrl,
-
+				"utm_source": (localUtmSource != null) ? localUtmSource : ""
 			}
 			var checkoutData = localStorage.getItem('checkOutData');
 			var mergedData = {
