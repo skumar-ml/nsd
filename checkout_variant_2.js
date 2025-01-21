@@ -490,7 +490,7 @@ class CheckOutWebflow {
 				"gender": studentGender.value,
 				"memberId": this.memberData.memberId,
 				"checkoutUrls": checkoutUrl,
-				"utm_source": (localUtmSource != null) ? localUtmSource : ""
+				"utm_source": (localUtmSource != null) ? localUtmSource : "null"
 			}
 			var checkoutData = localStorage.getItem('checkOutData');
 			var mergedData = {
