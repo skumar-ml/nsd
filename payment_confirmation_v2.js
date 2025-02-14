@@ -41,7 +41,7 @@ class PaymentConfirmation {
 	    let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
 	    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
 	   	if(programDetailId == 21){
-			let upSellModalBtn = document.getElementById('care-package-modal')
+			let modal = document.getElementById('care-package-modal')
 			modal.classList.add('show');
 			modal.style.display = 'flex';
 			//this.updateTutoringModal(tutoring_data);
