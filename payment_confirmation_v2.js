@@ -307,7 +307,7 @@ class PaymentConfirmation {
 		
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
-		
+		let allApiData = apiData;
 		// Added in our Local Data
 		this.$suppPro = apiData;
 		let prep_week_searchText = "topic prep week";
@@ -332,13 +332,16 @@ class PaymentConfirmation {
 		if(!apiData.length){
 			swiperSlideWrapper.style.display="none";
 		}
+	    if(!allApiData.length){
+			swiperSlideWrapper.style.display="none";
+		}
 		
 		if (container2 == undefined) return;
 		
 		if (swiperSlideWrapper == undefined) return
 
 		swiperSlideWrapper.innerHTML = "";
-		apiData.forEach(item => {
+		allApiData.forEach(item => {
 			item.forumType = "Public Forum";
 			//slider div
 			let swiperSlide = creEl('div', 'you-might_slide-item')
