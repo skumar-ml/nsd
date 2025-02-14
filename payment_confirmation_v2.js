@@ -40,10 +40,19 @@ class PaymentConfirmation {
         if (tutoring_data.length > 0) {
 	    let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
 	    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
-	    tutoringUpSellModal.style.display = "flex";
-	    topicPrepUpSellModal.style.display = "none";
-	    this.updateTutoringModal(tutoring_data); // Update modal content
-            this.displayUpSellModal(); // Show the modal
+	   	if(programDetailId == 21){
+			let upSellModalBtn = document.getElementById('care-package-modal')
+			modal.classList.add('show');
+			modal.style.display = 'flex';
+			//this.updateTutoringModal(tutoring_data);
+			//document.querySelector('.upsell-modal-bg').setAttribute('aria-hidden', 'false');
+		}else{
+			tutoringUpSellModal.style.display = "flex";
+			topicPrepUpSellModal.style.display = "none";
+			
+			this.updateTutoringModal(tutoring_data); // Update modal content
+			this.displayUpSellModal(); // Show the modal
+		}
         } else {
             console.warn(`No tutoring data found for ${hours} hours.`);
         }
