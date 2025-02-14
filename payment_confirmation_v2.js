@@ -38,7 +38,11 @@ class PaymentConfirmation {
     
         // If data exists, update and show modal
         if (tutoring_data.length > 0) {
-            this.updateTutoringModal(tutoring_data); // Update modal content
+	    let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
+	    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
+	    tutoringUpSellModal.style.display = "flex";
+	    topicPrepUpSellModal.style.display = "none";
+	    this.updateTutoringModal(tutoring_data); // Update modal content
             this.displayUpSellModal(); // Show the modal
         } else {
             console.warn(`No tutoring data found for ${hours} hours.`);
