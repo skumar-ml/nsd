@@ -502,10 +502,10 @@ class PaymentConfirmation {
         checkbox.id = "upsellTpwProgranId-1";
         checkbox.type = "checkbox";
         checkbox.name = "checkbox";
-        checkbox.value = "715.5";
-        checkbox.setAttribute("programdetailid", "12");
+        checkbox.value = item.amount;
+        checkbox.setAttribute("programdetailid", item.programDetailId);
         checkbox.setAttribute("data-name", "Checkbox");
-        checkbox.setAttribute("programname", "NSD PF Topic Prep Week");
+        checkbox.setAttribute("programname", item.label);
         hiddenDiv.appendChild(checkbox);
     
         buttonDiv.appendChild(buyNowButton);
