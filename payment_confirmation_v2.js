@@ -15,6 +15,7 @@ function creEl(name, className, idName) {
 	return el;
 }
 class PaymentConfirmation {
+    $suppPro = [];
     constructor(webFlowMemberId, apiBaseUrl, site_url) {
         this.apiBaseUrl = apiBaseUrl;
         this.site_url = site_url;
@@ -31,7 +32,20 @@ class PaymentConfirmation {
         this.displaySupplementaryProgram();
         
     }
-
+   
+    handleLearnMoreClick(programDetailId) {
+        var tutoring_data = this.$suppPro.filter(i => i.programDetailId == programDetailId);
+    
+        // If data exists, update and show modal
+        if (tutoring_data.length > 0) {
+            this.updateTutoringModal(tutoring_data); // Update modal content
+            this.displayUpSellModal(); // Show the modal
+        } else {
+            console.warn(`No tutoring data found for ${hours} hours.`);
+        }
+    }
+    
+    
     eventHandlerForUpSellModal() {
         let upSellModalBtn = document.getElementById('upsellModalBtn1')
         var $this = this;
@@ -119,22 +133,7 @@ class PaymentConfirmation {
         }
     }
 
-    // async displaySupplementaryProgram() {
-    //     let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
-    //     // Added in our Local Data
-    //     this.$suppPro = apiData;
-    //     let prep_week_searchText = "topic prep week";
-    //     let tutoring_week_searchText = "5 hours";
-    //     //let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
-    //     // let variant_type = this.memberData.variant_type
-    //     // variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
-    //     let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
-    //     let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
-    //     this.updateUpSellModal(prep_week_data, tutoring_data)
-
-    // }
-
-    updateUpSellModal(prep_week_data, tutoring_data) {
+    updatePrepWeekModal(prep_week_data) {
 
         if (prep_week_data.length > 0) {
             var tpwAmount = document.getElementById('tpw-amount');
@@ -175,6 +174,10 @@ class PaymentConfirmation {
 			}
         }
 
+    }
+
+    //updateTutoringModal(tutoring_data) {
+        updateTutoringModal(tutoring_data) {
 
         if (tutoring_data.length > 0) {
             var tutoringAmount = document.getElementById('tuto-amount');
@@ -301,6 +304,7 @@ class PaymentConfirmation {
             });
     }
 
+    
     async displaySupplementaryProgram() {
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
@@ -312,19 +316,24 @@ class PaymentConfirmation {
 		this.$suppPro = apiData;
 		let prep_week_searchText = "topic prep week";
 		let tutoring_week_searchText = "5 hours";
+        
+        
 		//let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
 		let variant_type = this.cart_page_variant;
 		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
 		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
-		//let care_package_data = apiData.find(i => i.programDetailId == 21);
-		this.updateUpSellModal(prep_week_data, tutoring_data)
-		
+       
+        //let care_package_data = apiData.find(i => i.programDetailId == 21);
+		this.updatePrepWeekModal(prep_week_data);
+        this.updateTutoringModal(tutoring_data)
+      		
 		
         if (variant_type == 1) {
             apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
         } else {
             apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
+          
         }
 		
 		apiData = apiData.filter(i => i.programDetailId != 21);
@@ -344,10 +353,16 @@ class PaymentConfirmation {
 		allApiData.forEach(item => {
 			item.forumType = "Public Forum";
 			//slider div
-			let swiperSlide = creEl('div', 'you-might_slide-item')
+			/*let swiperSlide = creEl('div', 'you-might_slide-item')
 			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
 			swiperSlide.appendChild(outerShadowDiv1)
-			swiperSlideWrapper.prepend(swiperSlide)
+			swiperSlideWrapper.prepend(swiperSlide)*/
+
+            let swiperSlide = document.createElement("div");
+            swiperSlide.classList.add("you-might_slide-item");
+            const updatedSlide = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
+            swiperSlideWrapper.prepend(updatedSlide);
+
 		});
         this.initSlickSlider();
         this.buyNow();
@@ -396,194 +411,125 @@ class PaymentConfirmation {
 		}
 
 	}
+    shouldShowLearnMore(programId) {
+        const allowedProgramIds = [10, 11, 21];
+        return allowedProgramIds.includes(parseInt(programId));
+    }
     // New UpSell Program / Supplementary
 	displaySingleSuppProgram(item, size, slideDiv) {
-		var $this = this;
-		// Create the outer-shadow div
-		//const outerDiv = document.createElement("div");
-		//outerDiv.classList.add("div-block-93", "outer-shadow");
-		// Create the grid container
-		const gridDiv = document.createElement("div");
-		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "upsell");
-
-		// Create the course-info div (left column)
-		const courseInfoDiv = document.createElement("div");
-
-		const upsellDiv = document.createElement("div");
-		upsellDiv.classList.add("upsell-div");
-
-		// Create the checkbox
-		const checkboxDiv = document.createElement("div");
-		checkboxDiv.classList.add("core-checkbox");
-
-		const label = document.createElement("label");
-		label.classList.add("w-checkbox");
-
-		const input = document.createElement("input");
-		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox");
-		input.type = "checkbox";
-		input.id = size + item.label.replace(/\s+/g, '-').toLowerCase();
-		input.name = "checkbox";
-		input.value = item.amount;
-		input.setAttribute("programdetailid", item.programDetailId);
-		input.setAttribute("data-name", "Checkbox");
-		var $this = this;
-		input.addEventListener("change", function () {
-			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
-			$this.updateAmount(this, item.amount);
-		})
-
-		const span = document.createElement("span");
-		span.classList.add("core-checkbox-label", "w-form-label");
-
-		label.appendChild(input);
-		label.appendChild(span);
-		checkboxDiv.appendChild(label);
-		const labelWrapper = creEl('div')
-		const campNameDiv = document.createElement("label");
-		campNameDiv.classList.add("camp-name", "margin-bottom-0");
-		campNameDiv.setAttribute("for", size + item.label.replace(/\s+/g, '-').toLowerCase())
-		campNameDiv.textContent = item.label;
-		labelWrapper.appendChild(campNameDiv)
-		courseInfoDiv.appendChild(labelWrapper)
-		//upsellDiv.appendChild(checkboxDiv);
-		///upsellDiv.appendChild(campNameDiv);
-
-
-		const textBlockWrapper = document.createElement("div");
-		textBlockWrapper.classList.add("text-block-wrapper");
-
-		item.tags.forEach(tag => {
-			const tagDiv = document.createElement("div");
-			tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
-			tagDiv.style.backgroundColor = tag.color
-			tagDiv.textContent = tag.name;
-			textBlockWrapper.appendChild(tagDiv);
-		});
-        
-        // Create the textBlockWrapper2 div
-        const textBlockWrapper2 = document.createElement("div");
-        textBlockWrapper2.classList.add("text-block-wrapper");
-
-        // Create the button_add-to-card div
-        const buttonAddToCardDiv = document.createElement("div");
-        buttonAddToCardDiv.classList.add("button_add-to-card");
-
-        // Create the 'Add to Cart' button
-        const addToCartButton = document.createElement("a");
-        addToCartButton.href = "#";
-        addToCartButton.classList.add(
-        "main-button-26",
-        "red",
-        "add-to-card",
-        "upsell_add_to_card",
-        "padding-all",
-        "w-button"
-        );
-        addToCartButton.textContent = "Add to Cart";
-
-        // Append 'Add to Cart' button to button_add-to-card div
-        buttonAddToCardDiv.appendChild(addToCartButton);
-
-        // Create the hidden div
+        var $this = this;
+    
+        // Create the first wrapper
+        const flexWrapper1 = document.createElement("div");
+        flexWrapper1.classList.add("you-might-flex-wrapper");
+    
+        // Create the text block wrapper
+        const textBlockWrapper = document.createElement("div");
+        textBlockWrapper.classList.add("text-block-wrapper");
+    
+        item.tags.forEach(tag => {
+            const tagDiv = document.createElement("div");
+            tagDiv.classList.add("payment-conf-tag");
+            tagDiv.style.backgroundColor = tag.color;
+            tagDiv.textContent = tag.name;
+            textBlockWrapper.appendChild(tagDiv);
+        });
+    
+        flexWrapper1.appendChild(textBlockWrapper);
+        slideDiv.appendChild(flexWrapper1); // Append to slideDiv
+    
+        // Create the second wrapper
+        const flexWrapper2 = document.createElement("div");
+        flexWrapper2.classList.add("you-might-flex-wrapper");
+    
+        const courseInfoDiv = document.createElement("div");
+        const campNameDiv = document.createElement("div");
+        campNameDiv.classList.add("camp-name");
+        campNameDiv.textContent = item.label;
+        courseInfoDiv.appendChild(campNameDiv);
+    
+        const priceWrapper = document.createElement("div");
+        priceWrapper.classList.add("price-wrapper", "upsell");
+    
+        const saveItem = document.createElement("div");
+        saveItem.classList.add("price-item");
+    
+        const saveLabel = document.createElement("div");
+        saveLabel.classList.add("save-amount");
+        saveLabel.textContent = "Save";
+    
+        const saveAmount = document.createElement("div");
+        saveAmount.classList.add("save-amount");
+        saveAmount.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
+    
+        saveItem.appendChild(saveLabel);
+        saveItem.appendChild(saveAmount);
+    
+        const originalPriceDiv = document.createElement("div");
+        originalPriceDiv.classList.add("price-item", "upsell");
+        originalPriceDiv.innerHTML = `<div class='original-price'>$${item.disc_amount}</div>`;
+    
+        const discountedPriceDiv = document.createElement("div");
+        discountedPriceDiv.classList.add("price-item", "upsell");
+        discountedPriceDiv.innerHTML = `<div class='discounted-price text-blue'>$${item.amount}</div>`;
+    
+        priceWrapper.appendChild(saveItem);
+        priceWrapper.appendChild(originalPriceDiv);
+        priceWrapper.appendChild(discountedPriceDiv);
+    
+        courseInfoDiv.appendChild(priceWrapper);
+        flexWrapper2.appendChild(courseInfoDiv);
+    
+        const buttonContainer = document.createElement("div");
+        const buttonDiv = document.createElement("div");
+        buttonDiv.classList.add("button_add-to-card", "marginbottom-10px");
+    
+        const buyNowButton = document.createElement("a");
+        buyNowButton.href = "#";
+        buyNowButton.classList.add("main-button-26", "red", "add-to-card", "upsell_add_to_card", "padding-with-full-width", "w-button");
+        buyNowButton.style.width = "100%";
+        buyNowButton.textContent = "Buy Now";
+    
         const hiddenDiv = document.createElement("div");
         hiddenDiv.classList.add("hide", "w-embed");
+    
+        const checkbox = document.createElement("input");
+        checkbox.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
+        checkbox.id = "upsellTpwProgranId-1";
+        checkbox.type = "checkbox";
+        checkbox.name = "checkbox";
+        checkbox.value = "715.5";
+        checkbox.setAttribute("programdetailid", "12");
+        checkbox.setAttribute("data-name", "Checkbox");
+        checkbox.setAttribute("programname", "NSD PF Topic Prep Week");
+        hiddenDiv.appendChild(checkbox);
+    
+        buttonDiv.appendChild(buyNowButton);
+        buttonDiv.appendChild(hiddenDiv);
 
-        // Create the checkbox input
-        const checkboxInput = document.createElement("input");
-        checkboxInput.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
-        checkboxInput.id = "upsellTpwProgranId-1";
-        checkboxInput.type = "checkbox";
-        checkboxInput.name = "checkbox";
-        checkboxInput.value = "719.2";
-        checkboxInput.setAttribute("programdetailid", "13");
-        checkboxInput.setAttribute("data-name", "Checkbox");
-        checkboxInput.setAttribute("programname", "NSD PF Topic Prep Week");
+        buttonContainer.appendChild(buttonDiv);
 
-        // Append the checkbox to the hidden div
-        hiddenDiv.appendChild(checkboxInput);
-
-        // Append the hidden div to button_add-to-card div
-        buttonAddToCardDiv.appendChild(hiddenDiv);
-
-        // Create the 'Learn More' button
-        const learnMoreButton = document.createElement("a");
-        learnMoreButton.id = "learnMore";
-        learnMoreButton.href = "#";
-        learnMoreButton.classList.add("main-button", "red", "alternate", "upsell", "w-button");
-        learnMoreButton.textContent = "Learn More";
-
-        // Append elements to textBlockWrapper2
-        textBlockWrapper2.appendChild(buttonAddToCardDiv);
-        textBlockWrapper2.appendChild(learnMoreButton);
-
-
-
-
-		const priceItem = document.createElement("div");
-		priceItem.classList.add("price-item");
-
-		const saveDiv1 = document.createElement("div");
-		saveDiv1.classList.add("save-amount");
-		saveDiv1.textContent = "Save";
-
-		const saveDiv2 = document.createElement("div");
-		saveDiv2.classList.add("save-amount");
-		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
-
-		priceItem.appendChild(saveDiv1);
-		priceItem.appendChild(saveDiv2);
-		
-		slideDiv.appendChild(upsellDiv);
-		upsellDiv.appendChild(textBlockWrapper);
-        upsellDiv.appendChild(textBlockWrapper2);
-		
-
-		// Create the price details div (right column)
-		const priceDiv = document.createElement("div");
-		priceDiv.classList.add("course-info", "p-16", "upsell");
-
-		const discountPriceDiv = document.createElement("div");
-		const discountLabel = document.createElement("div");
-		discountLabel.classList.add("dm-sans", "bold-700");
-		discountLabel.textContent = "Discount Price";
-		discountPriceDiv.appendChild(discountLabel);
-
-		const priceWrapper1 = document.createElement("div");
-		priceWrapper1.classList.add("price-wrapper", "upsell");
-
-		const originalPriceDiv1 = document.createElement("div");
-		originalPriceDiv1.classList.add("price-item", "upsell");
-
-		const originalPrice = document.createElement("div");
-		originalPrice.classList.add("original-price");
-		originalPrice.textContent = "$" + item.disc_amount;
-		originalPriceDiv1.appendChild(originalPrice);
-
-		const discountedPriceDiv = document.createElement("div");
-		discountedPriceDiv.classList.add("price-item", "upsell");
-
-		const discountedPrice = document.createElement("div");
-		discountedPrice.classList.add("discounted-price", "text-blue");
-		discountedPrice.textContent = "$" + item.amount;
-		discountedPriceDiv.appendChild(discountedPrice);
-
-		priceWrapper1.appendChild(priceItem);
-		priceWrapper1.appendChild(originalPriceDiv1);
-		priceWrapper1.appendChild(discountedPriceDiv);
-
-		
-
-		priceDiv.appendChild(discountPriceDiv);
-		courseInfoDiv.appendChild(priceWrapper1);
-		
-
-		gridDiv.appendChild(courseInfoDiv);
-		gridDiv.appendChild(checkboxDiv)
-		//gridDiv.appendChild(priceDiv);
-
-		//outerDiv.appendChild(gridDiv);
-
-		return gridDiv;
-	}
+        let learnMoreButton = null;
+         var $this = this;
+        // Learn More Button (Only for specific program IDs)
+        if (this.shouldShowLearnMore(item.programDetailId)) {
+            learnMoreButton = document.createElement("a");
+            learnMoreButton.id = "learnMore";
+            learnMoreButton.href = "#";
+            learnMoreButton.classList.add("main-button", "red", "alternate", "upsell", "w-button");
+            learnMoreButton.textContent = "Learn More";
+             // Attach event listener
+            learnMoreButton.addEventListener("click", (event) => {
+                //Call handleLearnMore function
+              $this.handleLearnMoreClick(item.programDetailId);
+          });
+            buttonContainer.appendChild(learnMoreButton);
+        }
+    
+        flexWrapper2.appendChild(buttonContainer);
+        slideDiv.appendChild(flexWrapper2); // Append to slideDiv
+    
+        return slideDiv; // Return the updated slideDiv
+    }
+    
 }
