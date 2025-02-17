@@ -28,11 +28,25 @@ class PaymentConfirmation {
         if(!this.programId || !this.sessionId){
             return false;
         }
+        this.setUpBackButtonTab();
         this.eventHandlerForUpSellModal();
         this.displaySupplementaryProgram();
         
+        
     }
-   
+    
+
+    setUpBackButtonTab() {
+        var ibackbutton = document.getElementById("backbuttonstate");
+        console.log("Value set", ibackbutton.value);
+            if ( ibackbutton.value == 1){
+                // initalize again slider
+                console.log("Value Set");
+                this.initSlickSlider();
+                
+            }
+    }
+
     handleLearnMoreClick(programDetailId) {
         var tutoring_data = this.$suppPro.filter(i => i.programDetailId == programDetailId);
     
@@ -340,10 +354,18 @@ class PaymentConfirmation {
         // Select all 'add-to-card' buttons
         const addToCartButtons = document.querySelectorAll(".add-to-card");
         var $this = this;
+
         addToCartButtons.forEach(button => {
             button.innerHTML = "Buy Now";
             button.addEventListener("click", function (event) {
 
+                // Select back button element properly
+                var ibackbutton = document.getElementById("backbuttonstate");
+                if (ibackbutton) {
+                    ibackbutton.value = "1"; // Set value correctly
+                } else {
+                    console.error("Error: #backbuttonstate element not found");
+                }
                 event.preventDefault(); // Prevent default link behavior
 
                 // Find the parent container with the 'btn-reserve-spot' class
