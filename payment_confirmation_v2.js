@@ -409,7 +409,7 @@ class PaymentConfirmation {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
             "successUrl": this.site_url+"members/"+ this.webFlowMemberId+"?paymentType=Supplementary",
-            "cancelUrl": this.site_url+"payment-confirmation?programId=" + encodeURIComponent(programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
+            "cancelUrl": this.site_url+"payment-confirmation?programId=" + encodeURIComponent(this.programId) + "&sessionId=" + encodeURIComponent(this.sessionId),
             "label": programName,
             "amount": parseFloat(amount*100)
         };
