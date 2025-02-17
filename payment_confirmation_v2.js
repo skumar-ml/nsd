@@ -172,7 +172,7 @@ class PaymentConfirmation {
 
         if (modal) {
             console.log('Showing modal on page load');
-            //$this.showUpSellModal(modal);
+            $this.showUpSellModal(modal);
             window.location.href = $this.portal_home;
         } else {
             console.log('Modal element not found.');
