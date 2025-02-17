@@ -44,6 +44,20 @@ class PaymentConfirmation {
 			let modal = document.getElementById('care-package-modal')
 			modal.classList.add('show');
 			modal.style.display = 'flex';
+            this.initializeProductSlider();
+            var $this = this;
+            const closeLinks = document.querySelectorAll('.upsell-close-link.order-details');
+            if(closeLinks != undefined){
+                closeLinks.forEach(function (closeLink) {
+                    //console.log("Care Package Click Event Called");
+                    closeLink.addEventListener('click', function (event) {
+                        event.preventDefault();
+                        $this.hideUpSellModal(modal);
+                        //window.location.href = $this.portal_home;
+                    });
+                });
+            }
+             
 			//this.updateTutoringModal(tutoring_data);
 			//document.querySelector('.upsell-modal-bg').setAttribute('aria-hidden', 'false');
 		}else{
@@ -58,6 +72,71 @@ class PaymentConfirmation {
         }
     }
     
+    initializeProductSlider() {
+        // Initialize the main slider
+        var $sliderFor = $('.slider-for');
+        if (!$sliderFor.hasClass('slick-initialized')) {
+            $sliderFor.slick({
+                slidesToShow: 1,
+                slidesToScroll: 1,
+                arrows: false, 
+                fade: true,
+                asNavFor: '.slider-nav',
+                responsive: [
+                    {
+                        breakpoint: 568,
+                        settings: {
+                            fade: false 
+                        }
+                    }
+                ]
+            });
+        }
+    
+        const productDetails = [
+            { content: "Limited Edition NSD Hoodie - Stay warm, look sharp, and rep NSD in this premium, unisex sweatshirt. Made from soft, high-quality fabric, it’s your new go-to for debate camp and beyond. Available only as part of the bundle, this hoodie is a must-have for every NSD student—grab yours before they’re gone!" },
+            { content: "The Timer Every Debater Needs - From practice rounds at camp to final rounds at tournaments, the NSD Timer is your go-to tool for staying in control of the clock and perfecting your speeches." },
+            { content: "Hydration Made Simple - Stay hydrated in style with the NSD water bottle. Its durable metal build and striking red color make it the perfect companion for busy camp days and high-stakes tournaments." },
+            { content: "NSD Hat: Where Comfort Meets Cool - Stay sharp and stylish with the unisex NSD hat, crafted for comfort and durability. Designed in a sleek, classic colorway, it’s the perfect accessory to rep your NSD pride—whether at camp, a tournament, or out and about." },
+            { content: "NSD Tote Bag - This NSD tote’s sturdy, high-quality materials hold all your essentials, yet remain sleek and easy to carry. With its clean design and iconic NSD logo, it adds a polished touch to your routine—whether you’re headed to a debate round or a coffee shop." }
+        ];
+    
+        $sliderFor.on('afterChange', function(event, slick, currentSlide) {
+            console.log('Current Slide Index:', currentSlide);
+            const productInfoElement = document.querySelector('.product-info');
+    
+            if (productInfoElement) {
+                const content = productDetails[currentSlide].content;
+                console.log('Content to display:', content);
+    
+                const [name, description] = content.split(' - ');
+                
+                const productNameElement = productInfoElement.querySelector('.product-name_span-text');
+                console.log("Name", productNameElement);
+                const productDescriptionElement = productInfoElement.querySelector('.product-description-2');
+                console.log("Description", productDescriptionElement);
+    
+                if (productNameElement && productDescriptionElement) {
+                    productNameElement.innerHTML = name;
+                    productDescriptionElement.innerHTML = description;
+    
+                    console.log('Updated Product Name:', productNameElement.innerHTML);
+                    console.log('Updated Product Description:', productDescriptionElement.innerHTML);
+                }
+            }
+        });
+    
+        var $sliderNav = $('.slider-nav');
+        if (!$sliderNav.hasClass('slick-initialized')) {
+            $sliderNav.slick({
+                slidesToShow: 5,
+                asNavFor: '.slider-for',
+                dots: false, 
+                centerMode: false,
+                focusOnSelect: true,
+            });
+        }
+    }
     
     eventHandlerForUpSellModal() {
         let upSellModalBtn = document.getElementById('upsellModalBtn1')
@@ -93,7 +172,8 @@ class PaymentConfirmation {
 
         if (modal) {
             console.log('Showing modal on page load');
-            $this.showUpSellModal(modal);
+            //$this.showUpSellModal(modal);
+            window.location.href = $this.portal_home;
         } else {
             console.log('Modal element not found.');
         }
@@ -101,6 +181,7 @@ class PaymentConfirmation {
             for (let index = 0; index < noThanks.length; index++) {
                 const element = noThanks[index];
                 element.addEventListener('click', function () {
+                    //$this.hideUpSellModal(modal);
                     window.location.href = $this.portal_home;
                 })
 
@@ -112,7 +193,8 @@ class PaymentConfirmation {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
                     event.preventDefault();
-                    window.location.href = $this.portal_home;
+                    $this.hideUpSellModal(modal);
+                    //window.location.href = $this.portal_home;
                 });
             });
         }
@@ -234,6 +316,26 @@ class PaymentConfirmation {
         }
     }
 
+    updateCarePackageModal(care_package_data) {
+
+      // Care Package Data Update
+		if(care_package_data != undefined){
+			let carePackagePrice = document.querySelectorAll("[data-care-package='price']")
+			if (carePackagePrice.length > 0) {
+				carePackagePrice.forEach(cp_price => {
+					cp_price.innerHTML = "$"+care_package_data.amount;
+				})
+			}
+			let carePackageCheckbox = document.querySelectorAll("[data-care-package='checkbox']")
+			if (carePackageCheckbox.length > 0) {
+				carePackageCheckbox.forEach(cp_checkbox => {
+					cp_checkbox.setAttribute('programdetailid', care_package_data.programDetailId)
+					cp_checkbox.value = care_package_data.amount
+				})
+			}
+		}
+    }
+
     buyNow() {
         // Select all 'add-to-card' buttons
         const addToCartButtons = document.querySelectorAll(".add-to-card");
@@ -321,6 +423,9 @@ class PaymentConfirmation {
     async displaySupplementaryProgram() {
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
+        // loader icon code
+			var spinner = document.getElementById("half-circle-spinner");
+			spinner.style.display = "block";
 		
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
@@ -335,11 +440,12 @@ class PaymentConfirmation {
 		let variant_type = this.cart_page_variant;
 		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
 		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
-		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
-       
-        //let care_package_data = apiData.find(i => i.programDetailId == 21);
+		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))       
+        let care_package_data = apiData.find(i => i.programDetailId == 21);
+
 		this.updatePrepWeekModal(prep_week_data);
-        this.updateTutoringModal(tutoring_data)
+        this.updateTutoringModal(tutoring_data);
+        this.updateCarePackageModal(care_package_data);
       		
 		
         if (variant_type == 1) {
@@ -379,6 +485,9 @@ class PaymentConfirmation {
 		});
         this.initSlickSlider();
         this.buyNow();
+        // loader icon code
+			
+			spinner.style.display = "none";
 	}
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
@@ -494,6 +603,7 @@ class PaymentConfirmation {
         flexWrapper2.appendChild(courseInfoDiv);
     
         const buttonContainer = document.createElement("div");
+        buttonContainer.classList.add("mob-width-100");
         const buttonDiv = document.createElement("div");
         buttonDiv.classList.add("button_add-to-card", "marginbottom-10px");
     
