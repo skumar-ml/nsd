@@ -561,7 +561,7 @@ class CheckOutWebflow {
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
-					$this.activeBreadCrumb('forms-&-tuition')
+					$this.activeBreadCrumb('student-details')
 					$this.displayUpSellModal();
 				} else {
 					checkoutFormError.style.display = "block";
@@ -1495,7 +1495,7 @@ class CheckOutWebflow {
 		}
 	}
 	activeBreadCrumb(activeId) {
-		let breadCrumbList = document.querySelectorAll('.container_pb ul li');
+		let breadCrumbList = document.querySelectorAll('.stepper-container ul li');
 		breadCrumbList.forEach(element => element.classList.remove('active'))
 		document.getElementById(activeId).classList.add('active')
 
