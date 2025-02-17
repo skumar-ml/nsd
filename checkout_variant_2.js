@@ -561,7 +561,7 @@ class CheckOutWebflow {
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
-					$this.activeBreadCrumb('student-details')
+					$this.activeBreadCrumb('pay-deposite')
 					$this.displayUpSellModal();
 				} else {
 					checkoutFormError.style.display = "block";
@@ -581,7 +581,7 @@ class CheckOutWebflow {
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
-			$this.activeBreadCrumb('pay-deposite')
+			$this.activeBreadCrumb('student-details')
 			//document.getElementById('w-tabs-1-data-w-tab-0').click()
 			setTimeout(function () {
 				$(".w-tab-link").removeClass("w--current");
