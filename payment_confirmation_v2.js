@@ -156,11 +156,11 @@ class PaymentConfirmation {
         let upSellModalBtn = document.getElementById('upsellModalBtn1')
         var $this = this;
         upSellModalBtn.addEventListener("click", function (event) {
-            event.preventDefault()
-            if($this.cart_page_variant != undefined){
-                $this.displayUpSellModal();
-            }else{
+            event.preventDefault();
+            if ($this.portal_home) {
                 window.location.href = $this.portal_home;
+            } else {
+                console.warn("portal_home is not defined.");
             }
             
         })
@@ -556,7 +556,7 @@ class PaymentConfirmation {
 
 	}
     shouldShowLearnMore(programId) {
-        const allowedProgramIds = [10, 11, 21];
+        const allowedProgramIds = [10, 11, 12, 13, 21];
         return allowedProgramIds.includes(parseInt(programId));
     }
     // New UpSell Program / Supplementary
