@@ -47,46 +47,76 @@ class PaymentConfirmation {
             }
     }
 
-    handleLearnMoreClick(programDetailId) {
-        var tutoring_data = this.$suppPro.filter(i => i.programDetailId == programDetailId);
-    
-        // If data exists, update and show modal
-        if (tutoring_data.length > 0) {
-	    let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
-	    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
-	   	if(programDetailId == 21){
-			let modal = document.getElementById('care-package-modal')
-			modal.classList.add('show');
-			modal.style.display = 'flex';
-            this.initializeProductSlider();
-            var $this = this;
-            const closeLinks = document.querySelectorAll('.upsell-close-link.order-details');
-            if(closeLinks != undefined){
-                closeLinks.forEach(function (closeLink) {
-                    //console.log("Care Package Click Event Called");
-                    closeLink.addEventListener('click', function (event) {
-                        event.preventDefault();
-                        $this.hideUpSellModal(modal);
-                        //window.location.href = $this.portal_home;
-                    });
-                });
+        handleLearnMoreClick(programDetailId) {
+            let prep_week_searchText = "topic prep week";
+        
+            // Filter data for the clicked programDetailId
+            let tutoring_data = this.$suppPro.filter(i =>
+                i.label.toLowerCase().includes("tutoring") && i.programDetailId === programDetailId
+            );
+        
+            let prep_week_data = this.$suppPro.filter(i =>
+                i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()) && i.programDetailId === programDetailId
+            );
+        
+            let carePackageData = this.$suppPro.find(i => i.programDetailId === 21);
+        
+            // Select modal elements
+            let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week');
+            let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring');
+        
+            // If programDetailId == 21, show the care package modal
+            if (programDetailId === 21 && carePackageData) {
+                let modal = document.getElementById('care-package-modal');
+        
+                if (modal) {
+                    modal.classList.add('show');
+                    modal.style.display = 'flex';
+                    this.initializeProductSlider();
+        
+                    var $this = this;
+                    const closeLinks = document.querySelectorAll('.upsell-close-link.order-details');
+                    if (closeLinks) {
+                        closeLinks.forEach(closeLink => {
+                            closeLink.addEventListener('click', function (event) {
+                                event.preventDefault();
+                                $this.hideUpSellModal(modal);
+                            });
+                        });
+                    }
+                } else {
+                    console.warn("Care package modal not found.");
+                }
+                return;
             }
-             
-			//this.updateTutoringModal(tutoring_data);
-			//document.querySelector('.upsell-modal-bg').setAttribute('aria-hidden', 'false');
-		}else{
-			tutoringUpSellModal.style.display = "flex";
-			topicPrepUpSellModal.style.display = "none";
-			
-			this.updateTutoringModal(tutoring_data); // Update modal content
-			this.displayUpSellModal(); // Show the modal
-		}
-        } else {
-            console.warn(`No tutoring data found for ${hours} hours.`);
+        
+            // Ensure the correct modal opens based on clicked programDetailId
+            if (prep_week_data.length > 0) {
+                
+                if (tutoringUpSellModal) tutoringUpSellModal.style.display = "none";
+                if (topicPrepUpSellModal) {
+                    topicPrepUpSellModal.style.display = "flex";
+                    this.updatePrepWeekModal(prep_week_data);
+                }
+            } else if (tutoring_data.length > 0) {
+                
+                if (tutoringUpSellModal) {
+                    tutoringUpSellModal.style.display = "flex";
+                    this.updateTutoringModal(tutoring_data);
+                }
+                if (topicPrepUpSellModal) topicPrepUpSellModal.style.display = "none";
+            } else {
+                //console.warn(`No matching tutoring or prep week data found for programDetailId: ${programDetailId}.`);
+                return;
+            }
+        
+            // Show the modal
+            this.displayUpSellModal();
         }
-    }
-    
-    initializeProductSlider() {
+        
+        
+        
+        initializeProductSlider() {
         // Initialize the main slider
         var $sliderFor = $('.slider-for');
         if (!$sliderFor.hasClass('slick-initialized')) {
@@ -243,7 +273,6 @@ class PaymentConfirmation {
     }
 
     updatePrepWeekModal(prep_week_data) {
-
         if (prep_week_data.length > 0) {
             var tpwAmount = document.getElementById('tpw-amount');
             if (tpwAmount != undefined) {
@@ -281,13 +310,13 @@ class PaymentConfirmation {
 					read_more_link.href = this.site_url + "topic-prep-week";
 				})
 			}
-        }
 
+
+        }
     }
 
     //updateTutoringModal(tutoring_data) {
         updateTutoringModal(tutoring_data) {
-
         if (tutoring_data.length > 0) {
             var tutoringAmount = document.getElementById('tuto-amount');
             if (tutoringAmount != undefined) {
@@ -462,6 +491,7 @@ class PaymentConfirmation {
 		let variant_type = this.cart_page_variant;
 		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
 		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
+        //console.log(prep_week_data);
 		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))       
         let care_package_data = apiData.find(i => i.programDetailId == 21);
 
