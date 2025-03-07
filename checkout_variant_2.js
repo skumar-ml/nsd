@@ -874,10 +874,7 @@ class CheckOutWebflow {
 	// After API response we call the createMakeUpSession method to manipulate student data
 	async renderPortalData(memberId) {
 		try {
-			// Update student data for purchase addon Supplementary program
-			if (this.memberData.productType == "supplementary") {
-				this.updateSuppData();
-			}
+			
 			// Update readOnly for core program
 			//this.updateDefaultCheckbox();
 			// Handle checkout button
@@ -894,6 +891,10 @@ class CheckOutWebflow {
 			this.setUpBackButtonTab();
 			// Update basic data
 			this.updateBasicData();
+			// Update student data for purchase addon Supplementary program
+			if (this.memberData.productType == "supplementary") {
+				this.updateSuppData();
+			}
 			// Hide spinner
 			spinner.style.display = "none";
 			this.displaySupplementaryProgram();
