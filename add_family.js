@@ -3,6 +3,7 @@ class FamilyMember {
   constructor(data) {
     this.memberId = data.memberId;
     this.baseUrl = data.baseUrl;
+    this.accountType = data.accountType;
     this.displayFamilyMember();
     this.handleEditMember();
   }
@@ -41,15 +42,14 @@ class FamilyMember {
    */
   async displayFamilyMember() {
     var spinner = document.getElementById("half-circle-spinner");
-		spinner.style.display = "block";
-    const familyData = await this.fetchData(
-      "getAllFamilyData/" + this.memberId
-    );
+    spinner.style.display = "block";
+    var familyData = await this.fetchData("getAllFamilyData/" + this.memberId);
     console.log("family Data", familyData);
     const FamilyMemberWrapper = document.querySelector(
       ".family-member-grid-wrapper"
     );
     FamilyMemberWrapper.innerHTML = "";
+    familyData = this.sortDataBasedOnMemberId(familyData, this.memberId);
     familyData.forEach((element) => {
       let singleFamily = this.getSingleFamilyData(element);
       FamilyMemberWrapper.appendChild(singleFamily);
@@ -57,10 +57,46 @@ class FamilyMember {
     spinner.style.display = "none";
   }
 
+  sortDataBasedOnMemberId(data, targetId) {
+    data.sort((a, b) => {
+      if (a.memberId) {
+        if (a.memberId === targetId) return -1; // Move target ID to the front
+        if (b.memberId === targetId) return 1;
+        return 0; // Keep other order the same
+      }
+    });
+    return data;
+  }
+
+  /**
+   * Convert date format
+   */
+  convertDate(dateString) {
+    const inputDate = new Date(dateString);
+    const formattedDate = inputDate
+      .toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\//g, "-"); // Replace slashes with dashes
+
+    return formattedDate;
+  }
+  getMemberType(data) {
+    let memberType = "sign-up";
+    if (!data.createdOn) {
+      memberType = "invited";
+    } else if (!data.itemId) {
+      memberType = "not-sign-up";
+    }
+    return memberType;
+  }
   /**
    * Manipulate single family data and return single family html
    */
   getSingleFamilyData(data) {
+    const memberType = this.getMemberType(data);
     var $this = this;
     const familyMemberContainer = this.creEl(
       "div",
@@ -80,30 +116,53 @@ class FamilyMember {
     familyMemberContainer.appendChild(emailLink);
 
     const roleParagraph = this.creEl("p", "dm-sans italics");
-    roleParagraph.innerHTML = data.accountType + "<br>";
+    roleParagraph.innerHTML =
+      memberType != "invited" ? data.accountType : "Invited member" + "<br>";
     familyMemberContainer.appendChild(roleParagraph);
 
-    const createdOnParagraph = this.creEl("p", "dm-sans");
-    createdOnParagraph.textContent = "Created On - 06-03-2025";
+    const accountNotCreatedClass = !data.memberId ? "account-not-created" : "";
+    const createdOnParagraph = this.creEl(
+      "p",
+      "dm-sans " + accountNotCreatedClass
+    );
+    createdOnParagraph.textContent =
+      memberType == "sign-up"
+        ? "Created On - " + this.convertDate(data.createdOn)
+        : "Account not created yet";
     familyMemberContainer.appendChild(createdOnParagraph);
 
-    const editButton = this.creEl(
-      "a",
-      "main-button transparent-red edit-btn w-button"
-    );
-    editButton.href = "#";
-    editButton.textContent = "Edit";
-    editButton.addEventListener("click", function () {
-      $this.$editMemberData = data;
-      $this.updateSuppData(data);
-      const addFamilyMemberEditModals = document.querySelector(
-        ".add-family-member-edit-modal"
+    if (this.accountType == "parent" || this.memberId == data.memberId) {
+      const btn_color = memberType != "invited" ? "transparent-red" : "red";
+      const editButton = this.creEl(
+        "a",
+        "main-button " + btn_color + " edit-btn w-button"
       );
-      addFamilyMemberEditModals.classList.add("show");
-      addFamilyMemberEditModals.style.display = "flex";
-    });
-    familyMemberContainer.appendChild(editButton);
-
+      editButton.href = "#";
+      editButton.textContent = memberType != "invited" ? "Edit" : "Delete";
+      editButton.addEventListener("click", function (event) {
+        $this.$editMemberData = data;
+        if (memberType != "invited") {
+          $this.updateSuppData(data);
+          const addFamilyMemberEditModals = document.querySelector(
+            ".add-family-member-edit-modal"
+          );
+          addFamilyMemberEditModals.classList.add("show");
+          addFamilyMemberEditModals.style.display = "flex";
+        } else {
+          editButton.innerHTML = "Processing...";
+          $this.deleteInvitedMember(data);
+          event.preventDefault();
+        }
+      });
+      familyMemberContainer.appendChild(editButton);
+    } else {
+      let emptyEl = this.creEl(
+        "a",
+        "main-button transparent-red edit-btn w-button visibility-hidden"
+      );
+      emptyEl.innerHTML = "&nbsp";
+      familyMemberContainer.appendChild(emptyEl);
+    }
     // return the constructed element to parent container
     return familyMemberContainer;
   }
@@ -123,13 +182,13 @@ class FamilyMember {
     } else {
       parentPhone.closest("div").classList.add("hide");
       studentGrade.closest("div").classList.remove("hide");
-      if(!data.itemId){
+      if (!data.itemId) {
         studentGrade.closest("div").classList.add("hide");
-      }else{
+      } else {
         studentGrade.closest("div").classList.remove("hide");
       }
     }
-    
+
     if (data != null) {
       studentEmail.value = data.email;
       studentFirstName.value = data.firstName;
@@ -185,11 +244,7 @@ class FamilyMember {
     console.log("data", data);
     var xhr = new XMLHttpRequest();
     var $this = this;
-    xhr.open(
-      "POST",
-      "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateMemberStack",
-      true
-    );
+    xhr.open("POST", $this.baseUrl + "updateMemberStack", true);
     xhr.withCredentials = false;
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {
@@ -222,5 +277,21 @@ class FamilyMember {
       }
     };
   }
+  deleteInvitedMember(memberData) {
+    var $this = this;
+    var xhr = new XMLHttpRequest();
+    var $this = this;
+    xhr.open(
+      "DELETE",
+      $this.baseUrl + "deleteInvitedMember/" + memberData.email,
+      true
+    );
+    xhr.withCredentials = false;
+    xhr.send();
+    xhr.onload = function () {
+      let responseText = JSON.parse(xhr.responseText);
+      console.log(xhr.responseText, responseText);
+      $this.displayFamilyMember();
+    };
+  }
 }
-
