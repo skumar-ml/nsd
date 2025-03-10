@@ -212,6 +212,11 @@ class FamilyMember {
       editMemberBtn.style.pointerEvents = "none";
       $this.editMemberInfo($this.$editMemberData);
     });
+    //only parent can invite the member
+    if($this.accountType != 'parent'){
+      let addFamilyMember = document.getElementById('add-family-member-btn')
+      addFamilyMember.style.display = "none"
+    }
   }
   closeModal(modal) {
     if (modal) {
