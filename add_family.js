@@ -109,7 +109,7 @@ class FamilyMember {
 
     const emailLink = this.creEl("a");
     emailLink.href = "#";
-    emailLink.classList.add("w-inline-block");
+    emailLink.classList.add("any-link");
     const emailParagraph = this.creEl("p", "dm-sans");
     emailParagraph.textContent = data.email;
     emailLink.appendChild(emailParagraph);
