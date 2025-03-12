@@ -910,6 +910,7 @@ class CheckOutWebflow {
 		let payNowLink = document.getElementById('pay-now-link');
 		payNowLink.addEventListener("click", function (e) {
 			e.preventDefault();
+			payNowLink.style.pointerEvents = "none";
 			payNowLink.innerHTML = "Processing..";
 			console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
@@ -919,6 +920,7 @@ class CheckOutWebflow {
 		let payNowLinkMo = document.getElementById('pay-now-link-2');
 		payNowLinkMo.addEventListener("click", function (e) {
 			e.preventDefault();
+			payNowLinkMo.style.pointerEvents = "none";
 			payNowLinkMo.innerHTML = "Processing..";
 			console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
@@ -929,6 +931,7 @@ class CheckOutWebflow {
 		let payNowLink3 = document.getElementById('pay-now-link-3');
 		payNowLink3.addEventListener("click", function (e) {
 			e.preventDefault();
+			payNowLink3.style.pointerEvents = "none";
 			payNowLink3.innerHTML = "Processing..";
 			console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
