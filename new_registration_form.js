@@ -174,7 +174,7 @@ class NSDPortal {
         tabPan.forEach(element => {
             element.classList.remove('w--tab-active');
         });
-        Webflow.require('tabs').redraw();
+        //Webflow.require('tabs').redraw();
     }
 
     updateGlobalVariable(tab) {
