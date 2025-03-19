@@ -43,7 +43,7 @@ class NSDPortal {
         curr_dashboard_title.style.display = 'block';
         // create portal student program tabs
         this.createPortalTabs(data);
-        this.removeByDefaultSelectedTab()
+        //this.removeByDefaultSelectedTab()
         // Re initialize webflow tabs after API call 
         //Webflow.require('tabs').redraw();
     }
