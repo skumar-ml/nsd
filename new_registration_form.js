@@ -166,6 +166,7 @@ class NSDPortal {
         })
     }
     removeByDefaultSelectedTab(){
+        Webflow.require('tabs').redraw();
         const panLink = document.querySelectorAll('.w-tab-link');
         panLink.forEach(element => {
             element.classList.remove('w--current');
@@ -174,7 +175,7 @@ class NSDPortal {
         tabPan.forEach(element => {
             element.classList.remove('w--tab-active');
         });
-        Webflow.require('tabs').redraw();
+        
     }
 
     updateGlobalVariable(tab) {
