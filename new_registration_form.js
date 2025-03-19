@@ -45,7 +45,7 @@ class NSDPortal {
         this.createPortalTabs(data);
         this.removeByDefaultSelectedTab()
         // Re initialize webflow tabs after API call 
-        Webflow.require('tabs').redraw();
+        //Webflow.require('tabs').redraw();
     }
     // Hide free and paid resources after api response data
     hidePortalData(responseText) {
@@ -174,7 +174,7 @@ class NSDPortal {
         tabPan.forEach(element => {
             element.classList.remove('w--tab-active');
         });
-        //Webflow.require('tabs').redraw();
+        Webflow.require('tabs').redraw();
     }
 
     updateGlobalVariable(tab) {
