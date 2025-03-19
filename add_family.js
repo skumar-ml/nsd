@@ -68,20 +68,30 @@ class FamilyMember {
     return data;
   }
 
+ 
+  // convertDate(dateString) {
+  //   const inputDate = new Date(dateString);
+  //   const formattedDate = inputDate
+  //     .toLocaleDateString("en-GB", {
+  //       day: "2-digit",
+  //       month: "2-digit",
+  //       year: "numeric",
+  //     })
+  //     .replace(/\//g, "-"); // Replace slashes with dashes
+
+  //   return formattedDate;
+  // }
   /**
    * Convert date format
    */
   convertDate(dateString) {
-    const inputDate = new Date(dateString);
-    const formattedDate = inputDate
-      .toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-      })
-      .replace(/\//g, "-"); // Replace slashes with dashes
-
-    return formattedDate;
+    if (dateString) {
+      const date = new Date(dateString);
+      const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are 0-based
+      const day = date.getDate().toString().padStart(2, "0");
+      const year = date.getFullYear();
+      return `${month}/${day}/${year}`;
+    }
   }
   getMemberType(data) {
     let memberType = "sign-up";
