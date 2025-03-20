@@ -167,14 +167,14 @@ class NSDPortal {
     }
     removeByDefaultSelectedTab(){
         Webflow.require('tabs').redraw();
-        const panLink = document.querySelectorAll('.w-tab-link');
-        panLink.forEach(element => {
-            element.classList.remove('w--current');
-        });
-        const tabPan = document.querySelectorAll('.w-tab-pane');
-        tabPan.forEach(element => {
-            element.classList.remove('w--tab-active');
-        });
+        // const panLink = document.querySelectorAll('.w-tab-link');
+        // panLink.forEach(element => {
+        //     element.classList.remove('w--current');
+        // });
+        // const tabPan = document.querySelectorAll('.w-tab-pane');
+        // tabPan.forEach(element => {
+        //     element.classList.remove('w--tab-active');
+        // });
         
     }
 
