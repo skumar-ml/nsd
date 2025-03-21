@@ -5,7 +5,7 @@ class updateMember {
     this.baseUrl = data.baseUrl;
     this.getMemberData();
     this.handleEditMember();
-    this.handleUpdateProfileBtn()
+    this.handleUpdateProfileBtn();
   }
   // Get API data with the help of endpoint
   async fetchData(endpoint) {
@@ -26,27 +26,27 @@ class updateMember {
    */
   async getMemberData() {
     var $this = this;
-    var update_profile = document.getElementById("update_profile");
+    var update_profile = document.querySelectorAll(".update_profile");
     //var spinner = document.getElementById("half-circle-spinner");
     //spinner.style.display = "block";
-    update_profile.style.display = "none";
+    update_profile.forEach(el => el.style.display = 'none');
     $this.$editMemberData = await this.fetchData("getItemId/" + this.memberId);
     console.log("itemIdData", $this.$editMemberData);
-    update_profile.style.display = "block";
+    update_profile.forEach(el => el.style.display = 'block');
     //spinner.style.display = "none";
     return $this.$editMemberData;
   }
 
-  handleUpdateProfileBtn(){
+  handleUpdateProfileBtn() {
     var $this = this;
-    var update_profile = document.getElementById("update_profile");
-    update_profile.addEventListener("click", function (event) {
-      event.preventDefault();
-      const editMemberModal = document.getElementById(
-        "add-family-member-edit-modal"
-      );
-      $this.updateSuppData($this.$editMemberData);
-      $this.openModal(editMemberModal);
+    var update_profiles = document.querySelectorAll(".update_profile");
+    update_profiles.forEach(update_profile => {
+      update_profile.addEventListener("click", function (event) {
+        event.preventDefault();
+        const editMemberModal = document.getElementById("update-profile-modal");
+        $this.updateSuppData($this.$editMemberData);
+        $this.openModal(editMemberModal);
+      });
     });
   }
 
@@ -141,19 +141,18 @@ class updateMember {
       let responseText = JSON.parse(xhr.responseText);
       console.log(xhr.responseText, responseText);
       const addFamilyMemberEditModals = document.querySelector(
-        ".add-family-member-edit-modal"
+        ".update-profile-modal"
       );
-      $this.getMemberData().then(data=>{
+      $this.getMemberData().then((data) => {
         setTimeout(() => {
-          console.log('updated')
+          console.log("updated");
           $this.closeModal(addFamilyMemberEditModals);
           $this.updateUserName(studentFirstName.value);
           editMemberBtn.innerHTML = "Save";
           editMemberBtn.classList.remove("disabled");
           editMemberBtn.style.pointerEvents = "auto";
-        }, 3000);
+        }, 1000);
       });
-      
     };
     xhr.onreadystatechange = function (oEvent) {
       if (xhr.readyState === 4) {
@@ -161,7 +160,9 @@ class updateMember {
           console.log(xhr.responseText);
         } else {
           console.log("Error", xhr.statusText);
-          alert("Unable to update your profile. Please contact to administration")
+          alert(
+            "Unable to update your profile. Please contact to administration"
+          );
           editMemberBtn.innerHTML = "Save";
           editMemberBtn.classList.remove("disabled");
           editMemberBtn.style.pointerEvents = "auto";
@@ -169,12 +170,13 @@ class updateMember {
       }
     };
   }
-  updateUserName(studentFirstName){
-    const wlcTextEl = document.querySelectorAll('.dashboard-heading-div .main-heading')
-    wlcTextEl.forEach(function(wlcText) {
-      wlcText.innerHTML = "Welcome, "+studentFirstName+"!";
-      console.log(wlcTextEl, studentFirstName)
-    })
+  updateUserName(studentFirstName) {
+    const wlcTextEl = document.querySelectorAll(
+      ".dashboard-heading-div .main-heading"
+    );
+    wlcTextEl.forEach(function (wlcText) {
+      wlcText.innerHTML = "Welcome, " + studentFirstName + "!";
+      console.log(wlcTextEl, studentFirstName);
+    });
   }
 }
-
