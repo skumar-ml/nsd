@@ -405,7 +405,7 @@ class CheckOutWebflow {
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
 				if(xhr.responseText == null){
-					alert("An error has occurred. Please reach out to the administrator for assistance.")
+					alert("Something went wrong. Please try again after some time.")
 				}
 				let responseText = JSON.parse(xhr.responseText);
 				if (responseText.success) {
