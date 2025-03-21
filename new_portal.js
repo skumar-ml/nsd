@@ -12,6 +12,7 @@ class NSDPortal {
     $uploadedContent = {};
     $startDate = '';
     $endDate = '';
+    $deadlineDate = '';
     /**New Variable */
     $allStudentData = []
     constructor(webflowMemberId, accountEmail, apiBaseUrl) {
@@ -219,6 +220,7 @@ class NSDPortal {
         this.checkProgramDeadline();
         this.$startDate = new Date(this.$programDetail.startDate);
         this.$endDate = new Date(this.$programDetail.endDate);
+        this.$deadlineDate = new Date(this.$programDetail.deadlineDate);
     }
 	
     tabPane(index, tabIndex, isTabActive, tab) {
@@ -493,7 +495,7 @@ class NSDPortal {
                 loading="lazy" alt=""></div>
             </div>
             <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$startDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()+this.getOrdinalSuffix(this.$startDate.getDate())}</div>
+                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$deadlineDate.toLocaleString('default', { month: 'long' })} ${this.$startDate.getDate()+this.getOrdinalSuffix(this.$startDate.getDate())}</div>
                 <div class="pre-camp_progress-container">
                 ${this.progressBar()}
                 </div>
