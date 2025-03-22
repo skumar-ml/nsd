@@ -495,7 +495,7 @@ class NSDPortal {
                 loading="lazy" alt=""></div>
             </div>
             <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$deadlineDate.toLocaleString('default', { month: 'long' })} ${this.deadlineDate.getDate()+this.getOrdinalSuffix(this.deadlineDate.getDate())}</div>
+                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$deadlineDate.toLocaleString('default', { month: 'long' })} ${this.$deadlineDate.getDate()+this.getOrdinalSuffix(this.$deadlineDate.getDate())}</div>
                 <div class="pre-camp_progress-container">
                 ${this.progressBar()}
                 </div>
