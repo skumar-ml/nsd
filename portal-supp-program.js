@@ -492,7 +492,7 @@ class DisplaySuppProgram {
       // Add a "Please select" option
       const defaultOption = document.createElement("option");
       defaultOption.value = "";
-      defaultOption.textContent = "Please select";
+      defaultOption.textContent = "Select a student";
       selectBox.appendChild(defaultOption);
       // Add new options from the API data
       filterData.forEach((item, index) => {
