@@ -556,10 +556,11 @@ class DisplaySuppProgram {
     const payBtn = document.getElementById("pay-supp-program");
     payBtn.addEventListener("click", function (event) {
       event.preventDefault();
-      payBtn.value = "Processing...";
-      payBtn.style.pointerEvents = "none";
+      
       const studentEl = document.getElementById("portal-students");
       if (studentEl.value) {
+	payBtn.value = "Processing...";
+      	payBtn.style.pointerEvents = "none";
         let programName = $this.$selectedProgram.label;
         let programId = $this.$selectedProgram.programDetailId;
         let amount = $this.$selectedProgram.amount;
