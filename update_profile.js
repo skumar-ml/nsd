@@ -32,7 +32,9 @@ class updateMember {
     update_profile.forEach(el => el.style.display = 'none');
     $this.$editMemberData = await this.fetchData("getItemId/" + this.memberId);
     console.log("itemIdData", $this.$editMemberData);
-    update_profile.forEach(el => el.style.display = 'block');
+    if($this.$editMemberData){
+      update_profile.forEach(el => el.style.display = 'block');
+    }
     //spinner.style.display = "none";
     return $this.$editMemberData;
   }
