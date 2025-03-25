@@ -43,9 +43,17 @@ class updateMember {
     update_profiles.forEach(update_profile => {
       update_profile.addEventListener("click", function (event) {
         event.preventDefault();
-        const editMemberModal = document.getElementById("update-profile-modal");
+        let editMemberModal = document.getElementById("update-profile-modal");
         $this.updateSuppData($this.$editMemberData);
         $this.openModal(editMemberModal);
+      });
+    });
+    const closeLinks = document.querySelectorAll('.upsell-close-link');
+    closeLinks.forEach(closeLink => {
+      closeLink.addEventListener("click", function (event) {
+        event.preventDefault();
+        let editMemberModal = document.getElementById("update-profile-modal");
+        $this.closeModal(editMemberModal);
       });
     });
   }
