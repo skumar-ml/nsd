@@ -206,6 +206,7 @@ class DisplaySuppProgram {
     buyNowBtn.addEventListener("click", function (event) {
       event.preventDefault();
       $this.$selectedProgram = item;
+      $this.updatePayNowModelAmount();
       const buyNowModal = document.getElementById("buyNowModal");
       $this.showModal(buyNowModal);
     });
@@ -348,6 +349,7 @@ class DisplaySuppProgram {
     buyNowBtn.addEventListener("click", function (event) {
       event.preventDefault();
       $this.$selectedProgram = item;
+      $this.updatePayNowModelAmount();
       const buyNowModal = document.getElementById("buyNowModal");
       $this.showModal(buyNowModal);
     });
@@ -574,6 +576,15 @@ class DisplaySuppProgram {
         alert("Please select student");
       }
     });
+  }
+  updatePayNowModelAmount(){
+    var $this = this;
+    let upSellAmount = document.querySelectorAll("[data-cart-total='cart-total-price']")
+			if (upSellAmount.length > 0) {
+				upSellAmount.forEach(up_Sell_price => {
+					up_Sell_price.innerHTML = "$"+$this.$selectedProgram.amount;
+				})
+			}
   }
 }
 
