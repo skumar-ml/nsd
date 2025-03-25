@@ -171,9 +171,7 @@ class updateMember {
     };
   }
   updateUserName(studentFirstName) {
-    const wlcTextEl = document.querySelectorAll(
-      ".dashboard-heading-div .main-heading"
-    );
+    const wlcTextEl = document.querySelectorAll("[data-portal='heading']");
     wlcTextEl.forEach(function (wlcText) {
       wlcText.innerHTML = "Welcome, " + studentFirstName + "!";
       console.log(wlcTextEl, studentFirstName);
