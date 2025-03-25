@@ -3,7 +3,9 @@ class updateMember {
   constructor(data) {
     this.memberId = data.memberId;
     this.baseUrl = data.baseUrl;
-    this.getMemberData();
+    setTimeout(() => {
+      this.getMemberData();
+    }, 2000);
     this.handleEditMember();
     this.handleUpdateProfileBtn();
   }
