@@ -1184,6 +1184,9 @@ class CheckOutWebflow {
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
 		// Check if the slider is already initialized
+		if ($slider.hasClass('slick-initialized')) {
+			$slider.slick('unslick'); // Destroy slick instance
+		}
 		if (!$slider.hasClass('slick-initialized')) {
 
 			var slickSettings = {
@@ -1470,6 +1473,9 @@ class CheckOutWebflow {
 			// Shared Slick slider settings
 			var $slider =  $('.why-families_slick-slider');
 			$slider.slick('destroy');
+			if ($slider.hasClass('slick-initialized')) {
+				$slider.slick('unslick'); // Destroy slick instance
+			}
 			var slickSettings = {
 				speed: 300,
 				slidesToShow: 1,
