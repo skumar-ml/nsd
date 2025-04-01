@@ -44,13 +44,16 @@ class NSDPortal {
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
         // const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
-	
-	//Invoice Changes, Calling invoice and form API 
-        const [data, invoiceData] = await Promise.all(
-            [this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current"),
-                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
-            ]
-        );
+	 try {
+		//Invoice Changes, Calling invoice and form API 
+	        const [data, invoiceData] = await Promise.all(
+	            [this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current"),
+	                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
+	            ]
+	        );
+	} catch (error) {
+            spinner.style.display = 'none';
+        }
         // Hide free and paid resources
         this.hidePortalData(data)
         // hide spinner
