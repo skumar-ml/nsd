@@ -52,6 +52,8 @@ class NSDPortal {
 	            ]
 	        );
 	} catch (error) {
+	    const data = [];
+	    const invoiceData = [];
             spinner.style.display = 'none';
         }
         // Hide free and paid resources
