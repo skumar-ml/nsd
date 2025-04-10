@@ -1198,6 +1198,7 @@ class CheckOutWebflow {
 		
 
 		swiperSlideWrapper.innerHTML = "";
+		newSlideWrapper.innerHTML = "";
 
 		// Modal Content Update
 		let modalContent = document.querySelector(
