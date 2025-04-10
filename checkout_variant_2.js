@@ -1276,7 +1276,7 @@ class CheckOutWebflow {
 		// Check if the slider is already initialized
 		if (!$slider.hasClass('slick-initialized')) {
 			// Initialize you might slider
-			var $sliderYouMightNew = $slider.slick(slickSettings);
+			var $sliderYouMightNew = $slider2.slick(slickSettings);
 						
 			$('.you-might-left-arrow').click(function () {
 				console.log("You Might: Left arrow clicked.");
