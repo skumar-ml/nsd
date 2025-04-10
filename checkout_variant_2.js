@@ -1276,7 +1276,7 @@ class CheckOutWebflow {
 			$slider2.slick('unslick'); // Destroy slick instance
 		}
 		// Check if the slider is already initialized
-		if (!$slider.hasClass('slick-initialized')) {
+		if (!slider2.hasClass('slick-initialized')) {
 			// Initialize you might slider
 			var $sliderYouMightNew = $slider2.slick(slickSettings);
 						
