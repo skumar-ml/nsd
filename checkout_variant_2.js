@@ -1237,8 +1237,9 @@ class CheckOutWebflow {
 	}
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
-		$slider2.slick('destroy');
+		
 		if ($slider.hasClass('slick-initialized')) {
+			$slider2.slick('destroy');
 			$slider.slick('unslick'); // Destroy slick instance
 		}
 		var slickSettings = {
@@ -1269,8 +1270,9 @@ class CheckOutWebflow {
 		}
 		// New Slider
 		var $slider2 = $('.you-might-slider-container');
-		$slider2.slick('destroy');
+		
 		if ($slider2.hasClass('slick-initialized')) {
+			$slider2.slick('destroy');
 			$slider2.slick('unslick'); // Destroy slick instance
 		}
 		// Check if the slider is already initialized
@@ -1547,8 +1549,9 @@ class CheckOutWebflow {
 		if(classs == "block"){
 			// Shared Slick slider settings
 			var $slider =  $('.why-families_slick-slider');
-			$slider.slick('destroy');
+			
 			if ($slider.hasClass('slick-initialized')) {
+				$slider.slick('destroy');
 				$slider.slick('unslick'); // Destroy slick instance
 			}
 			var slickSettings = {
