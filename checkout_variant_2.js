@@ -25,6 +25,7 @@ class CheckOutWebflow {
 	$checkoutData = "";
 	$checkOutResponse = false;
 	$initCheckout = null;
+	$selectedProgram = []
 	constructor(apiBaseUrl, memberData) {
 		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData;
@@ -562,6 +563,7 @@ class CheckOutWebflow {
 					$this.hideAndShowWhyFamilies('why-families-div', 'none')
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
+					$this.hideShowDivById('checkout-supplimentary-data-new', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('pay-deposite')
@@ -581,6 +583,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
+			$this.hideShowDivById('checkout-supplimentary-data-new', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
@@ -1110,7 +1113,16 @@ class CheckOutWebflow {
 
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
-
+						// update added text for same program in another section
+						var programDetailId = checkbox.getAttribute('programdetailid');
+						var elementSelector = ".supp_program_"+programDetailId;;
+						var matchedAddCartBtn = document.querySelectorAll(elementSelector)
+						matchedAddCartBtn.forEach(add_to_card_btn => {
+							add_to_card_btn.closest("div")
+							add_to_card_btn.textContent = "Added";
+							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
+							add_to_card_btn.style.color = 'gray';
+						})
 						while ($this.$suppPro.length == 0) {
 							console.log("$this.$suppPro.length", $this.$suppPro.length)
 						}
@@ -1137,6 +1149,12 @@ class CheckOutWebflow {
 	async displaySupplementaryProgram() {
 		let container2 = document.getElementById("checkout-supplimentary-data-2");
 		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
+
+		
+		// New Slider with add-to-cart and learn more button
+		let container3 = document.getElementById("checkout-supplimentary-data-new");
+		let newSlideWrapper = container3.querySelector('.you-might-slider-container')
+
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
@@ -1164,13 +1182,37 @@ class CheckOutWebflow {
 
 		if(!apiData.length){
 			swiperSlideWrapper.style.display="none";
+			// New Slider hide if no API data
+			newSlideWrapper.style.display = "none";
 		}
 		
 		if (container2 == undefined) return;
+
+		if(container3 == undefined) return;
 		
 		if (swiperSlideWrapper == undefined) return
 
+		if (newSlideWrapper == undefined) return
+
+		// Modal Content Update
+		
+
 		swiperSlideWrapper.innerHTML = "";
+
+		// Modal Content Update
+		let modalContent = document.querySelector(
+			".supp-programs-description-wrapper"
+		  );
+	  
+		if (!apiData.length) {
+		modalContent.style.display = "none";
+		}
+	
+		if (modalContent == undefined) return;
+	
+		modalContent.innerHTML = "";
+
+
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
 			//slider div
@@ -1178,15 +1220,26 @@ class CheckOutWebflow {
 			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
 			swiperSlide.appendChild(outerShadowDiv1)
 			swiperSlideWrapper.prepend(swiperSlide)
-		});
 
+			//newSlider div
+			let newSliderSlide = creEl('div', 'you-might_slide-item')
+			const newOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', swiperSlide);
+			newSliderSlide.appendChild(newOuterShadowDiv1)
+			newSlideWrapper.prepend(newSliderSlide)
+
+			// Modal Content Update
+			const modalSingleContent = this.displayModalSuppProgram(item, "modal");
+			modalContent.prepend(modalSingleContent);
+
+		});
+		this.closeIconEvent();
 	}
 	initSlickSlider() {
-		var $slider = $('.you-might_slick-slider');
-		// Check if the slider is already initialized
+		var $slider = $('.you-might_slick-slider, .you-might-slider-container');
 		if ($slider.hasClass('slick-initialized')) {
 			$slider.slick('unslick'); // Destroy slick instance
 		}
+		// Check if the slider is already initialized
 		if (!$slider.hasClass('slick-initialized')) {
 
 			var slickSettings = {
@@ -1211,6 +1264,15 @@ class CheckOutWebflow {
 			$('.right-arrow-slick').click(function () {
 				console.log("You Might: Right arrow clicked.");
 				$sliderYouMight.slick('slickNext');
+			});
+			$('.you-might-left-arrow').click(function () {
+				console.log("You Might: Left arrow clicked.");
+				$sliderYouMightSlider.slick('slickPrev');
+			});
+	 
+			$('.you-might-right-arrow').click(function () {
+				console.log("You Might: Right arrow clicked.");
+				$sliderYouMightSlider.slick('slickNext');
 			});
 		}
 
@@ -1514,4 +1576,402 @@ class CheckOutWebflow {
 
 	}
 
+	// New Supplimentary program update
+
+	showModal(display){
+		const suppProgramsModal = document.getElementById('suppProgramsModal');
+		suppProgramsModal.classList.add('show');
+		suppProgramsModal.style.display = 'flex';
+	}
+	hideModal(){
+		const suppProgramsModal = document.getElementById('suppProgramsModal');
+		suppProgramsModal.classList.add('show');
+		suppProgramsModal.style.display = 'flex';
+	}
+	closeIconEvent() {
+		const closeLinks = document.querySelectorAll(
+		  ".upsell-close-link, .main-button.close"
+		);
+		closeLinks.forEach(function (closeLink) {
+		  closeLink.addEventListener("click", function (event) {
+			event.preventDefault();
+			event.stopPropagation(); // Prevent event bubbling
+	
+			// First, try getting the modal from `data-target`
+			const targetModalId = closeLink.getAttribute("data-target");
+			let targetModal = targetModalId
+			  ? document.getElementById(targetModalId)
+			  : null;
+	
+			// If no `data-target`, find the closest parent that is a modal (checking if it has inline `display: flex;`)
+			if (!targetModal) {
+			  targetModal = closeLink.closest('[role="dialog"][aria-modal="true"]');
+			}
+	
+			if (targetModal) {
+			  console.log(`Closing ${targetModal.id}`);
+			  targetModal.classList.remove("show");
+			  targetModal.style.display = "none";
+			}
+		  });
+		});
+	  }
+	// New UpSell Program / Supplementary
+	newDisplaySingleSuppProgram(item, size, slideDiv) {
+		var $this = this;
+		// Create the outer-shadow div
+		//const outerDiv = document.createElement("div");
+		//outerDiv.classList.add("div-block-93", "outer-shadow");
+		// Create the grid container
+		const gridDiv = document.createElement("div");
+		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "upsell");
+
+		// Create the course-info div (left column)
+		const courseInfoDiv = document.createElement("div");
+
+		const upsellDiv = document.createElement("div");
+		upsellDiv.classList.add("upsell-div");
+
+		// Create the container button Div
+		const buttonDiv = document.createElement('div');
+		buttonDiv.className = 'button-div';
+
+		// Create the "Add to Cart" button
+		const addToCartBtn = document.createElement('a');
+		addToCartBtn.href = '#';
+		let programClass = "supp_program_"+item.programDetailId;
+		addToCartBtn.className = 'main-button-34 red add-to-card w-button '+programClass;
+		addToCartBtn.tabIndex = 0;
+		addToCartBtn.textContent = 'Add to Cart';
+
+		// Create the "Learn More" button
+		const learnMoreBtn = document.createElement('a');
+		learnMoreBtn.href = '#';
+		learnMoreBtn.className = 'main-button learn-more margin-top-5 w-button';
+		learnMoreBtn.tabIndex = 0;
+		learnMoreBtn.textContent = 'Learn More';
+		learnMoreBtn.addEventListener("click", function(event){
+			event.preventDefault();
+			$this.$selectedProgram = item;
+			$this.hideShowModalContent(item);
+			$this.showModal();
+		})
+
+		
+
+		// Optional: Append the container to the body or another part of the document
+		document.body.appendChild(buttonDiv);
+		// Create the checkbox
+		const checkboxDiv = document.createElement("div");
+
+		const input = document.createElement("input");
+		
+		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
+		input.type = "checkbox";
+		input.id = size + item.label.replace(/\s+/g, '-').toLowerCase();
+		input.name = "checkbox";
+		input.value = item.amount;
+		input.setAttribute("programdetailid", item.programDetailId);
+		input.setAttribute("data-name", "Checkbox");
+		var $this = this;
+		input.addEventListener("change", function () {
+			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
+			$this.updateAmount(this, item.amount);
+		})
+
+		checkboxDiv.appendChild(input);
+
+		// Append buttons to the container
+		buttonDiv.appendChild(addToCartBtn);
+		buttonDiv.appendChild(learnMoreBtn);
+		buttonDiv.appendChild(checkboxDiv)
+
+		
+		const labelWrapper = creEl('div')
+		const campNameDiv = document.createElement("label");
+		campNameDiv.classList.add("camp-name", "margin-bottom-0");
+		campNameDiv.setAttribute("for", size + item.label.replace(/\s+/g, '-').toLowerCase())
+		campNameDiv.textContent = item.label;
+		labelWrapper.appendChild(campNameDiv)
+		courseInfoDiv.appendChild(labelWrapper)
+		//upsellDiv.appendChild(checkboxDiv);
+		///upsellDiv.appendChild(campNameDiv);
+
+
+		const textBlockWrapper = document.createElement("div");
+		textBlockWrapper.classList.add("text-block-wrapper");
+
+		item.tags.forEach(tag => {
+			const tagDiv = document.createElement("div");
+			tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
+			tagDiv.style.backgroundColor = tag.color
+			tagDiv.textContent = tag.name;
+			textBlockWrapper.appendChild(tagDiv);
+		});
+
+		const priceItem = document.createElement("div");
+		priceItem.classList.add("price-item");
+
+		const saveDiv1 = document.createElement("div");
+		saveDiv1.classList.add("save-amount");
+		saveDiv1.textContent = "Save";
+
+		const saveDiv2 = document.createElement("div");
+		saveDiv2.classList.add("save-amount");
+		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
+
+		priceItem.appendChild(saveDiv1);
+		priceItem.appendChild(saveDiv2);
+		
+		slideDiv.appendChild(upsellDiv);
+		upsellDiv.appendChild(textBlockWrapper);
+
+		
+
+		// Create the price details div (right column)
+		const priceDiv = document.createElement("div");
+		priceDiv.classList.add("course-info", "p-16", "upsell");
+
+		const discountPriceDiv = document.createElement("div");
+		const discountLabel = document.createElement("div");
+		discountLabel.classList.add("dm-sans", "bold-700");
+		discountLabel.textContent = "Discount Price";
+		discountPriceDiv.appendChild(discountLabel);
+
+		const priceWrapper1 = document.createElement("div");
+		priceWrapper1.classList.add("price-wrapper", "upsell");
+
+		const originalPriceDiv1 = document.createElement("div");
+		originalPriceDiv1.classList.add("price-item", "upsell");
+
+		const originalPrice = document.createElement("div");
+		originalPrice.classList.add("original-price");
+		originalPrice.textContent = "$" + item.disc_amount;
+		originalPriceDiv1.appendChild(originalPrice);
+
+		const discountedPriceDiv = document.createElement("div");
+		discountedPriceDiv.classList.add("price-item", "upsell");
+
+		const discountedPrice = document.createElement("div");
+		discountedPrice.classList.add("discounted-price", "text-blue");
+		discountedPrice.textContent = "$" + item.amount;
+		discountedPriceDiv.appendChild(discountedPrice);
+
+		priceWrapper1.appendChild(priceItem);
+		priceWrapper1.appendChild(originalPriceDiv1);
+		priceWrapper1.appendChild(discountedPriceDiv);
+
+		
+
+		priceDiv.appendChild(discountPriceDiv);
+		courseInfoDiv.appendChild(priceWrapper1);
+		
+
+		gridDiv.appendChild(courseInfoDiv);
+		gridDiv.appendChild(buttonDiv)
+		//gridDiv.appendChild(priceDiv);
+
+		//outerDiv.appendChild(gridDiv);
+
+		return gridDiv;
+	}
+
+	displayModalSuppProgram(item, type = "banner", size="desktop") {
+		var $this = this;
+		let discount_amount = item.disc_amount - item.amount;
+		let discount = Number.isInteger(discount_amount)
+		  ? discount_amount
+		  : parseFloat(discount_amount).toFixed(2);
+		let typeClass = "modal-content " + type + "-" + item.programDetailId;
+		// Main wrapper
+		if (type == "banner") {
+		  var slideItem = creEl("div", "supp-programs-slide-item");
+		} else {
+		  var slideItem = creEl(
+			"div",
+			"supp-programs-description-div " + typeClass
+		  );
+		}
+	
+		// --------- Discounted Programs Div ---------
+		var programsDiv = creEl("div", "discounted-programs-div border-none");
+	
+		// Title
+		var title = creEl("div", "dm-sans bold-700 text-large");
+		title.innerHTML = item.label;
+	
+		// Price Grid
+		var priceGrid = creEl("div", "discount-price-grid supp-prog-price");
+	
+		var originalPrice = creEl("div", "original-price-gray medium-text");
+		originalPrice.textContent = "$" + item.disc_amount;
+	
+		var discountPrice = creEl("div", "discount-price supp-program");
+		discountPrice.innerHTML = "$" + item.amount + "<br />";
+	
+		var savePriceText = creEl("div", "save-price-text");
+		var saveAmount = creEl("div", "save-amount medium-text");
+		saveAmount.textContent = "Save " + "$" + discount;
+		savePriceText.appendChild(saveAmount);
+	
+		priceGrid.appendChild(originalPrice);
+		priceGrid.appendChild(discountPrice);
+		priceGrid.appendChild(savePriceText);
+	
+		// Key Benefits label
+		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits");
+		keyBenefitsLabel.innerHTML = "Key Benefits<br />";
+	
+		// Benefits container
+		var benefitsContainer = creEl("div", "width-100");
+	
+		// Benefits Data
+		var benefits = item.benefits;
+	
+		// Loop benefits
+		if (benefits.length > 0) {
+		  benefits.forEach(function (benefit) {
+			var benefitWrapper = creEl("div", "key-benefits-grid-wrapper");
+	
+			var benefitImg = creEl(
+			  "img",
+			  "full-width-inline-image margintop-5px"
+			);
+			benefitImg.src =
+			  "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+			benefitImg.loading = "lazy";
+			benefitImg.alt = "";
+	
+			var benefitContent = creEl("div");
+	
+			var benefitTitle = creEl(
+			  "div",
+			  "dm-sans margin-bottom-5 bold-700"
+			);
+			benefitTitle.innerHTML = benefit.title + "<br />";
+	
+			var benefitDesc = creEl("div", "dm-sans");
+			benefitDesc.innerHTML = benefit.desc;
+	
+			benefitContent.appendChild(benefitTitle);
+			benefitContent.appendChild(benefitDesc);
+	
+			benefitWrapper.appendChild(benefitImg);
+			benefitWrapper.appendChild(benefitContent);
+	
+			benefitsContainer.appendChild(benefitWrapper);
+		  });
+		}
+	
+		// Buttons
+		var buttonDiv = creEl(
+		  "div",
+		  "button-div button-grid-wrapper-with-margin-top"
+		);
+		
+		let programClass = "supp_program_"+item.programDetailId;
+		var buyNowBtn = creEl("a", "main-button-34 red add-to-card w-button "+programClass);
+		buyNowBtn.href = "#";
+		buyNowBtn.textContent = "Add to Cart";
+		// buyNowBtn.addEventListener("click", function (event) {
+		//   event.preventDefault();
+		//   $this.$selectedProgram = item;
+		//   //$this.updatePayNowModelAmount();
+		//   const buyNowModal = document.getElementById("buyNowModal");
+		//   $this.showModal(buyNowModal);
+		// });
+	
+		var learnMoreBtn = creEl("a", "main-button close w-button");
+		learnMoreBtn.href = "#";
+		learnMoreBtn.textContent = type == "banner" ? "Learn More" : "Close";
+		learnMoreBtn.addEventListener("click", function (event) {
+		  event.preventDefault();
+		  $this.$selectedProgram = item;
+		  const suppProgramsModal = document.getElementById("suppProgramsModal");
+		  if (type == "banner") {
+			$this.hideShowModalContent(item);
+			$this.showModal(suppProgramsModal);
+		  } else {
+			$this.hideModal(suppProgramsModal);
+		  }
+		});
+
+		// Checkbox added for add to cart feature
+		// Create the checkbox
+		const checkboxDiv = document.createElement("div");
+
+		const input = document.createElement("input");
+		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
+		input.type = "checkbox";
+		input.id = size + item.label.replace(/\s+/g, '-').toLowerCase();
+		input.name = "checkbox";
+		input.value = item.amount;
+		input.setAttribute("programdetailid", item.programDetailId);
+		input.setAttribute("data-name", "Checkbox");
+		var $this = this;
+		input.addEventListener("change", function () {
+			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
+			$this.updateAmount(this, item.amount);
+		})
+
+		checkboxDiv.appendChild(input);
+	
+		buttonDiv.appendChild(buyNowBtn);
+		buttonDiv.appendChild(learnMoreBtn);
+		buttonDiv.appendChild(checkboxDiv);
+	
+		// Assemble programsDiv
+		programsDiv.appendChild(title);
+		programsDiv.appendChild(priceGrid);
+		programsDiv.appendChild(keyBenefitsLabel);
+		programsDiv.appendChild(benefitsContainer);
+		programsDiv.appendChild(buttonDiv);
+	
+		// --------- Gradient Div Section ---------
+		var gradientDiv = creEl(
+		  "div",
+		  "gradient-div-supp-programs-modal mob-hide"
+		);
+	
+		// Image
+		var gradientImg = creEl("img", "supp-programs-img");
+		gradientImg.src =
+		  "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67d291810bb6fac1cea50637_supp-prog-2.avif";
+		gradientImg.loading = "lazy";
+		gradientImg.alt = "";
+	
+		// Text
+		var gradientText = creEl("div", "supp-programs-text");
+	
+		var percentOff = creEl("div", "dm-sans percent-off");
+		percentOff.innerHTML =
+		  "$" + discount + '<span class="off-text-shadow-right-white"> OFF</span>';
+	
+		var limitedTime = creEl("div", "dm-sans limited-time-supp-program");
+		limitedTime.textContent = "Limited Time Offer";
+	
+		gradientText.appendChild(percentOff);
+		gradientText.appendChild(limitedTime);
+	
+		// Assemble gradientDiv
+		gradientDiv.appendChild(gradientImg);
+		gradientDiv.appendChild(gradientText);
+	
+		// --------- Assemble Main Div ---------
+		slideItem.appendChild(programsDiv);
+		slideItem.appendChild(gradientDiv);
+	
+		return slideItem;
+	  }
+
+	hideShowModalContent(item) {
+		const modelContent = document.querySelectorAll(".modal-content");
+		for (let index = 0; index < modelContent.length; index++) {
+			const element = modelContent[index];
+			element.classList.add("hide");
+		}
+		document
+			.querySelector(".modal-content.modal-" + item.programDetailId)
+			.classList.remove("hide");
+	}
 }
