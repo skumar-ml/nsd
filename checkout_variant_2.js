@@ -1074,10 +1074,10 @@ class CheckOutWebflow {
 				const parent = button.closest("div");
 				if (parent) {
 					const checkbox = parent.querySelector(".suppCheckbox");
-					//if (checkbox.checked) {
+					if (checkbox) {
 					checkbox.checked = false;
 					console.log("checkbox.checked", checkbox.checked)
-					//}
+					}
 				}
 			})
 		}, 100);
