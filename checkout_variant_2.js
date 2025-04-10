@@ -563,7 +563,7 @@ class CheckOutWebflow {
 					}
 					$this.hideAndShowWhyFamilies('why-families-div', 'none')
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
-					//$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
+					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.hideShowDivById('checkout-supplimentary-data-new', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
@@ -583,7 +583,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
-			//$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
+			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideShowDivById('checkout-supplimentary-data-new', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
