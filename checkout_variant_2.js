@@ -1268,12 +1268,12 @@ class CheckOutWebflow {
 			});
 			$('.you-might-left-arrow').click(function () {
 				console.log("You Might: Left arrow clicked.");
-				$sliderYouMightSlider.slick('slickPrev');
+				$sliderYouMight.slick('slickPrev');
 			});
 	 
 			$('.you-might-right-arrow').click(function () {
 				console.log("You Might: Right arrow clicked.");
-				$sliderYouMightSlider.slick('slickNext');
+				$sliderYouMight.slick('slickNext');
 			});
 		}
 
