@@ -1236,23 +1236,23 @@ class CheckOutWebflow {
 		this.closeIconEvent();
 	}
 	initSlickSlider() {
-		var $slider = $('.you-might_slick-slider, .you-might-slider-container');
+		var $slider = $('.you-might_slick-slider');
+		$slider2.slick('destroy');
 		if ($slider.hasClass('slick-initialized')) {
 			$slider.slick('unslick'); // Destroy slick instance
 		}
+		var slickSettings = {
+			speed: 300,
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			infinite: true,
+			centerMode: false,
+			variableWidth: false,
+			arrows: false,
+			dots: true,
+		};
 		// Check if the slider is already initialized
 		if (!$slider.hasClass('slick-initialized')) {
-
-			var slickSettings = {
-				speed: 300,
-				slidesToShow: 1,
-				slidesToScroll: 1,
-				infinite: true,
-				centerMode: false,
-				variableWidth: false,
-				arrows: false,
-				dots: true,
-			};
 			// Initialize you might slider
 			var $sliderYouMight = $slider.slick(slickSettings);
 
@@ -1266,14 +1266,26 @@ class CheckOutWebflow {
 				console.log("You Might: Right arrow clicked.");
 				$sliderYouMight.slick('slickNext');
 			});
+		}
+		// New Slider
+		var $slider2 = $('.you-might-slider-container');
+		$slider2.slick('destroy');
+		if ($slider2.hasClass('slick-initialized')) {
+			$slider2.slick('unslick'); // Destroy slick instance
+		}
+		// Check if the slider is already initialized
+		if (!$slider.hasClass('slick-initialized')) {
+			// Initialize you might slider
+			var $sliderYouMightNew = $slider.slick(slickSettings);
+						
 			$('.you-might-left-arrow').click(function () {
 				console.log("You Might: Left arrow clicked.");
-				$sliderYouMight.slick('slickPrev');
+				$sliderYouMightNew.slick('slickPrev');
 			});
 	 
 			$('.you-might-right-arrow').click(function () {
 				console.log("You Might: Right arrow clicked.");
-				$sliderYouMight.slick('slickNext');
+				$sliderYouMightNew.slick('slickNext');
 			});
 		}
 
