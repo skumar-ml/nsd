@@ -231,6 +231,7 @@ class CheckOutWebflow {
 						addToCardButton.classList.remove('disabled');
 						addToCardButton.style.pointerEvents = 'auto';
 						addToCardButton.style.color = '';
+						addToCardButton.style.textDecoration = "none";
 						// } else {
 						// 	addToCardButton.innerHTML = 'Added';
 						// 	addToCardButton.classList.add('disabled');
@@ -1121,7 +1122,8 @@ class CheckOutWebflow {
 							add_to_card_btn.closest("div")
 							add_to_card_btn.textContent = "Added";
 							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-							add_to_card_btn.style.color = 'gray';
+							add_to_card_btn.style.color = '#ffffff';
+							add_to_card_btn.style.textDecoration = "underline";
 						})
 						while ($this.$suppPro.length == 0) {
 							console.log("$this.$suppPro.length", $this.$suppPro.length)
@@ -1140,7 +1142,8 @@ class CheckOutWebflow {
 					_care_package_add_to_card.forEach(add_to_card_btn => {
 						add_to_card_btn.textContent = "Added";
 						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-						add_to_card_btn.style.color = 'gray';
+						add_to_card_btn.style.color = '#ffffff';
+						add_to_card_btn.style.textDecoration = "underline";
 					})
 				}
 			});
@@ -1224,7 +1227,7 @@ class CheckOutWebflow {
 
 			//newSlider div
 			let newSliderSlide = creEl('div', 'you-might_slide-item')
-			const newOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', swiperSlide);
+			const newOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', newSliderSlide);
 			newSliderSlide.appendChild(newOuterShadowDiv1)
 			newSlideWrapper.prepend(newSliderSlide)
 
@@ -1656,7 +1659,7 @@ class CheckOutWebflow {
 		const addToCartBtn = document.createElement('a');
 		addToCartBtn.href = '#';
 		let programClass = "supp_program_"+item.programDetailId;
-		addToCartBtn.className = 'main-button-34 red add-to-card w-button '+programClass;
+		addToCartBtn.className = 'main-button-34 red add-to-card you-might-add-to-cart w-button '+programClass;
 		addToCartBtn.tabIndex = 0;
 		addToCartBtn.textContent = 'Add to Cart';
 
