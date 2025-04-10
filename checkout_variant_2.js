@@ -1239,7 +1239,7 @@ class CheckOutWebflow {
 		var $slider = $('.you-might_slick-slider');
 		
 		if ($slider.hasClass('slick-initialized')) {
-			$slider2.slick('destroy');
+			$slider.slick('destroy');
 			$slider.slick('unslick'); // Destroy slick instance
 		}
 		var slickSettings = {
@@ -1276,7 +1276,7 @@ class CheckOutWebflow {
 			$slider2.slick('unslick'); // Destroy slick instance
 		}
 		// Check if the slider is already initialized
-		if (!slider2.hasClass('slick-initialized')) {
+		if (!$slider2.hasClass('slick-initialized')) {
 			// Initialize you might slider
 			var $sliderYouMightNew = $slider2.slick(slickSettings);
 						
