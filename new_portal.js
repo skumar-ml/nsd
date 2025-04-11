@@ -212,8 +212,8 @@ class NSDPortal {
         this.$completedForm = tab.formCompletedList;
 	    
 	//Invoice Changes, Only getting form and invoice related completed form
-        this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No");
-        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => i.isInvoice == "Yes").length;
+        this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No" || i.form_sub_type == 'dropoff' || i.form_sub_type == 'pickup');
+        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => (i.isInvoice == "Yes" && i.form_sub_type == 'dropoff_invoice') || (i.isInvoice == "Yes" && i.form_sub_type == 'pickup_invoice') ).length;
         this.invoiceData = []
 	this.$totalInvoice = 0;    
         this.$formsList = tab.formList;
