@@ -548,7 +548,7 @@ class NSDPortal {
         
         
         if(invoiceForm == "Invoice"){
-            this.$totalInvoice = formCategory.forms.length + this.$invoices.invoiceList.length;
+            this.$totalInvoice = formCategory.forms.length + (this.$invoices.invoiceList != null ? this.$invoices.invoiceList.length : 0);
             return `
             <div>
             <div class="pre-camp_subtitle-wrapper">
