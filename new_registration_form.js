@@ -326,7 +326,7 @@ class NSDPortal {
     }
     progressBar() {
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
-        return `<div class="pre-camp_subtitle opacity-50">${percentageAmount}% / ${this.$completedForm.length} of ${this.$totalForm} forms complete</div>
+        return `<div class="pre-camp_subtitle opacity-50">${parseInt(percentageAmount)}% / ${this.$completedForm.length} of ${this.$totalForm} forms complete</div>
                 <div class="pre-camp_progress-bar">
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
