@@ -1784,8 +1784,55 @@ class CheckOutWebflow {
 
 		priceDiv.appendChild(discountPriceDiv);
 		courseInfoDiv.appendChild(priceWrapper1);
-		
 
+
+		const benifitWrapper = creEl("div", "margin-top")
+
+		// Key Benefits label
+		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits");
+		keyBenefitsLabel.innerHTML = "Key Benefits<br />";
+	
+		// Benefits container
+		var benefitsContainer = creEl("div", "width-100");
+	
+		// Benefits Data
+		var benefits = item.benefits;
+	
+		// Loop benefits
+		if (benefits.length > 0) {
+		  benefits.forEach(function (benefit) {
+			var benefitWrapper = creEl("div", "key-benefits-grid-wrapper");
+	
+			var benefitImg = creEl(
+			  "img",
+			  "full-width-inline-image margintop-5px"
+			);
+			benefitImg.src =
+			  "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+			benefitImg.loading = "lazy";
+			benefitImg.alt = "";
+	
+			var benefitContent = creEl("div");
+	
+			var benefitTitle = creEl(
+			  "div",
+			  "dm-sans"
+			);
+			benefitTitle.innerHTML = benefit.title + "<br />";
+	
+			benefitContent.appendChild(benefitTitle);
+	
+			benefitWrapper.appendChild(benefitImg);
+			benefitWrapper.appendChild(benefitContent);
+	
+			benefitsContainer.appendChild(benefitWrapper);
+		  });
+		}
+		
+		benifitWrapper.appendChild(keyBenefitsLabel)
+		benifitWrapper.appendChild(benefitsContainer)
+
+		courseInfoDiv.appendChild(benifitWrapper)
 		gridDiv.appendChild(courseInfoDiv);
 		gridDiv.appendChild(buttonDiv)
 		//gridDiv.appendChild(priceDiv);
