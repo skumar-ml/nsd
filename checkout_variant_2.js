@@ -1112,7 +1112,12 @@ class CheckOutWebflow {
 
 						// Update the button text based on the checkbox state
 						button.textContent = checkbox.checked ? "Added" : "Add to Cart";
-
+						if(checkbox.checked){
+							button.style.pointerEvents = 'none'; // Disable pointer events
+							button.style.color = '#ffffff';
+							button.style.backgroundColor = "gray";
+							button.style.textDecoration = "underline";
+						}
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
 						// update added text for same program in another section
