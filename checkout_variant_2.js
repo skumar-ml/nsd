@@ -1637,52 +1637,104 @@ class CheckOutWebflow {
 	  }
 	// New UpSell Program / Supplementary
 	newDisplaySingleSuppProgram(item, size, slideDiv) {
-		var $this = this;
-		// Create the outer-shadow div
-		//const outerDiv = document.createElement("div");
-		//outerDiv.classList.add("div-block-93", "outer-shadow");
-		// Create the grid container
+		// Create main grid container
 		const gridDiv = document.createElement("div");
-		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "upsell");
-
-		// Create the course-info div (left column)
-		const courseInfoDiv = document.createElement("div");
-
+		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "you-might");
+		
+		// Left column container
+		const leftCol = document.createElement("div");
+		
+		// Upsell tags section
 		const upsellDiv = document.createElement("div");
 		upsellDiv.classList.add("upsell-div");
-
-		// Create the container button Div
-		const buttonDiv = document.createElement('div');
-		buttonDiv.className = 'button-div';
-
-		// Create the "Add to Cart" button
-		const addToCartBtn = document.createElement('a');
-		addToCartBtn.href = '#';
-		let programClass = "supp_program_"+item.programDetailId;
-		addToCartBtn.className = 'main-button-34 red add-to-card you-might-add-to-cart w-button '+programClass;
-		addToCartBtn.tabIndex = 0;
-		addToCartBtn.textContent = 'Add to Cart';
-
-		// Create the "Learn More" button
-		const learnMoreBtn = document.createElement('a');
-		learnMoreBtn.href = '#';
-		learnMoreBtn.className = 'main-button learn-more margin-top-5 w-button';
-		learnMoreBtn.tabIndex = 0;
-		learnMoreBtn.textContent = 'Learn More';
-		learnMoreBtn.addEventListener("click", function(event){
-			event.preventDefault();
-			$this.$selectedProgram = item;
-			$this.hideShowModalContent(item);
-			$this.showModal();
-		})
-
 		
-
-		// Optional: Append the container to the body or another part of the document
-		document.body.appendChild(buttonDiv);
-		// Create the checkbox
+		const tagWrapper = document.createElement("div");
+		tagWrapper.classList.add("text-block-wrapper-2");
+		
+		item.tags.forEach(tag => {
+		  const tagDiv = document.createElement("div");
+		  tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
+		  if (tag.color === "dark") tagDiv.classList.replace("bg-color-light-blue", "bg-color-dark-blue");
+		  tagDiv.textContent = tag.name;
+		  tagWrapper.appendChild(tagDiv);
+		});
+		
+		upsellDiv.appendChild(tagWrapper);
+		leftCol.appendChild(upsellDiv);
+		
+		// Title
+		const campTitleWrapper = document.createElement("div");
+		const campTitle = document.createElement("div");
+		campTitle.classList.add("camp-name-2", "margin-bottom-5");
+		campTitle.textContent = item.label;
+		campTitleWrapper.appendChild(campTitle);
+		leftCol.appendChild(campTitleWrapper);
+		
+		// Price Info
+		const priceWrapper = document.createElement("div");
+		priceWrapper.classList.add("price-wrapper", "upsell");
+		
+		const saveItem = document.createElement("div");
+		saveItem.classList.add("price-item");
+		saveItem.id = "w-node-d9e089fb-dbb6-8c3c-781b-f2cfa37c0c51-f602461b";
+		
+		const saveLabel = document.createElement("div");
+		saveLabel.classList.add("save-amount-2");
+		saveLabel.textContent = "Save";
+		
+		const saveAmount = document.createElement("div");
+		saveAmount.classList.add("save-amount-2");
+		saveAmount.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
+		
+		saveItem.appendChild(saveLabel);
+		saveItem.appendChild(saveAmount);
+		
+		const originalItem = document.createElement("div");
+		originalItem.classList.add("price-item", "upsell");
+		
+		const originalPrice = document.createElement("div");
+		originalPrice.classList.add("original-price-2");
+		originalPrice.textContent = "$" + parseFloat(item.disc_amount).toFixed(2);
+		originalItem.appendChild(originalPrice);
+		
+		const discountedItem = document.createElement("div");
+		discountedItem.classList.add("price-item", "upsell");
+		
+		const discountedPrice = document.createElement("div");
+		discountedPrice.classList.add("discounted-price-2", "text-blue");
+		discountedPrice.textContent = "$" + parseFloat(item.amount).toFixed(2);
+		discountedItem.appendChild(discountedPrice);
+		
+		priceWrapper.appendChild(saveItem);
+		priceWrapper.appendChild(originalItem);
+		priceWrapper.appendChild(discountedItem);
+		leftCol.appendChild(priceWrapper);
+		
+		// Right column buttons
+		const buttonDiv = document.createElement("div");
+		buttonDiv.classList.add("button-div", "you-might-buttons-wrapper");
+		
+		const addToCartBtn = document.createElement("a");
+		addToCartBtn.href = "#";
+		let programClass = "supp_program_"+item.programDetailId;
+		addToCartBtn.classList.add("main-button-34", "red", "add-to-card", "you-might-add-to-cart", "w-button", programClass);
+		addToCartBtn.textContent = "Add to Cart";
+		
+		const learnMoreBtn = document.createElement("a");
+		learnMoreBtn.href = "#";
+		learnMoreBtn.classList.add("main-button", "learn-more", "w-button");
+		learnMoreBtn.textContent = "Learn More";
+		
+		learnMoreBtn.addEventListener("click", function (e) {
+		  e.preventDefault();
+		  this.$selectedProgram = item;
+		  this.hideShowModalContent(item);
+		  this.showModal();
+		}.bind(this));
+		
+		
 		const checkboxDiv = document.createElement("div");
-
+		
 		const input = document.createElement("input");
 		
 		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
@@ -1697,149 +1749,60 @@ class CheckOutWebflow {
 			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
 			$this.updateAmount(this, item.amount);
 		})
-
+		
 		checkboxDiv.appendChild(input);
-
-		// Append buttons to the container
+		
+		
 		buttonDiv.appendChild(addToCartBtn);
 		buttonDiv.appendChild(learnMoreBtn);
 		buttonDiv.appendChild(checkboxDiv)
-
 		
-		const labelWrapper = creEl('div')
-		const campNameDiv = document.createElement("label");
-		campNameDiv.classList.add("camp-name", "margin-bottom-0");
-		campNameDiv.setAttribute("for", size + item.label.replace(/\s+/g, '-').toLowerCase())
-		campNameDiv.textContent = item.label;
-		labelWrapper.appendChild(campNameDiv)
-		courseInfoDiv.appendChild(labelWrapper)
-		//upsellDiv.appendChild(checkboxDiv);
-		///upsellDiv.appendChild(campNameDiv);
-
-
-		const textBlockWrapper = document.createElement("div");
-		textBlockWrapper.classList.add("text-block-wrapper");
-
-		item.tags.forEach(tag => {
-			const tagDiv = document.createElement("div");
-			tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
-			tagDiv.style.backgroundColor = tag.color
-			tagDiv.textContent = tag.name;
-			textBlockWrapper.appendChild(tagDiv);
+		gridDiv.appendChild(leftCol);
+		gridDiv.appendChild(buttonDiv);
+		
+		// Benefits Section (separate div)
+		const benefitsContainer = document.createElement("div");
+		
+		const marginTopDiv = document.createElement("div");
+		marginTopDiv.classList.add("margin-top");
+		
+		const keyLabel = document.createElement("div");
+		keyLabel.classList.add("dm-sans", "key-benefits");
+		keyLabel.innerHTML = "Key Benefits<br />";
+		
+		const benefitsWrapper = document.createElement("div");
+		
+		item.benefits.forEach((benefit, index) => {
+		  const benefitWrapper = document.createElement("div");
+		  benefitWrapper.classList.add("key-benefits-grid-wrapper");
+		  if (index === 0) benefitWrapper.classList.add("center");
+		
+		  const img = document.createElement("img");
+		  img.src = "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+		  img.loading = "lazy";
+		  img.alt = "";
+		  img.classList.add("full-width-inline-image");
+		
+		  const benefitText = document.createElement("div");
+		  benefitText.classList.add("dm-sans");
+		  benefitText.innerHTML = benefit.title + "<br />";
+		
+		  benefitWrapper.appendChild(img);
+		  benefitWrapper.appendChild(benefitText);
+		
+		  benefitsWrapper.appendChild(benefitWrapper);
 		});
-
-		const priceItem = document.createElement("div");
-		priceItem.classList.add("price-item");
-
-		const saveDiv1 = document.createElement("div");
-		saveDiv1.classList.add("save-amount");
-		saveDiv1.textContent = "Save";
-
-		const saveDiv2 = document.createElement("div");
-		saveDiv2.classList.add("save-amount");
-		saveDiv2.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
-
-		priceItem.appendChild(saveDiv1);
-		priceItem.appendChild(saveDiv2);
 		
-		slideDiv.appendChild(upsellDiv);
-		upsellDiv.appendChild(textBlockWrapper);
-
+		marginTopDiv.appendChild(keyLabel);
+		marginTopDiv.appendChild(benefitsWrapper);
+		benefitsContainer.appendChild(marginTopDiv);
 		
-
-		// Create the price details div (right column)
-		const priceDiv = document.createElement("div");
-		priceDiv.classList.add("course-info", "p-16", "upsell");
-
-		const discountPriceDiv = document.createElement("div");
-		const discountLabel = document.createElement("div");
-		discountLabel.classList.add("dm-sans", "bold-700");
-		discountLabel.textContent = "Discount Price";
-		discountPriceDiv.appendChild(discountLabel);
-
-		const priceWrapper1 = document.createElement("div");
-		priceWrapper1.classList.add("price-wrapper", "upsell");
-
-		const originalPriceDiv1 = document.createElement("div");
-		originalPriceDiv1.classList.add("price-item", "upsell");
-
-		const originalPrice = document.createElement("div");
-		originalPrice.classList.add("original-price");
-		originalPrice.textContent = "$" + item.disc_amount;
-		originalPriceDiv1.appendChild(originalPrice);
-
-		const discountedPriceDiv = document.createElement("div");
-		discountedPriceDiv.classList.add("price-item", "upsell");
-
-		const discountedPrice = document.createElement("div");
-		discountedPrice.classList.add("discounted-price", "text-blue");
-		discountedPrice.textContent = "$" + item.amount;
-		discountedPriceDiv.appendChild(discountedPrice);
-
-		priceWrapper1.appendChild(priceItem);
-		priceWrapper1.appendChild(originalPriceDiv1);
-		priceWrapper1.appendChild(discountedPriceDiv);
-
+		// Return full fragment
+		const wrapper = document.createElement("div");
+		wrapper.appendChild(gridDiv);
+		wrapper.appendChild(benefitsContainer);
 		
-
-		priceDiv.appendChild(discountPriceDiv);
-		courseInfoDiv.appendChild(priceWrapper1);
-
-
-		const benifitWrapper = creEl("div", "margin-top")
-
-		// Key Benefits label
-		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits");
-		keyBenefitsLabel.innerHTML = "Key Benefits<br />";
-	
-		// Benefits container
-		var benefitsContainer = creEl("div", "width-100");
-	
-		// Benefits Data
-		var benefits = item.benefits;
-	
-		// Loop benefits
-		if (benefits.length > 0) {
-		  benefits.forEach(function (benefit) {
-			var benefitWrapper = creEl("div", "key-benefits-grid-wrapper");
-	
-			var benefitImg = creEl(
-			  "img",
-			  "full-width-inline-image margintop-5px"
-			);
-			benefitImg.src =
-			  "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
-			benefitImg.loading = "lazy";
-			benefitImg.alt = "";
-	
-			var benefitContent = creEl("div");
-	
-			var benefitTitle = creEl(
-			  "div",
-			  "dm-sans"
-			);
-			benefitTitle.innerHTML = benefit.title + "<br />";
-	
-			benefitContent.appendChild(benefitTitle);
-	
-			benefitWrapper.appendChild(benefitImg);
-			benefitWrapper.appendChild(benefitContent);
-	
-			benefitsContainer.appendChild(benefitWrapper);
-		  });
-		}
-		
-		benifitWrapper.appendChild(keyBenefitsLabel)
-		benifitWrapper.appendChild(benefitsContainer)
-
-		courseInfoDiv.appendChild(benifitWrapper)
-		gridDiv.appendChild(courseInfoDiv);
-		gridDiv.appendChild(buttonDiv)
-		//gridDiv.appendChild(priceDiv);
-
-		//outerDiv.appendChild(gridDiv);
-
-		return gridDiv;
+		return wrapper;
 	}
 
 	displayModalSuppProgram(item, type = "banner", size="desktop") {
