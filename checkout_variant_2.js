@@ -1687,11 +1687,11 @@ class CheckOutWebflow {
 		saveItem.id = "w-node-d9e089fb-dbb6-8c3c-781b-f2cfa37c0c51-f602461b";
 		
 		const saveLabel = document.createElement("div");
-		saveLabel.classList.add("save-amount-2");
+		saveLabel.classList.add("save-amount");
 		saveLabel.textContent = "Save";
 		
 		const saveAmount = document.createElement("div");
-		saveAmount.classList.add("save-amount-2");
+		saveAmount.classList.add("save-amount");
 		saveAmount.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
 		
 		saveItem.appendChild(saveLabel);
