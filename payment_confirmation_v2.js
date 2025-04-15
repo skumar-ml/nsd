@@ -440,7 +440,8 @@ class PaymentConfirmation {
             "successUrl": this.site_url+"members/"+ this.webFlowMemberId+"?paymentType=Supplementary",
             "cancelUrl": this.site_url+"payment-confirmation?programId=" + encodeURIComponent(this.programId) + "&transactionID=" + encodeURIComponent(this.sessionId),
             "label": programName,
-            "amount": parseFloat(amount*100)
+            "amount": parseFloat(amount*100),
+            "source": "success_page"
         };
         // Create the POST request
         fetch(this.apiBaseUrl+"createCheckoutUrlForSupplementary", {
