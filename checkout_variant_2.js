@@ -231,6 +231,7 @@ class CheckOutWebflow {
 						addToCardButton.classList.remove('disabled');
 						addToCardButton.style.pointerEvents = 'auto';
 						addToCardButton.style.color = '';
+						addToCardButton.style.backgroundColor = '#a51c30'
 						addToCardButton.style.textDecoration = "none";
 						// } else {
 						// 	addToCardButton.innerHTML = 'Added';
@@ -1123,6 +1124,7 @@ class CheckOutWebflow {
 							add_to_card_btn.textContent = "Added";
 							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
 							add_to_card_btn.style.color = '#ffffff';
+							add_to_card_btn.style.backgroundColor = "gray";
 							add_to_card_btn.style.textDecoration = "underline";
 						})
 						while ($this.$suppPro.length == 0) {
@@ -1143,6 +1145,7 @@ class CheckOutWebflow {
 						add_to_card_btn.textContent = "Added";
 						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
 						add_to_card_btn.style.color = '#ffffff';
+						add_to_card_btn.style.backgroundColor = "gray";
 						add_to_card_btn.style.textDecoration = "underline";
 					})
 				}
