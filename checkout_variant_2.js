@@ -1654,8 +1654,8 @@ class CheckOutWebflow {
 		item.tags.forEach(tag => {
 		  const tagDiv = document.createElement("div");
 		  tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
-		  if (tag.color === "dark") tagDiv.classList.replace("bg-color-light-blue", "bg-color-dark-blue");
 		  tagDiv.textContent = tag.name;
+		  tagDiv.style.backgroundColor = tag.color
 		  tagWrapper.appendChild(tagDiv);
 		});
 		
