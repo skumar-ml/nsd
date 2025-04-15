@@ -1701,7 +1701,7 @@ class CheckOutWebflow {
 		originalItem.classList.add("price-item", "upsell");
 		
 		const originalPrice = document.createElement("div");
-		originalPrice.classList.add("original-price-2");
+		originalPrice.classList.add("original-price");
 		originalPrice.textContent = "$" + parseFloat(item.disc_amount).toFixed(2);
 		originalItem.appendChild(originalPrice);
 		
@@ -1709,7 +1709,7 @@ class CheckOutWebflow {
 		discountedItem.classList.add("price-item", "upsell");
 		
 		const discountedPrice = document.createElement("div");
-		discountedPrice.classList.add("discounted-price-2", "text-blue");
+		discountedPrice.classList.add("discounted-price", "text-blue");
 		discountedPrice.textContent = "$" + parseFloat(item.amount).toFixed(2);
 		discountedItem.appendChild(discountedPrice);
 		
