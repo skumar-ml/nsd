@@ -219,6 +219,9 @@ class CheckOutWebflow {
 					if (checkbox.checked) {
 						checkbox.checked = !checkbox.checked
 						this.updateAmount(checkbox, checkbox.value);
+						if(checkbox.closest('.you-might_slide-item')){
+							checkbox.closest('.you-might_slide-item').classList.toggle('border-red')
+						}	
 					}
 
 					// Find the corresponding "add-to-card" button inside the same parent div
@@ -1120,6 +1123,10 @@ class CheckOutWebflow {
 						}
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
+						// Add red border in slider 
+						if(button.closest('.you-might_slide-item')){
+							button.closest('.you-might_slide-item').classList.toggle('border-red')
+						}
 						// update added text for same program in another section
 						var programDetailId = checkbox.getAttribute('programdetailid');
 						var elementSelector = ".supp_program_"+programDetailId;;
