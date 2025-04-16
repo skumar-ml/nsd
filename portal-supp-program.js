@@ -524,7 +524,7 @@ class DisplaySuppProgram {
         this.memberData.site_url + "members/" + this.memberData.memberId,
       label: programName,
       amount: parseFloat(amount * 100),
-      source: "success_page"
+      source: "portal_page"
     };
     // Create the POST request
     fetch(this.memberData.baseUrl + "createCheckoutUrlForSupplementary", {
