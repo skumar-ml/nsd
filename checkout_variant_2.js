@@ -569,7 +569,7 @@ class CheckOutWebflow {
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					$this.hideShowDivById('checkout-supplimentary-data-desktop', 'block')
-					$this.hideShowDivById('checkout-supplimentary-data-mobile', 'block')
+					//$this.hideShowDivById('checkout-supplimentary-data-mobile', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('pay-deposite')
@@ -590,7 +590,7 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
 			$this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
-			$this.hideShowDivById('checkout-supplimentary-data-mobile', 'none')
+			//$this.hideShowDivById('checkout-supplimentary-data-mobile', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
