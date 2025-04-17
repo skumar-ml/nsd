@@ -264,7 +264,7 @@ class CheckOutWebflow {
 		totalPriceText.innerHTML = this.numberWithCommas(amount.toFixed(2));
 
 		// Webflow total price dom element
-		var totalPriceTextMob = document.getElementById("totalPricemobile");
+		var totalPriceTextMob = document.getElementById("totalPriceMobile");
 		if (totalPriceTextMob) {
 			// added total price in dom element
 			totalPriceTextMob.innerHTML = this.numberWithCommas(amount.toFixed(2));
