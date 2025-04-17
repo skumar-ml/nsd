@@ -1885,7 +1885,7 @@ class CheckOutWebflow {
 		var programsDiv = creEl("div", "discounted-programs-div border-none");
 	
 		// Title
-		var title = creEl("div", "dm-sans bold-700 text-large");
+		var title = creEl("div", "dm-sans bold-700 text-large-with-mb");
 		title.innerHTML = item.label;
 	
 		// Price Grid
@@ -1907,7 +1907,7 @@ class CheckOutWebflow {
 		priceGrid.appendChild(savePriceText);
 	
 		// Key Benefits label
-		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits");
+		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits-with-margin-vertical");
 		keyBenefitsLabel.innerHTML = "Key Benefits<br />";
 	
 		// Benefits container
@@ -1958,7 +1958,7 @@ class CheckOutWebflow {
 		);
 		
 		let programClass = "supp_program_"+item.programDetailId;
-		var buyNowBtn = creEl("a", "main-button-34 red add-to-card w-button "+programClass);
+		var buyNowBtn = creEl("a", "main-button-34 red add-to-card supp-program w-button "+programClass);
 		buyNowBtn.href = "#";
 		buyNowBtn.textContent = "Add to Cart";
 		// buyNowBtn.addEventListener("click", function (event) {
