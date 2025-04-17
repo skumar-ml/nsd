@@ -568,7 +568,8 @@ class CheckOutWebflow {
 					$this.hideAndShowWhyFamilies('why-families-div', 'none')
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
 					$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
-					$this.hideShowDivById('checkout-supplimentary-data-new', 'block')
+					$this.hideShowDivById('checkout-supplimentary-data-desktop', 'block')
+					$this.hideShowDivById('checkout-supplimentary-data-mobile', 'block')
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('pay-deposite')
@@ -588,7 +589,8 @@ class CheckOutWebflow {
 			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
 			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
-			$this.hideShowDivById('checkout-supplimentary-data-new', 'none')
+			$this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
+			$this.hideShowDivById('checkout-supplimentary-data-mobile', 'none')
 			$this.hideAndShowWhyFamilies('why-families-div', 'block')
 			$this.hideAndShowByClass('rated-debate-banner', 'flex')
 			$this.hideShowCartVideo('show');
@@ -1170,8 +1172,12 @@ class CheckOutWebflow {
 
 		
 		// New Slider with add-to-cart and learn more button
-		let container3 = document.getElementById("checkout-supplimentary-data-new");
+		let container3 = document.getElementById("checkout-supplimentary-data-desktop");
 		let newSlideWrapper = container3.querySelector('.you-might-slider-container')
+
+		// For Mobile Slider
+		let container4 = document.getElementById("checkout-supplimentary-data-mobile");
+		let mobileSlideWrapper = container4.querySelector('.you-might-slider-container-mobile')
 
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
@@ -1202,21 +1208,28 @@ class CheckOutWebflow {
 			swiperSlideWrapper.style.display="none";
 			// New Slider hide if no API data
 			newSlideWrapper.style.display = "none";
+
+			mobileSlideWrapper.style.display = "none";
+			
 		}
 		
 		if (container2 == undefined) return;
 
 		if(container3 == undefined) return;
+		if(container4 == undefined) return;
 		
 		if (swiperSlideWrapper == undefined) return
 
 		if (newSlideWrapper == undefined) return
+
+		if (mobileSlideWrapper == undefined) return
 
 		// Modal Content Update
 		
 
 		swiperSlideWrapper.innerHTML = "";
 		newSlideWrapper.innerHTML = "";
+		mobileSlideWrapper.innerHTML = "";
 
 		// Modal Content Update
 		let modalContent = document.querySelector(
@@ -1246,12 +1259,20 @@ class CheckOutWebflow {
 			newSliderSlide.appendChild(newOuterShadowDiv1)
 			newSlideWrapper.prepend(newSliderSlide)
 
+			//Mobile slider div
+			let mobileSliderSlide = creEl('div', 'you-might_slide-item')
+			const mobileOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', mobileSliderSlide);
+			mobileSliderSlide.appendChild(mobileOuterShadowDiv1)
+			mobileSlideWrapper.prepend(mobileSliderSlide)
+
 			// Modal Content Update
 			const modalSingleContent = this.displayModalSuppProgram(item, "modal");
 			modalContent.prepend(modalSingleContent);
 
 		});
 		this.closeIconEvent();
+		// Setup back button for browser and stripe checkout page
+		//this.setUpBackButtonTab();
 	}
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
@@ -1264,7 +1285,7 @@ class CheckOutWebflow {
 			speed: 300,
 			slidesToShow: 1,
 			slidesToScroll: 1,
-			infinite: true,
+			infinite: false,
 			centerMode: false,
 			variableWidth: false,
 			arrows: false,
@@ -1297,7 +1318,7 @@ class CheckOutWebflow {
 		if (!$slider2.hasClass('slick-initialized')) {
 			// Initialize you might slider
 			var $sliderYouMightNew = $slider2.slick(slickSettings);
-						
+
 			$('.you-might-left-arrow').click(function () {
 				console.log("You Might: Left arrow clicked.");
 				$sliderYouMightNew.slick('slickPrev');
@@ -1306,6 +1327,29 @@ class CheckOutWebflow {
 			$('.you-might-right-arrow').click(function () {
 				console.log("You Might: Right arrow clicked.");
 				$sliderYouMightNew.slick('slickNext');
+			});
+		}
+
+		// Mobile Slider
+		var $slider3 = $('.you-might-slider-container-mobile');
+		
+		if ($slider3.hasClass('slick-initialized')) {
+			$slider3.slick('destroy');
+			$slider3.slick('unslick'); // Destroy slick instance
+		}
+		// Check if the slider is already initialized
+		if (!$slider3.hasClass('slick-initialized')) {
+			// Initialize you might slider
+			var $sliderYouMightMobile = $slider3.slick(slickSettings);
+
+			$('.you-might-left-arrow').click(function () {
+				console.log("You Might: Left arrow clicked.");
+				$sliderYouMightMobile.slick('slickPrev');
+			});
+	 
+			$('.you-might-right-arrow').click(function () {
+				console.log("You Might: Right arrow clicked.");
+				$sliderYouMightMobile.slick('slickNext');
 			});
 		}
 
