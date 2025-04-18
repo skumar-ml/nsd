@@ -791,6 +791,13 @@ class CheckOutWebflow {
 			cPrice[i].innerHTML = "$" + this.numberWithCommas(price.toFixed(2));
 		}
 	}
+	isWithinAWeek(dateString) {
+		const date = new Date(dateString);
+		const now = new Date();
+		const oneWeekAgo = new Date();
+		oneWeekAgo.setDate(now.getDate() - 7);
+		return date >= oneWeekAgo && date <= now;
+	}
 	// Setup back stripe button and browser back button
 	// Setup back stripe button and browser back button
 	setUpBackButtonTab() {
@@ -800,12 +807,17 @@ class CheckOutWebflow {
 		var returnType = urlPar.get("returnType");
 		// Get local storage data for back button
 		var checkoutJson = localStorage.getItem("checkOutData");
+		if (checkoutJson != undefined) {
+			var paymentData = JSON.parse(checkoutJson);
+		}else{
+			return;
+		}
 		// Browser back button event hidden fields
 		var ibackbutton = document.getElementById('backbuttonstate');
 		//if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
-			if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
+		if ((returnType == "back" || ibackbutton.value == 1 || this.isWithinAWeek(paymentData.createdOn)) && checkoutJson != undefined ) {
 		//if (checkoutJson != undefined) {
-			var paymentData = JSON.parse(checkoutJson);
+			//var paymentData = JSON.parse(checkoutJson);
 			this.$isAboundedProgram = true;
 			//this.addSessionId()
 			this.uncheckAllCardCheckbox();
