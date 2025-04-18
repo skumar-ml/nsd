@@ -593,6 +593,7 @@ class CheckOutWebflow {
 						$this.displayUpSellModal();
 					}{
 						$this.$isAboundedProgram = false;
+						$this.addToCart();
 					}
 					$this.displayStudentInfo("grid");
 				} else {
