@@ -57,6 +57,7 @@ class AbandonedCartModal {
       if (parsedCartData.createdOn) {
         if (parsedCartData && this.isWithinAWeek(parsedCartData.createdOn)) {
             console.log("Cart data is within a week, displaying modal.");
+           this.addLinkTOViewCartBtn();
           this.openModal();
           return;
         }
@@ -69,6 +70,7 @@ class AbandonedCartModal {
         if (data.createdOn) {
           if (data && this.isWithinAWeek(data.createdOn)) {
             localStorage.setItem("checkOutData", JSON.stringify(data));
+           this.addLinkTOViewCartBtn(); 
             this.openModal();
           }
         }
@@ -77,7 +79,7 @@ class AbandonedCartModal {
         console.error("Error fetching cart data:", error);
       });
 
-    this.addLinkTOViewCartBtn();
+ 
   }
 
   setModelDisplay() {
