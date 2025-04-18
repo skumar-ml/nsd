@@ -862,7 +862,6 @@ class CheckOutWebflow {
 						if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
 							SuppCheckbox[i].checked = true
 							$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
-							$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
 
 							var elementSelector = ".supp_program_"+checkBoxProgramdetailid;;
 							var matchedAddCartBtn = document.querySelectorAll(elementSelector)
