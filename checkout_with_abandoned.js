@@ -1688,26 +1688,27 @@ class CheckOutWebflow {
 				speed: 300,
 				slidesToShow: 1,
 				slidesToScroll: 1,
-				infinite: true,
+				infinite: false,
 				centerMode: false,
 				variableWidth: false,
 				arrows: false,
 				dots: true,
 			};
-	 
-			// Initialize both sliders
-			var $sliderFamilies = $slider.slick(slickSettings);
-		   
-			// Shared navigation logic for the "Why Families" slider
-			$('.families-left-arrow').click(function () {
-				console.log("Why Families: Left arrow clicked.");
-				$sliderFamilies.slick('slickPrev');
-			});
-	 
-			$('.families-right-arrow').click(function () {
-				console.log("Why Families: Right arrow clicked.");
-				$sliderFamilies.slick('slickNext');
-			});
+            if (!$slider.hasClass('slick-initialized')) {
+                // Initialize both sliders
+                var $sliderFamilies = $slider.slick(slickSettings);
+            
+                // Shared navigation logic for the "Why Families" slider
+                $('.families-left-arrow').click(function () {
+                    console.log("Why Families: Left arrow clicked.");
+                    $sliderFamilies.slick('slickPrev');
+                });
+        
+                $('.families-right-arrow').click(function () {
+                    console.log("Why Families: Right arrow clicked.");
+                    $sliderFamilies.slick('slickNext');
+                });
+            }
 		}
 	}
 	hideAndShowByClass(classs, display) {
