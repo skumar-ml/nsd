@@ -300,6 +300,7 @@ class CheckOutWebflow {
 			totalAmountInput.value = parseFloat(totalAmountInput.value) + parseFloat(amount);
 			var arrayIds = JSON.parse(suppProIdE.value);
 			arrayIds.push(suppId);
+			arrayIds = [...new Set(arrayIds)];
 			selectedIds = arrayIds;
 			suppProIdE.value = JSON.stringify(arrayIds);
 		} else {
@@ -314,6 +315,7 @@ class CheckOutWebflow {
 			}
 			totalAmountInput.value = parseFloat(totalAmountInput.value) - parseFloat(amount);
 			var arrayIds = JSON.parse(suppProIdE.value);
+			arrayIds = [...new Set(arrayIds)];
 			var allSupIds = arrayIds.filter((i) => i != suppId);
 			selectedIds = allSupIds;
 			suppProIdE.value = JSON.stringify(allSupIds);
