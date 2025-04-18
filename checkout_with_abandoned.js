@@ -769,8 +769,10 @@ class CheckOutWebflow {
 				studentGender.value = supStuData.gender;
 				studentGender.disabled = true;
 			}
-            var checkbox2 = document.getElementById("checkbox-2");
-			checkbox2.click();
+		    	var checkbox2 = document.getElementById("checkbox-2");
+			if(!checkbox2.checked){
+				checkbox2.click();
+		        }
 		}
 	}
 	// update default checkbox checked always
@@ -827,7 +829,9 @@ class CheckOutWebflow {
 				studentGender.value = paymentData.gender;
 			}
 			var checkbox2 = document.getElementById("checkbox-2");
-			checkbox2.click();
+			if(!checkbox2.checked){
+				checkbox2.click();
+		        }
 
 			if (paymentData.supplementaryProgramIds.length > 0) {
 				var SuppCheckbox = document.getElementsByClassName("suppCheckbox");
@@ -940,8 +944,10 @@ class CheckOutWebflow {
 			if (paymentData.gender) {
 				studentGender.value = paymentData.gender;
 			}
-            var checkbox2 = document.getElementById("checkbox-2");
-			checkbox2.click();
+            		var checkbox2 = document.getElementById("checkbox-2");
+			if(!checkbox2.checked){
+				checkbox2.click();
+		        }
 		}
 	}
 	// After API response we call the createMakeUpSession method to manipulate student data
