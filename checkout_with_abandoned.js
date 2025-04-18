@@ -844,7 +844,9 @@ class CheckOutWebflow {
 					if (!uniqueProgramCategoryIds.has(checkBoxProgramdetailid)) {
 						uniqueProgramCategoryIds.add(checkBoxProgramdetailid);
 						if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
-							SuppCheckbox[i].checked = true
+							if(!SuppCheckbox[i].checked){
+				                                SuppCheckbox[i].checked = !SuppCheckbox[i].checked;
+				                        }
 							$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
 
 							var elementSelector = ".supp_program_"+checkBoxProgramdetailid;;
