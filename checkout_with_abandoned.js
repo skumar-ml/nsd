@@ -844,10 +844,8 @@ class CheckOutWebflow {
 					if (!uniqueProgramCategoryIds.has(checkBoxProgramdetailid)) {
 						uniqueProgramCategoryIds.add(checkBoxProgramdetailid);
 						if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
-							// if(!SuppCheckbox[i].checked){
-							// 	SuppCheckbox[i].checked = true; // Explicitly set to true
-							// 	SuppCheckbox[i].dispatchEvent(new Event('change')); // Trigger change event to ensure proper DOM update
-       //                      				}
+							SuppCheckbox[i].checked = true
+							$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
 							$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
 
 							var elementSelector = ".supp_program_"+checkBoxProgramdetailid;;
@@ -866,12 +864,7 @@ class CheckOutWebflow {
 
 					
 					if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
-						if(!SuppCheckbox[i].checked){
-							console.log("checkBoxProgramdetailid", checkBoxProgramdetailid)
-						        SuppCheckbox[i].click(); // Explicitly set to true
-                            				SuppCheckbox[i].dispatchEvent(new Event('change')); 
-							console.log("SuppCheckbox[I]", 	SuppCheckbox[i].checked)
-			                        }
+						
 						//SuppCheckbox[i].click();
 						//$this.$initCheckout = true;
 						//SuppCheckbox[i].checked = !SuppCheckbox[i].checked;
@@ -1151,7 +1144,7 @@ class CheckOutWebflow {
 		return isOpen;
 	}
 	uncheckAllCardCheckbox() {
-		setTimeout(() => {
+		//setTimeout(() => {
 			const addToCartButtons = document.querySelectorAll(".add-to-card");
 			addToCartButtons.forEach(button => {
 				const parent = button.closest("div");
@@ -1163,7 +1156,7 @@ class CheckOutWebflow {
 					}
 				}
 			})
-		}, 100);
+		//}, 100);
 	}
 	hideUpSellModal(modal) {
 		modal.classList.remove('show');
