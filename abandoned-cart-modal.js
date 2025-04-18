@@ -46,7 +46,7 @@ class AbandonedCartModal {
     }
     const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
 
-    if (isAbandonedModalOpen) {
+    if (isAbandonedModalOpen == false) {
         console.log("Modal is already open, not displaying again.");    
       return;
     }
