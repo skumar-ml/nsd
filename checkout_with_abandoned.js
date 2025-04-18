@@ -870,7 +870,7 @@ class CheckOutWebflow {
 							console.log("checkBoxProgramdetailid", checkBoxProgramdetailid)
 						        SuppCheckbox[i].click(); // Explicitly set to true
                             				SuppCheckbox[i].dispatchEvent(new Event('change')); 
-							console.log("SuppCheckbox[I]", 	SuppCheckbox[I].checked)
+							console.log("SuppCheckbox[I]", 	SuppCheckbox[i].checked)
 			                        }
 						//SuppCheckbox[i].click();
 						//$this.$initCheckout = true;
