@@ -1172,7 +1172,7 @@ class CheckOutWebflow {
 							button.style.pointerEvents = 'none'; // Disable pointer events
 							button.style.color = '#ffffff';
 							button.style.backgroundColor = "gray";
-							button.style.textDecoration = "underline";
+							//button.style.textDecoration = "underline";
 						}
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
@@ -1190,7 +1190,7 @@ class CheckOutWebflow {
 							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
 							add_to_card_btn.style.color = '#ffffff';
 							add_to_card_btn.style.backgroundColor = "gray";
-							add_to_card_btn.style.textDecoration = "underline";
+							//add_to_card_btn.style.textDecoration = "underline";
 						})
 						while ($this.$suppPro.length == 0) {
 							console.log("$this.$suppPro.length", $this.$suppPro.length)
@@ -1211,7 +1211,7 @@ class CheckOutWebflow {
 						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
 						add_to_card_btn.style.color = '#ffffff';
 						add_to_card_btn.style.backgroundColor = "gray";
-						add_to_card_btn.style.textDecoration = "underline";
+						//add_to_card_btn.style.textDecoration = "underline";
 					})
 				}
 			});
