@@ -867,7 +867,10 @@ class CheckOutWebflow {
 					
 					if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
 						if(!SuppCheckbox[i].checked){
-						    SuppCheckbox[i].click();
+							console.log("checkBoxProgramdetailid", checkBoxProgramdetailid)
+						        SuppCheckbox[i].click(); // Explicitly set to true
+                            				SuppCheckbox[i].dispatchEvent(new Event('change')); 
+							console.log("SuppCheckbox[I]", 	SuppCheckbox[I].checked)
 			                        }
 						//SuppCheckbox[i].click();
 						//$this.$initCheckout = true;
