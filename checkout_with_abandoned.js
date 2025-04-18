@@ -1680,7 +1680,6 @@ class CheckOutWebflow {
 		if (classs) {
 			document.querySelector('.' + classs).style.display = display
 		}
-		if(classs == "block"){
 			// Shared Slick slider settings
 			var $slider =  $('.why-families_slick-slider');
 			
@@ -1713,7 +1712,6 @@ class CheckOutWebflow {
                     $sliderFamilies.slick('slickNext');
                 });
             }
-		}
 	}
 	hideAndShowByClass(classs, display) {
 		if (classs) {
