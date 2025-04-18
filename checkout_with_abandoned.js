@@ -371,7 +371,9 @@ class CheckOutWebflow {
 			paylater_payment.disabled = true;
 			//var cancelUrl = new URL("https://www.nsdebatecamp.com"+window.location.pathname);
 			var cancelUrl = new URL(window.location.href);
-			cancelUrl.searchParams.append('returnType', 'back')
+			if (!cancelUrl.searchParams.get('returnType')) {
+				cancelUrl.searchParams.append('returnType', 'back')
+			}
 			
 			var data = {
 				"email": this.memberData.email,
