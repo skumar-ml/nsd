@@ -523,6 +523,7 @@ class CheckOutWebflow {
 				...JSON.parse(checkoutData)
 			}
 			localStorage.setItem("checkOutData", JSON.stringify(mergedData));
+			localStorage.setItem("isAbandonedModalOpen", false);
 			var xhr = new XMLHttpRequest()
 			var $this = this;
 
