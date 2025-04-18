@@ -423,6 +423,15 @@ class CheckOutWebflow {
 
 					//Storing data in local storage
 					data.checkoutData = responseText
+
+					var checkoutData = localStorage.getItem('checkOutData');
+					if(checkoutData != null){
+						data = {
+							...JSON.parse(checkoutData),
+							...data
+						}
+					}
+					
 					localStorage.setItem("checkOutData", JSON.stringify(data));
 
 					ach_payment.innerHTML = "Checkout"
