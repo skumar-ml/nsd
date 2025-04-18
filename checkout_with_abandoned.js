@@ -2113,4 +2113,54 @@ class CheckOutWebflow {
 			.querySelector(".modal-content.modal-" + item.programDetailId)
 			.classList.remove("hide");
 	}
+	displayStudentInfo(display){
+		document.querySelectorAll('.student-info-container').forEach(el=>el.style.display = display)
+		var localCheckOutData = localStorage.getItem('checkOutData')
+		if(localCheckOutData != undefined){
+			localCheckOutData = JSON.parse(localCheckOutData);
+			let firstNameEls = document.querySelectorAll("[data-student='first-name']")
+			if (firstNameEls.length > 0) {
+				firstNameEls.forEach(El => {
+					El.innerHTML = localCheckOutData.firstName;
+				})
+			}
+
+			let lastNameEls = document.querySelectorAll("[data-student='last-name']")
+			if (lastNameEls.length > 0) {
+				lastNameEls.forEach(El => {
+					El.innerHTML = localCheckOutData.lastName;
+				})
+			}
+
+			let emailEls = document.querySelectorAll("[data-student='email']")
+			if (emailEls.length > 0) {
+				emailEls.forEach(El => {
+					El.innerHTML = localCheckOutData.studentEmail;
+				})
+			}
+			
+			let schoolEls = document.querySelectorAll("[data-student='school']")
+			if (schoolEls.length > 0) {
+				schoolEls.forEach(El => {
+					El.innerHTML = localCheckOutData.school;
+				})
+			}
+
+			let gradeEls = document.querySelectorAll("[data-student='grade']")
+			if (gradeEls.length > 0) {
+				gradeEls.forEach(El => {
+					El.innerHTML = localCheckOutData.grade;
+				})
+			}
+
+			let genderEls = document.querySelectorAll("[data-student='gender']")
+			if (genderEls.length > 0) {
+				genderEls.forEach(El => {
+					El.innerHTML = localCheckOutData.gender;
+				})
+			}
+
+			
+		}
+	}
 }
