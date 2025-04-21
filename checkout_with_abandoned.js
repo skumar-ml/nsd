@@ -585,6 +585,7 @@ class CheckOutWebflow {
 							var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
 							$this.updateStudentDetails(checkoutData).then(()=>{
 								$this.$initCheckout = true;
+								$this.displayStudentInfo("grid");
 							});
 						})
 					}
@@ -601,7 +602,7 @@ class CheckOutWebflow {
 						$this.$isAboundedProgram = false;
 						$this.addToCart();
 					}
-					$this.displayStudentInfo("grid");
+					
 				} else {
 					checkoutFormError.style.display = "block";
 				}
