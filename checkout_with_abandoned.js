@@ -337,6 +337,9 @@ class CheckOutWebflow {
 			}
 		}
 		this.displaySelectedSuppProgram(selectedIds);
+		if(selectedIds.length > 0){
+			this.updateCheckOutData({supplementaryProgramIds: selectedIds});
+		}
 	}
 	// Get API data with the help of endpoint
 	async fetchData(endpoint) {
@@ -802,26 +805,39 @@ class CheckOutWebflow {
 		oneWeekAgo.setDate(now.getDate() - 7);
 		return date >= oneWeekAgo && date <= now;
 	}
-	// Setup back stripe button and browser back button
-	// Setup back stripe button and browser back button
-	setUpBackButtonTab() {
-		var $this = this;
+	checkBackButtonEvent() {
 		var query = window.location.search;
 		var urlPar = new URLSearchParams(query);
 		var returnType = urlPar.get("returnType");
-		// Get local storage data for back button
+		var ibackbutton = document.getElementById('backbuttonstate');
 		var checkoutJson = localStorage.getItem("checkOutData");
 		if (checkoutJson != undefined) {
 			var paymentData = JSON.parse(checkoutJson);
 		}else{
 			return;
 		}
-		// Browser back button event hidden fields
-		var ibackbutton = document.getElementById('backbuttonstate');
-		//if ((returnType == "back" || ibackbutton.value == 1) && checkoutJson != undefined) {
 		if ((returnType == "back" || ibackbutton.value == 1 || this.isWithinAWeek(paymentData.createdOn)) && checkoutJson != undefined ) {
-		//if (checkoutJson != undefined) {
-			//var paymentData = JSON.parse(checkoutJson);
+			return true;
+		}else {
+			return false;
+		}
+	}
+	// Setup back stripe button and browser back button
+	setUpBackButtonTab() {
+		var $this = this;
+		var checkoutJson = localStorage.getItem("checkOutData");
+		if (checkoutJson != undefined) {
+			var paymentData = JSON.parse(checkoutJson);
+		}else{
+			return;
+		}
+		// check createdOn date for back button
+		if(paymentData.createdOn == undefined){
+			return;
+		}
+
+		if ( $this.checkBackButtonEvent() && checkoutJson != undefined) {
+			var paymentData = JSON.parse(checkoutJson);
 			this.$isAboundedProgram = true;
 			//this.addSessionId()
 			this.uncheckAllCardCheckbox();
@@ -832,11 +848,15 @@ class CheckOutWebflow {
 			var studentSchool = document.getElementById("Student-School");
 			var studentGender = document.getElementById("Student-Gender");
 			// Update all local storage data
-			studentEmail.value = paymentData.studentEmail;
-
-			studentFirstName.value = paymentData.firstName;
-
-			studentLastName.value = paymentData.lastName;
+			if(paymentData.studentEmail){
+				studentEmail.value = paymentData.studentEmail;
+			}
+			if(paymentData.firstName){			
+				studentFirstName.value = paymentData.firstName;
+			}
+			if(paymentData.lastName){
+				studentLastName.value = paymentData.lastName;
+			}
 
 			if (paymentData.grade) {
 				studentGrade.value = paymentData.grade;
@@ -850,9 +870,9 @@ class CheckOutWebflow {
 				studentGender.value = paymentData.gender;
 			}
 			var checkbox2 = document.getElementById("checkbox-2");
-			if(!checkbox2.checked){
+			if(checkbox2){
 				checkbox2.click();
-		        }
+			}
 
 			if (paymentData.supplementaryProgramIds.length > 0) {
 				var SuppCheckbox = document.getElementsByClassName("suppCheckbox");
@@ -879,18 +899,10 @@ class CheckOutWebflow {
 							
 						}
 					}
-
-					
-					if (paymentData.supplementaryProgramIds.includes(checkBoxProgramdetailid)) {
-						
-						//SuppCheckbox[i].click();
-						//$this.$initCheckout = true;
-						//SuppCheckbox[i].checked = !SuppCheckbox[i].checked;
-						//$this.updateAmount(SuppCheckbox[i], SuppCheckbox[i].value);
-					}
 				}
-				
-				this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
+				if(paymentData.supplementaryProgramIds.length > 0){
+					this.displaySelectedSuppProgram(paymentData.supplementaryProgramIds)
+				}
 
 				//update total amount for back button
 				//this.updateOnlyTotalAmount()
@@ -898,7 +910,9 @@ class CheckOutWebflow {
 				totalPriceDiv.style.visibility  = 'visible';
 				//Updated supp id for back button
 				var suppProIdE = document.getElementById('suppProIds');
-				suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
+				if(suppProIdE && paymentData.supplementaryProgramIds.length > 0){
+					suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
+				}
 			}
 			if (paymentData) {
 				this.$checkoutData = paymentData;
@@ -983,7 +997,9 @@ class CheckOutWebflow {
 			// Handle previous and next button
 			this.addEventForPrevNaxt();
 			// activate program tab
-			this.activateDiv("checkout_student_details");
+			if(!this.checkBackButtonEvent()){
+				this.activateDiv("checkout_student_details");
+			}
 			// loader icon code
 			var spinner = document.getElementById("half-circle-spinner");
 			spinner.style.display = "block";
@@ -2198,5 +2214,15 @@ class CheckOutWebflow {
 
 			
 		}
+	}
+	updateCheckOutData(checkoutData) {	
+		var localCheckoutData = localStorage.getItem('checkOutData');
+		if(checkoutData != null && localCheckoutData != null){
+			checkoutData = {
+				...JSON.parse(localCheckoutData),
+				...checkoutData
+			}
+		}
+		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
