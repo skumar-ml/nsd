@@ -911,10 +911,10 @@ class CheckOutWebflow {
 				var totalPriceDiv = document.getElementById('totalPriceDiv');
 				totalPriceDiv.style.visibility  = 'visible';
 				//Updated supp id for back button
-				var suppProIdE = document.getElementById('suppProIds');
-				if(suppProIdE && paymentData.supplementaryProgramIds.length > 0){
-					suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
-				}
+				// var suppProIdE = document.getElementById('suppProIds');
+				// if(suppProIdE && paymentData.supplementaryProgramIds.length > 0){
+				// 	suppProIdE.value = JSON.stringify(paymentData.supplementaryProgramIds)
+				// }
 			}
 			if (paymentData) {
 				this.$checkoutData = paymentData;
