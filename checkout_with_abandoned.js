@@ -483,6 +483,7 @@ class CheckOutWebflow {
 	}
 	// API call for checkout URL 
 	updateStudentDetails(checkoutUrl) {
+		var $this = this;
 		return new Promise((resolve, reject) => {
 			var studentFirstName = document.getElementById('Student-First-Name');
 			var studentLastName = document.getElementById('Student-Last-Name');
@@ -528,11 +529,12 @@ class CheckOutWebflow {
 				...data,
 				...JSON.parse(checkoutData)
 			}
+			
 			localStorage.setItem("checkOutData", JSON.stringify(mergedData));
 			localStorage.setItem("isAbandonedModalOpen", false);
+			$this.displayStudentInfo("grid");
 			var xhr = new XMLHttpRequest()
-			var $this = this;
-
+			
 			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
@@ -585,7 +587,6 @@ class CheckOutWebflow {
 							var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
 							$this.updateStudentDetails(checkoutData).then(()=>{
 								$this.$initCheckout = true;
-								$this.displayStudentInfo("grid");
 							});
 						})
 					}
