@@ -392,7 +392,7 @@ class CheckOutWebflow {
 				"device": (/Mobi|Android/i.test(navigator.userAgent)) ? 'Mobile' : 'Desktop',
 				"deviceUserAgent": navigator.userAgent
 			}
-			if($baseUrl == "createCheckouturlsByProgram"){
+			if($baseUrl == "createCheckoutUrlsByProgram"){
 				data.source = "cart_page"
 			}
 			// Added paymentId for supplementary program 
