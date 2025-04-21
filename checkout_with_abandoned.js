@@ -575,7 +575,9 @@ class CheckOutWebflow {
 
 			if (form.valid()) {
 				initialCheckout = $this.initializeStripePayment();
-				$this.storeBasicData();
+				if(!$this.$isAboundedProgram){
+					$this.storeBasicData();
+				}
 				$this.displayStudentInfo("grid");
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
