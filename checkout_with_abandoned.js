@@ -532,7 +532,6 @@ class CheckOutWebflow {
 			
 			localStorage.setItem("checkOutData", JSON.stringify(mergedData));
 			localStorage.setItem("isAbandonedModalOpen", false);
-			$this.displayStudentInfo("grid");
 			var xhr = new XMLHttpRequest()
 			
 			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
@@ -577,6 +576,7 @@ class CheckOutWebflow {
 			if (form.valid()) {
 				initialCheckout = $this.initializeStripePayment();
 				$this.storeBasicData();
+				$this.displayStudentInfo("grid");
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
 				if (isValidName) {
@@ -2169,7 +2169,7 @@ class CheckOutWebflow {
 	}
 	displayStudentInfo(display){
 		document.querySelectorAll('.student-info-container').forEach(el=>el.style.display = display)
-		var localCheckOutData = localStorage.getItem('checkOutData')
+		var localCheckOutData = localStorage.getItem('checkOutBasicData')
 		if(localCheckOutData != undefined){
 			localCheckOutData = JSON.parse(localCheckOutData);
 			let firstNameEls = document.querySelectorAll("[data-student='first-name']")
