@@ -1819,9 +1819,7 @@ class CheckOutWebflow {
 		
 	  
 		buttonDiv.appendChild(addToCartBtn);
-		if(item.benefits.length > 0){
-			buttonDiv.appendChild(learnMoreBtn);
-		}
+		buttonDiv.appendChild(learnMoreBtn);
 		buttonDiv.appendChild(checkboxDiv)
 	  
 		gridDiv.appendChild(leftCol);
