@@ -1795,6 +1795,8 @@ class CheckOutWebflow {
 			this.hideShowModalContent(item);
 			this.showModal();
 			}.bind(this));
+		}else{
+			learnMoreBtn.classList.add("width-100");
 		}
 
 
