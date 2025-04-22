@@ -1185,7 +1185,8 @@ class CheckOutWebflow {
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
-		
+		// sorting data by programDetailId
+		apiData.sort((a, b) => b.programDetailId - a.programDetailId);
 		// Added in our Local Data
 		this.$suppPro = apiData;
 		let prep_week_searchText = "topic prep week";
