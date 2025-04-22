@@ -1702,17 +1702,17 @@ class CheckOutWebflow {
 		// Create main grid container
 		const gridDiv = document.createElement("div");
 		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "you-might");
-		
+	  
 		// Left column container
 		const leftCol = document.createElement("div");
-		
+	  
 		// Upsell tags section
 		const upsellDiv = document.createElement("div");
 		upsellDiv.classList.add("upsell-div");
-		
+	  
 		const tagWrapper = document.createElement("div");
 		tagWrapper.classList.add("text-block-wrapper-2");
-		
+	  
 		item.tags.forEach(tag => {
 		  const tagDiv = document.createElement("div");
 		  tagDiv.classList.add("payment-conf-tag", "bg-color-light-blue");
@@ -1720,10 +1720,10 @@ class CheckOutWebflow {
 		  tagDiv.style.backgroundColor = tag.color
 		  tagWrapper.appendChild(tagDiv);
 		});
-		
+	  
 		upsellDiv.appendChild(tagWrapper);
 		leftCol.appendChild(upsellDiv);
-		
+	  
 		// Title
 		const campTitleWrapper = document.createElement("div");
 		const campTitle = document.createElement("div");
@@ -1731,72 +1731,73 @@ class CheckOutWebflow {
 		campTitle.textContent = item.label;
 		campTitleWrapper.appendChild(campTitle);
 		leftCol.appendChild(campTitleWrapper);
-		
+	  
 		// Price Info
 		const priceWrapper = document.createElement("div");
 		priceWrapper.classList.add("price-wrapper", "upsell");
-		
+	  
 		const saveItem = document.createElement("div");
 		saveItem.classList.add("price-item");
 		saveItem.id = "w-node-d9e089fb-dbb6-8c3c-781b-f2cfa37c0c51-f602461b";
-		
+	  
 		const saveLabel = document.createElement("div");
-		saveLabel.classList.add("save-amount");
+		saveLabel.classList.add("save-amount-2");
 		saveLabel.textContent = "Save";
-		
+	  
 		const saveAmount = document.createElement("div");
-		saveAmount.classList.add("save-amount");
+		saveAmount.classList.add("save-amount-2");
 		saveAmount.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
-		
+	  
 		saveItem.appendChild(saveLabel);
 		saveItem.appendChild(saveAmount);
-		
+	  
 		const originalItem = document.createElement("div");
 		originalItem.classList.add("price-item", "upsell");
-		
+	  
 		const originalPrice = document.createElement("div");
-		originalPrice.classList.add("original-price");
+		originalPrice.classList.add("original-price-2");
 		originalPrice.textContent = "$" + parseFloat(item.disc_amount).toFixed(2);
 		originalItem.appendChild(originalPrice);
-		
+	  
 		const discountedItem = document.createElement("div");
 		discountedItem.classList.add("price-item", "upsell");
-		
+	  
 		const discountedPrice = document.createElement("div");
-		discountedPrice.classList.add("discounted-price", "text-blue");
+		discountedPrice.classList.add("discounted-price-2", "text-blue");
 		discountedPrice.textContent = "$" + parseFloat(item.amount).toFixed(2);
 		discountedItem.appendChild(discountedPrice);
-		
+	  
 		priceWrapper.appendChild(saveItem);
 		priceWrapper.appendChild(originalItem);
 		priceWrapper.appendChild(discountedItem);
 		leftCol.appendChild(priceWrapper);
-		
+	  
 		// Right column buttons
 		const buttonDiv = document.createElement("div");
 		buttonDiv.classList.add("button-div", "you-might-buttons-wrapper");
-		
+	  
 		const addToCartBtn = document.createElement("a");
 		addToCartBtn.href = "#";
 		let programClass = "supp_program_"+item.programDetailId;
 		addToCartBtn.classList.add("main-button-34", "red", "add-to-card", "you-might-add-to-cart", "w-button", programClass);
 		addToCartBtn.textContent = "Add to Cart";
-		
 		const learnMoreBtn = document.createElement("a");
-		learnMoreBtn.href = "#";
-		learnMoreBtn.classList.add("main-button", "learn-more", "w-button");
-		learnMoreBtn.textContent = "Learn More";
+		if(item.benefits.length > 0){
+			learnMoreBtn.href = "#";
+			learnMoreBtn.classList.add("main-button", "learn-more", "w-button");
+			learnMoreBtn.textContent = "Learn More";
 		
-		learnMoreBtn.addEventListener("click", function (e) {
-		  e.preventDefault();
-		  this.$selectedProgram = item;
-		  this.hideShowModalContent(item);
-		  this.showModal();
-		}.bind(this));
-		
-		
+			learnMoreBtn.addEventListener("click", function (e) {
+			e.preventDefault();
+			this.$selectedProgram = item;
+			this.hideShowModalContent(item);
+			this.showModal();
+			}.bind(this));
+		}
+
+
 		const checkboxDiv = document.createElement("div");
-		
+
 		const input = document.createElement("input");
 		
 		input.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
@@ -1811,62 +1812,67 @@ class CheckOutWebflow {
 			this.checked ? slideDiv.classList.add('border-red') : slideDiv.classList.remove('border-red')
 			$this.updateAmount(this, item.amount);
 		})
-		
+
 		checkboxDiv.appendChild(input);
 		
-		
+	  
 		buttonDiv.appendChild(addToCartBtn);
-		buttonDiv.appendChild(learnMoreBtn);
+		if(item.benefits.length > 0){
+			buttonDiv.appendChild(learnMoreBtn);
+		}
 		buttonDiv.appendChild(checkboxDiv)
-		
+	  
 		gridDiv.appendChild(leftCol);
 		gridDiv.appendChild(buttonDiv);
-		
+	  
 		// Benefits Section (separate div)
 		const benefitsContainer = document.createElement("div");
+		if(item.benefits.length > 0){
 		
-		const marginTopDiv = document.createElement("div");
-		marginTopDiv.classList.add("margin-top");
+			const marginTopDiv = document.createElement("div");
+			marginTopDiv.classList.add("margin-top");
 		
-		const keyLabel = document.createElement("div");
-		keyLabel.classList.add("dm-sans", "key-benefits");
-		keyLabel.innerHTML = "Key Benefits<br />";
+			const keyLabel = document.createElement("div");
+			keyLabel.classList.add("dm-sans", "key-benefits");
+			keyLabel.innerHTML = "Key Benefits<br />";
 		
-		const benefitsWrapper = document.createElement("div");
+			const benefitsWrapper = document.createElement("div");
 		
-		item.benefits.forEach((benefit, index) => {
-		  const benefitWrapper = document.createElement("div");
-		  benefitWrapper.classList.add("key-benefits-grid-wrapper");
-		  if (index === 0) benefitWrapper.classList.add("center");
+			item.benefits.forEach((benefit, index) => {
+				const benefitWrapper = document.createElement("div");
+				benefitWrapper.classList.add("key-benefits-grid-wrapper");
+				if (index === 0) benefitWrapper.classList.add("center");
+			
+				const img = document.createElement("img");
+				img.src = "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+				img.loading = "lazy";
+				img.alt = "";
+				img.classList.add("full-width-inline-image");
+			
+				const benefitText = document.createElement("div");
+				benefitText.classList.add("dm-sans");
+				benefitText.innerHTML = benefit.title + "<br />";
+			
+				benefitWrapper.appendChild(img);
+				benefitWrapper.appendChild(benefitText);
+			
+				benefitsWrapper.appendChild(benefitWrapper);
+			});
 		
-		  const img = document.createElement("img");
-		  img.src = "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
-		  img.loading = "lazy";
-		  img.alt = "";
-		  img.classList.add("full-width-inline-image");
-		
-		  const benefitText = document.createElement("div");
-		  benefitText.classList.add("dm-sans");
-		  benefitText.innerHTML = benefit.title + "<br />";
-		
-		  benefitWrapper.appendChild(img);
-		  benefitWrapper.appendChild(benefitText);
-		
-		  benefitsWrapper.appendChild(benefitWrapper);
-		});
-		
-		marginTopDiv.appendChild(keyLabel);
-		marginTopDiv.appendChild(benefitsWrapper);
-		benefitsContainer.appendChild(marginTopDiv);
-		
+			marginTopDiv.appendChild(keyLabel);
+			marginTopDiv.appendChild(benefitsWrapper);
+			benefitsContainer.appendChild(marginTopDiv);
+		}
+	  
 		// Return full fragment
 		const wrapper = document.createElement("div");
 		wrapper.appendChild(gridDiv);
-		wrapper.appendChild(benefitsContainer);
-		
+		if(item.benefits.length > 0){
+			wrapper.appendChild(benefitsContainer);
+		}
+	  
 		return wrapper;
-	}
-
+	  }
 	displayModalSuppProgram(item, type = "banner", size="desktop") {
 		var $this = this;
 		let discount_amount = item.disc_amount - item.amount;
@@ -1888,7 +1894,7 @@ class CheckOutWebflow {
 		var programsDiv = creEl("div", "discounted-programs-div border-none");
 	
 		// Title
-		var title = creEl("div", "dm-sans bold-700 text-large-with-mb");
+		var title = creEl("div", "dm-sans bold-700 text-large");
 		title.innerHTML = item.label;
 	
 		// Price Grid
@@ -1909,49 +1915,52 @@ class CheckOutWebflow {
 		priceGrid.appendChild(discountPrice);
 		priceGrid.appendChild(savePriceText);
 	
-		// Key Benefits label
-		var keyBenefitsLabel = creEl("div", "dm-sans key-benefits-with-margin-vertical");
-		keyBenefitsLabel.innerHTML = "Key Benefits<br />";
-	
-		// Benefits container
-		var benefitsContainer = creEl("div", "width-100");
-	
 		// Benefits Data
 		var benefits = item.benefits;
-	
-		// Loop benefits
 		if (benefits.length > 0) {
-		  benefits.forEach(function (benefit) {
-			var benefitWrapper = creEl("div", "key-benefits-grid-wrapper");
-	
-			var benefitImg = creEl(
-			  "img",
-			  "full-width-inline-image margintop-5px"
-			);
-			benefitImg.src =
-			  "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
-			benefitImg.loading = "lazy";
-			benefitImg.alt = "";
-	
-			var benefitContent = creEl("div");
-	
-			var benefitTitle = creEl(
-			  "div",
-			  "dm-sans margin-bottom-5 bold-700"
-			);
-			benefitTitle.innerHTML = benefit.title + "<br />";
-	
-			var benefitDesc = creEl("div", "dm-sans");
-			benefitDesc.innerHTML = benefit.desc;
-	
-			benefitContent.appendChild(benefitTitle);
-			benefitContent.appendChild(benefitDesc);
-	
-			benefitWrapper.appendChild(benefitImg);
-			benefitWrapper.appendChild(benefitContent);
-	
-			benefitsContainer.appendChild(benefitWrapper);
-		  });
+			// Key Benefits label
+			var keyBenefitsLabel = creEl("div", "dm-sans key-benefits");
+			keyBenefitsLabel.innerHTML = "Key Benefits<br />";
+		
+			// Benefits container
+			var benefitsContainer = creEl("div", "width-100");
+		
+			
+		
+			// Loop benefits
+			if (benefits.length > 0) {
+			benefits.forEach(function (benefit) {
+				var benefitWrapper = creEl("div", "key-benefits-grid-wrapper");
+		
+				var benefitImg = creEl(
+				"img",
+				"full-width-inline-image margintop-5px"
+				);
+				benefitImg.src =
+				"https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+				benefitImg.loading = "lazy";
+				benefitImg.alt = "";
+		
+				var benefitContent = creEl("div");
+		
+				var benefitTitle = creEl(
+				"div",
+				"dm-sans margin-bottom-5 bold-700"
+				);
+				benefitTitle.innerHTML = benefit.title + "<br />";
+		
+				var benefitDesc = creEl("div", "dm-sans");
+				benefitDesc.innerHTML = benefit.desc;
+		
+				benefitContent.appendChild(benefitTitle);
+				benefitContent.appendChild(benefitDesc);
+		
+				benefitWrapper.appendChild(benefitImg);
+				benefitWrapper.appendChild(benefitContent);
+		
+				benefitsContainer.appendChild(benefitWrapper);
+			});
+			}
 		}
 	
 		// Buttons
@@ -1961,7 +1970,7 @@ class CheckOutWebflow {
 		);
 		
 		let programClass = "supp_program_"+item.programDetailId;
-		var buyNowBtn = creEl("a", "main-button-34 red add-to-card supp-program w-button "+programClass);
+		var buyNowBtn = creEl("a", "main-button-34 red add-to-card w-button "+programClass);
 		buyNowBtn.href = "#";
 		buyNowBtn.textContent = "Add to Cart";
 		// buyNowBtn.addEventListener("click", function (event) {
@@ -1973,19 +1982,21 @@ class CheckOutWebflow {
 		// });
 	
 		var learnMoreBtn = creEl("a", "main-button close w-button");
-		learnMoreBtn.href = "#";
-		learnMoreBtn.textContent = type == "banner" ? "Learn More" : "Close";
-		learnMoreBtn.addEventListener("click", function (event) {
-		  event.preventDefault();
-		  $this.$selectedProgram = item;
-		  const suppProgramsModal = document.getElementById("suppProgramsModal");
-		  if (type == "banner") {
-			$this.hideShowModalContent(item);
-			$this.showModal(suppProgramsModal);
-		  } else {
-			$this.hideModal(suppProgramsModal);
-		  }
-		});
+		if (benefits.length > 0) {
+			learnMoreBtn.href = "#";
+			learnMoreBtn.textContent = type == "banner" ? "Learn More" : "Close";
+			learnMoreBtn.addEventListener("click", function (event) {
+			event.preventDefault();
+			$this.$selectedProgram = item;
+			const suppProgramsModal = document.getElementById("suppProgramsModal");
+			if (type == "banner") {
+				$this.hideShowModalContent(item);
+				$this.showModal(suppProgramsModal);
+			} else {
+				$this.hideModal(suppProgramsModal);
+			}
+			});
+		}
 
 		// Checkbox added for add to cart feature
 		// Create the checkbox
@@ -2008,14 +2019,18 @@ class CheckOutWebflow {
 		checkboxDiv.appendChild(input);
 	
 		buttonDiv.appendChild(buyNowBtn);
-		buttonDiv.appendChild(learnMoreBtn);
+		if (benefits.length > 0) {
+			buttonDiv.appendChild(learnMoreBtn);
+		}
 		buttonDiv.appendChild(checkboxDiv);
 	
 		// Assemble programsDiv
 		programsDiv.appendChild(title);
 		programsDiv.appendChild(priceGrid);
-		programsDiv.appendChild(keyBenefitsLabel);
-		programsDiv.appendChild(benefitsContainer);
+		if (benefits.length > 0) {
+			programsDiv.appendChild(keyBenefitsLabel);
+			programsDiv.appendChild(benefitsContainer);
+		}
 		programsDiv.appendChild(buttonDiv);
 	
 		// --------- Gradient Div Section ---------
