@@ -1293,6 +1293,7 @@ class CheckOutWebflow {
 			variableWidth: false,
 			arrows: false,
 			dots: true,
+			adaptiveHeight: true
 		};
 		// Check if the slider is already initialized
 		if (!$slider.hasClass('slick-initialized')) {
@@ -1755,7 +1756,7 @@ class CheckOutWebflow {
 		originalItem.classList.add("price-item", "upsell");
 	  
 		const originalPrice = document.createElement("div");
-		originalPrice.classList.add("original-price-2");
+		originalPrice.classList.add("original-price");
 		originalPrice.textContent = "$" + parseFloat(item.disc_amount).toFixed(2);
 		originalItem.appendChild(originalPrice);
 	  
