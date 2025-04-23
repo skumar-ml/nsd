@@ -37,7 +37,7 @@ class AbandonedCartModal {
   }
 
   checkAndDisplayModal() {
-    $this = this;
+    var $this = this;
     if (
       window.location.pathname.includes("/cart/") ||
       window.location.pathname.includes("log-in")
