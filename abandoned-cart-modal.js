@@ -86,7 +86,7 @@ class AbandonedCartModal {
       const sixHoursAgo = new Date();
       sixHoursAgo.setHours(sixHoursAgo.getHours() - this.data.hour);
 
-      if (createdOnDate < sixHoursAgo) {
+      if (createdOnDate > sixHoursAgo) {
         console.log(
           `Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`,
           createdOnDate,
