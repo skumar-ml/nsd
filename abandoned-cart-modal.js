@@ -58,10 +58,7 @@ class AbandonedCartModal {
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
       if (parsedCartData.createdOn && parsedCartData.programStartDate) {  
-        $this.checkAndDisplayModals(
-          parsedCartData.createdOn,
-          parsedCartData.programStartDate
-        );
+        $this.checkAndDisplayModals(parsedCartData);
       }
     }
 
@@ -69,10 +66,7 @@ class AbandonedCartModal {
       .then((data) => {
         console.log("Fetched cart data:", data);
         if (data.createdOn && data.programStartDate) {
-          $this.checkAndDisplayModals(
-            data.createdOn,
-            data.programStartDate
-          );
+          $this.checkAndDisplayModals(data);
         }
       })
       .catch((error) => {
@@ -81,7 +75,7 @@ class AbandonedCartModal {
 
     this.addLinkTOViewCartBtn();
   }
-  checkAndDisplayModals(createdOn, programStartDate) {
+  checkAndDisplayModals(data) {
       const createdOnDate = new Date(data.createdOn);
       const sixHoursAgo = new Date();
       sixHoursAgo.setHours(sixHoursAgo.getHours() - 6);
