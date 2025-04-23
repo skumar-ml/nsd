@@ -1419,6 +1419,7 @@ class CheckOutWebflow {
 			variableWidth: false,
 			arrows: false,
 			dots: true,
+			adaptiveHeight: true
 		};
 		// Check if the slider is already initialized
 		if (!$slider.hasClass('slick-initialized')) {
