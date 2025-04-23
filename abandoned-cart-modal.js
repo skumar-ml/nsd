@@ -23,7 +23,7 @@ class AbandonedCartModal {
     const viewCartBtn = document.getElementById("view-cart-btn");
     if (viewCartBtn) {
       viewCartBtn.addEventListener("click", () => {
-        this.setModelDisplay();
+        //this.setModelDisplay();
       });
     }
   }
