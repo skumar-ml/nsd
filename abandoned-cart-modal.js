@@ -1,12 +1,12 @@
 class AbandonedCartModal {
   constructor(data) {
+    this.data = data;
     this.baseUrl = data.baseUrl;
     this.memberId = data.memberId;
     this.modalId = data.modalId;
     this.modal = document.getElementById(this.modalId);
     this.closeButtons = this.modal?.querySelectorAll(".close-abandoned-modal");
     this.init();
-    console.log("AbandonedCartModal initialized with data:", data);
   }
 
   init() {
@@ -17,7 +17,6 @@ class AbandonedCartModal {
           this.setModelDisplay();
         });
       });
-      console.log("Close buttons initialized:", this.closeButtons);
       this.checkAndDisplayModal();
     }
 
@@ -52,62 +51,81 @@ class AbandonedCartModal {
     if (isAbandonedModalOpen == "true") {
       console.log("Modal is already open, not displaying again.");
       return;
+    }else {
+      console.log("Modal is not open, checking local storage cart data.");
     }
     const cartData = localStorage.getItem("checkOutData");
-    console.log("Cart data from localStorage:", cartData);
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
       if (parsedCartData.createdOn && parsedCartData.programStartDate) {  
-        $this.checkAndDisplayModals(parsedCartData);
+        $this.checkAndDisplayModals(parsedCartData).then((result) => { 
+          $this.openModal();
+          $this.addLinkTOViewCartBtn();
+        }).catch((error) => {
+          console.error("Error displaying modal:", error);
+        });
       }
-    }
-
-    this.fetchCartDataFromAPI()
+    }else {
+      this.fetchCartDataFromAPI()
       .then((data) => {
-        console.log("Fetched cart data:", data);
         if (data.createdOn && data.programStartDate) {
-          $this.checkAndDisplayModals(data);
+          localStorage.setItem("checkOutData", JSON.stringify(data));
+          return $this.checkAndDisplayModals(data);
         }
-      })
-      .catch((error) => {
+      }).then((result) => {
+        $this.openModal();
+        $this.addLinkTOViewCartBtn();
+      }).catch((error) => {
         console.error("Error fetching cart data:", error);
       });
-
-    this.addLinkTOViewCartBtn();
+    }
   }
   checkAndDisplayModals(data) {
+    return new Promise((resolve, reject) => {
       const createdOnDate = new Date(data.createdOn);
       const sixHoursAgo = new Date();
-      sixHoursAgo.setHours(sixHoursAgo.getHours() - 6);
+      sixHoursAgo.setHours(sixHoursAgo.getHours() - this.data.hour);
 
-      if (createdOnDate >= sixHoursAgo) {
+      if (createdOnDate < sixHoursAgo) {
         console.log(
-          "Fetched cart data is less than 6 hours old, not displaying modal."
+          `Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`,
+          createdOnDate,
+          sixHoursAgo
         );
-        return;
+        reject(`Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`); 
+      }else {
+        console.log(
+          `Fetched cart data is older than ${this.data.hour} hours, checking for fiveMonthsAgo program start date.`, createdOnDate
+        );
       }
       const fiveMonthsAgo = new Date();
       fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
       if (createdOnDate < fiveMonthsAgo) {
         console.log(
-          "Fetched cart data is older than 5 months, not displaying modal."
+          "Fetched cart data is older than 5 months, not displaying modal.", createdOnDate
         );
-        return;
+        reject("Fetched cart data is older than 5 months, not displaying modal.");
+      }else{
+        console.log(
+          "Fetched cart data is within the 5 months range, checking for program start date."
+        );
       }
 
       if (data && this.isWithinAWeek(data.createdOn)) {
         if (data.programStartDate) {
           const programStartDate = new Date(data.programStartDate);
           const now = new Date();
-          if (programStartDate < now) {
+          if (programStartDate > now) {
             console.log(
-              "Program start date is before the current date, displaying modal."
+              "Program start date is after the current date, displaying modal.", data.programStartDate
             );
-            this.openModal();
-            return;
+            resolve("Program start date is after the current date, displaying modal.");
+          }else{
+            console.log("Program start date is before the current date, not displaying modal.", data.programStartDate);
           }
         }
       }
+    });
   }
   // Set the modal display to true in localStorage
   setModelDisplay() {
@@ -155,7 +173,6 @@ class AbandonedCartModal {
     // Check if cartData is not empty or null before parsing
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
-      console.log("Parsed cart data:", parsedCartData);
       // Check if parsedCartData is not empty or null before using it
       if (parsedCartData && parsedCartData.slug) {
         const baseUrl = window.location.origin;
