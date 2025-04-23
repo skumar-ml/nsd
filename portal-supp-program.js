@@ -38,7 +38,7 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
-    let apiData = await this.fetchData("getSupplementaryProgram/1");
+    let apiData = await this.fetchData("getSupplementaryProgram/5");
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrapper = document.querySelector(
@@ -87,9 +87,11 @@ class DisplaySuppProgram {
         // Option A
         const outerShadowDivA = this.displaySingleSuppProgram(item);
         swiperSlideWrapper.prepend(outerShadowDivA);
-        // Option b
-        const outerShadowDivB = this.displaySingleSuppProgramB(item);
-        swiperSlideWrapperB.prepend(outerShadowDivB);
+        if (item.benefits.length > 0) {
+          // Option b
+          const outerShadowDivB = this.displaySingleSuppProgramB(item);
+          swiperSlideWrapperB.prepend(outerShadowDivB);
+        }
         // Modal Content
         const outerShadowDivM = this.displaySingleSuppProgramB(item, "modal");
         swiperSlideWrapperM.prepend(outerShadowDivM);
@@ -159,38 +161,38 @@ class DisplaySuppProgram {
     priceGrid.appendChild(originalPrice);
     priceGrid.appendChild(discountPrice);
 
-    // Key benefits label
-    var keyBenefitsLabel = $this.creEl("div", "dm-sans key-benefits");
-    keyBenefitsLabel.textContent = "Key Benefits";
-
-    // Benefits list
-    var benefitsContainer = $this.creEl("div");
-
     // Benefit items
     var benefits = item.benefits;
+    if (benefits.length > 0) {
+      // Key benefits label
+      var keyBenefitsLabel = $this.creEl("div", "dm-sans key-benefits");
+      keyBenefitsLabel.textContent = "Key Benefits";
 
-    benefits.forEach(function (benefit, index) {
-      var wrapperClass =
-        index === 0
-          ? "key-benefits-grid-wrapper center"
-          : "key-benefits-grid-wrapper";
-      var benefitWrapper = $this.creEl("div", wrapperClass);
+      // Benefits list
+      var benefitsContainer = $this.creEl("div");
 
-      var benefitImg = $this.creEl("img", "full-width-inline-image");
-      benefitImg.src =
-        "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
-      benefitImg.loading = "lazy";
-      benefitImg.alt = "";
+      benefits.forEach(function (benefit, index) {
+        var wrapperClass =
+          index === 0
+            ? "key-benefits-grid-wrapper center"
+            : "key-benefits-grid-wrapper";
+        var benefitWrapper = $this.creEl("div", wrapperClass);
 
-      var benefitText = $this.creEl("div", "dm-sans");
-      benefitText.innerHTML = benefit.title + "<br />";
+        var benefitImg = $this.creEl("img", "full-width-inline-image");
+        benefitImg.src =
+          "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
+        benefitImg.loading = "lazy";
+        benefitImg.alt = "";
 
-      benefitWrapper.appendChild(benefitImg);
-      benefitWrapper.appendChild(benefitText);
+        var benefitText = $this.creEl("div", "dm-sans");
+        benefitText.innerHTML = benefit.title + "<br />";
 
-      benefitsContainer.appendChild(benefitWrapper);
-    });
+        benefitWrapper.appendChild(benefitImg);
+        benefitWrapper.appendChild(benefitText);
 
+        benefitsContainer.appendChild(benefitWrapper);
+      });
+    }
     // Buttons wrapper
     var buttonDiv = $this.creEl(
       "div",
@@ -210,27 +212,30 @@ class DisplaySuppProgram {
       const buyNowModal = document.getElementById("buyNowModal");
       $this.showModal(buyNowModal);
     });
-
-    var learnMoreBtn = this.creEl("a", "main-button learn-more w-button");
-    learnMoreBtn.href = "#";
-    learnMoreBtn.textContent = "Learn More";
-    learnMoreBtn.addEventListener("click", function (event) {
-      event.preventDefault();
-      $this.$selectedProgram = item;
-      $this.hideShowModalContent(item);
-      const suppProgramsModal = document.getElementById("suppProgramsModal");
-      $this.showModal(suppProgramsModal);
-    });
-
+    if (benefits.length > 0) {
+      var learnMoreBtn = this.creEl("a", "main-button learn-more w-button");
+      learnMoreBtn.href = "#";
+      learnMoreBtn.textContent = "Learn More";
+      learnMoreBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        $this.$selectedProgram = item;
+        $this.hideShowModalContent(item);
+        const suppProgramsModal = document.getElementById("suppProgramsModal");
+        $this.showModal(suppProgramsModal);
+      });
+    }
     buttonDiv.appendChild(buyNowBtn);
-    buttonDiv.appendChild(learnMoreBtn);
-
+    if (benefits.length > 0) {
+      buttonDiv.appendChild(learnMoreBtn);
+    }
     // Assemble the programsDiv
     programsDiv.appendChild(title);
     programsDiv.appendChild(priceLabel);
     programsDiv.appendChild(priceGrid);
-    programsDiv.appendChild(keyBenefitsLabel);
-    programsDiv.appendChild(benefitsContainer);
+    if (benefits.length > 0) {
+      programsDiv.appendChild(keyBenefitsLabel);
+      programsDiv.appendChild(benefitsContainer);
+    }
     programsDiv.appendChild(buttonDiv);
 
     // Append everything to main container
@@ -430,6 +435,7 @@ class DisplaySuppProgram {
         variableWidth: false,
         arrows: false, // Arrows removed
         dots: true,
+        adaptiveHeight: true,
       };
       // Initialize you might slider
       $slider.slick(slickSettings);
@@ -524,7 +530,7 @@ class DisplaySuppProgram {
         this.memberData.site_url + "members/" + this.memberData.memberId,
       label: programName,
       amount: parseFloat(amount * 100),
-      source: "portal_page"
+      source: "portal_page",
     };
     // Create the POST request
     fetch(this.memberData.baseUrl + "createCheckoutUrlForSupplementary", {
@@ -557,11 +563,11 @@ class DisplaySuppProgram {
     const payBtn = document.getElementById("pay-supp-program");
     payBtn.addEventListener("click", function (event) {
       event.preventDefault();
-      
+
       const studentEl = document.getElementById("portal-students");
       if (studentEl.value) {
-	payBtn.value = "Processing...";
-      	payBtn.style.pointerEvents = "none";
+        payBtn.value = "Processing...";
+        payBtn.style.pointerEvents = "none";
         let programName = $this.$selectedProgram.label;
         let programId = $this.$selectedProgram.programDetailId;
         let amount = $this.$selectedProgram.amount;
@@ -579,14 +585,15 @@ class DisplaySuppProgram {
       }
     });
   }
-  updatePayNowModelAmount(){
+  updatePayNowModelAmount() {
     var $this = this;
-    let upSellAmount = document.querySelectorAll("[data-cart-total='cart-total-price']")
-			if (upSellAmount.length > 0) {
-				upSellAmount.forEach(up_Sell_price => {
-					up_Sell_price.innerHTML = "$"+$this.$selectedProgram.amount;
-				})
-			}
+    let upSellAmount = document.querySelectorAll(
+      "[data-cart-total='cart-total-price']"
+    );
+    if (upSellAmount.length > 0) {
+      upSellAmount.forEach((up_Sell_price) => {
+        up_Sell_price.innerHTML = "$" + $this.$selectedProgram.amount;
+      });
+    }
   }
 }
-
