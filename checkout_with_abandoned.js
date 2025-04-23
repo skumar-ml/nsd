@@ -481,6 +481,23 @@ class CheckOutWebflow {
 			checkout_student_details.appendChild(payLaterSession)
 		}
 	}
+	getProgramStartDate() {
+		if(this.memberData.programStartDate == undefined){
+			return false;
+		}	
+		const inputDate = this.memberData.programStartDate;
+		const currentYear = new Date().getFullYear();
+
+		// Create Date object
+		const dateObj = new Date(`${inputDate}, ${currentYear}`);
+
+		// Helper to add leading zeros
+		const pad = (n, width = 2) => n.toString().padStart(width, '0');
+
+		// Format to YYYY-MM-DD HH:MM:SS.MICROSECONDS
+		const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}.000000`;
+		return formattedDate;
+	}
 	// API call for checkout URL 
 	updateStudentDetails(checkoutUrl) {
 		var $this = this;
@@ -520,6 +537,7 @@ class CheckOutWebflow {
 				"gender": studentGender.value,
 				"slug": this.memberData.slug,
 				"createdOn": new Date().toISOString(),
+				"programStartDate": this.getProgramStartDate(),
 				"memberId": this.memberData.memberId,
 				"checkoutUrls": checkoutUrl,
 				"utm_source": (localUtmSource != null) ? localUtmSource : "null"
