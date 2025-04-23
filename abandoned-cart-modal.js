@@ -37,51 +37,85 @@ class AbandonedCartModal {
   }
 
   checkAndDisplayModal() {
+    $this = this;
     if (
       window.location.pathname.includes("/cart/") ||
       window.location.pathname.includes("log-in")
     ) {
-        console.log("User is on the cart page or login page, not displaying modal.");
+      console.log(
+        "User is on the cart page or login page, not displaying modal."
+      );
       return;
     }
     const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
 
-    if (isAbandonedModalOpen == "true") {
-        console.log("Modal is already open, not displaying again.");    
+    if (isAbandonedModalOpen) {
+      console.log("Modal is already open, not displaying again.");
       return;
     }
     const cartData = localStorage.getItem("checkOutData");
     console.log("Cart data from localStorage:", cartData);
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
-      if (parsedCartData.createdOn) {
-        if (parsedCartData && this.isWithinAWeek(parsedCartData.createdOn)) {
-            console.log("Cart data is within a week, displaying modal.");
-           this.addLinkTOViewCartBtn();
-          this.openModal();
-          return;
-        }
+      if (parsedCartData.createdOn && parsedCartData.programStartDate) {  
+        $this.checkAndDisplayModals(
+          parsedCartData.createdOn,
+          parsedCartData.programStartDate
+        );
       }
     }
 
     this.fetchCartDataFromAPI()
       .then((data) => {
         console.log("Fetched cart data:", data);
-        if (data.createdOn) {
-          if (data && this.isWithinAWeek(data.createdOn)) {
-            localStorage.setItem("checkOutData", JSON.stringify(data));
-           this.addLinkTOViewCartBtn(); 
-            this.openModal();
-          }
+        if (data.createdOn && data.programStartDate) {
+          $this.checkAndDisplayModals(
+            data.createdOn,
+            data.programStartDate
+          );
         }
       })
       .catch((error) => {
         console.error("Error fetching cart data:", error);
       });
 
- 
+    this.addLinkTOViewCartBtn();
   }
+  checkAndDisplayModals(createdOn, programStartDate) {
+      const createdOnDate = new Date(data.createdOn);
+      const sixHoursAgo = new Date();
+      sixHoursAgo.setHours(sixHoursAgo.getHours() - 6);
 
+      if (createdOnDate >= sixHoursAgo) {
+        console.log(
+          "Fetched cart data is less than 6 hours old, not displaying modal."
+        );
+        return;
+      }
+      const fiveMonthsAgo = new Date();
+      fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
+      if (createdOnDate < fiveMonthsAgo) {
+        console.log(
+          "Fetched cart data is older than 5 months, not displaying modal."
+        );
+        return;
+      }
+
+      if (data && this.isWithinAWeek(data.createdOn)) {
+        if (data.programStartDate) {
+          const programStartDate = new Date(data.programStartDate);
+          const now = new Date();
+          if (programStartDate < now) {
+            console.log(
+              "Program start date is before the current date, displaying modal."
+            );
+            this.openModal();
+            return;
+          }
+        }
+      }
+  }
+  // Set the modal display to true in localStorage
   setModelDisplay() {
     localStorage.setItem("isAbandonedModalOpen", true);
   }
@@ -134,11 +168,11 @@ class AbandonedCartModal {
         var cart_url = "";
         const programCategoryId = parsedCartData.programCategoryId;
         if (programCategoryId == "1111") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=residential`;
+          cart_url = `${baseUrl}/${parsedCartData.slug}?productType=residential`;
         } else if (programCategoryId == "2222") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=commuter`;
+          cart_url = `${baseUrl}/${parsedCartData.slug}?productType=commuter`;
         } else if (programCategoryId == "3333") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}`;
+          cart_url = `${baseUrl}/${parsedCartData.slug}`;
         }
         viewCartBtn.href = cart_url;
       }
@@ -146,5 +180,3 @@ class AbandonedCartModal {
     // Add event listener to viewCartBtn
   }
 }
-
-
