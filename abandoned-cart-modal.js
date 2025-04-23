@@ -48,12 +48,12 @@ class AbandonedCartModal {
     }
     const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
 
-    if (isAbandonedModalOpen == "true") {
-      console.log("Modal is already open, not displaying again.");
-      return;
-    }else {
-      console.log("Modal is not open, checking local storage cart data.");
-    }
+    // if (isAbandonedModalOpen == "true") {
+    //   console.log("Modal is already open, not displaying again.");
+    //   return;
+    // }else {
+    //   console.log("Modal is not open, checking local storage cart data.");
+    // }
     const cartData = localStorage.getItem("checkOutData");
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
@@ -82,6 +82,8 @@ class AbandonedCartModal {
   }
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
+
+     
       const createdOnDate = new Date(data.createdOn);
       const sixHoursAgo = new Date();
       sixHoursAgo.setHours(sixHoursAgo.getHours() - this.data.hour);
@@ -124,6 +126,25 @@ class AbandonedCartModal {
             console.log("Program start date is before the current date, not displaying modal.", data.programStartDate);
           }
         }
+      }
+      const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
+      if (isAbandonedModalOpen == "true") {
+          const now = new Date();
+          const sevenDaysLater = new Date(data.createdOn);
+          sevenDaysLater.setDate(lastOpenedDate.getDate() + 7);
+
+          if (now < sevenDaysLater) {
+            console.log(
+              "Modal was opened less than 7 days ago, not displaying modal."
+            );
+            reject("Modal was opened less than 7 days ago, not displaying modal.");
+            return;
+          } else {
+            resolve("7 days have passed since the modal was last opened, displaying modal.");
+            console.log(
+              "7 days have passed since the modal was last opened, displaying modal."
+            );
+          }
       }
     });
   }
