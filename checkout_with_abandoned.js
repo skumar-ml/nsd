@@ -544,8 +544,8 @@ class CheckOutWebflow {
 			}
 			var checkoutData = localStorage.getItem('checkOutData');
 			var mergedData = {
+				...JSON.parse(checkoutData),
 				...data,
-				...JSON.parse(checkoutData)
 			}
 			
 			localStorage.setItem("checkOutData", JSON.stringify(mergedData));
