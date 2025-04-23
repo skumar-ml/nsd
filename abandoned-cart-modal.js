@@ -179,11 +179,11 @@ class AbandonedCartModal {
         var cart_url = "";
         const programCategoryId = parsedCartData.programCategoryId;
         if (programCategoryId == "1111") {
-          cart_url = `${baseUrl}/${parsedCartData.slug}?productType=residential`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=residential`;
         } else if (programCategoryId == "2222") {
-          cart_url = `${baseUrl}/${parsedCartData.slug}?productType=commuter`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=commuter`;
         } else if (programCategoryId == "3333") {
-          cart_url = `${baseUrl}/${parsedCartData.slug}`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}`;
         }
         viewCartBtn.href = cart_url;
       }
