@@ -1107,7 +1107,7 @@ class CheckOutWebflow {
 		const selectBox = document.getElementById('old-student')
 		var $this = this;
 		try {
-			const data = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId);
+			const data = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId+"/true");
 			//finding unique value and sorting by firstName
 			const filterData = data.filter((item, index, self) =>
 				index === self.findIndex(obj => obj.studentEmail === item.studentEmail)
