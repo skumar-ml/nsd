@@ -15,6 +15,7 @@ class AbandonedCartModal {
         button.addEventListener("click", () => {
           this.closeModal();
           this.setModelDisplay();
+          
         });
       });
       this.checkAndDisplayModal();
@@ -46,14 +47,7 @@ class AbandonedCartModal {
       );
       return;
     }
-    const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
-
-    // if (isAbandonedModalOpen == "true") {
-    //   console.log("Modal is already open, not displaying again.");
-    //   return;
-    // }else {
-    //   console.log("Modal is not open, checking local storage cart data.");
-    // }
+    
     const cartData = localStorage.getItem("checkOutData");
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
@@ -82,75 +76,110 @@ class AbandonedCartModal {
   }
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
-
-     
       const createdOnDate = new Date(data.createdOn);
       const sixHoursAgo = new Date();
       sixHoursAgo.setHours(sixHoursAgo.getHours() - this.data.hour);
 
+      // Condition 1: If abandoned cart happened less than 6 hours ago
       if (createdOnDate > sixHoursAgo) {
         console.log(
           `Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`,
           createdOnDate,
           sixHoursAgo
         );
-        reject(`Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`); 
-      }else {
-        console.log(
-          `Fetched cart data is older than ${this.data.hour} hours, checking for fiveMonthsAgo program start date.`, createdOnDate
-        );
-      }
-      const fiveMonthsAgo = new Date();
-      fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
-      if (createdOnDate < fiveMonthsAgo) {
-        console.log(
-          "Fetched cart data is older than 5 months, not displaying modal.", createdOnDate
-        );
-        reject("Fetched cart data is older than 5 months, not displaying modal.");
+        reject(`Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`);
+        return;
       }else{
         console.log(
-          "Fetched cart data is within the 5 months range, checking for program start date."
-        );
+          "Condition 1", 
+          createdOnDate, 
+          sixHoursAgo)
       }
 
-      if (data && this.isWithinAWeek(data.createdOn)) {
-        if (data.programStartDate) {
-          const programStartDate = new Date(data.programStartDate);
-          const now = new Date();
-          if (programStartDate > now) {
-            console.log(
-              "Program start date is after the current date, displaying modal.", data.programStartDate
-            );
-            resolve("Program start date is after the current date, displaying modal.");
-          }else{
-            console.log("Program start date is before the current date, not displaying modal.", data.programStartDate);
-          }
+      const fiveMonthsAgo = new Date();
+      fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
+
+      // Condition 2: If abandoned cart happened 5 months ago
+      if (createdOnDate < fiveMonthsAgo) {
+        console.log(
+          "Fetched cart data is older than 5 months, not displaying modal.",
+          createdOnDate
+        );
+        reject("Fetched cart data is older than 5 months, not displaying modal.");
+        return;
+      } else {
+        console.log(
+          "Condition 2",
+          createdOnDate,
+          fiveMonthsAgo
+        )
+      }
+
+      // Condition 3: If it is after the programStartDate for an abandoned cart
+      if (data.programStartDate) {
+        const programStartDate = new Date(data.programStartDate);
+        const now = new Date();
+        if (programStartDate <= now) {
+          console.log(
+            "Program start date is before or equal to the current date, not displaying modal.",
+            data.programStartDate
+          );
+          reject("Program start date is before or equal to the current date, not displaying modal.");
+          return;
+        } else {
+          console.log(
+            "Condition 3",
+            data.programStartDate
+          )
         }
       }
-      const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
-      if (isAbandonedModalOpen == "true") {
-          const now = new Date();
-          const sevenDaysLater = new Date(data.createdOn);
-          sevenDaysLater.setDate(lastOpenedDate.getDate() + 7);
 
-          if (now < sevenDaysLater) {
-            console.log(
-              "Modal was opened less than 7 days ago, not displaying modal."
-            );
-            reject("Modal was opened less than 7 days ago, not displaying modal.");
-            return;
-          } else {
-            resolve("7 days have passed since the modal was last opened, displaying modal.");
-            console.log(
-              "7 days have passed since the modal was last opened, displaying modal."
-            );
-          }
+      // Condition 4: If user closes pop-up with “Continue Browsing” or cross button, show it again after 7 days
+      const isAbandonedModalOpen = localStorage.getItem("isAbandonedModalOpen");
+      if (isAbandonedModalOpen === "true") {
+        const lastOpenedDate = new Date(localStorage.getItem("lastModalClosedDate"));
+        const now = new Date();
+        const sevenDaysLater = new Date(lastOpenedDate);
+        sevenDaysLater.setDate(lastOpenedDate.getDate() + 7);
+
+        if (now < sevenDaysLater) {
+          console.log(
+            "Modal was closed less than 7 days ago, not displaying modal."
+          );
+          reject("Modal was closed less than 7 days ago, not displaying modal.");
+          return;
+        } else {
+          console.log(
+            "Condition 4",
+            now,
+            sevenDaysLater
+          )
+        }
       }
+
+      // Condition: If user has an abandoned cart before a purchase
+      // No need to check has purchase
+      //const hasPurchased = localStorage.getItem("hasPurchased");
+      // if (hasPurchased === "true") {
+      //   console.log(
+      //     "User has made a purchase after the abandoned cart, not displaying modal."
+      //   );
+      //   reject("User has made a purchase after the abandoned cart, not displaying modal.");
+      //   return;
+      // }
+
+      // If all conditions pass, resolve to display the modal
+      console.log("All conditions passed, displaying modal.");
+      resolve("All conditions passed, displaying modal.");
     });
   }
   // Set the modal display to true in localStorage
   setModelDisplay() {
     localStorage.setItem("isAbandonedModalOpen", true);
+    localStorage.setItem(
+      "lastModalClosedDate",
+      new Date().toISOString()
+    );  
   }
 
   async fetchCartDataFromAPI() {
