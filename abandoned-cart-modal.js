@@ -78,7 +78,7 @@ class AbandonedCartModal {
     return new Promise((resolve, reject) => {
       const createdOnDate = new Date(data.createdOn);
       const sixHoursAgo = new Date();
-      sixHoursAgo.setHours(sixHoursAgo.getHours() - this.data.hour);
+      sixHoursAgo.setHours(sixHoursAgo.getMinutes() - 5);
 
       // Condition 1: If abandoned cart happened less than 6 hours ago
       if (createdOnDate > sixHoursAgo) {
