@@ -140,7 +140,7 @@ class AbandonedCartModal {
         const lastOpenedDate = new Date(localStorage.getItem("lastModalClosedDate"));
         const now = new Date();
         const sevenDaysLater = new Date(lastOpenedDate);
-        sevenDaysLater.setDate(lastOpenedDate.getDate() + 7);
+        sevenDaysLater.setDate(lastOpenedDate.getDate() + 1);
 
         if (now < sevenDaysLater) {
           console.log(
