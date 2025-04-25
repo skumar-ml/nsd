@@ -596,6 +596,7 @@ class CheckOutWebflow {
 				if(!$this.$isAboundedProgram){
 					$this.storeBasicData();
 				}
+				$this.updateOldStudentList();
 				$this.displayStudentInfo("grid");
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
