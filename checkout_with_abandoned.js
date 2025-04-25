@@ -634,27 +634,43 @@ class CheckOutWebflow {
 			$this.activateDiv("checkout_program");
 		});
 		prev_page_2.addEventListener("click", function () {
-			// click on back button reinitialze payment tab
-			document.getElementsByClassName("bank-transfer-tab")[0].click();
-			document.getElementById('pay-now-link').closest('div').style.display = "none";
-			document.getElementById('pay-now-link-2').closest('div').style.display = "none";
-			document.getElementById('pay-now-link-3').closest('div').style.display = "none";
-			$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
-			$this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
-            $this.displayStudentInfo("none");
-			$this.hideAndShowWhyFamilies('why-families-div', 'block')
-			$this.hideAndShowByClass('rated-debate-banner', 'flex')
-			$this.hideShowCartVideo('show');
-			$this.activeBreadCrumb('student-details')
-			//document.getElementById('w-tabs-1-data-w-tab-0').click()
-			setTimeout(function () {
-				$(".w-tab-link").removeClass("w--current");
-				$(".w-tab-pane").removeClass("w--tab-active");
-				Webflow.require("tabs").redraw();
-			}, 2000);
+			// click on back button reinitialize payment tab
+			$this.reinitializePaymentTab();
 
 			$this.activateDiv("checkout_student_details");
 		});
+		
+
+		let editStudentEl = document.querySelectorAll("[data-student-info='edit']")
+		if (editStudentEl.length > 0) {
+			editStudentEl.forEach(editBtn => {
+				editBtn.addEventListener("click", function () {
+					// click on edit button reinitialize payment tab
+					$this.reinitializePaymentTab();
+					$this.activateDiv("checkout_student_details");
+				})
+			})
+		}
+		
+	}
+	reinitializePaymentTab(){
+		document.getElementsByClassName("bank-transfer-tab")[0].click();
+		document.getElementById('pay-now-link').closest('div').style.display = "none";
+		document.getElementById('pay-now-link-2').closest('div').style.display = "none";
+		document.getElementById('pay-now-link-3').closest('div').style.display = "none";
+		$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
+		$this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
+		$this.displayStudentInfo("none");
+		$this.hideAndShowWhyFamilies('why-families-div', 'block')
+		$this.hideAndShowByClass('rated-debate-banner', 'flex')
+		$this.hideShowCartVideo('show');
+		$this.activeBreadCrumb('student-details')
+		setTimeout(function () {
+			$(".w-tab-link").removeClass("w--current");
+			$(".w-tab-pane").removeClass("w--tab-active");
+			Webflow.require("tabs").redraw();
+		}, 2000);
+		
 	}
 	// validating duplicate email
 	checkUniqueStudentEmail() {
