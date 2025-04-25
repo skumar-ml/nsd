@@ -658,13 +658,13 @@ class CheckOutWebflow {
 		document.getElementById('pay-now-link').closest('div').style.display = "none";
 		document.getElementById('pay-now-link-2').closest('div').style.display = "none";
 		document.getElementById('pay-now-link-3').closest('div').style.display = "none";
-		$this.hideShowDivById('checkout-supplimentary-data-2', 'none')
-		$this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
-		$this.displayStudentInfo("none");
-		$this.hideAndShowWhyFamilies('why-families-div', 'block')
-		$this.hideAndShowByClass('rated-debate-banner', 'flex')
-		$this.hideShowCartVideo('show');
-		$this.activeBreadCrumb('student-details')
+		this.hideShowDivById('checkout-supplimentary-data-2', 'none')
+		this.hideShowDivById('checkout-supplimentary-data-desktop', 'none')
+		this.displayStudentInfo("none");
+		this.hideAndShowWhyFamilies('why-families-div', 'block')
+		this.hideAndShowByClass('rated-debate-banner', 'flex')
+		this.hideShowCartVideo('show');
+		this.activeBreadCrumb('student-details')
 		setTimeout(function () {
 			$(".w-tab-link").removeClass("w--current");
 			$(".w-tab-pane").removeClass("w--tab-active");
