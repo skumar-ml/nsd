@@ -1156,7 +1156,7 @@ class CheckOutWebflow {
 					gender: filterData[event.target.value].gender,
 				};
 				localStorage.setItem("checkOutBasicData", JSON.stringify(data));
-				
+				$this.updateBasicData();
 			})
 		} catch (error) {
 			console.error('Error fetching API data:', error);
@@ -1164,7 +1164,7 @@ class CheckOutWebflow {
 			// Handle errors (optional)
 			selectBox.innerHTML = '<option value="">Student Details not available</option>';
 		}
-		$this.updateBasicData();
+		
 	}
 	displayUpSellModal() {
 		this.addToCart()
