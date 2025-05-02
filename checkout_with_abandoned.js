@@ -822,8 +822,8 @@ class CheckOutWebflow {
 			}
 		    	var checkbox2 = document.getElementById("checkbox-2");
 			if(!checkbox2.checked){
-				checkbox2.click();
-		        }
+				checkbox2.checked = !checkbox2.checked
+			    }
 		}
 	}
 	// update default checkbox checked always
@@ -909,9 +909,9 @@ class CheckOutWebflow {
 				studentGender.value = paymentData.gender;
 			}
 			var checkbox2 = document.getElementById("checkbox-2");
-			if(checkbox2){
-				checkbox2.click();
-			}
+			if(!checkbox2.checked){
+		                checkbox2.checked = !checkbox2.checked
+		            }
 
 			if (paymentData.supplementaryProgramIds.length > 0) {
 				var SuppCheckbox = document.getElementsByClassName("suppCheckbox");
@@ -1021,8 +1021,8 @@ class CheckOutWebflow {
 			}
             		var checkbox2 = document.getElementById("checkbox-2");
 			if(!checkbox2.checked){
-				checkbox2.click();
-		        }
+		                checkbox2.checked = !checkbox2.checked
+		            }
 		}
 	}
 	// After API response we call the createMakeUpSession method to manipulate student data
