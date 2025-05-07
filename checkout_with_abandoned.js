@@ -702,11 +702,11 @@ class CheckOutWebflow {
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// ach_payment.innerHTML = "Processing..."
 			// $this.initializeStripePayment('us_bank_account', ach_payment);
-			if (suppProIds.length > 0) {
+			//if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
 				var myInterval1 =  setInterval(() => {
-					if($this.$initCheckout){
+					if($this.$initCheckout ){
 						clearInterval(myInterval1);
 						let initialCheckout = $this.initializeStripePayment('us_bank_account', $this.$checkoutData.checkoutId, "updateStripeCheckoutDb");
 						if (initialCheckout) {
@@ -719,21 +719,21 @@ class CheckOutWebflow {
 						}
 					}
 				}, 1000);
-			} else {
-				var myInterval2 =  setInterval(() => {
-					if($this.$initCheckout){
-						clearInterval(myInterval2);
-						ibackbutton.value = "1";
-						window.location.href = $this.$checkoutData.achUrl;
-					}
-				}, 1000);
-			}
+			// } else {
+			// 	var myInterval2 =  setInterval(() => {
+			// 		if($this.$initCheckout){
+			// 			clearInterval(myInterval2);
+			// 			ibackbutton.value = "1";
+			// 			window.location.href = $this.$checkoutData.achUrl;
+			// 		}
+			// 	}, 1000);
+			// }
 		});
 		card_payment.addEventListener("click", function () {
 			let suppProIdE = document.getElementById('suppProIds');
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// card_payment.innerHTML = "Processing..."
-			if (suppProIds.length > 0) {
+			//if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
 				var myInterval3 =  setInterval(() => {
@@ -749,21 +749,21 @@ class CheckOutWebflow {
 						}
 					}
 				}, 1000);
-			} else {
-				var myInterval4 =  setInterval(() => {
-					if($this.$initCheckout){
-						clearInterval(myInterval4);
-						ibackbutton.value = "1";
-						window.location.href = $this.$checkoutData.cardUrl;
-					}
-				}, 1000);
-			}
+			// } else {
+			// 	var myInterval4 =  setInterval(() => {
+			// 		if($this.$initCheckout){
+			// 			clearInterval(myInterval4);
+			// 			ibackbutton.value = "1";
+			// 			window.location.href = $this.$checkoutData.cardUrl;
+			// 		}
+			// 	}, 1000);
+			// }
 		});
 		paylater_payment.addEventListener("click", function () {
 			let suppProIdE = document.getElementById('suppProIds');
 			let suppProIds = JSON.parse(suppProIdE.value)
 			// paylater_payment.innerHTML = "Processing..."
-			if (suppProIds.length > 0) {
+			//if (suppProIds.length > 0) {
 				// payNowLink.innerHTML = "Processing.."
 				// payNowLinkMob.innerHTML = "Processing.."
 				var myInterval5 =  setInterval(() => {
@@ -779,15 +779,15 @@ class CheckOutWebflow {
 						}
 					}
 				}, 1000);
-			} else {
-				var myInterval6 =  setInterval(() => {
-					if($this.$initCheckout){
-						clearInterval(myInterval6);
-						ibackbutton.value = "1";
-						window.location.href = $this.$checkoutData.payLaterUrl;
-					}
-				}, 1000);
-			}
+			// } else {
+			// 	var myInterval6 =  setInterval(() => {
+			// 		if($this.$initCheckout){
+			// 			clearInterval(myInterval6);
+			// 			ibackbutton.value = "1";
+			// 			window.location.href = $this.$checkoutData.payLaterUrl;
+			// 		}
+			// 	}, 1000);
+			// }
 		});
 	}
 	// Update student data for addon supplementary program purchase
