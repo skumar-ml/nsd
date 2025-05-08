@@ -337,9 +337,9 @@ class CheckOutWebflow {
 			}
 		}
 		this.displaySelectedSuppProgram(selectedIds);
-		if(selectedIds.length > 0){
+		//if(selectedIds.length > 0){
 			this.updateCheckOutData({supplementaryProgramIds: selectedIds});
-		}
+		//}
 	}
 	// Get API data with the help of endpoint
 	async fetchData(endpoint) {
