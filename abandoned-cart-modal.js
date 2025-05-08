@@ -63,7 +63,8 @@ class AbandonedCartModal {
       this.fetchCartDataFromAPI()
       .then((data) => {
         if (data.createdOn && data.programStartDate) {
-          localStorage.setItem("checkOutData", JSON.stringify(data));
+          data.createdOn = new Date(data.createdOn).toLocaleString();
+          localStorage.setItem("checkOutData from database", JSON.stringify(data));
           return $this.checkAndDisplayModals(data);
         }else{
           console.log("No createdOn or programStartDate found in the response.");
