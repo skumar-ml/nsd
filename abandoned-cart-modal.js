@@ -65,6 +65,9 @@ class AbandonedCartModal {
         if (data.createdOn && data.programStartDate) {
           localStorage.setItem("checkOutData", JSON.stringify(data));
           return $this.checkAndDisplayModals(data);
+        }else{
+          console.log("No createdOn or programStartDate found in the response.");
+          return Promise.reject("No createdOn or programStartDate found in the response.");
         }
       }).then((result) => {
         $this.openModal();
