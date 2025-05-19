@@ -38,7 +38,7 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
-    let apiData = await this.fetchData("getSupplementaryProgram/5");
+    let apiData = await this.fetchData("getSupplementaryProgram/all");
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrapper = document.querySelector(
@@ -83,7 +83,7 @@ class DisplaySuppProgram {
     apiData.forEach((item) => {
       item.forumType = "Public Forum";
       //slider div
-      if (item.disc_amount && item.amount) {
+      if (item.disc_amount && item.portal_amount) {
         // Option A
         const outerShadowDivA = this.displaySingleSuppProgram(item);
         swiperSlideWrapper.prepend(outerShadowDivA);
@@ -104,7 +104,7 @@ class DisplaySuppProgram {
 
   displaySingleSuppProgram(item) {
     var $this = this;
-    let discount_amount = item.disc_amount - item.amount;
+    let discount_amount = item.disc_amount - item.portal_amount;
     let discount = Number.isInteger(discount_amount)
       ? discount_amount
       : parseFloat(discount_amount).toFixed(2);
@@ -156,7 +156,7 @@ class DisplaySuppProgram {
     originalPrice.textContent = item.disc_amount ? "$" + item.disc_amount : "";
 
     var discountPrice = $this.creEl("div", "discount-price");
-    discountPrice.innerHTML = item.amount ? "$" + item.amount : "" + "<br />";
+    discountPrice.innerHTML = item.portal_amount ? "$" + item.portal_amount : "" + "<br />";
 
     priceGrid.appendChild(originalPrice);
     priceGrid.appendChild(discountPrice);
@@ -257,7 +257,7 @@ class DisplaySuppProgram {
   }
   displaySingleSuppProgramB(item, type = "banner") {
     var $this = this;
-    let discount_amount = item.disc_amount - item.amount;
+    let discount_amount = item.disc_amount - item.portal_amount;
     let discount = Number.isInteger(discount_amount)
       ? discount_amount
       : parseFloat(discount_amount).toFixed(2);
@@ -286,7 +286,7 @@ class DisplaySuppProgram {
     originalPrice.textContent = "$" + item.disc_amount;
 
     var discountPrice = $this.creEl("div", "discount-price supp-program");
-    discountPrice.innerHTML = "$" + item.amount + "<br />";
+    discountPrice.innerHTML = "$" + item.portal_amount + "<br />";
 
     var savePriceText = $this.creEl("div", "save-price-text");
     var saveAmount = $this.creEl("div", "save-amount medium-text");
@@ -483,7 +483,7 @@ class DisplaySuppProgram {
     var $this = this;
     try {
       const data = await this.fetchData(
-        "getAllPreviousStudents/" + this.memberData.memberId
+        "getAllPreviousStudents/" + this.memberData.memberId+"/false"
       );
       //finding unique value and sorting by firstName
       const filterData = data
@@ -570,7 +570,7 @@ class DisplaySuppProgram {
         payBtn.style.pointerEvents = "none";
         let programName = $this.$selectedProgram.label;
         let programId = $this.$selectedProgram.programDetailId;
-        let amount = $this.$selectedProgram.amount;
+        let amount = $this.$selectedProgram.portal_amount;
         let paymentId = studentEl.value;
         if (programName && programId && amount && paymentId) {
           $this.initSupplementaryPayment(
@@ -592,7 +592,7 @@ class DisplaySuppProgram {
     );
     if (upSellAmount.length > 0) {
       upSellAmount.forEach((up_Sell_price) => {
-        up_Sell_price.innerHTML = "$" + $this.$selectedProgram.amount;
+        up_Sell_price.innerHTML = "$" + $this.$selectedProgram.portal_amount;
       });
     }
   }
