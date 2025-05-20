@@ -116,8 +116,7 @@ class DisplaySuppProgram {
 
     // Image
     var img = $this.creEl("img", "supp-programs-img");
-    img.src =
-      "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67d28cc11425ea1144aab656_Group%2019197.avif";
+    img.src =item.banner_img_sm;
     img.loading = "lazy";
     img.alt = "";
 
@@ -392,8 +391,7 @@ class DisplaySuppProgram {
 
     // Image
     var gradientImg = $this.creEl("img", "supp-programs-img");
-    gradientImg.src =
-      "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67d291810bb6fac1cea50637_supp-prog-2.avif";
+    gradientImg.src = item.banner_img_lg;
     gradientImg.loading = "lazy";
     gradientImg.alt = "";
 
@@ -422,7 +420,7 @@ class DisplaySuppProgram {
   }
   initSlickSlider() {
     var $slider = $(
-      ".discounted-programs-slick-slider, .supp-programs-slick-slider"
+      ".discounted-programs-slick-slider"
     );
     // Check if the slider is already initialized
     if (!$slider.hasClass("slick-initialized")) {
@@ -439,6 +437,44 @@ class DisplaySuppProgram {
       };
       // Initialize you might slider
       $slider.slick(slickSettings);
+      $('.left-arrow').click(function() {
+          console.log("Left arrow clicked.");
+          $slider.slick('slickPrev');
+      });
+ 
+      $('.right-arrow').click(function() {
+          console.log("Right arrow clicked.");
+          $slider.slick('slickNext');
+      });
+    }
+
+    var $slider2 = $(
+      ".supp-programs-slick-slider"
+    );
+    // Check if the slider is already initialized
+    if (!$slider2.hasClass("slick-initialized")) {
+      const slickSettings = {
+        speed: 300,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        infinite: true,
+        centerMode: false,
+        variableWidth: false,
+        arrows: true, // Arrows removed
+        dots: true,
+        adaptiveHeight: true,
+      };
+      // Initialize you might slider
+      $slider2.slick(slickSettings);
+      $('.left-arrow').click(function() {
+          console.log("Left arrow clicked.");
+          $slider2.slick('slickPrev');
+      });
+ 
+      $('.right-arrow').click(function() {
+          console.log("Right arrow clicked.");
+          $slider2.slick('slickNext');
+      });
     }
   }
   showModal(modal) {
