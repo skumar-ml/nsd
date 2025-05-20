@@ -433,7 +433,7 @@ class DisplaySuppProgram {
         infinite: true,
         centerMode: false,
         variableWidth: false,
-        arrows: false, // Arrows removed
+        arrows: true, // Arrows removed
         dots: true,
         adaptiveHeight: true,
       };
@@ -593,6 +593,16 @@ class DisplaySuppProgram {
     if (upSellAmount.length > 0) {
       upSellAmount.forEach((up_Sell_price) => {
         up_Sell_price.innerHTML = "$" + $this.$selectedProgram.portal_amount;
+      });
+    }
+
+    // Update buy now modal title
+    let upSellTitle = document.querySelectorAll(
+      "[data-cart='title']"
+    );
+    if (upSellTitle.length > 0) {
+      upSellTitle.forEach((up_Sell_title) => {
+        up_Sell_title.innerHTML = "$" + $this.$selectedProgram.label;
       });
     }
   }
