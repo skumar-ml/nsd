@@ -109,8 +109,9 @@ class DisplaySuppProgram {
       ? discount_amount
       : parseFloat(discount_amount).toFixed(2);
     // Create main container
-    var slideItem = $this.creEl("div", "discounted-programs-slide-item");
-
+    //var slideItem = $this.creEl("div", "discounted-programs-slide-item");
+    let bannerTypeClass = "banner-content " + item.type + "-" + item.programDetailId;
+    var slideItem = $this.creEl("div", "discounted-programs-slide-item " + bannerTypeClass);
     // Image wrapper
     var imgWrapper = $this.creEl("div", "discounted-programs-img-wrapper");
 
