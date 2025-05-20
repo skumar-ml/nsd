@@ -638,7 +638,7 @@ class DisplaySuppProgram {
     );
     if (upSellTitle.length > 0) {
       upSellTitle.forEach((up_Sell_title) => {
-        up_Sell_title.innerHTML = "$" + $this.$selectedProgram.label;
+        up_Sell_title.innerHTML = $this.$selectedProgram.label;
       });
     }
   }
