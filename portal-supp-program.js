@@ -437,12 +437,12 @@ class DisplaySuppProgram {
       };
       // Initialize you might slider
       $slider.slick(slickSettings);
-      $('.left-arrow').click(function() {
+      $('.sidebar-left-arrow').click(function() {
           console.log("Left arrow clicked.");
           $slider.slick('slickPrev');
       });
  
-      $('.right-arrow').click(function() {
+      $('.sidebar-right-arrow').click(function() {
           console.log("Right arrow clicked.");
           $slider.slick('slickNext');
       });
