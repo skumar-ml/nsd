@@ -261,9 +261,10 @@ class DisplaySuppProgram {
       ? discount_amount
       : parseFloat(discount_amount).toFixed(2);
     let typeClass = "modal-content " + type + "-" + item.programDetailId;
+    let bannerTypeClass = "banner-content " + type + "-" + item.programDetailId;
     // Main wrapper
     if (type == "banner") {
-      var slideItem = $this.creEl("div", "supp-programs-slide-item");
+      var slideItem = $this.creEl("div", "supp-programs-slide-item " + bannerTypeClass);
     } else {
       var slideItem = $this.creEl(
         "div",
