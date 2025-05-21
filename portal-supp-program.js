@@ -136,7 +136,7 @@ class DisplaySuppProgram {
     imgWrapper.appendChild(limitedTime);
 
     // Discounted programs content
-    var programsDiv = $this.creEl("div", "discounted-programs-div");
+    var programsDiv = $this.creEl("div", "discounted-programs-div summer-program");
 
     // Title
     var title = $this.creEl(
