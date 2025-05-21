@@ -116,7 +116,7 @@ class DisplaySuppProgram {
     var imgWrapper = $this.creEl("div", "discounted-programs-img-wrapper");
 
     // Image
-    var img = $this.creEl("img", "supp-programs-img");
+    var img = $this.creEl("img", "supp-programs-img sidebar-slider-image");
     img.src =item.banner_img_sm;
     img.loading = "lazy";
     img.alt = "";
@@ -388,7 +388,7 @@ class DisplaySuppProgram {
     // --------- Gradient Div Section ---------
     var gradientDiv = $this.creEl(
       "div",
-      "gradient-div-supp-programs-modal mob-hide"
+      "gradient-div-supp-programs-modal portal"
     );
 
     // Image
