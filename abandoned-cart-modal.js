@@ -250,26 +250,26 @@ class AbandonedCartModal {
   }
   displayCartMenuData() {
     // get checkOutData from local storage
-    const noRecordsDiv = document.querySelector("[data-cart-menu='no-records-div']");
-    const cartDataDiv = document.querySelector("[data-cart-menu='cart-data-div']");
-    if(!noRecordsDiv && !cartDataDiv) {
+    const noRecordsDivs = document.querySelectorAll("[data-cart-menu='no-records-div']");
+    const cartDataDivs = document.querySelectorAll("[data-cart-menu='cart-data-div']");
+    if(!noRecordsDivs.length && !cartDataDivs.length) {
         console.error("No elements found with data-cart-menu attributes.");
         return;
-    } 
+    }  
     if (!localStorage.getItem("checkOutData")) {
-        noRecordsDiv.style.display = "block";
-        cartDataDiv.style.display = "none";
+        noRecordsDivs.forEach(div => div.style.display = "block");
+        cartDataDivs.forEach(div => div.style.display = "none");
         return;
     }
     const checkOutData = JSON.parse(localStorage.getItem("checkOutData"));
     if (!checkOutData) {
-        noRecordsDiv.style.display = "block";
-        cartDataDiv.style.display = "none";
+        noRecordsDivs.forEach(div => div.style.display = "block");
+        cartDataDivs.forEach(div => div.style.display = "none");
         return;
     }
     if (!checkOutData.programStartDate || !checkOutData.programEndDate || !checkOutData.label || !checkOutData.firstName || !checkOutData.slug || !checkOutData.programCategoryId) {
-        noRecordsDiv.style.display = "block";
-        cartDataDiv.style.display = "none";
+        noRecordsDivs.forEach(div => div.style.display = "block");
+        cartDataDivs.forEach(div => div.style.display = "none");
         return;
     }
     const programNameElements = document.querySelectorAll("[data-cart-menu='programName']")
