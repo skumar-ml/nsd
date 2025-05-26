@@ -51,7 +51,8 @@ class AbandonedCartModal {
     const cartData = localStorage.getItem("checkOutData");
     if (cartData) {
       const parsedCartData = JSON.parse(cartData);
-      if (parsedCartData.createdOn && parsedCartData.programStartDate) {  
+      if (parsedCartData.createdOn && parsedCartData.programStartDate) {
+        $this.displayCartMenuData()
         $this.checkAndDisplayModals(parsedCartData).then((result) => { 
           $this.openModal();
           $this.addLinkTOViewCartBtn();
@@ -72,6 +73,7 @@ class AbandonedCartModal {
           return Promise.reject("No createdOn or programStartDate found in the response.");
         }
       }).then((result) => {
+        $this.displayCartMenuData()
         $this.openModal();
         $this.addLinkTOViewCartBtn();
       }).catch((error) => {
@@ -246,9 +248,7 @@ class AbandonedCartModal {
     }
     // Add event listener to viewCartBtn
   }
-}
-// function for display cart menu
-function displayCartMenuData() {
+  displayCartMenuData() {
     // get checkOutData from local storage
     const noRecordsDiv = document.querySelector("[data-cart-menu='no-records-div']");
     const cartDataDiv = document.querySelector("[data-cart-menu='cart-data-div']");   
@@ -319,4 +319,5 @@ function displayCartMenuData() {
                 element.href = cart_url;
         });
     }
+  }
 }
