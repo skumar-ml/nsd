@@ -250,14 +250,22 @@ class AbandonedCartModal {
 // function for display cart menu
 function displayCartMenuData() {
     // get checkOutData from local storage
+    const noRecordsDiv = document.querySelector("[data-cart-menu='no-records-div']");
+    const cartDataDiv = document.querySelector("[data-cart-menu='cart-data-div']");   
     if (!localStorage.getItem("checkOutData")) {
+        noRecordsDiv.style.display = "block";
+        cartDataDiv.style.display = "none";
         return;
     }
     const checkOutData = JSON.parse(localStorage.getItem("checkOutData"));
     if (!checkOutData) {
+        noRecordsDiv.style.display = "block";
+        cartDataDiv.style.display = "none";
         return;
     }
     if (!checkOutData.programStartDate || !checkOutData.programEndDate || !checkOutData.label || !checkOutData.firstName || !checkOutData.slug || !checkOutData.programCategoryId) {
+        noRecordsDiv.style.display = "block";
+        cartDataDiv.style.display = "none";
         return;
     }
     const programNameElements = document.querySelectorAll("[data-cart-menu='programName']")
