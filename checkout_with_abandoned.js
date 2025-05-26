@@ -389,6 +389,8 @@ class CheckOutWebflow {
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
 				"productType": this.memberData.productType,
+				"programStartDate": this.getProgramFormattedDate(this.memberData.programStartDate),
+				"programEndDate": this.getProgramFormattedDate(this.memberData.programEndDate),
 				"achAmount": parseFloat(this.memberData.achAmount.replace(/,/g, '')),
 				"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
 				"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
