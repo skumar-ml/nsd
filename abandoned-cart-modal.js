@@ -323,5 +323,16 @@ class AbandonedCartModal {
                 element.href = cart_url;
         });
     }
+    this.setCartAnimation();
+    noRecordsDivs.forEach(div => div.style.display = "none");
+  }
+  setCartAnimation(){
+    const cartDiv = document.querySelector('.cart-icon-rounded-div');
+    var intervalId = setInterval(() => {
+      cartDiv.classList.add('wiggle');
+      setTimeout(() => cartDiv.classList.remove('wiggle'), 700);
+      // Clear the interval after 3 seconds
+      clearInterval(intervalId);
+    }, 3000);
   }
 }
