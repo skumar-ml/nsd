@@ -251,7 +251,11 @@ class AbandonedCartModal {
   displayCartMenuData() {
     // get checkOutData from local storage
     const noRecordsDiv = document.querySelector("[data-cart-menu='no-records-div']");
-    const cartDataDiv = document.querySelector("[data-cart-menu='cart-data-div']");   
+    const cartDataDiv = document.querySelector("[data-cart-menu='cart-data-div']");
+    if(!noRecordsDiv && !cartDataDiv) {
+        console.error("No elements found with data-cart-menu attributes.");
+        return;
+    } 
     if (!localStorage.getItem("checkOutData")) {
         noRecordsDiv.style.display = "block";
         cartDataDiv.style.display = "none";
