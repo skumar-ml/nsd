@@ -247,3 +247,68 @@ class AbandonedCartModal {
     // Add event listener to viewCartBtn
   }
 }
+// function for display cart menu
+function displayCartMenuData() {
+    // get checkOutData from local storage
+    if (!localStorage.getItem("checkOutData")) {
+        return;
+    }
+    const checkOutData = JSON.parse(localStorage.getItem("checkOutData"));
+    if (!checkOutData) {
+        return;
+    }
+    if (!checkOutData.programStartDate || !checkOutData.programEndDate || !checkOutData.label || !checkOutData.firstName || !checkOutData.slug || !checkOutData.programCategoryId) {
+        return;
+    }
+    const programNameElements = document.querySelectorAll("[data-cart-menu='programName']")
+    if(programNameElements.length > 0){
+        programNameElements.forEach((element) => {
+            element.innerHTML = checkOutData.label;
+        });
+    }
+    
+    const programDateElements = document.querySelectorAll("[data-cart-menu='programDate']")
+    if(programDateElements.length > 0){
+        programDateElements.forEach((element) => {
+            // add this format July 13-Aug 13, 2025
+            const startDate = new Date(checkOutData.programStartDate);
+            const endDate = new Date(checkOutData.programEndDate);
+            const options = { month: 'long', day: 'numeric', year: 'numeric' };
+            // remove the year from the start date
+            const startDateString = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+            const endDateString = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            element.innerHTML = startDateString + " - " + endDateString;
+           
+        });
+    }
+
+    const studentNameElements = document.querySelectorAll("[data-cart-menu='studentName']")
+    if(studentNameElements.length > 0){
+        studentNameElements.forEach((element) => {
+            if(checkOutData.lastName){
+                element.innerHTML = checkOutData.firstName + " " + checkOutData.lastName;
+            }else {
+                element.innerHTML = checkOutData.firstName;
+            }
+            
+        });
+    }
+
+    const baseUrl = window.location.origin;
+    var cart_url = "";
+    const programCategoryId = checkOutData.programCategoryId;
+    if (programCategoryId == "1111") {
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=residential`;
+    } else if (programCategoryId == "2222") {
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=commuter`;
+    } else if (programCategoryId == "3333") {
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}`;
+    }
+
+    const checkoutLinkElements = document.querySelectorAll("[data-cart-menu='checkoutLink']")
+    if(checkoutLinkElements.length > 0){
+        checkoutLinkElements.forEach((element) => {
+                element.href = cart_url;
+        });
+    }
+}
