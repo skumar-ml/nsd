@@ -332,7 +332,7 @@ class AbandonedCartModal {
       cartDiv.classList.add('wiggle');
       setTimeout(() => cartDiv.classList.remove('wiggle'), 700);
       // Clear the interval after 3 seconds
-      clearInterval(intervalId);
+      //clearInterval(intervalId);
     }, 3000);
   }
 }
