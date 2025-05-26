@@ -481,11 +481,11 @@ class CheckOutWebflow {
 			checkout_student_details.appendChild(payLaterSession)
 		}
 	}
-	getProgramStartDate() {
-		if(this.memberData.programStartDate == undefined){
+	getProgramFormattedDate($date) {
+		if($date == undefined){
 			return false;
 		}	
-		const inputDate = this.memberData.programStartDate;
+		const inputDate = $date;
 		const currentYear = new Date().getFullYear();
 
 		// Create Date object
@@ -537,7 +537,8 @@ class CheckOutWebflow {
 				"gender": studentGender.value,
 				"slug": this.memberData.slug,
 				"createdOn": new Date().toISOString(),
-				"programStartDate": this.getProgramStartDate(),
+				"programStartDate": this.getProgramFormattedDate(this.memberData.programStartDate),
+				"programEndDate": this.getProgramFormattedDate(this.memberData.programEndDate),
 				"memberId": this.memberData.memberId,
 				"checkoutUrls": checkoutUrl,
 				"utm_source": (localUtmSource != null) ? localUtmSource : "null"
