@@ -50,9 +50,9 @@ class AbandonedCartModal {
     
     const cartData = localStorage.getItem("checkOutData");
     if (cartData) {
+      $this.displayCartMenuData()
       const parsedCartData = JSON.parse(cartData);
       if (parsedCartData.createdOn && parsedCartData.programStartDate) {
-        $this.displayCartMenuData()
         $this.checkAndDisplayModals(parsedCartData).then((result) => { 
           $this.openModal();
           $this.addLinkTOViewCartBtn();
@@ -67,13 +67,13 @@ class AbandonedCartModal {
           data.createdOn = new Date(data.createdOn).toLocaleString();
           console.log('checkOutData from database', JSON.stringify(data))
           localStorage.setItem("checkOutData", JSON.stringify(data));
+          $this.displayCartMenuData()
           return $this.checkAndDisplayModals(data);
         }else{
           console.log("No createdOn or programStartDate found in the response.");
           return Promise.reject("No createdOn or programStartDate found in the response.");
         }
       }).then((result) => {
-        $this.displayCartMenuData()
         $this.openModal();
         $this.addLinkTOViewCartBtn();
       }).catch((error) => {
