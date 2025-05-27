@@ -252,6 +252,7 @@ class AbandonedCartModal {
     // get checkOutData from local storage
     const noRecordsDivs = document.querySelectorAll("[data-cart-menu='no-records-div']");
     const cartDataDivs = document.querySelectorAll("[data-cart-menu='cart-data-div']");
+    const cartRedIcons = document.querySelectorAll("[data-cart-menu='red-icon']");
     if(!noRecordsDivs.length && !cartDataDivs.length) {
         console.error("No elements found with data-cart-menu attributes.");
         return;
@@ -272,6 +273,9 @@ class AbandonedCartModal {
         cartDataDivs.forEach(div => div.style.display = "none");
         return;
     }
+    // Display block cart red icons
+    cartRedIcons.forEach(icon => { icon.style.display = "block"; });
+    
     const programNameElements = document.querySelectorAll("[data-cart-menu='programName']")
     if(programNameElements.length > 0){
         programNameElements.forEach((element) => {
