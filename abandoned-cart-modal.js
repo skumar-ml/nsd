@@ -328,7 +328,9 @@ class AbandonedCartModal {
         });
     }
     this.setCartAnimation();
+    cartDataDivs.forEach(div => div.style.display = "block");
     noRecordsDivs.forEach(div => div.style.display = "none");
+    
   }
   setCartAnimation(){
     const cartDiv = document.querySelector('.cart-icon-rounded-div');
