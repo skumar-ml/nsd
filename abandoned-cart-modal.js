@@ -244,11 +244,11 @@ class AbandonedCartModal {
         var cart_url = "";
         const programCategoryId = parsedCartData.programCategoryId;
         if (programCategoryId == "1111") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=residential`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=residential&returnType=back`;
         } else if (programCategoryId == "2222") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=commuter`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?productType=commuter&returnType=back`;
         } else if (programCategoryId == "3333") {
-          cart_url = `${baseUrl}/cart/${parsedCartData.slug}`;
+          cart_url = `${baseUrl}/cart/${parsedCartData.slug}?returnType=back`;
         }
         viewCartBtn.href = cart_url;
       }
@@ -321,11 +321,11 @@ class AbandonedCartModal {
     var cart_url = "";
     const programCategoryId = checkOutData.programCategoryId;
     if (programCategoryId == "1111") {
-        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=residential`;
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=residential&returnType=back`;
     } else if (programCategoryId == "2222") {
-        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=commuter`;
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}?productType=commuter&returnType=back`;
     } else if (programCategoryId == "3333") {
-        cart_url = `${baseUrl}/cart/${checkOutData.slug}`;
+        cart_url = `${baseUrl}/cart/${checkOutData.slug}?returnType=back`;
     }
 
     const checkoutLinkElements = document.querySelectorAll("[data-cart-menu='checkoutLink']")
