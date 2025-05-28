@@ -83,7 +83,13 @@ class AbandonedCartModal {
   }
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
-      const createdOnDate = new Date(data.createdOn);
+      //const createdOnDate = new Date(data.createdOn);
+      const [datePart, timePart] = dateString.split(", ");
+      const [day, month, year] = datePart.split("/").map(Number);
+      const [hours, minutes, seconds] = timePart.split(":").map(Number);
+      
+      const createdOnDate = new Date(year, month - 1, day, hours, minutes, seconds);
+      
       //const sixHoursAgo = new Date();
       //sixHoursAgo.setHours(sixHoursAgo.getMinutes() - 5);
       const sixHoursAgo = new Date(Date.now() - this.data.hour * 60 * 60 * 1000);
