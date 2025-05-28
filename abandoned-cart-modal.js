@@ -84,6 +84,7 @@ class AbandonedCartModal {
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
       //const createdOnDate = new Date(data.createdOn);
+      const dateString = data.createdOn;
       const [datePart, timePart] = dateString.split(", ");
       const [day, month, year] = datePart.split("/").map(Number);
       const [hours, minutes, seconds] = timePart.split(":").map(Number);
