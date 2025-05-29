@@ -38,7 +38,8 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
-    let apiData = await this.fetchData("getSupplementaryProgram/all");
+    //let apiData = await this.fetchData("getSupplementaryProgram/all");
+     let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.memberId);
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrapper = document.querySelector(
