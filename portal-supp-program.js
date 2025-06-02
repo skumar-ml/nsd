@@ -278,7 +278,7 @@ class DisplaySuppProgram {
     var programsDiv = $this.creEl("div", "discounted-programs-div border-none");
 
     // Title
-    var title = $this.creEl("div", "dm-sans bold-700 text-large");
+    var title = $this.creEl("div", "dm-sans supp-program-header");
     title.innerHTML = item.label;
 
     // Price Grid
