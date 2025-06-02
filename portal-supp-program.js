@@ -316,7 +316,7 @@ class DisplaySuppProgram {
 
         var benefitImg = $this.creEl(
           "img",
-          "full-width-inline-image margintop-5px"
+          "full-width-inline-image"
         );
         benefitImg.src =
           "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/67cec6d2f47c8a1eee15da7e_library_books.svg";
@@ -327,7 +327,7 @@ class DisplaySuppProgram {
 
         var benefitTitle = $this.creEl(
           "div",
-          "dm-sans margin-bottom-5 bold-700"
+          "dm-sans benefits-text"
         );
         benefitTitle.innerHTML = benefit.title + "<br />";
 
