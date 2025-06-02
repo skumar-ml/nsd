@@ -35,7 +35,7 @@ class DisplaySuppProgram {
       throw error;
     }
   }
-  async displaySupplementaryProgram() {
+ /* async displaySupplementaryProgram() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
     //let apiData = await this.fetchData("getSupplementaryProgram/all");
@@ -102,7 +102,75 @@ class DisplaySuppProgram {
     this.closeIconEvent();
     spinner.style.display = "none";
   }
+*/
+  async displaySupplementaryProgram() {
+    var spinner = document.getElementById("half-circle-spinner");
+    spinner.style.display = "block";
+    let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.memberId);
+    console.log("apiData", apiData);
+    // Option A
+    let swiperSlideWrappers = document.querySelectorAll(
+      ".discounted-programs-slick-slider"
+    );
 
+    if (!apiData.length) {
+      swiperSlideWrappers.forEach(wrapper => wrapper.style.display = "none");
+    }
+
+    if (swiperSlideWrappers == undefined) return;
+
+    swiperSlideWrappers.forEach(wrapper => wrapper.innerHTML = "");
+
+    // Option B
+
+    let swiperSlideWrapperB = document.querySelector(
+      ".supp-programs-slick-slider"
+    );
+
+    if (!apiData.length) {
+      swiperSlideWrapperB.style.display = "none";
+    }
+
+    if (swiperSlideWrapperB == undefined) return;
+
+    swiperSlideWrapperB.innerHTML = "";
+
+    // For Modal content
+    let swiperSlideWrapperM = document.querySelector(
+      ".supp-programs-description-wrapper"
+    );
+
+    if (!apiData.length) {
+      swiperSlideWrapperM.style.display = "none";
+    }
+
+    if (swiperSlideWrapperM == undefined) return;
+
+    swiperSlideWrapperM.innerHTML = "";
+
+    apiData.forEach((item) => {
+      item.forumType = "Public Forum";
+      //slider div
+      if (item.disc_amount && item.portal_amount) {
+        // Option A
+        swiperSlideWrappers.forEach((swiperSlideWrapper) => {
+          var outerShadowDivA = this.displaySingleSuppProgram(item);
+          swiperSlideWrapper.prepend(outerShadowDivA);
+        });
+        if (item.benefits.length > 0) {
+          // Option b
+          var outerShadowDivB = this.displaySingleSuppProgramB(item);
+          swiperSlideWrapperB.prepend(outerShadowDivB);
+        }
+        // Modal Content
+        var outerShadowDivM = this.displaySingleSuppProgramB(item, "modal");
+        swiperSlideWrapperM.prepend(outerShadowDivM);
+      }
+    });
+    this.initSlickSlider();
+    this.closeIconEvent();
+    spinner.style.display = "none";
+  }
   displaySingleSuppProgram(item) {
     var $this = this;
     let discount_amount = item.disc_amount - item.portal_amount;
