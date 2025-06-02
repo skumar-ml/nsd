@@ -53,6 +53,7 @@ class AbandonedCartModal {
       $this.displayCartMenuData()
       const parsedCartData = JSON.parse(cartData);
       if (parsedCartData.createdOn && parsedCartData.programStartDate) {
+        parsedCartData.createdOn = new Date(parsedCartData.createdOn).toLocaleString();
         $this.checkAndDisplayModals(parsedCartData).then((result) => { 
           $this.openModal();
           $this.addLinkTOViewCartBtn();
