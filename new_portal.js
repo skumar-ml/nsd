@@ -298,12 +298,13 @@ class NSDPortal {
                 var duringInvoiceContainer = document.getElementById('during_invoice_' + item.paymentId)
                 if (invoiceContainer != null) {
                     item.invoiceList.forEach(invoice => {
-
+			
                         let preCampRow = this.singleInvoiceForm(invoice, item.paymentId)
                         invoiceContainer.appendChild(preCampRow);
-
-                        let duringCampRow = this.singleInvoiceForm(invoice, item.paymentId)
-                        duringInvoiceContainer.appendChild(duringCampRow)
+			if(duringInvoiceContainer){
+                        	let duringCampRow = this.singleInvoiceForm(invoice, item.paymentId)
+                        	duringInvoiceContainer.appendChild(duringCampRow)
+			}
                     })
                 }
             }
