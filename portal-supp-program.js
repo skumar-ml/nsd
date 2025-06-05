@@ -505,7 +505,7 @@ class DisplaySuppProgram {
         variableWidth: false,
         arrows: true, // Arrows removed
         dots: true,
-        adaptiveHeight: true,
+        adaptiveHeight: false,
       };
       // Initialize you might slider
       $slider.slick(slickSettings);
@@ -535,7 +535,7 @@ class DisplaySuppProgram {
         variableWidth: false,
         arrows: true, // Arrows removed
         dots: true,
-        adaptiveHeight: true,
+        adaptiveHeight: false,
       };
       // Initialize you might slider
       $slider2.slick(slickSettings);
