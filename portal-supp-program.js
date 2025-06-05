@@ -501,6 +501,7 @@ class DisplaySuppProgram {
         slidesToScroll: 1,
         infinite: true,
         centerMode: false,
+        autoplay:true,
         variableWidth: false,
         arrows: true, // Arrows removed
         dots: true,
@@ -530,6 +531,7 @@ class DisplaySuppProgram {
         slidesToScroll: 1,
         infinite: true,
         centerMode: false,
+        autoplay:true,
         variableWidth: false,
         arrows: true, // Arrows removed
         dots: true,
