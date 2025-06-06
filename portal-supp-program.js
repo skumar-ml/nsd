@@ -177,21 +177,20 @@ class DisplaySuppProgram {
     // }, 2000);
     this.visibilityTimeout(swiperSlideWrappers);
   }
-  visibilityTimeout(swiperSlideWrappers) {
-    let slideItem = document.querySelector(".discounted-programs-slide-item");
-      if (slideItem) {
-          let slideWidth = slideItem.offsetWidth;
-          //console.log("Slide Width:", slideWidth);
-
-          if (slideWidth === 0) {
-              swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
-                if (loader) loader.style.display = "block";  
-              //console.log("Slider Hidden: Slide width is 0");
-          } else if (slideWidth > 300) {  
+   visibilityTimeout(swiperSlideWrappers) {
+    let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
+    if (slideItems.length > 0) {
+      slideItems.forEach(slideItem => {
+        let slideWidth = slideItem.offsetWidth;
+        //console.log("Slide Width:", slideWidth);
+        if (slideWidth === 0) {
+          swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
+          //console.log("Slider Hidden: Slide width is 0");
+        } else if (slideWidth > 300) {
               swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
-                if (loader) loader.style.display = "none";  
-                clearInterval(slideCheckInterval); 
+              clearInterval(slideCheckInterval); 
           }
+        })
       } else {
           console.error("No slide items found!");
             if (loader) loader.style.display = "block";  
