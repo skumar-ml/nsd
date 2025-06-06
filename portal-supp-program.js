@@ -175,20 +175,20 @@ class DisplaySuppProgram {
     // setTimeout(() => {
     //   swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
     // }, 2000);
-    this.visibilityTimeout();
+    this.visibilityTimeout(swiperSlideWrappers);
   }
-  visibilityTimeout() {
+  visibilityTimeout(swiperSlideWrappers) {
     let slideItem = document.querySelector(".discounted-programs-slide-item");
       if (slideItem) {
           let slideWidth = slideItem.offsetWidth;
           //console.log("Slide Width:", slideWidth);
 
           if (slideWidth === 0) {
-              articleSlider.style.visibility = "hidden";
+              swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
                 if (loader) loader.style.display = "block";  
               //console.log("Slider Hidden: Slide width is 0");
           } else if (slideWidth > 300) {  
-              articleSlider.style.visibility = "visible";
+              swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
                 if (loader) loader.style.display = "none";  
                 clearInterval(slideCheckInterval); 
           }
