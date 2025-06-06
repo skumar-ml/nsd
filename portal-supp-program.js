@@ -172,9 +172,30 @@ class DisplaySuppProgram {
     this.initSlickSlider();
     this.closeIconEvent();
     //spinner.style.display = "none";
-    setTimeout(() => {
-      swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
-    }, 2000);
+    // setTimeout(() => {
+    //   swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
+    // }, 2000);
+    this.visibilityTimeout();
+  }
+  visibilityTimeout() {
+    let slideItem = document.querySelector(".discounted-programs-slide-item");
+      if (slideItem) {
+          let slideWidth = slideItem.offsetWidth;
+          //console.log("Slide Width:", slideWidth);
+
+          if (slideWidth === 0) {
+              articleSlider.style.visibility = "hidden";
+                if (loader) loader.style.display = "block";  
+              //console.log("Slider Hidden: Slide width is 0");
+          } else if (slideWidth > 300) {  
+              articleSlider.style.visibility = "visible";
+                if (loader) loader.style.display = "none";  
+                clearInterval(slideCheckInterval); 
+          }
+      } else {
+          console.error("No slide items found!");
+            if (loader) loader.style.display = "block";  
+      }
   }
   displaySingleSuppProgram(item) {
     var $this = this;
