@@ -615,6 +615,10 @@ class DisplaySuppProgram {
       filterData.forEach((item, index) => {
         const option = document.createElement("option");
         option.value = item.paymentId;
+        // Add selected if filterData length is 1
+        if (filterData.length === 1) {
+          option.selected = true;
+        }
         option.textContent = `${item.firstName} ${item.lastName}`;
         selectBox.appendChild(option);
       });
