@@ -104,8 +104,8 @@ class DisplaySuppProgram {
   }
 */
   async displaySupplementaryProgram() {
-    var spinner = document.getElementById("half-circle-spinner");
-    spinner.style.display = "block";
+   // var spinner = document.getElementById("half-circle-spinner");
+   // spinner.style.display = "block";
     let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.memberId);
     console.log("apiData", apiData);
     // Option A
@@ -170,7 +170,7 @@ class DisplaySuppProgram {
     });
     this.initSlickSlider();
     this.closeIconEvent();
-    spinner.style.display = "none";
+    //spinner.style.display = "none";
   }
   displaySingleSuppProgram(item) {
     var $this = this;
