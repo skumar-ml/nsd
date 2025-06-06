@@ -172,10 +172,10 @@ class DisplaySuppProgram {
     this.initSlickSlider();
     this.closeIconEvent();
     //spinner.style.display = "none";
-    // setTimeout(() => {
-    //   swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
-    // }, 2000);
-    setInterval(() => this.visibilityTimeout(swiperSlideWrappers), 500);
+    setTimeout(() => {
+      swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
+    }, 3000);
+    //setInterval(() => this.visibilityTimeout(swiperSlideWrappers), 500);
   }
    visibilityTimeout(swiperSlideWrappers) {
     let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
