@@ -193,7 +193,6 @@ class DisplaySuppProgram {
         })
       } else {
           console.error("No slide items found!");
-            if (loader) loader.style.display = "block";  
       }
   }
   displaySingleSuppProgram(item) {
