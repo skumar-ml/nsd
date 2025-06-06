@@ -173,7 +173,7 @@ class DisplaySuppProgram {
     this.closeIconEvent();
     //spinner.style.display = "none";
     setTimeout(() => {
-     // swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
+      swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
     }, 3000);
     //setInterval(() => this.visibilityTimeout(swiperSlideWrappers), 500);
   }
