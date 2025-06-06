@@ -172,7 +172,9 @@ class DisplaySuppProgram {
     this.initSlickSlider();
     this.closeIconEvent();
     //spinner.style.display = "none";
-    swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
+    setTimeout(() => {
+      swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
+    }, 1000);
   }
   displaySingleSuppProgram(item) {
     var $this = this;
