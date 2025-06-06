@@ -123,17 +123,17 @@ class DisplaySuppProgram {
 
     // Option B
 
-    let swiperSlideWrapperB = document.querySelector(
-      ".supp-programs-slick-slider"
-    );
+    // let swiperSlideWrapperB = document.querySelector(
+    //   ".supp-programs-slick-slider"
+    // );
 
-    if (!apiData.length) {
-      swiperSlideWrapperB.style.display = "none";
-    }
+    // if (!apiData.length) {
+    //   swiperSlideWrapperB.style.display = "none";
+    // }
 
     //if (swiperSlideWrapperB == undefined) return;
 
-    swiperSlideWrapperB.innerHTML = "";
+    //swiperSlideWrapperB.innerHTML = "";
 
     // For Modal content
     let swiperSlideWrapperM = document.querySelector(
@@ -157,13 +157,12 @@ class DisplaySuppProgram {
           var outerShadowDivA = this.displaySingleSuppProgram(item);
           swiperSlideWrapper.prepend(outerShadowDivA);
         });
-        if (item.benefits.length > 0) {
-          // Option b
-          if(swiperSlideWrapperB){
-            var outerShadowDivB = this.displaySingleSuppProgramB(item);
-            swiperSlideWrapperB.prepend(outerShadowDivB);
-          }
-        }
+        // if (item.benefits.length > 0) {
+        //   if(swiperSlideWrapperB){
+        //     var outerShadowDivB = this.displaySingleSuppProgramB(item);
+        //     swiperSlideWrapperB.prepend(outerShadowDivB);
+        //   }
+        // }
         // Modal Content
         var outerShadowDivM = this.displaySingleSuppProgramB(item, "modal");
         swiperSlideWrapperM.prepend(outerShadowDivM);
