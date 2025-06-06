@@ -131,7 +131,7 @@ class DisplaySuppProgram {
       swiperSlideWrapperB.style.display = "none";
     }
 
-    if (swiperSlideWrapperB == undefined) return;
+    //if (swiperSlideWrapperB == undefined) return;
 
     swiperSlideWrapperB.innerHTML = "";
 
@@ -159,8 +159,10 @@ class DisplaySuppProgram {
         });
         if (item.benefits.length > 0) {
           // Option b
-          var outerShadowDivB = this.displaySingleSuppProgramB(item);
-          swiperSlideWrapperB.prepend(outerShadowDivB);
+          if(swiperSlideWrapperB){
+            var outerShadowDivB = this.displaySingleSuppProgramB(item);
+            swiperSlideWrapperB.prepend(outerShadowDivB);
+          }
         }
         // Modal Content
         var outerShadowDivM = this.displaySingleSuppProgramB(item, "modal");
