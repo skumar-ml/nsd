@@ -174,7 +174,7 @@ class DisplaySuppProgram {
     //spinner.style.display = "none";
     setTimeout(() => {
       swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
-    }, 1000);
+    }, 3000);
   }
   displaySingleSuppProgram(item) {
     var $this = this;
