@@ -533,22 +533,7 @@ class DisplaySuppProgram {
       };
       // Initialize you might slider
       $slider.slick(slickSettings);
-      $slider.on('setPosition', function(event, slick){
-        let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
-        if (slideItems.length > 0) {
-          slideItems.forEach(slideItem => {
-            let slideWidth = slideItem.offsetWidth;
-            //console.log("Slide Width:", slideWidth);
-            if (slideWidth === 0) {
-              $slider.css('visibility', 'hidden');
-              //console.log("Slider Hidden: Slide width is 0");
-            }
-          });
-        } else {
-          console.error("No slide items found!");
-          $slider.css('visibility', 'hidden');
-        } 
-      });
+      
       $('.sidebar-left-arrow').click(function() {
           console.log("Left arrow clicked.");
           $slider.slick('slickPrev');
