@@ -112,7 +112,8 @@ class DisplaySuppProgram {
     let swiperSlideWrappers = document.querySelectorAll(
       ".discounted-programs-slick-slider"
     );
-
+   // hidden initial swiperSlideWrappers
+    swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
     if (!apiData.length) {
       swiperSlideWrappers.forEach(wrapper => wrapper.style.display = "none");
     }
@@ -171,6 +172,7 @@ class DisplaySuppProgram {
     this.initSlickSlider();
     this.closeIconEvent();
     //spinner.style.display = "none";
+    swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
   }
   displaySingleSuppProgram(item) {
     var $this = this;
