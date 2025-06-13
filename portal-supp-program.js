@@ -663,7 +663,7 @@ class DisplaySuppProgram {
       paymentId: paymentId,
       programId: parseInt(programId),
       successUrl:
-        this.memberData.site_url + "members/" + this.memberData.memberId,
+        this.memberData.site_url + "members/" + this.memberData.memberId+"?paymentType=portal",
       cancelUrl:
         this.memberData.site_url + "members/" + this.memberData.memberId,
       label: programName,
