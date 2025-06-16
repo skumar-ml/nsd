@@ -1071,7 +1071,7 @@ class CheckOutWebflow {
 			e.preventDefault();
 			payNowLink.style.pointerEvents = "none";
 			payNowLink.innerHTML = "Processing..";
-			console.log("click payNow Button")
+			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
@@ -1081,7 +1081,7 @@ class CheckOutWebflow {
 			e.preventDefault();
 			payNowLinkMo.style.pointerEvents = "none";
 			payNowLinkMo.innerHTML = "Processing..";
-			console.log("click payNow Button")
+			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
@@ -1092,7 +1092,7 @@ class CheckOutWebflow {
 			e.preventDefault();
 			payNowLink3.style.pointerEvents = "none";
 			payNowLink3.innerHTML = "Processing..";
-			console.log("click payNow Button")
+			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
@@ -1180,10 +1180,10 @@ class CheckOutWebflow {
 		let variant = this.getVariant();
 		localStorage.setItem('_ab_test_variant', variant)
 		if (modal) {
-			console.log('Showing modal on page load');
+			//console.log('Showing modal on page load');
 			this.showUpSellModal(modal);
 		} else {
-			console.log('Modal element not found.');
+			//console.log('Modal element not found.');
 		}
 		if (noThanks) {
 			for (let index = 0; index < noThanks.length; index++) {
@@ -1198,7 +1198,7 @@ class CheckOutWebflow {
 	}
 	showUpSellModal(modal) {
 		const check_up_sell = this.checkUpSellModalOpen();
-		console.log('check_up_sell', check_up_sell)
+		//console.log('check_up_sell', check_up_sell)
 		if (check_up_sell) {
 			return;
 		}
@@ -1229,7 +1229,7 @@ class CheckOutWebflow {
 					const checkbox = parent.querySelector(".suppCheckbox");
 					if (checkbox) {
 					checkbox.checked = false;
-					console.log("checkbox.checked", checkbox.checked)
+					//console.log("checkbox.checked", checkbox.checked)
 					}
 				}
 			})
@@ -1289,7 +1289,7 @@ class CheckOutWebflow {
 							//add_to_card_btn.style.textDecoration = "underline";
 						})
 						while ($this.$suppPro.length == 0) {
-							console.log("$this.$suppPro.length", $this.$suppPro.length)
+							//console.log("$this.$suppPro.length", $this.$suppPro.length)
 						}
 						setTimeout(() => {
 							const modal = document.getElementById('upsell-modal-1');
@@ -1449,12 +1449,12 @@ class CheckOutWebflow {
 
 			// Shared navigation logic for the "You Might" slider
 			$('.left-arrow-slick').click(function () {
-				console.log("You Might: Left arrow clicked.");
+				//console.log("You Might: Left arrow clicked.");
 				$sliderYouMight.slick('slickPrev');
 			});
 
 			$('.right-arrow-slick').click(function () {
-				console.log("You Might: Right arrow clicked.");
+				//console.log("You Might: Right arrow clicked.");
 				$sliderYouMight.slick('slickNext');
 			});
 		}
@@ -1471,12 +1471,12 @@ class CheckOutWebflow {
 			var $sliderYouMightNew = $slider2.slick(slickSettings);
 
 			$('.you-might-left-arrow').click(function () {
-				console.log("You Might: Left arrow clicked.");
+				//console.log("You Might: Left arrow clicked.");
 				$sliderYouMightNew.slick('slickPrev');
 			});
 	 
 			$('.you-might-right-arrow').click(function () {
-				console.log("You Might: Right arrow clicked.");
+				//console.log("You Might: Right arrow clicked.");
 				$sliderYouMightNew.slick('slickNext');
 			});
 		}
@@ -1494,12 +1494,12 @@ class CheckOutWebflow {
 			var $sliderYouMightMobile = $slider3.slick(slickSettings);
 
 			$('.you-might-left-arrow').click(function () {
-				console.log("You Might: Left arrow clicked.");
+				//console.log("You Might: Left arrow clicked.");
 				$sliderYouMightMobile.slick('slickPrev');
 			});
 	 
 			$('.you-might-right-arrow').click(function () {
-				console.log("You Might: Right arrow clicked.");
+				//console.log("You Might: Right arrow clicked.");
 				$sliderYouMightMobile.slick('slickNext');
 			});
 		}
@@ -1782,12 +1782,12 @@ class CheckOutWebflow {
             
                 // Shared navigation logic for the "Why Families" slider
                 $('.families-left-arrow').click(function () {
-                    console.log("Why Families: Left arrow clicked.");
+                    //console.log("Why Families: Left arrow clicked.");
                     $sliderFamilies.slick('slickPrev');
                 });
         
                 $('.families-right-arrow').click(function () {
-                    console.log("Why Families: Right arrow clicked.");
+                    //console.log("Why Families: Right arrow clicked.");
                     $sliderFamilies.slick('slickNext');
                 });
             }
@@ -1837,7 +1837,7 @@ class CheckOutWebflow {
 			}
 	
 			if (targetModal) {
-			  console.log(`Closing ${targetModal.id}`);
+			  //console.log(`Closing ${targetModal.id}`);
 			  targetModal.classList.remove("show");
 			  targetModal.style.display = "none";
 			}
