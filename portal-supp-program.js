@@ -186,7 +186,7 @@ class DisplaySuppProgram {
         if (slideWidth === 0) {
           swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
           //console.log("Slider Hidden: Slide width is 0");
-        } else if (slideWidth > 300) {
+         } else if (slideWidth >= 300) {
               swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
               clearInterval(slideCheckInterval); 
           }
