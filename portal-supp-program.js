@@ -112,10 +112,13 @@ class DisplaySuppProgram {
     let swiperSlideWrappers = document.querySelectorAll(
       ".discounted-programs-slick-slider"
     );
-   // hidden initial swiperSlideWrappers
-    swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
+   let swiperSliderParent = document.querySelector(
+      ".desktop-slider-div"
+    );
+    // hidden initial swiperSlideWrappers
+    swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "hidden");
     if (!apiData.length) {
-      swiperSlideWrappers.forEach(wrapper => wrapper.style.display = "none");
+      swiperSliderParent.forEach(wrapper => wrapper.style.display = "none");
     }
 
     if (swiperSlideWrappers == undefined) return;
@@ -175,20 +178,20 @@ class DisplaySuppProgram {
     // setTimeout(() => {
     //   swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
     // }, 3000);
-    setInterval(() => this.visibilityTimeout(swiperSlideWrappers), 500);
+    setInterval(() => this.visibilityTimeout(swiperSliderParent), 500);
   }
-   visibilityTimeout(swiperSlideWrappers) {
+  visibilityTimeout(swiperSliderParent) {
     let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
     if (slideItems.length > 0) {
       slideItems.forEach(slideItem => {
         let slideWidth = slideItem.offsetWidth;
         //console.log("Slide Width:", slideWidth);
         if (slideWidth === 0) {
-          swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "hidden");
+          swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "hidden");
           //console.log("Slider Hidden: Slide width is 0");
-         } else if (slideWidth >= 300) {
-              swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
-              clearInterval(slideCheckInterval); 
+        } else if (slideWidth >= 300) {
+              swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "visible");
+              clearInterval(slideCheckInterval);
           }
         })
       } else {
