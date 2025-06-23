@@ -178,9 +178,9 @@ class DisplaySuppProgram {
     // setTimeout(() => {
     //   swiperSlideWrappers.forEach(wrapper => wrapper.style.visibility = "visible");
     // }, 3000);
-    setInterval(() => this.visibilityTimeout(swiperSliderParent), 500);
+    var slideCheckInterval = setInterval(() => this.visibilityTimeout(swiperSliderParent, slideCheckInterval), 500);
   }
-  visibilityTimeout(swiperSliderParent) {
+   visibilityTimeout(swiperSliderParent, slideCheckInterval) {
     let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
     if (slideItems.length > 0) {
       slideItems.forEach(slideItem => {
@@ -191,7 +191,7 @@ class DisplaySuppProgram {
           //console.log("Slider Hidden: Slide width is 0");
         } else if (slideWidth >= 300) {
               swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "visible");
-              clearInterval(slideCheckInterval);
+             clearInterval(slideCheckInterval);
           }
         })
       } else {
