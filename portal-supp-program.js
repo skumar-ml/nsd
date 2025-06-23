@@ -112,7 +112,7 @@ class DisplaySuppProgram {
     let swiperSlideWrappers = document.querySelectorAll(
       ".discounted-programs-slick-slider"
     );
-   let swiperSliderParent = document.querySelector(
+   let swiperSliderParent = document.querySelectorAll(
       ".desktop-slider-div"
     );
     // hidden initial swiperSlideWrappers
