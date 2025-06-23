@@ -181,23 +181,23 @@ class DisplaySuppProgram {
     var slideCheckInterval = setInterval(() => this.visibilityTimeout(swiperSliderParent, slideCheckInterval), 500);
   }
    visibilityTimeout(swiperSliderParent, slideCheckInterval) {
-    let slideItems = document.querySelectorAll(".discounted-programs-slide-item");
-    if (slideItems.length > 0) {
-      slideItems.forEach(slideItem => {
-        let slideWidth = slideItem.offsetWidth;
-        //console.log("Slide Width:", slideWidth);
-        if (slideWidth === 0) {
-          swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "hidden");
-          //console.log("Slider Hidden: Slide width is 0");
-        } else if (slideWidth >= 300) {
-              swiperSliderParent.forEach(wrapper => wrapper.style.visibility = "visible");
-             clearInterval(slideCheckInterval);
-             return; 
-          }
-        })
-      } else {
-          console.error("No slide items found!");
+    let slideItems = document.querySelector(".discounted-programs-slide-item");
+    if (slideItems) {
+      let slideWidth = slideItems.offsetWidth;
+      //console.log("Slide Width:", slideWidth);
+      if (slideWidth === 0) {
+        swiperSliderParent.forEach(
+          (wrapper) => (wrapper.style.visibility = "hidden")
+        );
+        //console.log("Slider Hidden: Slide width is 0");
+      } else if (slideWidth >= 300) {
+        swiperSliderParent.forEach(
+          (wrapper) => (wrapper.style.visibility = "visible")
+        );
+        clearInterval(slideCheckInterval);
+        return;
       }
+    }
   }
   displaySingleSuppProgram(item) {
     var $this = this;
