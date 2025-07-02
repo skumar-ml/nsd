@@ -73,17 +73,14 @@ class GoogleReviewModal {
     // const startDate = new Date(this.googleReviewData.startDate);
     // const endDate = new Date(this.googleReviewData.endDate);
     const startDate = new Date("2025-06-13 00:00:00");
-    const endDate = new Date("2025-06-30 23:45:00");
+    const endDate = new Date("2025-07-02 23:45:00");
 
     const currentDate = new Date();
 
     const oneDayAfterEndDate = new Date(endDate);
     oneDayAfterEndDate.setDate(endDate.getDate() + 1);
 
-    console.log("Current Date:", currentDate);
-    console.log("Start Date:", startDate);
-    console.log("End Date:", endDate);
-    console.log("One Day After End Date:", oneDayAfterEndDate);
+    
     if (currentDate >= startDate && currentDate < oneDayAfterEndDate) {
       const totalCampDuration = endDate - startDate;
       const elapsedCampDuration = currentDate - startDate;
@@ -93,7 +90,7 @@ class GoogleReviewModal {
       const lastShownDate = this.googleReviewData.lastShownDate || "";
 
       if (lastShownDate === today) {
-        console.log("Modal already shown today.");
+       // console.log("Modal already shown today.");
         return;
       }
 
