@@ -70,10 +70,10 @@ class GoogleReviewModal {
   checkConditionsAndShowModal() {
     if (!this.googleReviewData || !this.isStudent) return;
 
-    // const startDate = new Date(this.googleReviewData.startDate);
-    // const endDate = new Date(this.googleReviewData.endDate);
-    const startDate = new Date("2025-06-13 00:00:00");
-    const endDate = new Date("2025-07-02 23:45:00");
+    const startDate = new Date(this.googleReviewData.startDate);
+    const endDate = new Date(this.googleReviewData.endDate);
+    // const startDate = new Date("2025-06-13 00:00:00");
+    // const endDate = new Date("2025-07-02 23:45:00");
 
     const currentDate = new Date();
 
