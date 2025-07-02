@@ -1,3 +1,227 @@
+/* Popup Modal CSS*/
+ .abandoned-cart-modal , .google-review-modal {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0s 0.3s; 
+}
+.abandoned-cart-modal-bg[aria-hidden="false"] , .google-review-modal-bg[aria-hidden="false"] {
+    display: block; 
+}
+ .abandoned-cart-modal.show , .google-review-modal.show {
+    display: flex;
+    opacity: 1;
+    transition: opacity 0.3s ease, visibility 0s 0s;
+}
+
+.abandoned-cart-modal-bg , .google-review-modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .7;
+}
+.abandoned-cart-modal-container , .google-review-modal-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Google Review Slider Element CSS*/
+.lfCQiA {
+    margin-bottom: 2vh !important;
+}
+
+
+/* Global Used Elements CSS*/
+  @media (max-width: 768px) { 
+      .portal_right-main-container {
+          height: auto;
+      }
+  }
+  @media (max-width: 991px) {
+    .light-blue-div {
+        z-index: 1;
+    }    
+    .portal-sidebar-list-items.w-dropdown-list.open {
+        height: 100vh;
+    }
+   }
+  .w-dropdown-list {
+           background: #FFF !important;
+    }
+  a.button-with-icon-div:hover,
+  a#prev_page_2:hover {
+    box-shadow: 0 6px 20px #1b4f72e6;
+  }
+  .any-link.link001:hover {
+    box-shadow: 0 6px 20px #1b4f72e6;
+  }
+  .next-step-link.main-button.next_page_2:hover {
+    background-color: #771524;
+    border-color: #771524;
+    box-shadow: 0 4px 12px #00000080;
+  }
+
+  /* Combined hover effect for all image containers */
+  .elite-today_img-wrapper img,
+  .img-container img,
+  .camp-faculty---block img,
+  .camp-hero_img img,
+  .w-layout-grid .pricing-card,
+  .camp-statistic-image-div img,
+  .parent-s-perspective_image-wrapper img,
+  .feature-container img,
+  .curriculum-faculty-container .curriculum-faculty-card {
+    transition: transform 0.3s ease; /* Smooth transition */
+  }
+
+  .elite-today_img-wrapper:hover img,
+  .img-container:hover img,
+  .camp-faculty---block:hover img,
+  .camp-hero_img:hover img,
+  .w-layout-grid .pricing-card:hover,
+  .camp-statistic-image-div img:hover, 
+  .parent-s-perspective_image-wrapper img:hover,
+  .feature-container img:hover,
+  .curriculum-faculty-container .curriculum-faculty-card:hover {
+    transform: scale(1.05); /* Increase size to 105% on hover */
+  }
+  .w-dropdown:hover .w-dropdown-list {
+    display: block;
+  }
+
+  /* Hide scrollbar in all devices */
+  ::-webkit-scrollbar {
+    display: none;
+  }
+  /* CSS for screens with width <= 568px */
+  @media (max-width: 568px) {
+    .slick-slide img {
+      display: inline-block; 
+      margin: 0 auto; 
+    }
+  }
+  
+  /* Desktop Active class styling */
+  .nav-link-item.active {
+    background-color: rgba(241, 240, 238, 1);
+    color: #000;            
+    border-radius: 100px;
+  }
+  .nav-link-item:hover{
+    background-color: rgba(241, 240, 238, 1);
+    border-radius: 100px;
+  }
+  @media screen and (max-width: 375px) {
+    .arrow.margin-bottom-5 {
+      top: 80px !important;
+    }
+  }
+  
+ @media screen and (max-width: 768px) and (min-width: 568px) {
+  .arrow.margin-bottom-5 {
+    top: 83px !important;
+  }
+}
+  @media screen and (max-width: 767px) {
+    .overview-section {
+      padding: 2.8vh 0 !important;
+    }
+    .arrow.margin-bottom-5.navbar {
+      top: 10px !important; 
+    } 
+  }
+  .swiper-button.swiper-btn-next, .swiper-button.swiper-btn-prev {
+    -webkit-tap-highlight-color: #0000;
+  }
+  a#prev_page_2 {
+    margin-top: 12px!important;
+  }
+  .upsell-price-original {
+    position: relative;
+  }
+  .upsell-price-original {
+    width: max-content;
+  }
+  .upsell-price-original::before {
+    top: 50%;
+    left: 10%;
+    width: 70%;
+    height: 1px;
+    background-color: #000000;
+    transform: translate(0, 0) rotate(330deg);
+    position: absolute;
+    content: '';
+    transform-origin: center;
+  }
+
+  .fade.active .progress.three,
+  .fade.active .progress.four {
+    background-color: #4781a9 !important;
+  }
+
+.pricing-grid-with-margin .vertical-node .most-popular-text {
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 768px) { 
+   .curriculum-faculty-container .curriculum-faculty-card:hover , .w-layout-grid .pricing-card:hover {
+        transform: none; 
+    }
+}
+.w-slider-dot.w-active {
+      font-size: 10px !important;
+}
+.swiper-pagination-bullet {
+   width: 10px !important;  
+      height: 10px !important; 
+   }
+   .swiper-pagination {
+      bottom: 14vh !important;
+    }
+    /* For tablet to mobile breakpoints */
+    @media (max-width: 991px) {
+    .swiper-pagination {
+      bottom: 12vh !important;
+    }
+ }
+ .swiper-pagination-bullet {
+     background: #fff !important;
+}
+
+.slick-dots li button:before {
+  color: #1b4f72 !important;
+}
+.slick-dots li.slick-active button:before {
+    opacity: inherit !important;
+}    
+:root {
+    --swiper-pagination-color: #1b4f72;
+}
+/* Remove autofill background color in WebKit browsers */
+input:-webkit-autofill {
+    background-color: transparent !important;
+    box-shadow: 0 0 0px 1000px white inset !important;
+}
+#Type-3, 
+#student-age-2 {
+    outline: none !important; /* Removes default blue outline */
+}
+
+input:focus,
+input:-webkit-autofill:focus {
+    outline: 1px solid #a51c30 !important;
+}
+@media screen and (max-width: 991px) {
+    .pagination.rankings {
+       display: grid !important;
+       align-items: center !important;  /* Vertically center items */
+       justify-content: center !important;  /* Horizontally center items */
+    }
+}
 
 /* Testimonials nav circle colors */
 .w-slider-dot {
@@ -6,41 +230,5 @@
 }
 .w-slider-dot.w-active {
   background: #A51C30;
-  font-size: 11px;
-}  
-/* Google review modal styles */
-.google-review-modal {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.3s ease, visibility 0s 0.3s;
-}
- 
-.google-review-modal.show {
-    display: flex;
-    opacity: 1;
-    transition: opacity 0.3s ease, visibility 0s 0s;
-}
- 
-.google-review-modal-bg[aria-hidden="false"] {
-    display: block;
-}
- 
-.google-review-modal-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0.7;
-}
- 
-.google-review-modal-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-.lfCQiA {
-    margin-bottom: 2vh !important;
-}
- 
+  font-size: 10px;
+} 
