@@ -379,7 +379,7 @@ class CheckOutWebflow {
 			}
 			
 			var data = {
-				"email": this.memberData.email,
+				"email": this.memberData.email.toLowerCase(),
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
 				"successUrl": this.memberData.site_url + "payment-confirmation?programId=" + this.memberData.programId,
