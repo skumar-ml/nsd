@@ -215,7 +215,7 @@ class NSDPortal {
         this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No" || i.form_sub_type == 'dropoff' || i.form_sub_type == 'pickup');
         this.$completedInvoiceOnly = tab.formCompletedList.filter(i => (i.isInvoice == "Yes" && i.form_sub_type == 'dropoff_invoice') || (i.isInvoice == "Yes" && i.form_sub_type == 'pickup_invoice') ).length;
         this.invoiceData = []
-	this.$totalInvoice = 0;    
+	    this.$totalInvoice = 0;    
         this.$formsList = tab.formList;
         this.$programCategory = tab.programCategory;
         this.$studentDetail = tab.studentDetail;
@@ -242,16 +242,21 @@ class NSDPortal {
         });
         var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
 
-	// for online program invoice list
+	    // for online program invoice list
         if(this.$programCategory.programCategoryId == 3333 && this.$invoices.invoiceList != null){
             formList += this.invoiceList()
         }
-	
-        var pre_camp_html = this.createPreCampContent(formList);
-        var during_camp_html = this.createDuringCampContent();
+
         let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
+        if (percentageAmount == 100) {
+            formList = "";
+        }
+        var pre_camp_html = this.createPreCampContent(formList, percentageAmount);
+        var during_camp_html = this.createDuringCampContent();
+        
 	    tabPane.innerHTML = ``;
-       if (percentageAmount != 100) {
+
+       if (!(percentageAmount == 100 && this.checkProgramStartDate())) {
 	      tabPane.innerHTML += `
             <div class="pre-camp_div">
                 <!-- Pre camp content will come conditionally here -->
@@ -260,7 +265,9 @@ class NSDPortal {
         `;
          } 
         
-         if (this.checkProgramStartDate() || percentageAmount == 100) {
+         //if (this.checkProgramStartDate() || percentageAmount == 100) {
+         // Updated logic now only camp will start then during_camp_html will show
+         if (this.checkProgramStartDate()) {
              tabPane.innerHTML += `
             <div class="during-camp_div">
                 <!-- During camp content will come conditionally here -->
@@ -488,7 +495,8 @@ class NSDPortal {
     createPreCampContent(formList) {
         const preCampDiv = document.createElement('div');
         preCampDiv.className = 'pre-camp_div';
-        preCampDiv.innerHTML = `
+        if(formList){
+            preCampDiv.innerHTML = `
             <div class="pre-camp_title-content-wrapper">
                 <div class="pre-camp_title-div bg-blue">
                     <div class="dm-sans line-height-20">Pre-camp</div>
@@ -506,9 +514,27 @@ class NSDPortal {
                 ${this.progressBar()}
                 </div>
             </div>
+            
             ${formList}
             ${this.resourceList()}
         `;
+        }else{
+            preCampDiv.innerHTML = `
+            <div class="pre-camp_title-content-wrapper">
+                <div class="pre-camp_title-div bg-blue">
+                    <div class="dm-sans line-height-20">Pre-camp</div>
+                </div>
+                <div>
+                    <div class="pre-camp_title-text">Resources</div>
+                </div>
+                <div class="cross-icon" id="cross-icon"><img
+                src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
+                loading="lazy" alt=""></div>
+            </div>
+            ${this.resourceList()}
+        `;
+        }
+        
 
 
         return preCampDiv;
@@ -652,7 +678,7 @@ class NSDPortal {
                     <div class="pre-camp_title-text">Resources/Camp Topic</div>
                 </div>
             </div>
-            ${ this.getCampTopicData() ? this.getCampTopicData() : 'Resources not available for this camp'}
+            ${ this.getCampTopicData() ? this.getCampTopicData() : 'Camp topic is not available for this camp'}
             <div class="${isInvoiceClass}">
                     <div class="pre-camp_subtitle">Invoice</div>
                     <div class="pre-camp_grid" id="during_invoice_${this.$studentDetail.uniqueIdentification}">
