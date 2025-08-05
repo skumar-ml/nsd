@@ -1330,12 +1330,7 @@ class CheckOutWebflow {
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
 
-		if(apiData.length == 0){
-			container2.style.display = "none";
-			container3.style.display = "none";
-			container4.style.display = "none";
-			return;
-		}
+		
 
 		// sorting data by programDetailId
 		apiData.sort((a, b) => b.programDetailId - a.programDetailId);
@@ -1430,6 +1425,12 @@ class CheckOutWebflow {
 		this.closeIconEvent();
 		// Setup back button for browser and stripe checkout page
 		this.setUpBackButtonTab();
+		if(apiData.length == 0){
+			container2.style.display = "none";
+			container3.style.display = "none";
+			container4.style.display = "none";
+			return;
+		}
 	}
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
@@ -2298,4 +2299,5 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
 
