@@ -53,6 +53,7 @@ class NSDPortal {
 	                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
 	            ]
 	        );
+		data = data.studentData || [];
 	} catch (error) {
 		spinner.style.display = 'none';
         }
@@ -954,3 +955,4 @@ class NSDPortal {
         return el;
     }
 }
+
