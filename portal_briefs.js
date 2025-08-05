@@ -47,8 +47,8 @@ class BriefManager {
             this.$briefs = [];
             this.elements.container.style.display = 'none';
         }
-        
-        
+
+
         this.checkEmptyState();
         this.bindEvents();
         this.updateAllElements();
@@ -110,7 +110,7 @@ class BriefManager {
         const currentBrief = this.getCurrentBrief();
         if (currentBrief) {
             this.elements.downloadPDF.href = currentBrief.pdf_url;
-            this.elements.downloadPDF.textContent = `Download PDF - ${currentBrief.title}`;
+            //this.elements.downloadPDF.textContent = `Download PDF - ${currentBrief.title}`;
         }
     }
 
@@ -120,7 +120,7 @@ class BriefManager {
         const currentBrief = this.getCurrentBrief();
         if (currentBrief) {
             this.elements.downloadWord.href = currentBrief.doc_url;
-            this.elements.downloadWord.textContent = `Download WORD - ${currentBrief.title}`;
+            //this.elements.downloadWord.textContent = `Download WORD - ${currentBrief.title}`;
         }
     }
 
@@ -150,4 +150,3 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
-
