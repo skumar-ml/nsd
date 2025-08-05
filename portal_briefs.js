@@ -132,12 +132,12 @@ class BriefManager {
             let previewUrl = currentBrief.pdf_url;
 
             // Handle Google Drive links
-            if (previewUrl.includes('drive.google.com') && !previewUrl.includes('/preview')) {
-                const fileId = previewUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
-                if (fileId) {
-                    previewUrl = `https://drive.google.com/file/d/${fileId[1]}/preview`;
-                }
-            }
+            // if (previewUrl.includes('drive.google.com') && !previewUrl.includes('/preview')) {
+            //     const fileId = previewUrl.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            //     if (fileId) {
+            //         previewUrl = `https://drive.google.com/file/d/${fileId[1]}/preview`;
+            //     }
+            // }
 
             this.elements.pdfPreview.src = previewUrl;
         }
@@ -150,3 +150,4 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
