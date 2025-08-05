@@ -40,6 +40,7 @@ class GoogleReviewModal {
       fetch(`${this.baseApiUrl}getCompletedForm/${this.memberId}/current`)
         .then((response) => response.json())
         .then((campData) => {
+          campData = campData.studentData || [];
           const currentStudentData = campData.find(
             (data) => data.studentDetail.studentEmail === this.studentEmail
           );
@@ -111,4 +112,5 @@ class GoogleReviewModal {
     this.modal.style.display = "none";
   }
 }
+
 
