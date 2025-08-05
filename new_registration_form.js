@@ -34,7 +34,8 @@ class NSDPortal {
         const curr_dashboard_title = document.getElementById('curr_dashboard_title');
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
-        const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/all");
+        var data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/all");
+        data = data.studentData || [];
         // Hide free and paid resources
         this.hidePortalData(data)
         // hide spinner
@@ -527,3 +528,4 @@ class NSDPortal {
         return el;
     }
 }
+
