@@ -276,7 +276,7 @@ class BriefsCheckout {
                 e.preventDefault();
                 this.showBriefsSelection();
                 window.scrollTo(0, 0);
-                this.activeBreadCrumb('student-details');
+                this.activeBreadCrumb('pdf-briefs');
             });
         }
 
@@ -625,3 +625,4 @@ class BriefsCheckout {
 
     }
 }
+
