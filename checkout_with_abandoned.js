@@ -1330,6 +1330,13 @@ class CheckOutWebflow {
 		// Get the container element
 		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
 
+		if(apiData.length == 0){
+			container2.style.display = "none";
+			container3.style.display = "none";
+			container4.style.display = "none";
+			return;
+		}
+
 		// sorting data by programDetailId
 		apiData.sort((a, b) => b.programDetailId - a.programDetailId);
 		
@@ -2291,3 +2298,4 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
