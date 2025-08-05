@@ -59,7 +59,7 @@ class BriefManager {
         this.elements.downloadPDF = document.querySelector('[data-brief="download-pdf"]');
         this.elements.downloadWord = document.querySelector('[data-brief="download-word"]');
         this.elements.pdfPreview = document.querySelector('[data-brief="pdf-preview"]');
-        this.elements.container = document.querySelector('.pdf-briefs-container');
+        this.elements.container = document.querySelector('.pdf-briefs-main-container');
     }
 
     checkEmptyState() {
@@ -150,3 +150,4 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
