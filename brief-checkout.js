@@ -555,7 +555,7 @@ class BriefsCheckout {
             productType: "brief",
             device: /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
             deviceUserAgent: navigator.userAgent,
-            successUrl: "https://www.bergendebate.com/members/" + this.data.memberId,
+            successUrl: "https://www.nsdebatecamp.com/members/" + this.data.memberId,
             cancelUrl: cancelUrl.href,
             // cancelUrl: "https://www.nsdebatecamp.com",
             source: "brief-checkout",
@@ -625,5 +625,6 @@ class BriefsCheckout {
 
     }
 }
+
 
 
