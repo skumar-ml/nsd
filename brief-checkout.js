@@ -25,6 +25,9 @@ class BriefsCheckout {
     }
 
     async getBriefs() {
+        const nextPage2Btn = document.getElementById('next_page_2');
+        nextPage2Btn.style.display = 'none';
+
         this.showLoading();
         try {
             const response = await this.fetchData('getBriefDetails');
@@ -32,6 +35,7 @@ class BriefsCheckout {
                 if (response.briefs.length === 0) {
                     this.showError('No briefs are currently available.');
                 } else {
+                    nextPage2Btn.style.display = 'block';
                     this.renderBriefs(response.briefs);
                 }
             } else {
@@ -76,7 +80,7 @@ class BriefsCheckout {
         const container = document.querySelector('[data-briefs-checkout="select-briefs"] .pdf-briefs-grid-wrapper');
         if (container) {
             container.innerHTML = `
-                <div style="text-align: center; padding: 40px; color: #666;">
+                <div style="text-align: center; padding: 40px; color: #666;grid-column: 1 / 4">
                     <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #d38d97; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                     <p style="margin-top: 20px;">Loading briefs...</p>
                 </div>
@@ -259,6 +263,8 @@ class BriefsCheckout {
             nextPage2Btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.showPaymentMethod();
+                // scroll top 
+                window.scrollTo(0, 0);
             });
         }
 
@@ -268,6 +274,7 @@ class BriefsCheckout {
             prevPage1Btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.showBriefsSelection();
+                window.scrollTo(0, 0);
             });
         }
 
@@ -443,7 +450,9 @@ class BriefsCheckout {
                 return sum;
             }, 0);
             let truncated = Math.floor(total * 100) / 100;
-            totalElement.textContent = `$${truncated}`;
+            // add comma in the truncated price
+            let formattedPrice = truncated.toLocaleString('en-US');
+            totalElement.textContent = `$${formattedPrice}`;
         }
     }
 
