@@ -32,6 +32,7 @@ class BriefManager {
 
     async init() {
         this.elements.container.style.display = 'none';
+        this.elements.spinner.style.display = 'block';
         try {
             const data = await this.fetchData(`getCompletedForm/${this.data.memberId}/current`);
             if (data && data.brief) {
@@ -42,10 +43,12 @@ class BriefManager {
                 this.$briefs = [];
             }
             this.elements.container.style.display = 'block';
+            this.elements.spinner.style.display = 'none';
         } catch (error) {
             console.error('Failed to initialize briefs:', error);
             this.$briefs = [];
             this.elements.container.style.display = 'none';
+            this.elements.spinner.style.display = 'none';
         }
 
 
@@ -60,6 +63,7 @@ class BriefManager {
         this.elements.downloadWord = document.querySelector('[data-brief="download-word"]');
         this.elements.pdfPreview = document.querySelector('[data-brief="pdf-preview"]');
         this.elements.container = document.querySelector('.pdf-briefs-main-container');
+        this.elements.spinner = document.getElementById('half-circle-spinner');
     }
 
     checkEmptyState() {
@@ -67,8 +71,10 @@ class BriefManager {
 
         if (this.$briefs.length === 0) {
             this.elements.container.style.display = 'none';
+            this.elements.spinner.style.display = 'block';
         } else {
             this.elements.container.style.display = 'block';
+            this.elements.spinner.style.display = 'none';
         }
     }
 
@@ -150,4 +156,3 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
-
