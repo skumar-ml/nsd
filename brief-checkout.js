@@ -265,6 +265,7 @@ class BriefsCheckout {
                 this.showPaymentMethod();
                 // scroll top 
                 window.scrollTo(0, 0);
+                this.activeBreadCrumb('pay-deposite');
             });
         }
 
@@ -275,6 +276,7 @@ class BriefsCheckout {
                 e.preventDefault();
                 this.showBriefsSelection();
                 window.scrollTo(0, 0);
+                this.activeBreadCrumb('student-details');
             });
         }
 
@@ -615,5 +617,11 @@ class BriefsCheckout {
         };
 
         xhr.send(JSON.stringify(checkoutData));
+    }
+    activeBreadCrumb(activeId) {
+        let breadCrumbList = document.querySelectorAll('.stepper-container ul li');
+        breadCrumbList.forEach(element => element.classList.remove('active'))
+        document.getElementById(activeId).classList.add('active')
+
     }
 }
