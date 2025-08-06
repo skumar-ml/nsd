@@ -1288,9 +1288,9 @@ class CheckOutWebflow {
 							add_to_card_btn.style.backgroundColor = "gray";
 							//add_to_card_btn.style.textDecoration = "underline";
 						})
-						while ($this.$suppPro.length == 0) {
+						//while ($this.$suppPro.length == 0) {
 							//console.log("$this.$suppPro.length", $this.$suppPro.length)
-						}
+						//}
 						setTimeout(() => {
 							const modal = document.getElementById('upsell-modal-1');
 							$this.hideUpSellModal(modal)
@@ -2299,5 +2299,6 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
 
 
