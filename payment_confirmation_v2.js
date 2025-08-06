@@ -541,6 +541,10 @@ class PaymentConfirmation {
         // loader icon code
 			
 			spinner.style.display = "none";
+		if(apiData.length == 0){
+			container2.style.display = "none";
+			return;
+		}
 	}
 	initSlickSlider() {
 		var $slider = $('.you-might_slick-slider');
@@ -709,3 +713,4 @@ class PaymentConfirmation {
     }
     
 }
+
