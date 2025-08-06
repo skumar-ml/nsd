@@ -54,6 +54,10 @@ class NSDPortal {
 	            ]
 	        );
 		data = data.studentData || [];
+		const briefsData = data.brief || [];
+	        if (briefsData.length > 0) {
+	            new BriefManager(briefsData)
+	        }
 	} catch (error) {
 		spinner.style.display = 'none';
         }
@@ -955,4 +959,5 @@ class NSDPortal {
         return el;
     }
 }
+
 
