@@ -1,87 +1,58 @@
 class BriefManager {
-    $briefs = [];
-    constructor(data) {
-        this.data = data;
+    constructor(briefs) {
+        this.$briefs = briefs;
         this.currentBriefIndex = 0;
         this.elements = {
-            selectBrief: null,
-            downloadPDF: null,
-            downloadWord: null,
-            pdfPreview: null,
-            container: null
+            selectBriefs: null,
+            downloadPDFs: null,
+            downloadWords: null,
+            pdfPreviews: null,
+            containers: null,
+            spinner: null
         };
-        this.checkEmptyState()
-        this.cacheElements();
         this.init();
     }
 
-    // Get API data with the help of endpoint
-    async fetchData(endpoint) {
-        try {
-            const response = await fetch(`${this.data.baseUrl}${endpoint}`);
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error fetching data:", error);
-            return null;
-        }
-    }
+
 
     async init() {
-        this.elements.container.style.display = 'none';
-        this.elements.spinner.style.display = 'block';
-        try {
-            const data = await this.fetchData(`getCompletedForm/${this.data.memberId}/current`);
-            if (data && data.brief) {
-                this.$briefs = data.brief;
-                console.log('Briefs loaded:', this.$briefs);
-            } else {
-                console.log('No briefs data available');
-                this.$briefs = [];
-            }
-            this.elements.container.style.display = 'block';
-            this.elements.spinner.style.display = 'none';
-        } catch (error) {
-            console.error('Failed to initialize briefs:', error);
-            this.$briefs = [];
-            this.elements.container.style.display = 'none';
-            this.elements.spinner.style.display = 'none';
-        }
-
-
+        this.cacheElements();
         this.checkEmptyState();
         this.bindEvents();
         this.updateAllElements();
     }
 
     cacheElements() {
-        this.elements.selectBrief = document.querySelector('[data-brief="select-brief"]');
-        this.elements.downloadPDF = document.querySelector('[data-brief="download-pdf"]');
-        this.elements.downloadWord = document.querySelector('[data-brief="download-word"]');
-        this.elements.pdfPreview = document.querySelector('[data-brief="pdf-preview"]');
-        this.elements.container = document.querySelector('.pdf-briefs-main-container');
+        this.elements.selectBriefs = document.querySelectorAll('[data-brief="select-brief"]');
+        this.elements.downloadPDFs = document.querySelectorAll('[data-brief="download-pdf"]');
+        this.elements.downloadWords = document.querySelectorAll('[data-brief="download-word"]');
+        this.elements.pdfPreviews = document.querySelectorAll('[data-brief="pdf-preview"]');
+        this.elements.containers = document.querySelectorAll('.pdf-briefs-main-container');
         this.elements.spinner = document.getElementById('half-circle-spinner');
     }
 
     checkEmptyState() {
-        if (!this.elements.container) return;
+        if (!this.elements.containers || this.elements.containers.length === 0) return;
 
         if (this.$briefs.length === 0) {
-            this.elements.container.style.display = 'none';
+            this.elements.containers.forEach(container => {
+                container.style.display = 'none';
+            });
             this.elements.spinner.style.display = 'block';
         } else {
-            this.elements.container.style.display = 'block';
+            this.elements.containers.forEach(container => {
+                container.style.display = 'block';
+            });
             this.elements.spinner.style.display = 'none';
         }
     }
 
     bindEvents() {
-        if (this.elements.selectBrief) {
-            this.elements.selectBrief.addEventListener('change', (e) => {
-                this.setCurrentBrief(parseInt(e.target.value));
+        if (this.elements.selectBriefs && this.elements.selectBriefs.length > 0) {
+            this.elements.selectBriefs.forEach(select => {
+                select.addEventListener('change', (e) => {
+                    this.setCurrentBrief(parseInt(e.target.value));
+                });
             });
         }
     }
@@ -98,40 +69,46 @@ class BriefManager {
     }
 
     updateBriefSelect() {
-        if (!this.elements.selectBrief) return;
+        if (!this.elements.selectBriefs || this.elements.selectBriefs.length === 0) return;
 
-        this.elements.selectBrief.innerHTML = '';
-        this.$briefs.forEach((brief, index) => {
-            const option = document.createElement('option');
-            option.value = index;
-            option.textContent = brief.title;
-            this.elements.selectBrief.appendChild(option);
+        this.elements.selectBriefs.forEach(select => {
+            select.innerHTML = '';
+            this.$briefs.forEach((brief, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = brief.title;
+                select.appendChild(option);
+            });
+            select.value = this.currentBriefIndex;
         });
-        this.elements.selectBrief.value = this.currentBriefIndex;
     }
 
     updateDownloadPDF() {
-        if (!this.elements.downloadPDF) return;
+        if (!this.elements.downloadPDFs || this.elements.downloadPDFs.length === 0) return;
 
         const currentBrief = this.getCurrentBrief();
         if (currentBrief) {
-            this.elements.downloadPDF.href = currentBrief.pdf_url;
-            //this.elements.downloadPDF.textContent = `Download PDF - ${currentBrief.title}`;
+            this.elements.downloadPDFs.forEach(link => {
+                link.href = currentBrief.pdf_url;
+                link.setAttribute('download', true);
+            });
         }
     }
 
     updateDownloadWord() {
-        if (!this.elements.downloadWord) return;
+        if (!this.elements.downloadWords || this.elements.downloadWords.length === 0) return;
 
         const currentBrief = this.getCurrentBrief();
         if (currentBrief) {
-            this.elements.downloadWord.href = currentBrief.doc_url;
-            //this.elements.downloadWord.textContent = `Download WORD - ${currentBrief.title}`;
+            this.elements.downloadWords.forEach(link => {
+                link.href = currentBrief.doc_url;
+                link.setAttribute('download', true);
+            });
         }
     }
 
     updatePDFPreview() {
-        if (!this.elements.pdfPreview) return;
+        if (!this.elements.pdfPreviews || this.elements.pdfPreviews.length === 0) return;
 
         const currentBrief = this.getCurrentBrief();
         if (currentBrief) {
@@ -145,7 +122,9 @@ class BriefManager {
             //     }
             // }
 
-            this.elements.pdfPreview.src = previewUrl;
+            this.elements.pdfPreviews.forEach(iframe => {
+                iframe.src = previewUrl;
+            });
         }
     }
 
