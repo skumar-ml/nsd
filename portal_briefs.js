@@ -90,7 +90,7 @@ class BriefManager {
         if (currentBrief) {
             this.elements.downloadPDFs.forEach(link => {
                 link.href = currentBrief.pdf_url;
-                link.setAttribute('download', true);
+                link.setAttribute('target', "_blank");
             });
         }
     }
@@ -102,7 +102,7 @@ class BriefManager {
         if (currentBrief) {
             this.elements.downloadWords.forEach(link => {
                 link.href = currentBrief.doc_url;
-                link.setAttribute('download', true);
+                link.setAttribute('target', "_blank");
             });
         }
     }
@@ -135,3 +135,4 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
