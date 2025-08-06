@@ -53,8 +53,8 @@ class NSDPortal {
 	                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
 	            ]
 	        );
+		const briefsData = data.brief || []; 
 		data = data.studentData || [];
-		const briefsData = data.brief || [];
 	        if (briefsData.length > 0) {
 	            new BriefManager(briefsData)
 	        }
@@ -959,5 +959,6 @@ class NSDPortal {
         return el;
     }
 }
+
 
 
