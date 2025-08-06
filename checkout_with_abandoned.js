@@ -616,7 +616,7 @@ class CheckOutWebflow {
 					}
 					$this.hideAndShowWhyFamilies('why-families-div', 'none')
 					$this.hideAndShowByClass('rated-debate-banner', 'none')
-					var sliderData = this.$suppPro = this.$suppPro.filter(i => i.programDetailId != 21);
+					var sliderData = this.$suppPro = $this.$suppPro.filter(i => i.programDetailId != 21);
 					if(sliderData.length > 0){
 					      $this.hideShowDivById('checkout-supplimentary-data-2', 'block')
 					      $this.hideShowDivById('checkout-supplimentary-data-desktop', 'block')
@@ -2302,6 +2302,7 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
 
 
 
