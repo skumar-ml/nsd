@@ -123,7 +123,7 @@ class BriefManager {
             // }
 
             this.elements.pdfPreviews.forEach(iframe => {
-                iframe.src = previewUrl;
+                iframe.src = previewUrl+"?toolbar=0";
             });
         }
     }
@@ -135,4 +135,5 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
 
