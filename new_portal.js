@@ -41,8 +41,10 @@ class NSDPortal {
         const nsdSuppDataPortal = document.getElementById('nsdSuppDataPortal');
         const curr_dashboard_title = document.getElementById('curr_dashboard_title');
         const supp_dashboard_title = document.getElementById('supp_dashboard_title');
+	const nsdPortal = document.getElementById('nsdPortal');
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
+	nsdPortal.style.display = 'none';
         // const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
 	 var data = [];
 	 var invoiceData = [];
@@ -71,6 +73,7 @@ class NSDPortal {
             nsdSuppDataPortal.style.display = 'block';
             curr_dashboard_title.style.display = 'block';
             supp_dashboard_title.style.display = 'block';
+	    nsdPortal.style.display = 'block';
         } 
         // create portal student program tabs
         //this.createPortalTabs(data);
@@ -964,6 +967,7 @@ class NSDPortal {
         return el;
     }
 }
+
 
 
 
