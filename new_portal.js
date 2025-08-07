@@ -46,14 +46,15 @@ class NSDPortal {
         // const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
 	 var data = [];
 	 var invoiceData = [];
-	 try {
+	 var briefsData = []; 
+	try {
 		//Invoice Changes, Calling invoice and form API 
 		[data, invoiceData] = await Promise.all(
 	            [this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current"),
 	                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
 	            ]
 	        );
-		const briefsData = data.brief || []; 
+		briefsData = data.brief || []; 
 		data = data.studentData || [];
 	        if (briefsData.length > 0) {
 	            new BriefManager(briefsData)
@@ -62,13 +63,15 @@ class NSDPortal {
 		spinner.style.display = 'none';
         }
         // Hide free and paid resources
-        this.hidePortalData(data)
+        this.hidePortalData(data, briefsData)
         // hide spinner
         spinner.style.display = 'none';
         // display supplementary program dom element 
-        nsdSuppDataPortal.style.display = 'block';
-        curr_dashboard_title.style.display = 'block';
-        supp_dashboard_title.style.display = 'block';
+        if(data.length> 0){
+            nsdSuppDataPortal.style.display = 'block';
+            curr_dashboard_title.style.display = 'block';
+            supp_dashboard_title.style.display = 'block';
+        } 
         // create portal student program tabs
         //this.createPortalTabs(data);
 
@@ -82,8 +85,10 @@ class NSDPortal {
         Webflow.require('tabs').redraw();
     }
     // Hide free and paid resources after api response data
-    hidePortalData(responseText) {
-        if (responseText == "No data Found") {
+    hidePortalData(responseText, briefsData) {
+        if (briefsData.length > 0) {
+            document.getElementById("paid-resources").style.display = "block";
+        } else if (responseText == "No data Found") {
             document.getElementById("free-resources").style.display = "block";
             // commented for update profile modal 
             // setTimeout(() => {
@@ -959,6 +964,7 @@ class NSDPortal {
         return el;
     }
 }
+
 
 
 
