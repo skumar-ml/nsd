@@ -209,6 +209,7 @@ class BriefsCheckout {
         console.log('BriefsCheckout initialized');
         this.setupNavigation();
         this.setInitialState();
+        this.updateOrderDetail();
     }
 
     setInitialState() {
@@ -625,6 +626,7 @@ class BriefsCheckout {
 
     }
 }
+
 
 
 
