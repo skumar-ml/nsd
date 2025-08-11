@@ -453,7 +453,7 @@ class BriefsCheckout {
             }, 0);
             let truncated = Math.floor(total * 100) / 100;
             // add comma in the truncated price
-            let formattedPrice = truncated.toLocaleString('en-US');
+            let formattedPrice = truncated.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             totalElement.textContent = `$${formattedPrice}`;
         }
     }
@@ -625,6 +625,7 @@ class BriefsCheckout {
 
     }
 }
+
 
 
 
