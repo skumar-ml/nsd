@@ -232,3 +232,28 @@ input:-webkit-autofill:focus {
   background: #A51C30;
   font-size: 10px;
 } 
+
+/* CSS for screens with width <= 568px */
+@media (max-width: 568px) {
+  .slick-slide img {
+    display: inline-block;
+    margin: 0 auto;
+  }
+}
+
+/* Remove autofill background color in WebKit browsers */
+input:-webkit-autofill {
+  background-color: transparent !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
+
+#Type-3,
+#student-age-2 {
+  outline: none !important;
+  /* Removes default blue outline */
+}
+
+input:focus,
+input:-webkit-autofill:focus {
+  outline: 1px solid #a51c30 !important;
+}
