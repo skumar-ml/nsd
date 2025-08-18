@@ -1,6 +1,6 @@
 class BriefsCheckout {
     constructor(data) {
-        this.data = data;              // Configuration + user/session data (apiBaseURL, memberId, accountEmail, etc.)
+        this.data = data;              // Configuration + webflow data (apiBaseURL, memberId, accountEmail, etc.)
         this.selectedBriefs = [];      // Track IDs of selected briefs
         this.init();
         this.getBriefs();              // Fetch available briefs on init
@@ -480,3 +480,4 @@ class BriefsCheckout {
     resetPayNowButtons() {
         document.querySelectorAll('[data-briefs-checkout="pay-now"], #pay-now-link-3')
             .forEach(el => { el.innerHTML = "Pay Now"; el.style.pointer
+
