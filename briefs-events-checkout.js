@@ -1117,8 +1117,8 @@ class BriefsEventsCheckout {
             device: /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
             deviceUserAgent: navigator.userAgent,
             successUrl: "https://www.nsdebatecamp.com/members/" + this.data.memberId + "?briefsPayment=true",
-            //cancelUrl: cancelUrl.href,
-            cancelUrl: "https://www.nsdebatecamp.com",
+            cancelUrl: cancelUrl.href,
+            //cancelUrl: "https://www.nsdebatecamp.com",
             source: "brief-checkout",
             utm_source: (localUtmSource != null) ? localUtmSource : "",
             paymentId: ""
