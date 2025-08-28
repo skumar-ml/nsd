@@ -519,13 +519,13 @@ class BriefsEventsCheckout {
                 }
                 annualAccordion.querySelector('.annual-subs-accordion-item').classList.add('open')
                 if (annualRadio) annualRadio.checked = true;
-                if (annualIcon) annualIcon.style.transform = 'rotate(180deg)';
+                //if (annualIcon) annualIcon.style.transform = 'rotate(180deg)';
             } else {
                 // Close annual accordion
                 if (annualBody) annualBody.style.maxHeight = '0px';
                 annualAccordion.querySelector('.annual-subs-accordion-item').classList.remove('open')
                 if (annualRadio) annualRadio.checked = false;
-                if (annualIcon) annualIcon.style.transform = 'rotate(0deg)';
+                //if (annualIcon) annualIcon.style.transform = 'rotate(0deg)';
             }
         }
 
@@ -548,13 +548,13 @@ class BriefsEventsCheckout {
                 }
                 singleAccordion.querySelector('.briefs-accordion-item').classList.add('open')
                 if (singleRadio) singleRadio.checked = true;
-                if (singleIcon) singleIcon.style.transform = 'rotate(180deg)';
+                //if (singleIcon) singleIcon.style.transform = 'rotate(180deg)';
             } else {
                 // Close single accordion
                 if (singleBody) singleBody.style.maxHeight = '0px';
                 singleAccordion.querySelector('.briefs-accordion-item').classList.remove('open')
                 if (singleRadio) singleRadio.checked = false;
-                if (singleIcon) singleIcon.style.transform = 'rotate(0deg)';
+                //if (singleIcon) singleIcon.style.transform = 'rotate(0deg)';
             }
         }
 
