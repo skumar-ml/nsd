@@ -152,17 +152,17 @@ class BriefsEventsCheckout {
         const singleContainer = document.querySelector('[data-brief="single-briefs-accordion"] .briefs-accordion-item-body');
 
         const loadingHTML = `
-            <div style="text-align: center; padding: 40px; color: #666;width: 100%;">
-                <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #d38d97; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <p style="margin-top: 20px;">Loading content...</p>
-            </div>
-            <style>
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            </style>
-        `;
+    <div style="text-align: center; padding: 40px; color: #666;width: 100%;">
+        <div style="display: inline-block; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #d38d97; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+        <p style="margin-top: 20px;">Loading content...</p>
+    </div>
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+`;
 
         if (annualContainer) {
             annualContainer.innerHTML = loadingHTML;
@@ -178,18 +178,18 @@ class BriefsEventsCheckout {
         card.dataset.briefId = brief.briefId;
 
         card.innerHTML = `
-            <div class="pdf-brief-flex-wrapper">
-                <div>
-                    <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/675c15fe5f8aea4cf0c7c9f5_check_box.svg" alt="" class="check_inactive-icon" ${isSelected ? 'style="display: none;"' : ''} />
-                    <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/675c15fe5f8aea4cf0c7c9fb_check%20(3).svg" alt="" class="check_active-icon" ${isSelected ? '' : 'style="display: none;"'} />
-                </div>
-                <p class="pdf-briefs-title">${brief.title}<br /></p>
-                <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/688c7c07e7e21bc1cfcce250_pdf-brief.svg" loading="lazy" alt="" class="pdf-brief-icon" />
-            </div>
-            <p class="pdf-brief-text-medium">${brief.description}<br /></p>
-            <p class="pdf-brief-text-small">Topic: ${brief.topic}<br /></p>
-            <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}<br /></p>
-        `;
+    <div class="pdf-brief-flex-wrapper">
+        <div>
+            <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/675c15fe5f8aea4cf0c7c9f5_check_box.svg" alt="" class="check_inactive-icon" ${isSelected ? 'style="display: none;"' : ''} />
+            <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/675c15fe5f8aea4cf0c7c9fb_check%20(3).svg" alt="" class="check_active-icon" ${isSelected ? '' : 'style="display: none;"'} />
+        </div>
+        <p class="pdf-briefs-title">${brief.title}<br /></p>
+        <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/688c7c07e7e21bc1cfcce250_pdf-brief.svg" loading="lazy" alt="" class="pdf-brief-icon" />
+    </div>
+    <p class="pdf-brief-text-medium">${brief.description}<br /></p>
+    <p class="pdf-brief-text-small">Topic: ${brief.topic}<br /></p>
+    <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}<br /></p>
+`;
 
         // Add click handler
         card.addEventListener('click', () => this.toggleBriefSelection(brief.briefId, card));
@@ -209,27 +209,27 @@ class BriefsEventsCheckout {
 
         // Generate features HTML from event object
         const featuresHTML = event.features ? event.features.map(feature => `
-            <div class="annual-subs-flex-wrapper">
-                <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/68af3f0237cfa9519254cbe6_check_circle%20(2).svg" loading="lazy" alt="">
-                <div class="annual-subs-text-regular">${feature}</div>
-            </div>
-        `).join('') : '';
+    <div class="annual-subs-flex-wrapper">
+        <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/68af3f0237cfa9519254cbe6_check_circle%20(2).svg" loading="lazy" alt="">
+        <div class="annual-subs-text-regular">${feature}</div>
+    </div>
+`).join('') : '';
 
         // Generate saved amount HTML if available
         const savedAmountHTML = event.saved_amount ? `
-            <div class="annual-subs-save-text">Save $${parseFloat(event.saved_amount).toFixed(2)}</div>
-        ` : '';
+    <div class="annual-subs-save-text">Save $${parseFloat(event.saved_amount).toFixed(2)}</div>
+` : '';
 
         card.innerHTML = `
-            <div class="annual-subs-type">${event.title}</div>
-            <div class="annual-subs-price"><span class="price-red">$${parseFloat(event.price).toFixed(2)}</span><span class="price-line">/</span><span class="price-text-medium">Year</span></div>
-            ${savedAmountHTML}
-            <div class="annual-subs-text">${event.description}</div>
-            <div class="annual-subs-features-block">
-                ${featuresHTML}
-            </div>
-            <a href="#" class="main-button w-button">${isSelected ? 'Remove' : 'Add to Cart'}</a>
-        `;
+    <div class="annual-subs-type">${event.title}</div>
+    <div class="annual-subs-price"><span class="price-red">$${parseFloat(event.price).toFixed(2)}</span><span class="price-line">/</span><span class="price-text-medium">Year</span></div>
+    ${savedAmountHTML}
+    <div class="annual-subs-text">${event.description}</div>
+    <div class="annual-subs-features-block">
+        ${featuresHTML}
+    </div>
+    <a href="#" class="main-button w-button">${isSelected ? 'Remove' : 'Add to Cart'}</a>
+`;
 
         // Add click handler
         card.addEventListener('click', () => this.toggleEventSelection(event.eventId, card));
@@ -442,10 +442,10 @@ class BriefsEventsCheckout {
         const singleContainer = document.querySelector('[data-brief="single-briefs-accordion"] .briefs-accordion-item-body');
 
         const errorHTML = `
-            <div style="text-align: center; padding: 20px; color: #666;">
-                <p>${message}</p>
-            </div>
-        `;
+    <div style="text-align: center; padding: 20px; color: #666;">
+        <p>${message}</p>
+    </div>
+`;
 
         if (annualContainer) {
             annualContainer.innerHTML = errorHTML;
@@ -463,7 +463,7 @@ class BriefsEventsCheckout {
 
     setupAccordion() {
         // Set default accordion as selected
-        this.selectAccordion('annual-events-accordion');
+        this.selectAccordion('annual-events-accordion', "onload");
 
         // Add click event listeners to accordion headers
         const annualAccordion = document.querySelector('[data-brief="annual-events-accordion"]');
@@ -488,14 +488,18 @@ class BriefsEventsCheckout {
         }
     }
 
-    selectAccordion(accordionType) {
+    selectAccordion(accordionType, type = "") {
         // Check if the same accordion is already selected and open
         // Commented out to allow multiple accordions to be open at the same time
-        // if (this.selectedAccordion === accordionType) {
-        //     // Toggle the current accordion (close it if it's open)
-        //     this.toggleCurrentAccordion(accordionType);
-        //     return;
-        // }
+        if (this.selectedAccordion === accordionType && type != "onload") {
+            // open single briefs if accordionType is annual-events-accordion   
+            if (accordionType === 'annual-events-accordion') {
+                this.selectAccordion('single-briefs-accordion');
+            } else {
+                this.selectAccordion('annual-events-accordion');
+            }
+            return;
+        }
 
         // Update selected accordion
         this.selectedAccordion = accordionType;
@@ -907,9 +911,9 @@ class BriefsEventsCheckout {
                 const itemElement = document.createElement('div');
                 itemElement.className = 'brief-flex-wrapper';
                 itemElement.innerHTML = `
-            <p class="dm-sans brief-medium">${title} (Brief)</p>
-            <p class="dm-sans brief-medium">${displayPrice}</p>
-        `;
+    <p class="dm-sans brief-medium">${title} (Brief)</p>
+    <p class="dm-sans brief-medium">${displayPrice}</p>
+`;
 
                 briefsContainer.parentElement.insertBefore(itemElement, briefsContainer.nextSibling);
                 addedItems.add(`brief-${briefId}`);
@@ -939,9 +943,9 @@ class BriefsEventsCheckout {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'brief-flex-wrapper';
                     itemElement.innerHTML = `
-                <p class="dm-sans brief-medium">${title} (Event)</p>
-                <p class="dm-sans brief-medium">${displayPrice}</p>
-            `;
+        <p class="dm-sans brief-medium">${title} (Event)</p>
+        <p class="dm-sans brief-medium">${displayPrice}</p>
+    `;
 
                     briefsContainer.parentElement.insertBefore(itemElement, briefsContainer.nextSibling);
                     addedItems.add(`event-${eventId}`);
