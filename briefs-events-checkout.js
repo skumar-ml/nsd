@@ -204,7 +204,7 @@ class BriefsEventsCheckout {
 
     createEventCard(event, isSelected = false) {
         const card = document.createElement('div');
-        card.className = `annual-subs-card ${isSelected ? 'selected' : ''}`;
+        card.className = `annual-subs-card ${isSelected ? 'red-border' : ''}`;
         card.dataset.eventId = event.eventId;
 
         // Generate features HTML from event object
@@ -309,7 +309,7 @@ class BriefsEventsCheckout {
         // Clear visual selection from all event cards
         const eventCards = document.querySelectorAll('[data-event-id]');
         eventCards.forEach(card => {
-            card.classList.remove('selected');
+            card.classList.remove('red-border');
 
             // Update button text to "Add to Cart"
             const button = card.querySelector('.main-button');
@@ -320,11 +320,10 @@ class BriefsEventsCheckout {
     }
 
     toggleEventSelection(eventId, card) {
-        const isSelected = card.classList.contains('selected');
-
+        const isSelected = card.classList.contains('red-border');
         if (isSelected) {
             // Deselect
-            card.classList.remove('selected');
+            card.classList.remove('red-border');
             this.selectedEvents = this.selectedEvents.filter(id => id !== eventId);
 
             // Update button text to "Add to Cart"
@@ -336,8 +335,11 @@ class BriefsEventsCheckout {
             // Clear any selected briefs first (mutual exclusion)
             this.clearSelectedBriefs();
 
+            // Clear any previously selected Annual Subscription Plan cards
+            this.clearSelectedEvents();
+
             // Select
-            card.classList.add('selected');
+            card.classList.add('red-border');
             this.selectedEvents.push(eventId);
 
             // Update button text to "Remove"
