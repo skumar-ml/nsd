@@ -522,7 +522,7 @@ class BriefsEventsCheckout {
                     //setTimeout(() => {
                         //annualBody.style.maxHeight = annualBody.scrollHeight + 'px';
                     //}, 10);
-                    annualBody.style.display = 'block';
+                    annualBody.style.display = 'flex';
                     annualBody.style.height = 'auto';
                     annualBody.style.opacity = '1';
                 }
@@ -558,7 +558,7 @@ class BriefsEventsCheckout {
                     //setTimeout(() => {
                         //singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
                     //}, 10);
-                    singleBody.style.display = 'block';
+                    singleBody.style.display = 'flex';
                     singleBody.style.height = 'auto';
                     singleBody.style.opacity = '1';
                 }
@@ -1213,5 +1213,6 @@ class BriefsEventsCheckout {
         // feth
     }
 }
+
 
 
