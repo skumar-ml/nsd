@@ -517,18 +517,25 @@ class BriefsEventsCheckout {
                 // Open annual accordion
                 if (annualBody) {
                     // Set a temporary height to ensure content is rendered
-                    annualBody.style.maxHeight = 'none';
+                    //annualBody.style.maxHeight = 'none';
                     // Use setTimeout to ensure content is fully rendered before calculating height
-                    setTimeout(() => {
-                        annualBody.style.maxHeight = annualBody.scrollHeight + 'px';
-                    }, 100);
+                    //setTimeout(() => {
+                        //annualBody.style.maxHeight = annualBody.scrollHeight + 'px';
+                    //}, 10);
+                    annualBody.style.display = 'block';
+                    annualBody.style.height = 'auto';
+                    annualBody.style.opacity = '1';
                 }
                 annualAccordion.querySelector('.annual-subs-accordion-item').classList.add('open')
                 if (annualRadio) annualRadio.checked = true;
                 //if (annualIcon) annualIcon.style.transform = 'rotate(180deg)';
             } else {
                 // Close annual accordion
-                if (annualBody) annualBody.style.maxHeight = '0px';
+                if (annualBody) {
+                    annualBody.style.display = 'none';
+                    annualBody.style.height = '0';
+                    annualBody.style.opacity = '0';
+                }
                 annualAccordion.querySelector('.annual-subs-accordion-item').classList.remove('open')
                 if (annualRadio) annualRadio.checked = false;
                 //if (annualIcon) annualIcon.style.transform = 'rotate(0deg)';
@@ -546,18 +553,25 @@ class BriefsEventsCheckout {
                 // Open single accordion
                 if (singleBody) {
                     // Set a temporary height to ensure content is rendered
-                    singleBody.style.maxHeight = 'none';
+                    //singleBody.style.maxHeight = 'none';
                     // Use setTimeout to ensure content is fully rendered before calculating height
-                    setTimeout(() => {
-                        singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
-                    }, 100);
+                    //setTimeout(() => {
+                        //singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
+                    //}, 10);
+                    singleBody.style.display = 'block';
+                    singleBody.style.height = 'auto';
+                    singleBody.style.opacity = '1';
                 }
                 singleAccordion.querySelector('.briefs-accordion-item').classList.add('open')
                 if (singleRadio) singleRadio.checked = true;
                 //if (singleIcon) singleIcon.style.transform = 'rotate(180deg)';
             } else {
                 // Close single accordion
-                if (singleBody) singleBody.style.maxHeight = '0px';
+                if (singleBody) {
+                    singleBody.style.display = 'none';
+                    singleBody.style.height = '0';
+                    singleBody.style.opacity = '0';
+                }
                 singleAccordion.querySelector('.briefs-accordion-item').classList.remove('open')
                 if (singleRadio) singleRadio.checked = false;
                 //if (singleIcon) singleIcon.style.transform = 'rotate(0deg)';
@@ -1199,4 +1213,5 @@ class BriefsEventsCheckout {
         // feth
     }
 }
+
 
