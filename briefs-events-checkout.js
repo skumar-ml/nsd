@@ -521,7 +521,7 @@ class BriefsEventsCheckout {
                     // Use setTimeout to ensure content is fully rendered before calculating height
                     setTimeout(() => {
                         annualBody.style.maxHeight = annualBody.scrollHeight + 'px';
-                    }, 10);
+                    }, 100);
                 }
                 annualAccordion.querySelector('.annual-subs-accordion-item').classList.add('open')
                 if (annualRadio) annualRadio.checked = true;
@@ -550,7 +550,7 @@ class BriefsEventsCheckout {
                     // Use setTimeout to ensure content is fully rendered before calculating height
                     setTimeout(() => {
                         singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
-                    }, 10);
+                    }, 100);
                 }
                 singleAccordion.querySelector('.briefs-accordion-item').classList.add('open')
                 if (singleRadio) singleRadio.checked = true;
@@ -1199,3 +1199,4 @@ class BriefsEventsCheckout {
         // feth
     }
 }
+
