@@ -217,12 +217,12 @@ class BriefsEventsCheckout {
 
         // Generate saved amount HTML if available
         const savedAmountHTML = event.saved_amount ? `
-    <div class="annual-subs-save-text">Save $${parseFloat(event.saved_amount).toFixed(2)}</div>
+    <div class="annual-subs-save-text">Save $${parseFloat(event.saved_amount).toFixed(0)}</div>
 ` : '';
 
         card.innerHTML = `
     <div class="annual-subs-type">${event.title}</div>
-    <div class="annual-subs-price"><span class="price-red">$${parseFloat(event.price).toFixed(2)}</span><span class="price-line">/</span><span class="price-text-medium">Year</span></div>
+    <div class="annual-subs-price"><span class="price-red">$${parseFloat(event.price).toFixed(2)}</span><span class="price-line">/</span><span class="price-text-medium">year</span></div>
     ${savedAmountHTML}
     <div class="annual-subs-text">${event.description}</div>
     <div class="annual-subs-features-block">
@@ -1213,6 +1213,7 @@ class BriefsEventsCheckout {
         // feth
     }
 }
+
 
 
 
