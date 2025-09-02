@@ -959,7 +959,7 @@ class BriefsEventsCheckout {
                     const itemElement = document.createElement('div');
                     itemElement.className = 'brief-flex-wrapper';
                     itemElement.innerHTML = `
-        <p class="dm-sans brief-medium">${title} (Event)</p>
+        <p class="dm-sans brief-medium">${title}</p>
         <p class="dm-sans brief-medium">${displayPrice}</p>
     `;
 
@@ -1213,6 +1213,7 @@ class BriefsEventsCheckout {
         // feth
     }
 }
+
 
 
 
