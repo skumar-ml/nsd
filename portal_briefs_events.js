@@ -83,6 +83,10 @@ class BriefManager {
             // Get recommended subscription based on user's briefs
             const recommendedSubscription = this.getRecommendedSubscription(subscriptionOptions, briefAnalysis);
             
+            const getAccessBriefsContainer = document.querySelector('.get-access-briefs');
+            if(recommendedSubscription){
+                getAccessBriefsContainer.style.display = 'block';
+            }
             // Update the upsell elements with dynamic content
             this.updateUpsellElements(recommendedSubscription, briefAnalysis);
             
@@ -103,9 +107,9 @@ class BriefManager {
             discountPerBrief: 25,
             totalDiscount: 0
         };
-
+        var briefsData =  this.$briefs.filter(option => !option.subscription);
         // Analyze each brief to determine types
-        this.$briefs.forEach(brief => {
+        briefsData.forEach(brief => {
             const title = brief.title || '';
             if (title.includes('(LD)')) {
                 analysis.hasLD = true;
@@ -144,7 +148,7 @@ class BriefManager {
             );
         }
 
-        return recommended || subscriptionOptions[0]; // Fallback to first option
+        return recommended; // Fallback to first option
     }
 
     /**
@@ -511,3 +515,4 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
