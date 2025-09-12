@@ -104,7 +104,7 @@ class BriefManager {
                 const analysis = {
                     hasLD: false,
                     hasPF: false,
-                    totalBriefs: this.$briefs.length,
+                    totalBriefs: this.$briefs.filter(option => !option.subscription).length,
                     totalSpent: 0,
                     discountPerBrief: 25,
                     totalDiscount: 0
@@ -530,3 +530,4 @@ class BriefManager {
                 this.updatePDFPreview();
             }
         }
+
