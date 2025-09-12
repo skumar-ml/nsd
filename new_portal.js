@@ -59,7 +59,11 @@ class NSDPortal {
 		briefsData = data.brief || []; 
 		data = data.studentData || [];
 	        if (briefsData.length > 0) {
-	            new BriefManager(briefsData)
+	            new BriefManager(briefsData, {
+					 "webflowMemberId": this.webflowMemberId,
+					 "accountEmail": this.accountEmail,
+					 "baseUrl": this.baseUrl
+				})
 	        }
 	} catch (error) {
 		spinner.style.display = 'none';
@@ -967,6 +971,7 @@ class NSDPortal {
         return el;
     }
 }
+
 
 
 
