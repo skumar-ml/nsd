@@ -317,7 +317,7 @@ class BriefManager {
             device: /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
             deviceUserAgent: navigator.userAgent,
             successUrl: "https://www.nsdebatecamp.com/members/" + this.data.memberId + "?briefsPayment=true",
-            cancelUrl: "https://www.nsdebatecamp.com",
+            cancelUrl: cancelUrl,
             source: "brief-checkout",
             utm_source: (localUtmSource != null) ? localUtmSource : "",
             paymentId: "",
@@ -515,4 +515,5 @@ class BriefManager {
         this.updatePDFPreview();
     }
 }
+
 
