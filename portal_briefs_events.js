@@ -1,4 +1,4 @@
- class BriefManager {
+class BriefManager {
             constructor(briefs, data) {
                 // Array of briefs (each brief should have: title, pdf_url, doc_url)
                 this.$briefs = briefs;
@@ -236,7 +236,7 @@
                             originalPrice: subscription.price,
                             discount: briefAnalysis.totalDiscount,
                             userBriefs: this.$briefs.map(brief => brief.briefId || brief.title),
-                            memberId: this.data?.memberId
+                            memberId: this.data?.webflowMemberId
                         })
                     });
 
@@ -319,11 +319,11 @@
                     email: this.data.accountEmail || "user@example.com",
                     briefIds: [], // No individual briefs for subscription
                     briefEventIds: [this.currentRecommendedSubscription.eventId],
-                    memberId: this.data.memberId,
+                    memberId: this.data.webflowMemberId,
                     productType: "briefPortal",
                     device: /Mobi|Android/i.test(navigator.userAgent) ? "Mobile" : "Desktop",
                     deviceUserAgent: navigator.userAgent,
-                    successUrl: "https://www.nsdebatecamp.com/members/" + this.data.memberId + "?briefsPayment=true",
+                    successUrl: "https://www.nsdebatecamp.com/members/" + this.data.webflowMemberId + "?briefsPayment=true",
                     cancelUrl: cancelUrl,
                     source: "brief-checkout",
                     utm_source: (localUtmSource != null) ? localUtmSource : "",
