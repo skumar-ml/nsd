@@ -4,7 +4,21 @@ class BriefsCheckout {
         this.selectedBriefs = [];      // Track IDs of selected briefs
         this.init();
         this.getBriefs();              // Fetch available briefs on init
+        this.modal = document.getElementById("briefs-preview-modal");
+        this.iframe = document.getElementById("preview-frame");
+        this.closeBtn = document.getElementById("close-preview");
+        this.addCloseModalHandler();
     }
+
+        // Add this new method
+  addCloseModalHandler() {
+    if (this.closeBtn) {
+      this.closeBtn.addEventListener("click", () => {
+        this.modal.style.display = "none";
+        this.iframe.src = "";
+      });
+    }
+  }
 
     /**
      * Generic API fetcher
@@ -112,13 +126,49 @@ class BriefsCheckout {
             </div>
             <p class="pdf-brief-text-medium">${brief.description}</p>
             <p class="pdf-brief-text-small">Topic: ${brief.topic}</p>
-            <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}</p>
+            <div class="view-pdf-brief-price-flex-wrapper"> 
+            <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}<br /></p>
+            <a href="#" data-brief-id="${brief.briefId}" class="main-button briefs-preview-btn w-button">View PDF Brief</a>
+            </div>
         `;
 
         card.addEventListener('click', () => this.toggleBriefSelection(brief.briefId, card));
         if (isSelected) this.selectedBriefs.push(brief.briefId);
 
         return card;
+    }
+
+    attachPreviewHandlers(briefs) {
+      document.querySelectorAll(".briefs-preview-btn").forEach((button) => {
+        button.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          const briefId = button.dataset.briefId;
+          const brief = briefs.find((b) => b.briefId == briefId);
+
+          if (!brief) return;
+
+          const originalText = button.textContent;
+          button.textContent = "Loading...";
+          button.disabled = true;
+
+          if (brief.preview_pdf_url) {
+            this.modal.style.display = "flex";
+            this.iframe.src = brief.preview_pdf_url;
+
+            this.iframe.onload = () => {
+              button.textContent = originalText;
+              button.disabled = false;
+            };
+          } else {
+            button.textContent = "Not Available";
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.disabled = false;
+            }, 2000);
+          }
+        });
+      });
     }
 
     /**
