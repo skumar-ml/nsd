@@ -51,6 +51,8 @@ class BriefsCheckout {
                 } else {
                     nextPage2Btn.style.display = 'block';
                     this.renderBriefs(response.briefs);
+                    this.attachPreviewHandlers(response.briefs);
+    
                 }
             } else {
                 console.error('No briefs data received');
