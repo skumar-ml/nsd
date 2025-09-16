@@ -65,7 +65,7 @@ class BriefsEventsCheckout {
                     if (this.selectedAccordion === 'annual-events-accordion' && this.data.briefEvents.length > 0) {
                         this.currentView = 'events';
                         this.renderEvents(this.data.briefEvents);
-                        this.attachPreviewHandlers(this.data.briefs);
+                        this.attachPreviewHandlers(this.data.briefEvents);
                         // Fix initial height after rendering
                         setTimeout(() => {
                             this.fixAccordionHeight('annual-events-accordion');
@@ -90,6 +90,7 @@ class BriefsEventsCheckout {
                         } else if (this.data.briefEvents.length > 0) {
                             this.currentView = 'events';
                             this.renderEvents(this.data.briefEvents);
+                            this.attachPreviewHandlers(this.data.briefEvents);
                             setTimeout(() => {
                                 this.fixAccordionHeight('annual-events-accordion');
                             }, 100);
@@ -1266,6 +1267,7 @@ class BriefsEventsCheckout {
       });
     }
 }
+
 
 
 
