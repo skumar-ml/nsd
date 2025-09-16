@@ -2,7 +2,10 @@ class BriefManager {
             constructor(briefs, data) {
                 // Array of briefs (each brief should have: title, pdf_url, doc_url)
                 this.$briefs = briefs;
-
+                  // crazy egg session recording script
+            (window.CE_API || (window.CE_API = [])).push(function () {
+              CE2.startRecording();
+            });
                 // Store API data for making requests
                 this.data = data;
 
@@ -530,4 +533,5 @@ class BriefManager {
                 this.updatePDFPreview();
             }
         }
+
 
