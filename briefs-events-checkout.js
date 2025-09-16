@@ -65,6 +65,7 @@ class BriefsEventsCheckout {
                     if (this.selectedAccordion === 'annual-events-accordion' && this.data.briefEvents.length > 0) {
                         this.currentView = 'events';
                         this.renderEvents(this.data.briefEvents);
+                        this.attachPreviewHandlers(this.data.briefs);
                         // Fix initial height after rendering
                         setTimeout(() => {
                             this.fixAccordionHeight('annual-events-accordion');
@@ -1265,6 +1266,7 @@ class BriefsEventsCheckout {
       });
     }
 }
+
 
 
 
