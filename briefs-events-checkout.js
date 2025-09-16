@@ -6,6 +6,12 @@ class BriefsEventsCheckout {
         this.currentView = 'briefs'; // 'briefs' or 'events'
         this.updateTotalTimeout = null; // For debouncing updateTotal calls
         this.selectedAccordion = 'annual-events-accordion'; // Default selected accordion
+        // For the preview pdf modal
+        this.modal = document.getElementById("briefs-preview-modal");
+        this.iframe = document.getElementById("preview-frame");
+        this.closeBtn = document.getElementById("close-preview");
+        this.addCloseModalHandler();
+        
         this.init();
         this.setupAccordion();
         this.getBriefsAndEvents();
@@ -28,7 +34,16 @@ class BriefsEventsCheckout {
             return null;
         }
     }
-
+    // Pdf Modal Close Handler
+    addCloseModalHandler() {
+        if (this.closeBtn) {
+        this.closeBtn.addEventListener("click", () => {
+            this.modal.style.display = "none";
+            this.iframe.src = "";
+        });
+        }
+    }
+    
     async getBriefsAndEvents() {
         const nextPage2Btn = document.getElementById('next_page_2');
         nextPage2Btn.style.display = 'none';
@@ -57,6 +72,7 @@ class BriefsEventsCheckout {
                     } else if (this.selectedAccordion === 'single-briefs-accordion' && this.data.briefs.length > 0) {
                         this.currentView = 'briefs';
                         this.renderBriefs(this.data.briefs);
+                        this.attachPreviewHandlers(response.briefs);
                         // Fix initial height after rendering
                         setTimeout(() => {
                             this.fixAccordionHeight('single-briefs-accordion');
@@ -66,6 +82,7 @@ class BriefsEventsCheckout {
                         if (this.data.briefs.length > 0) {
                             this.currentView = 'briefs';
                             this.renderBriefs(this.data.briefs);
+                            this.attachPreviewHandlers(response.briefs);
                             setTimeout(() => {
                                 this.fixAccordionHeight('single-briefs-accordion');
                             }, 100);
@@ -188,7 +205,10 @@ class BriefsEventsCheckout {
     </div>
     <p class="pdf-brief-text-medium">${brief.description}<br /></p>
     <p class="pdf-brief-text-small">Topic: ${brief.topic}<br /></p>
-    <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}<br /></p>
+    <div class="view-pdf-brief-price-flex-wrapper"> 
+       <p class="pdf-brief-price">$${parseFloat(brief.price).toFixed(2)}<br /></p>
+       <a href="#" data-brief-id="${brief.briefId}" class="main-button briefs-preview-btn w-button">Preview Brief</a>
+    </div>
 `;
 
         // Add click handler
@@ -1212,7 +1232,40 @@ class BriefsEventsCheckout {
     getMemberDetails() {
         // feth
     }
+     attachPreviewHandlers(briefs) {
+      document.querySelectorAll(".briefs-preview-btn").forEach((button) => {
+        button.addEventListener("click", async (e) => {
+          e.preventDefault();
+
+          const briefId = button.dataset.briefId;
+          const brief = briefs.find((b) => b.briefId == briefId);
+
+          if (!brief) return;
+
+          const originalText = button.textContent;
+          //button.textContent = "Loading...";
+          //button.disabled = true;
+
+          if (brief.preview_pdf_url) {
+            this.modal.style.display = "flex";
+            this.iframe.src = brief.preview_pdf_url;
+
+            this.iframe.onload = () => {
+              button.textContent = originalText;
+              button.disabled = false;
+            };
+          } else {
+            button.textContent = "Not Available";
+            setTimeout(() => {
+              button.textContent = originalText;
+              button.disabled = false;
+            }, 2000);
+          }
+        });
+      });
+    }
 }
+
 
 
 
