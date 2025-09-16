@@ -65,7 +65,6 @@ class BriefsEventsCheckout {
                     if (this.selectedAccordion === 'annual-events-accordion' && this.data.briefEvents.length > 0) {
                         this.currentView = 'events';
                         this.renderEvents(this.data.briefEvents);
-                        this.attachPreviewHandlers(this.data.briefEvents);
                         // Fix initial height after rendering
                         setTimeout(() => {
                             this.fixAccordionHeight('annual-events-accordion');
@@ -73,7 +72,6 @@ class BriefsEventsCheckout {
                     } else if (this.selectedAccordion === 'single-briefs-accordion' && this.data.briefs.length > 0) {
                         this.currentView = 'briefs';
                         this.renderBriefs(this.data.briefs);
-                        this.attachPreviewHandlers(this.data.briefs);
                         // Fix initial height after rendering
                         setTimeout(() => {
                             this.fixAccordionHeight('single-briefs-accordion');
@@ -83,7 +81,6 @@ class BriefsEventsCheckout {
                         if (this.data.briefs.length > 0) {
                             this.currentView = 'briefs';
                             this.renderBriefs(this.data.briefs);
-                            this.attachPreviewHandlers(this.data.briefs);
                             setTimeout(() => {
                                 this.fixAccordionHeight('single-briefs-accordion');
                             }, 100);
@@ -133,6 +130,7 @@ class BriefsEventsCheckout {
             // Update order details even if no briefs
             this.updateOrderDetails();
         }
+        this.attachPreviewHandlers(briefs);
     }
 
     renderEvents(events) {
@@ -616,6 +614,7 @@ class BriefsEventsCheckout {
             // Render briefs if available
             if (this.data.briefs && this.data.briefs.length > 0) {
                 this.renderBriefs(this.data.briefs);
+               this.attachPreviewHandlers(this.data.briefs);
             }
         }
 
@@ -1267,6 +1266,7 @@ class BriefsEventsCheckout {
       });
     }
 }
+
 
 
 
