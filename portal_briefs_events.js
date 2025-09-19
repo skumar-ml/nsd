@@ -126,7 +126,12 @@ class BriefManager {
 
                 // Calculate total discount based on number of briefs owned
                 analysis.totalDiscount = analysis.totalBriefs * analysis.discountPerBrief;
-
+                if(!analysis.hasLD  && !analysis.hasPF){
+                        const briefsFlexWrapper = document.querySelector('.briefs-flex-wrapper');
+                        if(briefsFlexWrapper){
+                            briefsFlexWrapper.classList.add('no-briefs-suggestion');
+                        }
+                    }
                 return analysis;
             }
 
@@ -533,5 +538,6 @@ class BriefManager {
                 this.updatePDFPreview();
             }
         }
+
 
 
