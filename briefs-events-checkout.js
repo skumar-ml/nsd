@@ -578,7 +578,7 @@ class BriefsEventsCheckout {
                     //setTimeout(() => {
                         //singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
                     //}, 10);
-                    singleBody.style.display = 'flex';
+                    singleBody.style.display = 'grid';
                     singleBody.style.height = 'auto';
                     singleBody.style.opacity = '1';
                 }
@@ -1266,6 +1266,7 @@ class BriefsEventsCheckout {
       });
     }
 }
+
 
 
 
