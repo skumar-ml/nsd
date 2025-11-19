@@ -625,7 +625,8 @@ class CheckOutWebflow {
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('pay-deposite')
 					if(!$this.$isAboundedProgram){
-						$this.displayUpSellModal();
+						 // temp removed
+						//$this.displayUpSellModal();
 					}{
 						$this.$isAboundedProgram = false;
 						$this.addToCart();
@@ -2302,6 +2303,7 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
 
 
 
