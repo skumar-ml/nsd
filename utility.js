@@ -5,8 +5,8 @@ class NSDUtilityClass {
     /**
      * checks if the webflowMemberId is NSD
      */
-    static setupAdminViewListener(webflowMemberId) {
-        if (webflowMemberId === "639ae841e3d1790004f29b80") {
+    static setupAdminViewListener(webflowMemberId, adminIds) {
+        if (adminIds.includes(webflowMemberId)) {
             const css = `
                     div#cart-main-div {
                         display: block !important;
