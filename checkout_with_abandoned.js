@@ -600,7 +600,7 @@ class CheckOutWebflow {
 					$this.storeBasicData();
 				}
 				$this.updateOldStudentList();
-				$this.displayStudentInfo("grid");
+				$this.displayStudentInfo("block");
 				// validation for student email different form Parent email
 				var isValidName = $this.checkUniqueStudentEmail();
 				if (isValidName) {
@@ -2303,6 +2303,7 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
+
 
 
 
