@@ -23,6 +23,11 @@ class NSDUtilityClass {
                     .opening-shortly-msg {
                         display: none !important;
                     }
+                    @media screen and (max-width: 479px) {
+                        div#card-grid-main {
+                            display: block !important;
+                        }
+                    }
                 `;
 
             const style = document.createElement("style");
@@ -33,3 +38,4 @@ class NSDUtilityClass {
         return false;
     }
 }
+
