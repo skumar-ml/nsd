@@ -14,13 +14,512 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+class BriefsUpsellModal {
+	constructor() {
+		this.modal = document.getElementById('briefs-upsell-modal');
+		this.modalBg = document.getElementById('briefs-upsell-modal-bg');
+		this.modalContainer = document.getElementById('briefs-upsell-modal-container');
+		this.modalClose = document.getElementById('briefs-modal-close');
+		this.briefEventsContainers = Array.from(document.querySelectorAll('[data-cart="briefEvents-container"]'));
+		this.briefEventsContainer = this.briefEventsContainers[0] || null;
+		this.selectedBriefEventsWrapper = document.querySelector('.selected_brief_events');
+		this.briefCtaButtons = Array.from(document.querySelectorAll('[data-cart="add-brief-event"]'));
+		this.briefCtaButton = this.briefCtaButtons[0] || null;
+		this.briefCtaDefaultDisplay = this.briefCtaButton ? this.briefCtaButton.style.display : '';
+		this.briefCtaDefaultDisplays = new Map();
+		this.briefCtaButtons.forEach((button) => {
+			this.briefCtaDefaultDisplays.set(button, button.style.display || '');
+		});
+		this.briefCheckboxIcons = {
+			checked: 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/691ecbd882b2c55efd083770_square-check%20(2).svg',
+			unchecked: 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/691ec94934f1278c4ad69157_square-check.svg'
+		};
+		this.briefEvents = [];
+		this.selectedBriefEvent = null;
+		this.appliedBriefEvent = null;
+		this.briefEventAdded = false;
+		this.briefSelectionFromStorage = null;
+		this.briefSelectionRestored = false;
+		this.briefTotalsRestored = false;
+		this.bindBriefModalCloseEvents();
+		this.loadStoredBriefSelection();
+	}
+	showBriefsUpsellModal() {
+		if (!this.memberData || !this.memberData.isAdmin) {
+			return;
+		}
+		if (!this.modal || !this.modalBg) {
+			return;
+		}
+		if (this.briefEventAdded) {
+			return;
+		}
+		this.modal.classList.add('show');
+		this.modal.style.display = 'flex';
+		this.modalBg.setAttribute('aria-hidden', 'false');
+	}
+	hideBriefsUpsellModal() {
+		if (!this.modal || !this.modalBg) {
+			return;
+		}
+		this.modal.classList.remove('show');
+		this.modal.style.display = 'none';
+		this.modalBg.removeAttribute('aria-hidden');
+	}
+	bindBriefModalCloseEvents() {
+		if (this.modalClose) {
+			this.modalClose.addEventListener('click', (event) => {
+				event.preventDefault();
+				this.hideBriefsUpsellModal();
+			});
+		}
+		if (this.modalBg) {
+			this.modalBg.addEventListener('click', () => this.hideBriefsUpsellModal());
+		}
+	}
+	bindBriefCtaButton() {
+		if (!this.briefCtaButtons || !this.briefCtaButtons.length) {
+			return;
+		}
+		this.briefCtaButtons.forEach((button) => {
+			if (button.dataset.briefCtaBound === 'true') {
+				return;
+			}
+			button.dataset.briefCtaBound = 'true';
+			button.addEventListener('click', (event) => {
+				event.preventDefault();
+				if (this.selectedBriefEvent) {
+					this.updateBriefAmount(this.selectedBriefEvent);
+					this.renderSelectedBriefSummary();
+					this.briefEventAdded = true;
+					this.hideBriefsUpsellModal();
+					this.persistBriefSelection(this.selectedBriefEvent);
+					this.briefSelectionRestored = true;
+				}
+			});
+		});
+	}
+	initializeBriefsUpsellModal() {
+		if (!this.memberData || !this.memberData.isAdmin) {
+			return;
+		}
+		this.cacheBriefModalElements();
+		this.bindBriefModalCloseEvents();
+		this.bindBriefCtaButton();
+		this.updateBriefCtaState();
+		this.fetchBriefEvents();
+	}
+	cacheBriefModalElements() {
+		this.briefEventsContainers = Array.from(document.querySelectorAll('[data-cart="briefEvents-container"]'));
+		this.briefEventsContainer = this.briefEventsContainers[0] || null;
+		this.selectedBriefEventsWrapper = document.querySelector('.selected_brief_events');
+		this.briefCtaButtons = Array.from(document.querySelectorAll('[data-cart="add-brief-event"]'));
+		this.briefCtaButton = this.briefCtaButtons[0] || null;
+		if (!this.briefCtaDefaultDisplays) {
+			this.briefCtaDefaultDisplays = new Map();
+		}
+		this.briefCtaButtons.forEach((button) => {
+			if (!this.briefCtaDefaultDisplays.has(button)) {
+				this.briefCtaDefaultDisplays.set(button, button.style.display || '');
+			}
+		});
+		if (this.briefCtaButton && !this.briefCtaDefaultDisplay) {
+			this.briefCtaDefaultDisplay = this.briefCtaButton.style.display || '';
+		}
+	}
+	async fetchBriefEvents() {
+		if (typeof this.fetchData !== 'function') {
+			return;
+		}
+		try {
+			const response = await this.fetchData('getBriefDetails');
+			const events = response && Array.isArray(response.briefEvents) ? response.briefEvents : [];
+			this.briefEvents = events.sort((a, b) => {
+				const aOrder = typeof a.displayOrder === 'number' ? a.displayOrder : 0;
+				const bOrder = typeof b.displayOrder === 'number' ? b.displayOrder : 0;
+				return aOrder - bOrder;
+			});
+			this.renderBriefEvents();
+		} catch (error) {
+			console.error('Error fetching brief events:', error);
+			this.renderBriefEventsError();
+		}
+	}
+	renderBriefEvents() {
+		const containers = this.getBriefEventsContainers();
+		if (!containers.length) {
+			return;
+		}
+		const unavailableMarkup =
+			'<p class="dm-sans center-text-small">Brief events are currently unavailable.</p>';
+		containers.forEach((container) => {
+			container.innerHTML = '';
+			if (!this.briefEvents.length) {
+				container.innerHTML = unavailableMarkup;
+				return;
+			}
+			const fragment = document.createDocumentFragment();
+			this.briefEvents.forEach((briefEvent) => {
+				const card = document.createElement('div');
+				card.className = 'bundle-gray-rounded-div';
+				if (briefEvent.highlighted) {
+					card.classList.add('selected-red');
+				}
+				card.setAttribute('data-brief-event-id', briefEvent.eventId);
+				card.setAttribute('data-brief-event-title', briefEvent.title || '');
+				card.innerHTML = this.buildBriefEventMarkup(briefEvent);
+				fragment.appendChild(card);
+			});
+			container.appendChild(fragment);
+		});
+		this.bindBriefEventCards();
+		this.syncBriefCardsWithSelection();
+		this.restoreBriefSelectionFromStorage();
+	}
+	renderBriefEventsError() {
+		const containers = this.getBriefEventsContainers();
+		if (!containers.length) {
+			return;
+		}
+		const errorMarkup =
+			'<p class="dm-sans center-text-small">Unable to load brief events right now. Please try again later.</p>';
+		containers.forEach((container) => {
+			container.innerHTML = errorMarkup;
+		});
+	}
+	buildBriefEventMarkup(briefEvent) {
+		const price = this.formatCurrency(briefEvent.price);
+		const savedAmount = parseFloat(briefEvent.saved_amount || 0);
+		const description = briefEvent.description || '';
+		return `
+			<div class="bundle-info-flex">
+				<div class="bundle-checkbox-wrapper" aria-hidden="true">
+					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
+				</div>
+				<div class="dm-sans bundle-name">
+					<span>${briefEvent.title}</span><br>
+				</div>
+			</div>
+			<div class="bundle-price-info">
+				<div class="dm-sans bundle">
+					<strong class="bundle-price-red">${price}</strong><span>/Year</span><br>
+				</div>
+				<div class="dm-sans green-center">
+					<span class="text-green">Save ${this.formatCurrency(savedAmount)}</span><br>
+				</div>
+				<div class="dm-sans center-text-small">
+					<span>${description}</span><br>
+				</div>
+			</div>
+		`;
+	}
+	formatCurrency(amount) {
+		const numericAmount = parseFloat(typeof amount !== 'undefined' && amount !== null ? amount : 0) || 0;
+		const formatted = this.numberWithCommas
+			? this.numberWithCommas(numericAmount.toFixed(2))
+			: numericAmount.toFixed(2);
+		return `$${formatted}`;
+	}
+	bindBriefEventCards() {
+		const containers = this.getBriefEventsContainers();
+		if (!containers.length) {
+			return;
+		}
+		containers.forEach((container) => {
+			const cards = container.querySelectorAll('[data-brief-event-id]');
+			cards.forEach((card) => {
+				card.addEventListener('click', (event) => {
+					event.preventDefault();
+					const briefId = card.getAttribute('data-brief-event-id');
+					if (!briefId) {
+						return;
+					}
+					this.selectBriefEvent(briefId);
+				});
+			});
+		});
+	}
+	selectBriefEvent(eventId) {
+		const selected = this.briefEvents.find(
+			(event) => String(event.eventId) === String(eventId)
+		);
+		if (!selected) {
+			return;
+		}
+		this.selectedBriefEvent = selected;
+		this.syncBriefCardsWithSelection();
+		this.updateBriefCtaState();
+	}
+	updateBriefAmount(nextSelection) {
+		const totalAmountInput = document.getElementById('totalAmount');
+		if (!totalAmountInput) {
+			return;
+		}
+		const currentBriefAmount = parseFloat(
+			this.appliedBriefEvent && this.appliedBriefEvent.price ? this.appliedBriefEvent.price : 0
+		) || 0;
+		const nextBriefAmount = parseFloat(nextSelection && nextSelection.price ? nextSelection.price : 0) || 0;
+		const updatedAmount = (parseFloat(totalAmountInput.value) || 0) - currentBriefAmount + nextBriefAmount;
+		totalAmountInput.value = updatedAmount;
+		this.appliedBriefEvent = nextSelection || null;
+		if (typeof this.updateOnlyTotalAmount === 'function') {
+			this.updateOnlyTotalAmount();
+		}
+		this.refreshTotalPriceVisibility();
+	}
+	syncBriefCardsWithSelection() {
+		const containers = this.getBriefEventsContainers();
+		if (!containers.length) {
+			return;
+		}
+		const selectedId = this.selectedBriefEvent ? this.selectedBriefEvent.eventId : null;
+		containers.forEach((container) => {
+			const cards = container.querySelectorAll('[data-brief-event-id]');
+			cards.forEach((card) => {
+				const cardId = card.getAttribute('data-brief-event-id');
+				const isSelected = selectedId && String(cardId) === String(selectedId);
+				card.classList.toggle('brief-card-selected', Boolean(isSelected));
+				card.classList.toggle('selected-red', Boolean(isSelected));
+				const checkboxIcon = card.querySelector('.bundle-checkbox');
+				if (checkboxIcon) {
+					checkboxIcon.classList.toggle('checked', Boolean(isSelected));
+					checkboxIcon.setAttribute(
+						'src',
+						isSelected ? this.briefCheckboxIcons.checked : this.briefCheckboxIcons.unchecked
+					);
+				}
+			});
+		});
+	}
+	renderSelectedBriefSummary() {
+		if (!this.selectedBriefEventsWrapper) {
+			return;
+		}
+		this.selectedBriefEventsWrapper.innerHTML = '';
+		if (!this.selectedBriefEvent) {
+			return;
+		}
+		const format = this.extractBriefFormat(this.selectedBriefEvent.title);
+		const freeBriefName = `NSD Briefs 2025-2026 (${format}) FREE`;
+		const paidBriefName = `NSD Briefs 2026-2027 (${format}) (Paid)`;
+
+		const headingContainer = creEl('div', 'horizontal-div supp-program');
+		const headingLabel = creEl('p', 'dm-sans bold-700');
+		headingLabel.textContent = 'NSD Briefs';
+		headingContainer.prepend(headingLabel);
+		this.selectedBriefEventsWrapper.appendChild(headingContainer);
+
+		const wrapper = creEl('div', 'selected-brief-event');
+		const row = creEl('div', 'horizontal-div align-left brief-summary-row');
+		const infoContainer = creEl('div', 'horizontal-div supplementary');
+
+		const offeringType = creEl('div', 'dm-sans offering-type selected-brief-names');
+		const freeLabel = creEl('p', 'dm-sans');
+		freeLabel.textContent = freeBriefName;
+		const paidLabel = creEl('p', 'dm-sans');
+		paidLabel.textContent = paidBriefName;
+		offeringType.append(freeLabel, paidLabel);
+
+		const offeringRemove = creEl('div', 'dm-sans offering-remove brief-remove-btn');
+		offeringRemove.setAttribute('data-brief-action', 'remove');
+		offeringRemove.setAttribute('role', 'button');
+		offeringRemove.setAttribute('tabindex', '0');
+		offeringRemove.textContent = 'Remove';
+		infoContainer.prepend(offeringType, offeringRemove);
+
+		const offeringPrice = creEl('div', 'dm-sans offering-price');
+		offeringPrice.textContent = this.formatCurrency(this.selectedBriefEvent.price);
+
+		row.prepend(infoContainer, offeringPrice);
+		wrapper.appendChild(row);
+
+		const description = creEl('p', 'dm-sans center-text-small');
+		description.textContent = this.selectedBriefEvent.description || '';
+		wrapper.appendChild(description);
+
+		this.selectedBriefEventsWrapper.appendChild(wrapper);
+
+		const removeBtn = wrapper.querySelector('[data-brief-action="remove"]');
+		if (removeBtn) {
+			const handleRemove = (event) => {
+				event.preventDefault();
+				this.clearBriefSelection();
+			};
+			removeBtn.addEventListener('click', handleRemove);
+			removeBtn.addEventListener('keydown', (event) => {
+				if (event.key === 'Enter' || event.key === ' ') {
+					handleRemove(event);
+				}
+			});
+		}
+	}
+	extractBriefFormat(title) {
+		if (!title) {
+			return '';
+		}
+		const titleUpper = title.toUpperCase();
+		if (titleUpper.includes('LD + PF') || titleUpper.includes('LD+PF') || titleUpper.includes('BUNDLE')) {
+			return 'LD + PF';
+		}
+		if (titleUpper.includes('PF')) {
+			return 'PF';
+		}
+		if (titleUpper.includes('LD')) {
+			return 'LD';
+		}
+		return title;
+	}
+	updateBriefCtaState() {
+		if (!this.briefCtaButtons || !this.briefCtaButtons.length) {
+			return;
+		}
+		const shouldShow = Boolean(this.selectedBriefEvent);
+		this.briefCtaButtons.forEach((button) => {
+			const defaultDisplay = this.briefCtaDefaultDisplays
+				? this.briefCtaDefaultDisplays.get(button)
+				: this.briefCtaDefaultDisplay;
+			button.style.display = shouldShow ? defaultDisplay || '' : 'none';
+		});
+	}
+	clearBriefSelection() {
+		if (!this.selectedBriefEvent && !this.appliedBriefEvent) {
+			return;
+		}
+		const totalAmountInput = document.getElementById('totalAmount');
+		if (totalAmountInput) {
+			const currentAmount = parseFloat(totalAmountInput.value) || 0;
+			const appliedSelection = this.appliedBriefEvent || this.selectedBriefEvent;
+			if (appliedSelection) {
+				const updatedAmount = currentAmount - (parseFloat(appliedSelection.price) || 0);
+				totalAmountInput.value = updatedAmount < 0 ? 0 : updatedAmount;
+				if (typeof this.updateOnlyTotalAmount === 'function') {
+					this.updateOnlyTotalAmount();
+				}
+			}
+		}
+		this.appliedBriefEvent = null;
+		this.selectedBriefEvent = null;
+		this.briefEventAdded = false;
+		if (this.selectedBriefEventsWrapper) {
+			this.selectedBriefEventsWrapper.innerHTML = '';
+		}
+		this.syncBriefCardsWithSelection();
+		this.updateBriefCtaState();
+		this.persistBriefSelection(null);
+		this.briefTotalsRestored = false;
+		this.refreshTotalPriceVisibility();
+	}
+	loadStoredBriefSelection() {
+		if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
+			return;
+		}
+		try {
+			const stored = localStorage.getItem('checkOutData');
+			if (!stored) {
+				return;
+			}
+			const parsed = JSON.parse(stored);
+			if (parsed && parsed.briefEvent) {
+				this.briefSelectionFromStorage = parsed.briefEvent;
+			}
+		} catch (error) {
+			console.warn('Unable to parse stored brief selection:', error);
+		}
+	}
+	persistBriefSelection(selection) {
+		if (typeof window === 'undefined') {
+			return;
+		}
+		const payload = selection
+			? { briefEvent: selection, briefEventIds: this.getSelectedBriefEventIds() }
+			: { briefEvent: null, briefEventIds: [] };
+		if (typeof this.updateCheckOutData === 'function') {
+			this.updateCheckOutData(payload);
+		} else if (typeof localStorage !== 'undefined') {
+			try {
+				const existing = localStorage.getItem('checkOutData');
+				const merged = existing ? { ...JSON.parse(existing), ...payload } : payload;
+				localStorage.setItem('checkOutData', JSON.stringify(merged));
+			} catch (error) {
+				console.warn('Unable to persist brief selection:', error);
+			}
+		}
+		this.briefSelectionFromStorage = selection || null;
+	}
+	restoreBriefSelectionFromStorage() {
+		if (this.briefSelectionRestored || !this.briefSelectionFromStorage) {
+			return;
+		}
+		const storedMatch = this.findStoredBriefSelectionMatch();
+		if (!storedMatch) {
+			this.briefSelectionRestored = true;
+			return;
+		}
+		this.selectedBriefEvent = storedMatch;
+		this.briefEventAdded = true;
+		this.renderSelectedBriefSummary();
+		this.ensureBriefTotalsApplied(storedMatch);
+		this.syncBriefCardsWithSelection();
+		this.updateBriefCtaState();
+		this.briefSelectionRestored = true;
+	}
+	findStoredBriefSelectionMatch() {
+		if (!this.briefSelectionFromStorage) {
+			return null;
+		}
+		const storedId = this.briefSelectionFromStorage.eventId;
+		if (storedId && Array.isArray(this.briefEvents) && this.briefEvents.length) {
+			const matched = this.briefEvents.find(
+				(event) => String(event.eventId) === String(storedId)
+			);
+			if (matched) {
+				return matched;
+			}
+		}
+		return this.briefSelectionFromStorage;
+	}
+	ensureBriefTotalsApplied(selection) {
+		if (this.briefTotalsRestored) {
+			return;
+		}
+		const totalAmountInput = document.getElementById('totalAmount');
+		if (!totalAmountInput || !selection) {
+			return;
+		}
+		const currentTotal = parseFloat(totalAmountInput.value) || 0;
+		const briefPrice = parseFloat(selection.price) || 0;
+		totalAmountInput.value = (currentTotal + briefPrice).toFixed(2);
+		this.appliedBriefEvent = selection;
+		if (typeof this.updateOnlyTotalAmount === 'function') {
+			this.updateOnlyTotalAmount();
+		}
+		this.refreshTotalPriceVisibility();
+		this.briefTotalsRestored = true;
+	}
+	getSelectedBriefEventIds() {
+		if (!this.selectedBriefEvent) {
+			return [];
+		}
+		const ids = new Set();
+		const selected = this.selectedBriefEvent;
+		ids.add(selected.eventId);
+		return Array.from(ids);
+	}
+	getBriefEventsContainers() {
+		if (Array.isArray(this.briefEventsContainers) && this.briefEventsContainers.length) {
+			return this.briefEventsContainers;
+		}
+		return this.briefEventsContainer ? [this.briefEventsContainer] : [];
+	}
+}
+
 /**
  * CheckOutWebflow Class is used to intigrate with stripe payment.
  * In this API we pass baseUrl, memberData.
  * In this class we are manipulating student form and member data
  */
 
-class CheckOutWebflow {
+class CheckOutWebflow extends BriefsUpsellModal {
 	$suppPro = [];
 	$checkoutData = "";
 	$checkOutResponse = false;
@@ -28,9 +527,33 @@ class CheckOutWebflow {
 	$selectedProgram = []
     $isAboundedProgram =false;
 	constructor(apiBaseUrl, memberData) {
+		super();
 		this.baseUrl = apiBaseUrl;
-		this.memberData = memberData;
+		this.memberData = memberData || {};
+		this.briefsUpsellEnabled = Boolean(this.memberData.isAdmin);
+		this.toggleSeasonInfoVisibility();
+		if (this.briefsUpsellEnabled) {
+			this.initializeBriefsUpsellModal();
+		}
 		this.renderPortalData();
+	}
+	toggleSeasonInfoVisibility() {
+		const wrappers = document.querySelectorAll('.setup-season-info-wrapper');
+		if (!wrappers || !wrappers.length) {
+			return;
+		}
+		const isAdmin = Boolean(this.memberData && this.memberData.isAdmin);
+		wrappers.forEach((wrapper) => {
+			if (isAdmin) {
+				wrapper.style.removeProperty('display');
+				if (!wrapper.classList.contains('d-block')) {
+					wrapper.classList.add('d-block');
+				}
+			} else {
+				wrapper.style.display = 'none';
+				wrapper.classList.remove('d-block');
+			}
+		});
 	}
 	// Create tags
 	createTags(suppData) {
@@ -320,26 +843,49 @@ class CheckOutWebflow {
 			selectedIds = allSupIds;
 			suppProIdE.value = JSON.stringify(allSupIds);
 		}
-		// Hide and show based on supplementary program length
-		var totalPriceDiv = document.getElementById("totalPriceDiv");
-		if (selectedIds.length > 0) {
-			totalPriceDiv.classList.add('show');
+		this.refreshTotalPriceVisibility(selectedIds);
+		this.displaySelectedSuppProgram(selectedIds);
+		//if(selectedIds.length > 0){
+			this.updateCheckOutData({supplementaryProgramIds: selectedIds});
+		//}
+	}
+	refreshTotalPriceVisibility(selectedIds) {
+		let suppIds = [];
+		if (Array.isArray(selectedIds)) {
+			suppIds = selectedIds;
 		} else {
-			totalPriceDiv.classList.remove('show');
+			try {
+				const suppProIdE = document.getElementById("suppProIds");
+				if (suppProIdE && suppProIdE.value) {
+					const parsed = JSON.parse(suppProIdE.value);
+					if (Array.isArray(parsed)) {
+						suppIds = parsed;
+					}
+				}
+			} catch (error) {
+				suppIds = [];
+			}
 		}
-		// Hide and show based on supplementary program length
-		var totalPriceDiv = document.getElementById("totalPriceDivMob");
-		if (totalPriceDiv != undefined) {
-			if (selectedIds.length > 0) {
+		const shouldShow = suppIds.length > 0 || Boolean(this.appliedBriefEvent);
+		this.toggleTotalPriceVisibility(shouldShow);
+	}
+	toggleTotalPriceVisibility(shouldShow) {
+		const totalPriceDiv = document.getElementById("totalPriceDiv");
+		if (totalPriceDiv) {
+			if (shouldShow) {
 				totalPriceDiv.classList.add('show');
 			} else {
 				totalPriceDiv.classList.remove('show');
 			}
 		}
-		this.displaySelectedSuppProgram(selectedIds);
-		//if(selectedIds.length > 0){
-			this.updateCheckOutData({supplementaryProgramIds: selectedIds});
-		//}
+		const totalPriceDivMob = document.getElementById("totalPriceDivMob");
+		if (totalPriceDivMob) {
+			if (shouldShow) {
+				totalPriceDivMob.classList.add('show');
+			} else {
+				totalPriceDivMob.classList.remove('show');
+			}
+		}
 	}
 	// Get API data with the help of endpoint
 	async fetchData(endpoint) {
@@ -383,8 +929,7 @@ class CheckOutWebflow {
 				"label": this.memberData.programName,
 				"programId": this.memberData.programId,
 				"successUrl": this.memberData.site_url + "payment-confirmation?programId=" + this.memberData.programId,
-				"cancelUrl": cancelUrl.href,
-				//"cancelUrl": "https://www.nsdebatecamp.com/",
+				cancelUrl: cancelUrl.href.includes("file:///") ? "https://www.nsdebatecamp.com" : cancelUrl.href,
 				"memberId": this.memberData.memberId,
 				"programCategoryId": this.memberData.programCategoryId,
 				"supplementaryProgramIds": JSON.parse(suppProIdE.value),
@@ -395,7 +940,8 @@ class CheckOutWebflow {
 				"cardAmount": parseFloat(this.memberData.cardAmount.replace(/,/g, '')),
 				"payLaterAmount": parseFloat(this.memberData.payLaterAmount.replace(/,/g, '')),
 				"device": (/Mobi|Android/i.test(navigator.userAgent)) ? 'Mobile' : 'Desktop',
-				"deviceUserAgent": navigator.userAgent
+				"deviceUserAgent": navigator.userAgent,
+				"briefEventIds": this.getSelectedBriefEventIds()
 			}
 			if($baseUrl == "createCheckoutUrlsByProgram"){
 				data.source = "cart_page"
@@ -416,7 +962,7 @@ class CheckOutWebflow {
 				//console.log('data', data)
 				//return true;
 			}
-			
+			//return true;
 			var xhr = new XMLHttpRequest()
 			var $this = this;
 			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/"+$baseUrl, true)
@@ -624,9 +1170,12 @@ class CheckOutWebflow {
 					$this.initSlickSlider();
 					$this.hideShowCartVideo('hide');
 					$this.activeBreadCrumb('pay-deposite')
-					if(!$this.$isAboundedProgram){
+					const canShowBriefUpsell = Boolean($this.memberData && $this.memberData.isAdmin && !$this.$isAboundedProgram);
+					if(canShowBriefUpsell){
 						 // temp removed
 						//$this.displayUpSellModal();
+						// show briefs upsell modal
+						$this.showBriefsUpsellModal();
 					}{
 						$this.$isAboundedProgram = false;
 						$this.addToCart();
@@ -1070,6 +1619,7 @@ class CheckOutWebflow {
 
 
 	eventForPayNowBtn() {
+		const $this = this;
 		let payNowLink = document.getElementById('pay-now-link');
 		payNowLink.addEventListener("click", function (e) {
 			e.preventDefault();
@@ -1120,6 +1670,22 @@ class CheckOutWebflow {
 					payNowLink.innerHTML = "Pay Now With BNPL"
 					payNowLinkMo.innerHTML = "Pay Now With BNPL"
 					payNowLink3.innerHTML = "Pay Now With BNPL"
+				}
+				const hasBriefSelection = Boolean($this.appliedBriefEvent || $this.selectedBriefEvent);
+				let hasSuppSelections = false;
+				try {
+					const suppProIdE = document.getElementById('suppProIds');
+					if (suppProIdE && suppProIdE.value) {
+						const parsed = JSON.parse(suppProIdE.value);
+						hasSuppSelections = Array.isArray(parsed) && parsed.length > 0;
+					}
+				} catch (error) {
+					hasSuppSelections = false;
+				}
+				if ((hasBriefSelection || hasSuppSelections) && typeof $this.updateOnlyTotalAmount === 'function') {
+					requestAnimationFrame(() => {
+						$this.updateOnlyTotalAmount();
+					});
 				}
 			})
 		}
@@ -1174,6 +1740,9 @@ class CheckOutWebflow {
 		
 	}
 	displayUpSellModal() {
+		if (!this.memberData || !this.memberData.isAdmin) {
+			return;
+		}
 		this.addToCart()
 		if (this.memberData.hide_upsell) {
 			return;
@@ -2303,11 +2872,3 @@ class CheckOutWebflow {
 		localStorage.setItem("checkOutData", JSON.stringify(checkoutData));
 	}
 }
-
-
-
-
-
-
-
-
