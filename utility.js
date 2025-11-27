@@ -23,7 +23,7 @@ class NSDUtilityClass {
                     .opening-shortly-msg {
                         display: none !important;
                     }
-                    @media screen and (max-width: 479px) {
+                    @media screen and (max-width: 991px) {
                         div#card-grid-main {
                             display: block !important;
                         }
@@ -38,4 +38,5 @@ class NSDUtilityClass {
         return false;
     }
 }
+
 
