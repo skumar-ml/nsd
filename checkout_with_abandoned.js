@@ -22,7 +22,7 @@ class BriefsUpsellModal {
 		this.modalClose = document.getElementById('briefs-modal-close');
 		this.briefEventsContainers = Array.from(document.querySelectorAll('[data-cart="briefEvents-container"]'));
 		this.briefEventsContainer = this.briefEventsContainers[0] || null;
-		this.selectedBriefEventsWrapper = document.querySelector('.selected_brief_events');
+		this.setSelectedBriefEventsWrappers();
 		this.briefCtaButtons = Array.from(document.querySelectorAll('[data-cart="add-brief-event"]'));
 		this.briefCtaButton = this.briefCtaButtons[0] || null;
 		this.briefCtaDefaultDisplay = this.briefCtaButton ? this.briefCtaButton.style.display : '';
@@ -112,7 +112,7 @@ class BriefsUpsellModal {
 	cacheBriefModalElements() {
 		this.briefEventsContainers = Array.from(document.querySelectorAll('[data-cart="briefEvents-container"]'));
 		this.briefEventsContainer = this.briefEventsContainers[0] || null;
-		this.selectedBriefEventsWrapper = document.querySelector('.selected_brief_events');
+		this.setSelectedBriefEventsWrappers();
 		this.briefCtaButtons = Array.from(document.querySelectorAll('[data-cart="add-brief-event"]'));
 		this.briefCtaButton = this.briefCtaButtons[0] || null;
 		if (!this.briefCtaDefaultDisplays) {
@@ -126,6 +126,16 @@ class BriefsUpsellModal {
 		if (this.briefCtaButton && !this.briefCtaDefaultDisplay) {
 			this.briefCtaDefaultDisplay = this.briefCtaButton.style.display || '';
 		}
+	}
+	setSelectedBriefEventsWrappers() {
+		this.selectedBriefEventsWrappers = Array.from(document.querySelectorAll('.selected_brief_events'));
+		this.selectedBriefEventsWrapper = this.selectedBriefEventsWrappers[0] || null;
+	}
+	getSelectedBriefEventsWrappers() {
+		if (Array.isArray(this.selectedBriefEventsWrappers) && this.selectedBriefEventsWrappers.length) {
+			return this.selectedBriefEventsWrappers;
+		}
+		return this.selectedBriefEventsWrapper ? [this.selectedBriefEventsWrapper] : [];
 	}
 	async fetchBriefEvents() {
 		if (typeof this.fetchData !== 'function') {
@@ -292,22 +302,33 @@ class BriefsUpsellModal {
 		});
 	}
 	renderSelectedBriefSummary() {
-		if (!this.selectedBriefEventsWrapper) {
+		this.setSelectedBriefEventsWrappers();
+		const wrappers = this.getSelectedBriefEventsWrappers();
+		if (!wrappers.length) {
 			return;
 		}
-		this.selectedBriefEventsWrapper.innerHTML = '';
+		wrappers.forEach((wrapperEl) => {
+			wrapperEl.innerHTML = '';
+		});
 		if (!this.selectedBriefEvent) {
 			return;
 		}
+		wrappers.forEach((wrapperEl) => {
+			const fragment = this.buildSelectedBriefSummaryFragment();
+			wrapperEl.appendChild(fragment);
+		});
+	}
+	buildSelectedBriefSummaryFragment() {
+		const fragment = document.createDocumentFragment();
 		const format = this.extractBriefFormat(this.selectedBriefEvent.title);
 		const freeBriefName = `NSD Briefs 2025-2026 (${format}) FREE`;
-		const paidBriefName = `NSD Briefs 2026-2027 (${format}) (Paid)`;
+		const paidBriefName = `NSD Briefs 2026-2027 (${format})`;
 
 		const headingContainer = creEl('div', 'horizontal-div supp-program');
 		const headingLabel = creEl('p', 'dm-sans bold-700');
 		headingLabel.textContent = 'NSD Briefs';
 		headingContainer.prepend(headingLabel);
-		this.selectedBriefEventsWrapper.appendChild(headingContainer);
+		fragment.appendChild(headingContainer);
 
 		const wrapper = creEl('div', 'selected-brief-event');
 		const row = creEl('div', 'horizontal-div align-left brief-summary-row');
@@ -333,11 +354,11 @@ class BriefsUpsellModal {
 		row.prepend(infoContainer, offeringPrice);
 		wrapper.appendChild(row);
 
-		const description = creEl('p', 'dm-sans center-text-small');
-		description.textContent = this.selectedBriefEvent.description || '';
-		wrapper.appendChild(description);
+		// const description = creEl('p', 'dm-sans center-text-small');
+		// description.textContent = this.selectedBriefEvent.description || '';
+		// wrapper.appendChild(description);
 
-		this.selectedBriefEventsWrapper.appendChild(wrapper);
+		fragment.appendChild(wrapper);
 
 		const removeBtn = wrapper.querySelector('[data-brief-action="remove"]');
 		if (removeBtn) {
@@ -352,6 +373,7 @@ class BriefsUpsellModal {
 				}
 			});
 		}
+		return fragment;
 	}
 	extractBriefFormat(title) {
 		if (!title) {
@@ -400,9 +422,10 @@ class BriefsUpsellModal {
 		this.appliedBriefEvent = null;
 		this.selectedBriefEvent = null;
 		this.briefEventAdded = false;
-		if (this.selectedBriefEventsWrapper) {
-			this.selectedBriefEventsWrapper.innerHTML = '';
-		}
+		this.setSelectedBriefEventsWrappers();
+		this.getSelectedBriefEventsWrappers().forEach((wrapperEl) => {
+			wrapperEl.innerHTML = '';
+		});
 		this.syncBriefCardsWithSelection();
 		this.updateBriefCtaState();
 		this.persistBriefSelection(null);
