@@ -1,3 +1,10 @@
+/*
+Purpose: Notification center that fetches notification data from the API and displays it in a grid.
+
+Brief Logic: Fetches notification data from API and displays notifications in a grid format. Handles notification filtering, marking as read, and pagination.
+
+Are there any dependent JS files: No
+*/
 /**
  * 	
  * @param name - HTML element name

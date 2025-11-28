@@ -1,3 +1,11 @@
+/*
+Purpose: Full checkout experience with abandoned-cart recovery plus briefs upsell modal management.
+
+Brief Logic: Handles abandoned cart recovery by checking localStorage and API for saved carts. Manages briefs upsell modal display and integrates selected briefs into checkout flow with dynamic total updates.
+
+Are there any dependent JS files: No
+*/
+
 /**
  *
  * @param name - HTML element name

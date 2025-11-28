@@ -1,3 +1,10 @@
+/*
+Purpose: Displays polling assignments in a list format with filters and pagination.
+
+Brief Logic: Fetches polling data from API and displays assignments in a list with filtering and pagination controls. Handles assignment status and submission tracking.
+
+Are there any dependent JS files: No
+*/
 /**
  * 	
  * @param name - HTML element name

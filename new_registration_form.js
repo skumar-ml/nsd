@@ -1,3 +1,10 @@
+/*
+Purpose: New registration form that fetches form data from the API and displays it in a grid.
+
+Brief Logic: Fetches registration form data from API and displays forms in a grid. Handles form completion tracking, program category filtering, and form submission.
+
+Are there any dependent JS files: No
+*/
 class NSDPortal {
     $completedForm = [];
     $formsList = [];

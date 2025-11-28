@@ -1,3 +1,10 @@
+/*
+Purpose: Handles the registration tabs for the NSD portal.
+
+Brief Logic: Fetches registration data from API and displays it in accordion tabs. Manages tab switching and form display based on program categories and completion status.
+
+Are there any dependent JS files: No
+*/
 /**
  * Class for Handling multiple forms tabs
  * @param webflowMemberId - MemberId

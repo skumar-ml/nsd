@@ -1,3 +1,10 @@
+/*
+Purpose: Success-page logic that reads query params, shows supplementary upsells, and resets checkout UI states.
+
+Brief Logic: Reads query parameters from URL to determine payment status. Displays supplementary program upsells and resets checkout UI states for next transaction.
+
+Are there any dependent JS files: No
+*/
 /**
  *
  * @param name - HTML element name

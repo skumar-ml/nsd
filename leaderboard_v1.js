@@ -1,3 +1,10 @@
+/*
+Purpose: Comprehensive competition leaderboard that fetches member data, builds tabs, and tracks progress bars.
+
+Brief Logic: Fetches competition data from API and builds tabbed interface for different competitions. Displays member standings with progress bars and sorting capabilities.
+
+Are there any dependent JS files: No
+*/
 class NDFLeaderBoard {
     $competition = [];
     $allCompetition = [];

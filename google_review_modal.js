@@ -1,3 +1,10 @@
+/*
+Purpose: Eligibility checker and modal that invites recent students to leave a Google review after completing a program.
+
+Brief Logic: Checks if student is eligible for Google review based on program completion data. Displays modal if eligible and stores review invitation status in localStorage to prevent repeated prompts.
+
+Are there any dependent JS files: No
+*/
 class GoogleReviewModal {
   constructor(memberData) {
     this.modal = document.getElementById("google-review-modal");

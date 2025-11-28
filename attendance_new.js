@@ -1,3 +1,12 @@
+/*
+Purpose: Student self check-in UI that filters sessions, shows lab availability, and submits attendance.
+
+Brief Logic: Filters sessions and displays available labs. Shows check-in button when lab is selected and submits attendance to API.
+
+Are there any dependent JS files: No
+*/
+
+
 /**
  * 	
  * @param name - HTML element name

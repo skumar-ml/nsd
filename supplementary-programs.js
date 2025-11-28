@@ -1,3 +1,10 @@
+/*
+Purpose: Displays supplementary programs in a list format with filters and pagination.
+
+Brief Logic: Fetches supplementary programs data from API and renders them in a list with filtering and pagination controls. Handles program selection and displays program details.
+
+Are there any dependent JS files: No
+*/
 /**
  * 	
  * @param name - HTML element name

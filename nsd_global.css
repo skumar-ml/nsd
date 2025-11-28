@@ -1,3 +1,10 @@
+/*
+Purpose: 
+Shared styling for modals, navigation, and various responsive tweaks across the NSD portal.
+Brief Logic:
+Basic CSS for the NSD portal.
+Are  there any dependent JS files: No
+*/
 /* Popup Modal CSS*/
 .abandoned-cart-modal,
 .google-review-modal {

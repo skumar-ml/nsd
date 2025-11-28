@@ -1,3 +1,10 @@
+/*
+Purpose: Update profile modal that loads member details, pre-fills the form, and submits changes.
+
+Brief Logic: Fetches member data from API and populates form fields. Handles form submission to update member information via API endpoint.
+
+Are there any dependent JS files: No
+*/
 class updateMember {
   $editMemberData = [];
   constructor(data) {

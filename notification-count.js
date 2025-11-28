@@ -1,3 +1,10 @@
+/*
+Purpose: Shows a notification count badge beside the bell icon based on unread notifications.
+
+Brief Logic: Fetches notification data from API and calculates unread count. Updates badge display with unread notification count.
+
+Are there any dependent JS files: No
+*/
 class NotificationCount {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;

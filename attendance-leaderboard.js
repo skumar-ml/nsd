@@ -1,3 +1,11 @@
+/*
+Purpose: Renders the attendance leaderboard grid showing lab names and their current scores.
+
+Brief Logic: Takes leaderboard data from API response and renders a grid with Lab and Score columns. Iterates through output array to display each lab name with its corresponding attendance percentage score.
+
+Are there any dependent JS files: No
+*/
+
 /**
  * 	
  * @param name - HTML element name

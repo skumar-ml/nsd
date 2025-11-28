@@ -1,3 +1,10 @@
+/*
+Purpose: Instructor-facing check-in dashboard with filters, pagination, and session management controls.
+
+Brief Logic: Fetches labs data from API and displays lab selection dropdown. Renders student list with filters, attendance tracking, and pagination. Handles real-time data refresh and attendance updates.
+
+Are there any dependent JS files: No
+*/
 /**
  * 	
  * @param name - HTML element name

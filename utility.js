@@ -1,6 +1,10 @@
-/**
- * Utility class for NSD functionality
- */
+/*
+Purpose: Utility class for NSD functionality.
+
+Brief Logic: Checks if webflowMemberId matches admin IDs or access parameter. If admin, applies CSS to show cart management interface and card grid layout.
+
+Are there any dependent JS files: No
+*/
 class NSDUtilityClass {
     /**
      * checks if the webflowMemberId is NSD

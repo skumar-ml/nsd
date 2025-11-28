@@ -1,3 +1,10 @@
+/*
+Purpose: Loader for the family member grid that fetches household profiles, sorts them, and wires edit actions.
+
+Brief Logic: Fetches family member data from API endpoint and sorts it with current member first. Displays sorted members in a grid with edit/delete functionality based on account type and permissions.
+
+Are there any dependent JS files: No
+*/
 class FamilyMember {
   $editMemberData = [];
   constructor(data) {

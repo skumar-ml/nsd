@@ -1,3 +1,10 @@
+/*
+Purpose: 
+Dedicated CSS for the onboarding progress bar widget.
+Brief Logic:
+Contains the CSS for the onboarding progress bar widget.
+Are  there any dependent JS files: No
+*/
 .main{
     
     display: flex;

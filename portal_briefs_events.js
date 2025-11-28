@@ -1,3 +1,10 @@
+/*
+Purpose: Manages the briefs and events for the NSD portal.
+
+Brief Logic: Initializes briefs and events, caches DOM elements, and fetches data from API to display in grid. Analyzes user's briefs to determine subscription recommendations and updates upsell elements with dynamic content.
+
+Are there any dependent JS files: No
+*/
 class BriefManager {
             constructor(briefs, data) {
                 // Array of briefs (each brief should have: title, pdf_url, doc_url)

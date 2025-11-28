@@ -1,3 +1,10 @@
+/*
+Purpose: Coach resource loader that maps camp IDs to schedules and injects uploaded materials for the instructor portal.
+
+Brief Logic: Maps camp IDs to schedules and fetches uploaded materials from API. Injects schedule and resource data into instructor portal interface for easy access.
+
+Are there any dependent JS files: No
+*/
 async function coachResources(coachCampId, memberId) {
 
   const coachResourceGrid = document.getElementById('coach-resource-grid');

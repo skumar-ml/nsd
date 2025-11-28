@@ -1,3 +1,10 @@
+/*
+Purpose: Displays supplementary programs in a list format with filters and pagination.
+
+Brief Logic: Fetches supplementary programs from API and renders them in a list with filtering and pagination. Handles program selection, student list updates, and checkout flow integration.
+
+Are there any dependent JS files: No
+*/
 class DisplaySuppProgram {
   $selectedProgram = [];
   constructor(memberData) {

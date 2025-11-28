@@ -1,3 +1,10 @@
+/*
+Purpose: Fetches polling assignments and updates the unread polling counter badge.
+
+Brief Logic: Fetches polling data from API and calculates unread count. Updates badge display with unread polling assignment count.
+
+Are there any dependent JS files: No
+*/
 class PollingNotificationCount {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;

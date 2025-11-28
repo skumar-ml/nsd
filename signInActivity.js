@@ -1,3 +1,10 @@
+/*
+Purpose: Inserts a sign-in activity record into the database.
+
+Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tracks user login events for analytics and activity monitoring.
+
+Are there any dependent JS files: No
+*/
 class SigninActivity {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;

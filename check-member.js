@@ -1,3 +1,10 @@
+/*
+Purpose: Lightweight membership verifier that hits the checkMemberExist API and fills status fields.
+
+Brief Logic: Calls checkMemberExist API to verify member existence across MongoDB, Memberstack, and Webflow. Updates status fields in UI based on verification results.
+
+Are there any dependent JS files: No
+*/
 class checkMember {
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;

@@ -1,3 +1,10 @@
+/*
+Purpose: Builds accordion views of competition standings, sorting events and team point totals.
+
+Brief Logic: Fetches competition data from API and sorts by start date. Builds accordion interface for each competition with timers, notifications, live check-in data, and tab navigation.
+
+Are there any dependent JS files: No
+*/
 /**
  * 	
  * @param name - HTML element name

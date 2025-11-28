@@ -1,3 +1,10 @@
+/*
+Purpose: Primary NSD portal experience that aggregates forms, invoices, briefs, and supplementary data for the current season.
+
+Brief Logic: Fetches forms, invoices, briefs, and supplementary program data from API. Aggregates and displays all data in organized grid layouts with filtering and navigation.
+
+Are there any dependent JS files: No
+*/
 class NSDPortal {
     $completedForm = [];
     $completedFormOnly = [];

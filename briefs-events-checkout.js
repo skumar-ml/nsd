@@ -1,3 +1,10 @@
+/*
+Purpose: Multi-step checkout wizard for briefs/events that pulls inventory, handles accordions, and updates totals.
+
+Brief Logic: Fetches briefs and events data from API and displays them in a grid with accordion navigation. Handles item selection, preview modal, payment method tabs, and dynamically updates total amounts based on selected items.
+
+Are there any dependent JS files: No
+*/
 class BriefsEventsCheckout {
     constructor(data) {
         this.data = data;
