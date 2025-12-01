@@ -75,19 +75,6 @@ class FamilyMember {
     return data;
   }
 
- 
-  // convertDate(dateString) {
-  //   const inputDate = new Date(dateString);
-  //   const formattedDate = inputDate
-  //     .toLocaleDateString("en-GB", {
-  //       day: "2-digit",
-  //       month: "2-digit",
-  //       year: "numeric",
-  //     })
-  //     .replace(/\//g, "-"); // Replace slashes with dashes
-
-  //   return formattedDate;
-  // }
   /**
    * Convert date format
    */

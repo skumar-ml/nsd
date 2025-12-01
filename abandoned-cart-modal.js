@@ -27,13 +27,6 @@ class AbandonedCartModal {
       });
       this.checkAndDisplayModal();
     }
-
-    const viewCartBtn = document.getElementById("view-cart-btn");
-    if (viewCartBtn) {
-      viewCartBtn.addEventListener("click", () => {
-        //this.setModelDisplay();
-      });
-    }
   }
   isWithinAWeek(dateString) {
     const date = new Date(dateString);
@@ -49,9 +42,6 @@ class AbandonedCartModal {
       window.location.pathname.includes("/cart/") ||
       window.location.pathname.includes("log-in")
     ) {
-      // console.log(
-      //   "User is on the cart page or login page, not displaying modal."
-      // );
       return;
     }
     
@@ -60,7 +50,6 @@ class AbandonedCartModal {
       $this.displayCartMenuData()
       const parsedCartData = JSON.parse(cartData);
       if (parsedCartData.createdOn && parsedCartData.programStartDate) {
-        //parsedCartData.createdOn = new Date(parsedCartData.createdOn).toLocaleString();
         $this.checkAndDisplayModals(parsedCartData).then((result) => { 
           $this.openModal();
           $this.addLinkTOViewCartBtn();
@@ -72,13 +61,10 @@ class AbandonedCartModal {
       this.fetchCartDataFromAPI()
       .then((data) => {
         if (data.createdOn && data.programStartDate) {
-          //data.createdOn = new Date(data.createdOn).toLocaleString();
-          //console.log('checkOutData from database', JSON.stringify(data))
           localStorage.setItem("checkOutData", JSON.stringify(data));
           $this.displayCartMenuData()
           return $this.checkAndDisplayModals(data);
         }else{
-          // console.log("No createdOn or programStartDate found in the response.");
           return Promise.reject("No createdOn or programStartDate found in the response.");
         }
       }).then((result) => {
@@ -92,31 +78,10 @@ class AbandonedCartModal {
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
       const createdOnDate = new Date(data.createdOn);
-      // const dateString = data.createdOn;
-      // const [datePart, timePart] = dateString.split(", ");
-      // const [day, month, year] = datePart.split("/").map(Number);
-      // const [hours, minutes, seconds] = timePart.split(":").map(Number);
-      
-      // const createdOnDate = new Date(year, month - 1, day, hours, minutes, seconds);
-      
-      //const sixHoursAgo = new Date();
-      //sixHoursAgo.setHours(sixHoursAgo.getMinutes() - 5);
       const sixHoursAgo = new Date(Date.now() - this.data.hour * 60 * 60 * 1000);
-      //const sixHoursAgo = new Date(Date.now() - 5 * 60 * 1000);
-      // Condition 1: If abandoned cart happened less than 6 hours ago
       if (createdOnDate > sixHoursAgo) {
-        // console.log(
-        //   `Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`,
-        //   createdOnDate,
-        //   sixHoursAgo
-        // );
         reject(`Fetched cart data is less than ${this.data.hour} hours old, not displaying modal.`);
         return;
-      }else{
-        // console.log(
-        //   "Condition 1", 
-        //   createdOnDate, 
-        //   sixHoursAgo)
       }
 
       const fiveMonthsAgo = new Date();
@@ -124,18 +89,8 @@ class AbandonedCartModal {
 
       // Condition 2: If abandoned cart happened 5 months ago
       if (createdOnDate < fiveMonthsAgo) {
-        // console.log(
-        //   "Fetched cart data is older than 5 months, not displaying modal.",
-        //   createdOnDate
-        // );
         reject("Fetched cart data is older than 5 months, not displaying modal.");
         return;
-      } else {
-        // console.log(
-        //   "Condition 2",
-        //   createdOnDate,
-        //   fiveMonthsAgo
-        // )
       }
 
       // Condition 3: If it is after the programStartDate for an abandoned cart
@@ -143,17 +98,8 @@ class AbandonedCartModal {
         const programStartDate = new Date(data.programStartDate);
         const now = new Date();
         if (programStartDate <= now) {
-          // console.log(
-          //   "Program start date is before or equal to the current date, not displaying modal.",
-          //   data.programStartDate
-          // );
           reject("Program start date is before or equal to the current date, not displaying modal.");
           return;
-        } else {
-          console.log(
-            "Condition 3",
-            data.programStartDate
-          )
         }
       }
 
@@ -166,31 +112,10 @@ class AbandonedCartModal {
         sevenDaysLater.setDate(lastOpenedDate.getDate() + 7);
 
         if (now < sevenDaysLater) {
-          // console.log(
-          //   "Modal was closed less than 7 days ago, not displaying modal."
-          // );
           reject("Modal was closed less than 7 days ago, not displaying modal.");
           return;
-        } else {
-          // console.log(
-          //   "Condition 4",
-          //   now,
-          //   sevenDaysLater
-          // )
         }
       }
-
-      // Condition: If user has an abandoned cart before a purchase
-      // No need to check has purchase
-      //const hasPurchased = localStorage.getItem("hasPurchased");
-      // if (hasPurchased === "true") {
-      //   console.log(
-      //     "User has made a purchase after the abandoned cart, not displaying modal."
-      //   );
-      //   reject("User has made a purchase after the abandoned cart, not displaying modal.");
-      //   return;
-      // }
-
       // If all conditions pass, resolve to display the modal
       //console.log("All conditions passed, displaying modal.");
       resolve("All conditions passed, displaying modal.");
@@ -215,7 +140,6 @@ class AbandonedCartModal {
       }
       return await response.json();
     } catch (error) {
-      //console.error("Failed to fetch cart data:", error);
       throw error;
     }
   }

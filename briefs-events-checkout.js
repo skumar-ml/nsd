@@ -450,14 +450,8 @@ class BriefsEventsCheckout {
 
         // Update the order total display
         this.updateOrderTotalDisplay(total);
-
-        console.log('Selected briefs:', this.selectedBriefs);
-        console.log('Selected events:', this.selectedEvents);
-        console.log('Briefs total:', briefsTotal);
-        console.log('Events total:', eventsTotal);
-        console.log('Combined total amount:', total);
+        
         const isCreditCardSelected = this.isCreditCardSelected();
-        console.log('Credit card selected:', isCreditCardSelected);
 
         if (isCreditCardSelected) {
             const individualAmounts = this.getIndividualAmounts();
@@ -543,12 +537,6 @@ class BriefsEventsCheckout {
             if (accordionType === 'annual-events-accordion') {
                 // Open annual accordion
                 if (annualBody) {
-                    // Set a temporary height to ensure content is rendered
-                    //annualBody.style.maxHeight = 'none';
-                    // Use setTimeout to ensure content is fully rendered before calculating height
-                    //setTimeout(() => {
-                        //annualBody.style.maxHeight = annualBody.scrollHeight + 'px';
-                    //}, 10);
                     annualBody.style.display = 'flex';
                     annualBody.style.height = 'auto';
                     annualBody.style.opacity = '1';
@@ -579,12 +567,6 @@ class BriefsEventsCheckout {
             if (accordionType === 'single-briefs-accordion') {
                 // Open single accordion
                 if (singleBody) {
-                    // Set a temporary height to ensure content is rendered
-                    //singleBody.style.maxHeight = 'none';
-                    // Use setTimeout to ensure content is fully rendered before calculating height
-                    //setTimeout(() => {
-                        //singleBody.style.maxHeight = singleBody.scrollHeight + 'px';
-                    //}, 10);
                     singleBody.style.display = 'grid';
                     singleBody.style.height = 'auto';
                     singleBody.style.opacity = '1';

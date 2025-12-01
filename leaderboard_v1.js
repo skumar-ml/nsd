@@ -34,13 +34,7 @@ class NDFLeaderBoard {
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
         // var competitionLocalData = localStorage.getItem("competitionData");
-        var $this = this;
-        // console.log('competitionLocalData', competitionLocalData)
-        // if (competitionLocalData != "undefined" && competitionLocalData != null) {
-        //     var responseText = JSON.parse(competitionLocalData);
-        //     $this.createPortalTabs(responseText)
-        //     spinner.style.display = 'none';
-        // } else {
+        var $this = this;   
             try {
                 const data = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
                 spinner.style.display = 'none';
@@ -51,9 +45,6 @@ class NDFLeaderBoard {
                 console.error('Error fetching data:', error);
                 throw error;
             }
-        // }
-        // const bgData = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
-        // localStorage.setItem("competitionData", JSON.stringify(bgData));
     }
     createProgressBarHTML(title, progressPercentage, currentDay, totalDays) {
         return `

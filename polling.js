@@ -252,12 +252,7 @@ class Polling {
 		var $this = this;
 		var fileName = fileLink
 		var a = creEl('a', 'downloadLink iframe-lightbox-link poll-btn main-button red w-button')
-		/*var img = creEl('img','viewIcon')
-		img.src="https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/643501a495c54e74d70e60ba_view-file.svg";
-		img.title = 'View';
-		a.appendChild(img);*/
-		//a.innerHTML = "START"
-		//a.href = fileLink;
+		
 		if(item.is_user_edit && item.submissionId){
 			a.innerHTML = "EDIT";
 			a.href = "https://www.jotform.com/edit/"+item.submissionId;
@@ -360,17 +355,7 @@ class Polling {
 		})
 		return backButton;
 	}
-	/*deatailPageRow(text, text_head){
-		var row = creEl('div', 'w-row')
-		var title_head = this.creBoldText(text_head)
-		var title = text;
-		var col_1 = this.createCol('', 2);
-		col_1.appendChild(title_head);
-		var col_2 = this.createCol(title, 10);
-		row.appendChild(col_1);
-		row.appendChild(col_2);
-		return row;
-	}*/
+	
 	/*Foramated date for list and details page*/
 	formatedDate(dateString, type=''){
 		const monthText = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -410,15 +395,7 @@ class Polling {
 		detailHead.appendChild(sendBycol);
 		contain.appendChild(detailHead);
 		
-		/*var dateTextcol = creEl("div", 'w-col w-col-10 detail-head text-right');
-		dateTextcol.innerHTML = dateText;
-		contain.appendChild(dateTextcol);
 		
-		var title = item.title;
-		var dateTextcol = creEl("div", 'w-col w-col-12 detail-title text-right');
-		dateTextcol.innerHTML = title;
-		contain.appendChild(dateTextcol);
-		*/
 		var message = (item.activityType)? item.activityType : '-';
 		var dateMessagecol = creEl("div", 'w-col w-col-12 details-message');
 		dateMessagecol.innerHTML = '<b>Activity Type</b>: '+ message;
@@ -432,10 +409,7 @@ class Polling {
 		if(item.jotformUrl){
 			var viewIcon = this.viewDownLoadedFile(item.jotformUrl, item)
 			var downloadCol = creEl("div", 'w-col w-col-12 download-icon');
-			//var download_head = this.creBoldText('View Poll: ')
-			//var downloadIcon = this.downLoadLinkIcon(item.jotformUrl,'download');
-			//downloadCol.appendChild(download_head);
-			//downloadCol.appendChild(downloadIcon);
+			
 			downloadCol.appendChild(viewIcon);
 			contain.appendChild(downloadCol);
 		}
