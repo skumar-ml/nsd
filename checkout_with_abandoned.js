@@ -103,6 +103,10 @@ class BriefsUpsellModal {
 					this.hideBriefsUpsellModal();
 					this.persistBriefSelection(this.selectedBriefEvent);
 					this.briefSelectionRestored = true;
+					// Update button text to "Added" after clicking
+					this.briefCtaButtons.forEach((btn) => {
+						btn.textContent = 'Added';
+					});
 				}
 			});
 		});
@@ -266,6 +270,10 @@ class BriefsUpsellModal {
 		}
 		this.selectedBriefEvent = selected;
 		this.syncBriefCardsWithSelection();
+		// Reset briefEventAdded when selecting a new brief (switching)
+		if (this.appliedBriefEvent) {
+			this.briefEventAdded = false;
+		}
 		this.updateBriefCtaState();
 	}
 	updateBriefAmount(nextSelection) {
@@ -405,6 +413,17 @@ class BriefsUpsellModal {
 				? this.briefCtaDefaultDisplays.get(button)
 				: this.briefCtaDefaultDisplay;
 			button.style.display = shouldShow ? defaultDisplay || '' : 'none';
+			// Update button text based on state
+			if (shouldShow) {
+				// Priority: Added > Switch Bundle > Add to Cart
+				if (this.briefEventAdded) {
+					button.textContent = 'Added';
+				} else if (this.appliedBriefEvent) {
+					button.textContent = 'Switch Bundle';
+				} else {
+					button.textContent = 'Add to Cart';
+				}
+			}
 		});
 	}
 	clearBriefSelection() {
@@ -431,6 +450,10 @@ class BriefsUpsellModal {
 			wrapperEl.innerHTML = '';
 		});
 		this.syncBriefCardsWithSelection();
+		// Reset button text to "Add to Cart" when clearing selection
+		this.briefCtaButtons.forEach((button) => {
+			button.textContent = 'Add to Cart';
+		});
 		this.updateBriefCtaState();
 		this.persistBriefSelection(null);
 		this.briefTotalsRestored = false;
