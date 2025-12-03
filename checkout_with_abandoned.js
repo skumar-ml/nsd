@@ -35,8 +35,15 @@ class BriefsUpsellModal {
 		this.briefCtaButton = this.briefCtaButtons[0] || null;
 		this.briefCtaDefaultDisplay = this.briefCtaButton ? this.briefCtaButton.style.display : '';
 		this.briefCtaDefaultDisplays = new Map();
+		this.briefCtaDefaultStyles = new Map();
 		this.briefCtaButtons.forEach((button) => {
 			this.briefCtaDefaultDisplays.set(button, button.style.display || '');
+			// Store original styles for restoration
+			this.briefCtaDefaultStyles.set(button, {
+				pointerEvents: button.style.pointerEvents || '',
+				color: button.style.color || '',
+				backgroundColor: button.style.backgroundColor || ''
+			});
 		});
 		this.briefCheckboxIcons = {
 			checked: 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/691ecbd882b2c55efd083770_square-check%20(2).svg',
@@ -103,9 +110,13 @@ class BriefsUpsellModal {
 					this.hideBriefsUpsellModal();
 					this.persistBriefSelection(this.selectedBriefEvent);
 					this.briefSelectionRestored = true;
-					// Update button text to "Added" after clicking
+					// Update button text to "Added" after clicking and disable it
 					this.briefCtaButtons.forEach((btn) => {
 						btn.textContent = 'Added';
+						// Disable button when text is "Added"
+						btn.style.pointerEvents = 'none';
+						btn.style.color = 'rgb(255, 255, 255)';
+						btn.style.backgroundColor = 'gray';
 					});
 				}
 			});
@@ -133,6 +144,16 @@ class BriefsUpsellModal {
 		this.briefCtaButtons.forEach((button) => {
 			if (!this.briefCtaDefaultDisplays.has(button)) {
 				this.briefCtaDefaultDisplays.set(button, button.style.display || '');
+			}
+			if (!this.briefCtaDefaultStyles) {
+				this.briefCtaDefaultStyles = new Map();
+			}
+			if (!this.briefCtaDefaultStyles.has(button)) {
+				this.briefCtaDefaultStyles.set(button, {
+					pointerEvents: button.style.pointerEvents || '',
+					color: button.style.color || '',
+					backgroundColor: button.style.backgroundColor || ''
+				});
 			}
 		});
 		if (this.briefCtaButton && !this.briefCtaDefaultDisplay) {
@@ -423,14 +444,32 @@ class BriefsUpsellModal {
 					String(this.appliedBriefEvent.eventId) === String(this.selectedBriefEvent.eventId);
 				
 				if (isSameBrief) {
-					// Selected brief is the same as applied brief - show "Added"
+					// Selected brief is the same as applied brief - show "Added" and disable
 					button.textContent = 'Added';
-				} else if (this.appliedBriefEvent) {
-					// Different brief is applied - show "Switch Bundle"
-					button.textContent = 'Switch Bundle';
+					button.style.pointerEvents = 'none';
+					button.style.color = 'rgb(255, 255, 255)';
+					button.style.backgroundColor = 'gray';
 				} else {
-					// No brief applied yet - show "Add to Cart"
-					button.textContent = 'Add to Cart';
+					// Restore original styles when not "Added"
+					const defaultStyles = this.briefCtaDefaultStyles ? this.briefCtaDefaultStyles.get(button) : null;
+					if (defaultStyles) {
+						button.style.pointerEvents = defaultStyles.pointerEvents || '';
+						button.style.color = defaultStyles.color || '';
+						button.style.backgroundColor = defaultStyles.backgroundColor || '';
+					} else {
+						// Reset to default if no stored styles
+						button.style.pointerEvents = '';
+						button.style.color = '';
+						button.style.backgroundColor = '';
+					}
+					
+					if (this.appliedBriefEvent) {
+						// Different brief is applied - show "Switch Bundle"
+						button.textContent = 'Switch Bundle';
+					} else {
+						// No brief applied yet - show "Add to Cart"
+						button.textContent = 'Add to Cart';
+					}
 				}
 			}
 		});
@@ -459,9 +498,21 @@ class BriefsUpsellModal {
 			wrapperEl.innerHTML = '';
 		});
 		this.syncBriefCardsWithSelection();
-		// Reset button text to "Add to Cart" when clearing selection
+		// Reset button text to "Add to Cart" and restore styles when clearing selection
 		this.briefCtaButtons.forEach((button) => {
 			button.textContent = 'Add to Cart';
+			// Restore original styles
+			const defaultStyles = this.briefCtaDefaultStyles ? this.briefCtaDefaultStyles.get(button) : null;
+			if (defaultStyles) {
+				button.style.pointerEvents = defaultStyles.pointerEvents || '';
+				button.style.color = defaultStyles.color || '';
+				button.style.backgroundColor = defaultStyles.backgroundColor || '';
+			} else {
+				// Reset to default if no stored styles
+				button.style.pointerEvents = '';
+				button.style.color = '';
+				button.style.backgroundColor = '';
+			}
 		});
 		this.updateBriefCtaState();
 		this.persistBriefSelection(null);
