@@ -7,6 +7,7 @@ Are there any dependent JS files: No
 */
 class FamilyMember {
   $editMemberData = [];
+  // Initializes the FamilyMember instance with provided data and sets up family member display
   constructor(data) {
     this.memberId = data.memberId;
     this.baseUrl = data.baseUrl;
@@ -14,7 +15,7 @@ class FamilyMember {
     this.displayFamilyMember();
     this.handleEditMember();
   }
-  // Get API data with the help of endpoint
+  // Fetches data from the API endpoint and returns the response
   async fetchData(endpoint) {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -29,7 +30,7 @@ class FamilyMember {
     }
   }
   /**
-   *
+   * Creates a DOM element with optional class and id attributes
    * @param name - HTML element name
    * @param className - HTML element class attribute
    * @param idName - HTML element id attribute
@@ -44,9 +45,7 @@ class FamilyMember {
     }
     return el;
   }
-  /**
-   * Get family member data based on memberId
-   */
+  // Fetches and displays all family member data sorted with current member first
   async displayFamilyMember() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
@@ -64,6 +63,7 @@ class FamilyMember {
     spinner.style.display = "none";
   }
 
+  // Sorts the data array to move the target member ID to the front
   sortDataBasedOnMemberId(data, targetId) {
     data.sort((a, b) => {
       if (a.memberId) {
@@ -74,10 +74,7 @@ class FamilyMember {
     });
     return data;
   }
-
-  /**
-   * Convert date format
-   */
+  // Converts a date string to MM/DD/YYYY format
   convertDate(dateString) {
     if (dateString) {
       const date = new Date(dateString);
@@ -87,6 +84,7 @@ class FamilyMember {
       return `${month}/${day}/${year}`;
     }
   }
+  // Determines the member type based on createdOn and itemId properties
   getMemberType(data) {
     let memberType = "sign-up";
     if (!data.createdOn) {
@@ -96,9 +94,7 @@ class FamilyMember {
     }
     return memberType;
   }
-  /**
-   * Manipulate single family data and return single family html
-   */
+  // Creates and returns a DOM element representing a single family member card
   getSingleFamilyData(data) {
     const memberType = this.getMemberType(data);
     var $this = this;
@@ -171,7 +167,7 @@ class FamilyMember {
     return familyMemberContainer;
   }
 
-  // Update student data for addon supplementary program purchase
+  // Updates form fields with student data for supplementary program purchase
   updateSuppData(data) {
     var studentFirstName = document.getElementById("Student-First-Name");
     var studentLastName = document.getElementById("Student-Last-Name");
@@ -207,6 +203,7 @@ class FamilyMember {
     }
   }
 
+  // Sets up event handlers for editing member information and manages add family member button visibility
   handleEditMember() {
     var $this = this;
     const editMemberBtn = document.getElementById("editMemberBtn");
@@ -222,12 +219,14 @@ class FamilyMember {
       addFamilyMember.style.display = "none"
     }
   }
+  // Closes the specified modal by removing show class and hiding it
   closeModal(modal) {
     if (modal) {
       modal.classList.remove("show");
       modal.style.display = "none";
     }
   }
+  // Sends updated member information to the API and refreshes the family member display
   editMemberInfo(memberData) {
     var $this = this;
     var studentFirstName = document.getElementById("Student-First-Name");
@@ -286,6 +285,7 @@ class FamilyMember {
       }
     };
   }
+  // Deletes an invited member from the system via API call
   deleteInvitedMember(memberData) {
     var $this = this;
     var xhr = new XMLHttpRequest();

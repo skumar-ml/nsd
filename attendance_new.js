@@ -13,6 +13,7 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
+// Creates a DOM element with optional class and id attributes
 function creEl(name, className, idName) {
 	var el = document.createElement(name);
 	if (className) {
@@ -31,12 +32,13 @@ function creEl(name, className, idName) {
 class selfCheckInForm {
 	$currentLab = {};
 	$selected_labs = [];
+	// Initializes the self check-in form with member ID and labs data
 	constructor(webflowMemberId, labsData) {
 		this.webflowMemberId = webflowMemberId;
 		this.labsData = labsData;
 		this.view();
 	}
-	/*Display Self check-in form*/
+	// Displays the self check-in form with session and lab selection
 	view() {
 		// Get Parent Div
 		var accordionDiv = document.getElementById("attendanceSelfCheckIn");
@@ -59,7 +61,7 @@ class selfCheckInForm {
 		row.appendChild(col)
 		accordionDiv.appendChild(row);
 	}
-	// Create session select box html element 
+	// Creates and returns a session selection dropdown element
 	get_session() {
 		var $this = this;
 		// Get all labs data
@@ -94,7 +96,7 @@ class selfCheckInForm {
 		select.appendChild(labsSelectBox)
 		return select;
 	}
-	// Hide check-in button when lab is empty  
+	// Hides the check-in button when no lab is selected
 	hideLabAndBtn() {
 		var labListSelect = document.getElementsByClassName('select-timezones')[0];
 		var btn = document.getElementsByClassName('check-in-btn')[0];
@@ -102,7 +104,7 @@ class selfCheckInForm {
 			btn.style.display = 'none';
 		}
 	}
-	// Hide lab list and check-in button when lab list or session is empty
+	// Hides lab list and check-in button when session or lab selection is empty
 	hideShowUI() {
 		var labListSelect = document.getElementsByClassName('select-timezones')[0];
 		var _labListSelect = document.getElementsByClassName('select_timezones')[0];
@@ -118,7 +120,7 @@ class selfCheckInForm {
 		}
 
 	}
-	// Create labs select box html element 
+	// Creates and returns a lab selection dropdown element based on selected session
 	get_Labs() {
 		var $this = this;
 		// Get all labs data
@@ -148,7 +150,7 @@ class selfCheckInForm {
 		select.appendChild(sessionSelectBox)
 		sessionFilter.appendChild(select)
 	}
-	// Create default checked button html element
+	// Creates and returns the self check-in button element
 	getCheckInBtn() {
 		var $this = this;
 		var checkInBtn = creEl('button', 'main-button red w-button check-in-btn', 'check-in-btn');
@@ -158,7 +160,7 @@ class selfCheckInForm {
 		})
 		return checkInBtn;
 	}
-	// Display checked in button on lab change
+	// Displays or hides the check-in button based on lab selection and checked-in status
 	displayCheckInBtn(labId) {
 
 		var currentLab = this.$selected_labs.find(item => item.labId == labId);
@@ -189,13 +191,13 @@ class selfCheckInForm {
 		}
 
 	}
-	// get checkin tick icon
+	// Returns an image element for the check-in confirmation icon
 	getCheckInIcon() {
 		var img = creEl('img', 'checkedInIcon')
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/647062754a2e7d5b5208c785_square-check-red.svg';
 		return img
 	}
-	// API call for daily checked in
+	// Makes an API call to submit the student's check-in attendance
 	callCheckedInApi() {
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
@@ -227,7 +229,7 @@ class selfCheckInForm {
 		}
 
 	}
-	// After checked in update local data
+	// Updates the local labs data after successful check-in
 	updateCurrentData() {
 		var labsSelectBox = document.getElementById('select-labs');
 		var labListSelect = document.getElementsByClassName('select-timezones')[0];
@@ -245,7 +247,7 @@ class selfCheckInForm {
 		})
 		this.labsData = labsData;
 	}
-	// Get API data with the help of endpoint
+	// Fetches data from the specified URL endpoint
 	async fetchData(url) {
 		try {
 			const response = await fetch(url);
@@ -259,7 +261,7 @@ class selfCheckInForm {
 			throw error;
 		}
 	}
-	//Update competition local data
+	// Updates competition data in localStorage after check-in
 	async updatedCompetitionLocalData(){
 		const bgData = await this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + this.webflowMemberId);
 		localStorage.setItem("competitionData", JSON.stringify(bgData));
@@ -272,11 +274,12 @@ class selfCheckInForm {
 class LabsData {
 	$isLoading = true;
 	$messageData = '';
+	// Initializes LabsData instance and fetches session and lab data
 	constructor(webflowMemberId) {
 		this.webflowMemberId = webflowMemberId;
 		this.getSessionLabsData();
 	}
-	// Get all session and lab data and create a check in for student
+	// Fetches all session and lab data from API and creates the check-in form
 	getSessionLabsData() {
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'block';

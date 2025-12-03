@@ -6,6 +6,7 @@ Brief Logic: Checks if student is eligible for Google review based on program co
 Are there any dependent JS files: No
 */
 class GoogleReviewModal {
+  // Initializes the Google review modal with member data and sets up event handlers
   constructor(memberData) {
     this.modal = document.getElementById("google-review-modal");
     this.closeButtons = document.querySelectorAll(".google-review-close-link, #may-be-later");
@@ -23,6 +24,7 @@ class GoogleReviewModal {
     this.init();
   }
 
+  // Sets up close button event listeners and checks eligibility for review
   init() {
     this.closeButtons.forEach((button) => {
       button.addEventListener("click", () => this.closeModal());
@@ -31,6 +33,7 @@ class GoogleReviewModal {
     this.isEligibleForReview();
   }
 
+  // Clears Google review data from localStorage if student email has changed
   clearGoogleReviewData() {
     if (!this.googleReviewData || !this.googleReviewData.studentEmail) return;
     if (this.studentEmail !== this.googleReviewData.studentEmail) {
@@ -39,6 +42,7 @@ class GoogleReviewModal {
     }
   }
 
+  // Checks if the student is eligible for Google review based on program completion data
   isEligibleForReview() {
     if (this.googleReviewData && Object.keys(this.googleReviewData).length > 0) {
       this.checkConditionsAndShowModal();
@@ -70,11 +74,13 @@ class GoogleReviewModal {
     }
   }
 
+  // Updates Google review data in localStorage with new information
   updateGoogleReviewData(data) {
     this.googleReviewData = { ...this.googleReviewData, ...data };
     localStorage.setItem("googleReviewData", btoa(JSON.stringify(this.googleReviewData)));
   }
 
+  // Validates conditions and displays the review modal if eligible
   checkConditionsAndShowModal() {
     if (!this.googleReviewData || !this.isStudent) return;
 
@@ -109,11 +115,13 @@ class GoogleReviewModal {
     }
   }
 
+  // Displays the Google review modal by adding show class and setting display to flex
   showModal() {
     this.modal.classList.add("show");
     this.modal.style.display = "flex";
   }
 
+  // Closes the Google review modal by removing show class and hiding it
   closeModal() {
     this.modal.classList.remove("show");
     this.modal.style.display = "none";

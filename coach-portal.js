@@ -5,6 +5,7 @@ Brief Logic: Maps camp IDs to schedules and fetches uploaded materials from API.
 
 Are there any dependent JS files: No
 */
+// Maps camp IDs to schedules and displays uploaded materials for the instructor portal
 async function coachResources(coachCampId, memberId) {
 
   const coachResourceGrid = document.getElementById('coach-resource-grid');
@@ -68,6 +69,7 @@ async function coachResources(coachCampId, memberId) {
   }
 }
 
+// Fetches coach portal data from the API for the specified member ID
 async function getCoachData(memberId){
 	
 	try {

@@ -22,6 +22,7 @@ class NSDPortal {
     $deadlineDate = '';
     /**New Variable */
     $allStudentData = []
+    // Initializes the NSD portal instance and fetches portal and supplementary data
     constructor(webflowMemberId, accountEmail, apiBaseUrl) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
@@ -29,7 +30,7 @@ class NSDPortal {
         this.getPortalData();
         this.getSuppPortalData();
     }
-    // Get API data with the help of endpoint
+    // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -43,6 +44,7 @@ class NSDPortal {
             //throw error;
         }
     }
+    // Fetches portal data including forms, invoices, and briefs from API
     async getPortalData() {
         // API call
         const nsdSuppDataPortal = document.getElementById('nsdSuppDataPortal');
@@ -98,7 +100,7 @@ class NSDPortal {
         // Re initialize webflow tabs after API call 
         Webflow.require('tabs').redraw();
     }
-    // Hide free and paid resources after api response data
+    // Hides or shows free/paid resources based on API response data
     hidePortalData(responseText, briefsData) {
         if (briefsData.length > 0) {
             document.getElementById("paid-resources").style.display = "block";
@@ -123,6 +125,7 @@ class NSDPortal {
             document.getElementById("paid-resources").style.display = "block";
         }
     }
+    // Creates portal tabs for multiple student programs with invoice data
     createPortalTabs(tabsData, invoiceData) {
         const nsd_portal_container = document.getElementById('nsdPortal');
         var is_notification = false;
@@ -215,6 +218,7 @@ class NSDPortal {
         this.updateMemberFirstName();
 
     }
+    // Sets up event handlers for cross icon clicks to close tabs
     crossEvent() {
         var crossIcon = document.querySelectorAll('.cross-icon')
         crossIcon.forEach(e =>{
@@ -232,6 +236,7 @@ class NSDPortal {
             });
         })
     }
+    // Updates global variables with form, invoice, and program data from tab
     updateGlobalVariable(tab) {
         this.$completedForm = tab.formCompletedList;
 	    
@@ -252,6 +257,7 @@ class NSDPortal {
         this.$deadlineDate = new Date(this.$programDetail.deadlineDate);
     }
 	
+    // Creates and returns a tab pane element with pre-camp and during-camp content
     tabPane(index, tabIndex, isTabActive, tab) {
         // Update global data
         // Create the tab content
@@ -322,6 +328,7 @@ class NSDPortal {
 
 
    //Invoice Changes
+    // Updates invoice data in both pre-camp and during-camp sections
     updateInvoiceData(invoiceData) {
         invoiceData.forEach(item => {
             if (item.invoiceList != null) {
@@ -341,7 +348,7 @@ class NSDPortal {
             }
         })
     }
-    //Invoice Changes
+    // Creates and returns a DOM element for a single invoice form row
     singleInvoiceForm(invoice, paymentId) {
         var $this = this;
 
@@ -420,8 +427,7 @@ class NSDPortal {
         preCampRow.appendChild(linkContainer);
         return preCampRow;
     }
-    //Invoice Changes
-    /**  Initialize tooltip */
+    // Initializes tooltips for elements with tip attributes
     initializeToolTips() {
         const elements = [...document.querySelectorAll('[tip]')]
         var i = 0;
@@ -450,9 +456,7 @@ class NSDPortal {
             }
         }
     }
-    /**
-     * Get Checkbox icon for form complete or complete
-     */
+    // Returns the appropriate icon URL based on invoice status (processing, failed, or completed)
     getCheckedInvoiceIcon(status, failed, processing) {
 
         if (processing) {
@@ -466,7 +470,7 @@ class NSDPortal {
         }
     }
 
-    /** Initialize stripe payment for invoice */
+    // Initializes Stripe payment checkout for invoice payment
     initializeStripePayment(invoice_id, title, amount, paymentLinkId, span, link_title, paymentType, paymentId) {
         var centAmount = (amount*100).toFixed(2);
         var data = {
@@ -500,6 +504,7 @@ class NSDPortal {
         }
     }
 
+   // Returns HTML for invoice progress bar showing completion percentage
    progressBarInvoice() {
         let percentageAmount = (this.$completedInvoiceOnly) ? (100 * this.$completedInvoiceOnly) / this.$totalInvoice : 0;
         return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly} of ${(this.$totalInvoice)? this.$totalInvoice : 1} invoices complete</div>
@@ -509,13 +514,13 @@ class NSDPortal {
     }
 
 	
-    /**
-     * check program is started or not based on current date
-     */
+    
+	// Checks if the program start date has been reached
 	checkProgramStartDate(){
 		var currentDate = new Date(); 
 		return (currentDate >= this.$startDate) ? true : false;
 	}
+    // Creates and returns the pre-camp content div with forms and resources
     createPreCampContent(formList) {
         const preCampDiv = document.createElement('div');
         preCampDiv.className = 'pre-camp_div';
@@ -564,6 +569,7 @@ class NSDPortal {
         return preCampDiv;
     }
 
+   // Returns HTML for invoice list section with progress bar
    invoiceList() {
 	   this.$totalInvoice +=  this.$invoices.invoiceList.length;
         return `<div>
@@ -575,9 +581,10 @@ class NSDPortal {
                     </div>
                     <div class="pre-camp_grid invoice_grid" id="invoice_${this.$studentDetail.uniqueIdentification}">
                     </div>
-                </div>`;
-    }	
+                    </div>`;	
+    }
    
+    // Creates and returns HTML for a form category section
     formCategoryList(formCategory) {
         let invoiceForm = formCategory.name;
         let invoiceClass = (invoiceForm == 'Invoice') ? "invoice_grid" : "form_grid";
@@ -622,6 +629,7 @@ class NSDPortal {
             </div>`;
         return formCategory;
     }
+    // Returns HTML string for list of forms in a category
     formsList(formCategory, type) {
         if (formCategory.forms.length == 0) {
             return ''
@@ -631,6 +639,7 @@ class NSDPortal {
         }).map(form => this.singleForm(form, type)).join('')
         return forms;
     }
+    // Returns HTML string for a single form row with status icon and link
     singleForm(form, type) {
         //check it's editable
         let editable = this.checkForm(form.formId);
@@ -681,6 +690,7 @@ class NSDPortal {
         `;
         return singleForm;
     }
+    // Returns HTML for progress bar showing form completion percentage
     progressBar() {
         let percentageAmount = (this.$completedFormOnly.length) ? (100 * this.$completedFormOnly.length) / this.$totalForm : 0;
         return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedFormOnly.length} of ${this.$totalForm} forms complete</div>
@@ -688,6 +698,7 @@ class NSDPortal {
                     <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
                 </div>`;
     }
+    // Creates and returns the during-camp content div with resources and camp topic
     createDuringCampContent() {
         const debateEvent = this.$programDetail.debateEvent;
         const duringCampDiv = document.createElement('div');
@@ -713,6 +724,7 @@ class NSDPortal {
 
         return duringCampDiv;
     }
+    // Returns HTML for all resources section with uploaded content links
     getAllResources(){
         if(this.$uploadedContent.length == 0){
             return '';
@@ -726,6 +738,7 @@ class NSDPortal {
                 </div>
             </div>`;
     }
+    // Returns HTML for resource list including camp topic and uploaded resources
     resourceList() {
         const debateEvent = this.$programDetail.debateEvent;
         if (this.$uploadedContent.length || debateEvent == 'Lincoln-Douglas' ||  debateEvent == 'Public Forum') {
@@ -735,6 +748,7 @@ class NSDPortal {
             return '';
         }
     }
+    // Returns HTML for a single resource link element
     resourceLink(uploadData) {
         if (uploadData.label && uploadData.uploadedFiles[0]) {
             return `<a href="${uploadData.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
@@ -749,6 +763,7 @@ class NSDPortal {
     /**
      * Get Camp topic data 
      */
+    // Returns HTML for camp topic section if topic data is available
     getCampTopicData() {
         let textContent = (this.$programDetail.campTopic) ? this.$programDetail.campTopic : "";
         // const debateEvent = this.$programDetail.debateEvent;
@@ -771,6 +786,7 @@ class NSDPortal {
         
     }
     /*Filter Ivoice Related Forms based on forms id*/
+    // Filters invoice-related forms based on completion status of dropoff/pickup forms
     filterInvoiceForms(forms) {
         var newForms = forms.filter(item => {
             if (item.form_sub_type == 'dropoff_invoice') {
@@ -798,6 +814,7 @@ class NSDPortal {
      * Check form's id in completedForm list (from MongoDB) and use to determine if form is editable
      * @param formId - Jotform Id
      */
+    // Checks if a form ID exists in the completed forms list
     checkForm($formId) {
         if ($formId) {
             const found = this.$completedForm.some(el => el.formId == $formId);
@@ -806,6 +823,7 @@ class NSDPortal {
         return false;
     }
     /*Creating Read and unread icon for list page*/
+    // Returns the URL for checked or unchecked icon based on completion status
     getCheckedIcon(status) {
         if (status) {
             return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png";
@@ -817,10 +835,12 @@ class NSDPortal {
      * Get Completed Form data by form id
      * @param formId - Jotform Id
      */
+    // Returns the completed form data object for the specified form ID
     getFormData($formId) {
         let data = this.$completedForm.find(o => o.formId == $formId);
         return data;
     }
+    // Returns the ordinal suffix (st, nd, rd, th) for a given day number
     getOrdinalSuffix(day) {
         if (day > 3 && day < 21) return 'th'; // Covers 11th to 20th
         switch (day % 10) {
@@ -837,6 +857,7 @@ class NSDPortal {
     /**
      * Check Program Deadline
      */
+    // Checks if the program deadline has passed and updates isLiveProgram flag
     checkProgramDeadline() {
         var deadlineDate = this.$programDetail.deadlineDate.replace(/\\/g, '');
         deadlineDate = deadlineDate.replace(/"/g, '')
@@ -847,6 +868,7 @@ class NSDPortal {
     /**
      * initialize Lightbox and rerender accordion after close the lightbox
      */
+    // Initializes iframe lightbox for form previews
     initiateLightbox() {
         var $this = this;
         [].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
@@ -862,6 +884,7 @@ class NSDPortal {
     /**
      * Update Member first name in portal after user profile update
      */
+    // Updates member first name in portal after profile update modal is closed
     updateMemberFirstName() {
         var elements = document.getElementsByClassName("ms-portal-exit");
         var myFunctionNew = function () {
@@ -880,6 +903,7 @@ class NSDPortal {
         }
     }
     /** Supplementary Program Code */
+    // Fetches supplementary program data from API and creates portal tabs
     async getSuppPortalData() {
         // API call
         const tabsData = await this.fetchData("getSupplimentaryForm/" + this.webflowMemberId + "/current");
@@ -887,6 +911,7 @@ class NSDPortal {
         this.createSuppPortalTabs(tabsData);
 
     }
+    // Creates portal tabs for supplementary programs
     createSuppPortalTabs(tabsData) {
         const nsd_portal_container = document.getElementById('nsdSuppDataPortal');
         if (tabsData != "No data Found") {
@@ -951,6 +976,7 @@ class NSDPortal {
             nsd_portal_container.innerHTML = "No Records found"
         }
     }
+    // Creates and returns a supplementary program tab pane element
     suppTabPane(index, tabIndex, isTabActive) {
         // Update global data
         // Create the tab content
@@ -967,6 +993,7 @@ class NSDPortal {
 
         return tabPane
     }
+    // Creates a DOM element with optional class and id attributes
     creEl(name, className, idName) {
         var el = document.createElement(name);
         if (className) {

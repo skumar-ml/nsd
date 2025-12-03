@@ -6,6 +6,7 @@ Brief Logic: Checks localStorage or fetches cart data from API. Validates that c
 Are there any dependent JS files: No
 */
 class AbandonedCartModal {
+  // Initializes the AbandonedCartModal instance with provided data and sets up modal elements
   constructor(data) {
     this.data = data;
     this.baseUrl = data.baseUrl;
@@ -15,7 +16,8 @@ class AbandonedCartModal {
     this.closeButtons = this.modal?.querySelectorAll(".close-abandoned-modal");
     this.init();
   }
-
+  
+  // Sets up event listeners for close buttons and triggers modal display check
   init() {
     if (this.modal && this.closeButtons) {
       this.closeButtons.forEach((button) => {
@@ -28,6 +30,7 @@ class AbandonedCartModal {
       this.checkAndDisplayModal();
     }
   }
+  // Checks if the given date string falls within the past week
   isWithinAWeek(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -36,6 +39,7 @@ class AbandonedCartModal {
     return date >= oneWeekAgo && date <= now;
   }
 
+  // Checks if modal should be displayed by validating cart data from localStorage or API
   checkAndDisplayModal() {
     var $this = this;
     if (
@@ -75,6 +79,7 @@ class AbandonedCartModal {
       });
     }
   }
+  // Validates cart data against multiple conditions (age, program dates, cooldown period) before displaying modal
   checkAndDisplayModals(data) {
     return new Promise((resolve, reject) => {
       const createdOnDate = new Date(data.createdOn);
@@ -117,11 +122,10 @@ class AbandonedCartModal {
         }
       }
       // If all conditions pass, resolve to display the modal
-      //console.log("All conditions passed, displaying modal.");
       resolve("All conditions passed, displaying modal.");
     });
   }
-  // Set the modal display to true in localStorage
+  // Sets the modal display flag and last closed date in localStorage to track user dismissal
   setModelDisplay() {
     localStorage.setItem("isAbandonedModalOpen", true);
     localStorage.setItem(
@@ -130,6 +134,7 @@ class AbandonedCartModal {
     );  
   }
 
+  // Fetches cart data from the API endpoint using the member ID
   async fetchCartDataFromAPI() {
     try {
       const response = await fetch(
@@ -143,6 +148,7 @@ class AbandonedCartModal {
       throw error;
     }
   }
+  // Opens the abandoned cart modal by adding show class and setting display to flex
   openModal() {
     if (this.modal) {
       this.modal.classList.add("show");
@@ -150,6 +156,7 @@ class AbandonedCartModal {
     }
   }
 
+  // Closes the abandoned cart modal by removing show class and hiding the element
   closeModal() {
     if (this.modal) {
       this.modal.classList.remove("show");
@@ -157,13 +164,14 @@ class AbandonedCartModal {
     }
   }
 
-  // Close modal when clicking outside of it (optional)
+  // Closes the modal when user clicks outside of it
   handleOutsideClick(event) {
     if (event.target === this.modal) {
       this.closeModal();
     }
   }
 
+  // Adds the cart URL link to the view cart button based on program category ID
   addLinkTOViewCartBtn() {
     const viewCartBtn = document.getElementById("view-cart-btn");
     const cartData = localStorage.getItem("checkOutData");
@@ -185,8 +193,8 @@ class AbandonedCartModal {
         viewCartBtn.href = cart_url;
       }
     }
-    // Add event listener to viewCartBtn
   }
+  // Displays cart information in the cart menu including program name, dates, student name, and checkout link
   displayCartMenuData() {
     // get checkOutData from local storage
     const noRecordsDivs = document.querySelectorAll("[data-cart-menu='no-records-div']");
@@ -271,6 +279,7 @@ class AbandonedCartModal {
     noRecordsDivs.forEach(div => div.style.display = "none");
     
   }
+  // Adds a wiggle animation to the cart icon that repeats every 3 seconds
   setCartAnimation(){
     const cartDiv = document.querySelector('.cart-icon-rounded-div');
     var intervalId = setInterval(() => {

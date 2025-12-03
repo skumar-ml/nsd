@@ -7,6 +7,7 @@ Are there any dependent JS files: No
 */
 class DisplaySuppProgram {
   $selectedProgram = [];
+  // Initializes DisplaySuppProgram instance and sets up supplementary program display
   constructor(memberData) {
     this.memberData = memberData;
     this.displaySupplementaryProgram();
@@ -19,6 +20,7 @@ class DisplaySuppProgram {
    * @param className - HTML element class attribute
    * @param idName - HTML element id attribute
    */
+  // Creates a DOM element with optional class and id attributes
   creEl(name, className, idName) {
     var el = document.createElement(name);
     if (className) {
@@ -43,6 +45,7 @@ class DisplaySuppProgram {
     }
   }
  
+  // Fetches supplementary programs from API and displays them in sliders with modal content
   async displaySupplementaryProgram() {
    // var spinner = document.getElementById("half-circle-spinner");
    // spinner.style.display = "block";
@@ -99,6 +102,7 @@ class DisplaySuppProgram {
     
     var slideCheckInterval = setInterval(() => this.visibilityTimeout(swiperSliderParent, slideCheckInterval), 500);
   }
+   // Checks slide width and updates slider visibility, clearing interval when ready
    visibilityTimeout(swiperSliderParent, slideCheckInterval) {
     let slideItems = document.querySelector(".discounted-programs-slide-item");
     if (slideItems) {
@@ -118,6 +122,7 @@ class DisplaySuppProgram {
       }
     }
   }
+  // Creates and returns a DOM element for a single supplementary program card in the slider
   displaySingleSuppProgram(item) {
     var $this = this;
     let discount_amount = item.disc_amount - item.portal_amount;
@@ -261,6 +266,7 @@ class DisplaySuppProgram {
     // Append to body or any container
     //swiperSlide.appendChild(slideItem);
   }
+  // Hides all modal content and shows the content for the specified program
   hideShowModalContent(item) {
     const modelContent = document.querySelectorAll(".modal-content");
     for (let index = 0; index < modelContent.length; index++) {
@@ -271,6 +277,7 @@ class DisplaySuppProgram {
       .querySelector(".modal-content.modal-" + item.programDetailId)
       .classList.remove("hide");
   }
+  // Creates and returns a DOM element for supplementary program modal or banner content
   displaySingleSuppProgramB(item, type = "banner") {
     var $this = this;
     let discount_amount = item.disc_amount - item.portal_amount;
@@ -436,6 +443,7 @@ class DisplaySuppProgram {
 
     return slideItem;
   }
+  // Initializes Slick sliders for discounted programs and supplementary programs sections
   initSlickSlider() {
     var $slider = $(
       ".discounted-programs-slick-slider"
@@ -498,14 +506,17 @@ class DisplaySuppProgram {
       });
     }
   }
+  // Shows the specified modal by adding show class and setting display to flex
   showModal(modal) {
     modal.classList.add("show");
     modal.style.display = "flex";
   }
+  // Hides the specified modal by removing show class and setting display to none
   hideModal(modal) {
     modal.classList.remove("show");
     modal.style.display = "none";
   }
+  // Sets up event handlers for close icon clicks to close modals
   closeIconEvent() {
     const closeLinks = document.querySelectorAll(
       ".upsell-close-link, .main-button.close"
@@ -534,7 +545,7 @@ class DisplaySuppProgram {
       });
     });
   }
-  //updateOldStudentList
+  // Fetches previous students from API and populates the student select dropdown
   async updateOldStudentList() {
     const selectBox = document.getElementById("portal-students");
     var $this = this;
@@ -579,6 +590,7 @@ class DisplaySuppProgram {
     }
   }
 
+  // Creates checkout URL for supplementary program payment and redirects to payment gateway
   initSupplementaryPayment(paymentId, programId, programName, amount) {
     // Define the data to be sent in the POST request
     const data = {
@@ -619,6 +631,7 @@ class DisplaySuppProgram {
         console.error("There was a problem with the fetch operation:", error); // Handle errors
       });
   }
+  // Sets up event handler for pay button to process supplementary program payment
   handlePaymentEvents() {
     var $this = this;
     const payBtn = document.getElementById("pay-supp-program");
@@ -646,6 +659,7 @@ class DisplaySuppProgram {
       }
     });
   }
+  // Updates the buy now modal with selected program amount and title
   updatePayNowModelAmount() {
     var $this = this;
     let upSellAmount = document.querySelectorAll(

@@ -9,6 +9,7 @@ class NDFLeaderBoard {
     $competition = [];
     $allCompetition = [];
     $programDetail = {};
+    // Initializes the leaderboard instance and fetches competition data
     constructor(webflowMemberId, accountEmail, apiBaseUrl, accountType) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
@@ -16,7 +17,7 @@ class NDFLeaderBoard {
         this.baseUrl = apiBaseUrl;
         this.getLeaderboardData();
     }
-    // Get API data with the help of endpoint
+    // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -30,6 +31,7 @@ class NDFLeaderBoard {
             //throw error;
         }
     }
+    // Fetches leaderboard data from API and creates portal tabs
     async getLeaderboardData() {
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
@@ -46,6 +48,7 @@ class NDFLeaderBoard {
                 throw error;
             }
     }
+    // Creates HTML for the progress bar showing competition day progress
     createProgressBarHTML(title, progressPercentage, currentDay, totalDays) {
         return `
             <div class="progress-info-container">
@@ -63,6 +66,7 @@ class NDFLeaderBoard {
             </div>
         `;
     }
+    // Updates global variables with competition and program details from tab data
     updateGlobalVariable(tab) {
         this.$competition = tab.competition.find(item => item.is_live == true);
         this.$allCompetition = tab.competition.filter(item => item.is_live == true);
@@ -73,6 +77,7 @@ class NDFLeaderBoard {
     /**
      * Calculate total day's of competition
      */
+    // Calculates the total number of days in the competition
     getTotalComDays() {
         var startDate = this.$startDate;
         var endDate = this.$endDate;
@@ -91,6 +96,7 @@ class NDFLeaderBoard {
     /**
      * Calculate completed day of competition
      */
+    // Calculates the number of completed days in the competition
     getCompletedComDays() {
         // Parse the start date and set the time to midnight (00:00:00)
         var start = this.$startDate;
@@ -110,11 +116,13 @@ class NDFLeaderBoard {
 
         return (roundedDifferenceInDays > 0 )? roundedDifferenceInDays: 0;
     }
+    // Calculates the percentage of competition days completed
     getPercentageComDay(){
         var completedDay = this.getCompletedComDays();
         var totalDay =  this.getTotalComDays();
         return (completedDay) ? (100 * completedDay) / totalDay : 0;
     }
+    // Creates and returns a tab pane element with progress bar and leaderboard
     tabPane(index, tabIndex, isTabActive, tab) {
 
         const tabPane = document.createElement('div');
@@ -132,6 +140,7 @@ class NDFLeaderBoard {
 
         return tabPane
     }
+    // Creates portal tabs for multiple competitions with tab navigation
     createPortalTabs(tabsData) {
         const nsd_portal_container = document.getElementById('leaderboard');
         // Create the main portal tab container
@@ -197,6 +206,7 @@ class NDFLeaderBoard {
         }
         Webflow.require('tabs').redraw();
     }
+    // Creates and returns HTML for a single leaderboard row with rank, team name, and points
     createLeaderboardRow(rank, title, points, myTeam) {
         var trophyUrl = this.getTrophyUrl(rank, points);
         var $this = this;
@@ -221,6 +231,7 @@ class NDFLeaderBoard {
             </div>
         `;
     }
+    // Creates and returns HTML for the complete leaderboard table
     createLeaderboard() {
        this.$competition.points.sort(function (r, a) {
             //return a.point - r.point
@@ -253,6 +264,7 @@ class NDFLeaderBoard {
             </div>
         `;
     }
+    // Returns the trophy icon URL for top 3 ranks, or empty string for others
     getTrophyUrl(rank, points) {
         if (rank == 1 && points) {
             return 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6674399b030b15665fab28c8_np_trophy_1047539_000000%201%20(1).svg'

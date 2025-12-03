@@ -11,6 +11,7 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
+// Creates a DOM element with optional class and id attributes
 function creEl(name,className,idName){
   var el = document.createElement(name);
 	if(className){
@@ -28,6 +29,7 @@ function creEl(name,className,idName){
  */
 class Polling {
 	$currentDetailsData = '';
+	// Initializes the Polling instance with member ID and message data, then sets up UI
 	constructor(webflowMemberId, messageData){
 		this.webflowMemberId = webflowMemberId;
 		messageData.sort(function(a,b){
@@ -42,7 +44,7 @@ class Polling {
 		this.displayUnreadPolling();
 		
 	}
-	/*Creating pagination array object*/
+	// Creates a paginated list from items array with page and per_page parameters
 	paginatorList(items, page, per_page) {
 		var page = page || 1,
 		per_page = per_page || 5,
@@ -60,7 +62,7 @@ class Polling {
 			data: paginatedItems
 		};
 	}
-	/*display notification polling count based polling-budge class*/
+	// Displays the unread polling count badge next to the bell icon
 	displayUnreadPolling(){
 		var pollingBudge = document.getElementsByClassName("polling-budge")[0];
 		var pollingCount = document.getElementsByClassName("polling-count")[0];
@@ -72,7 +74,7 @@ class Polling {
 		notificationPolling.innerHTML = unreadPolling.length;
 		pollingBudge.appendChild(notificationPolling)
 	}
-	/*Get message type from api response*/
+	// Returns an array of unique polling types from the filter data
 	getPollingType(){
 		return this.filterData.filter(
 		  (obj, index) =>
@@ -116,7 +118,7 @@ class Polling {
 		this.paginateData = this.paginatorList(messageData);
 		this.refreshData();
 	}
-	/*Creating the dom element for message type filter*/
+	// Creates and returns a DOM element for the polling type filter dropdown
 	createPollingTypeFilter(){
 		var col = creEl("div", 'col');
 		var $this = this;
@@ -140,7 +142,7 @@ class Polling {
 		col.appendChild(messagetype)
 		return col;
 	}
-	/* Creating the DOM element for date filter like new and old */
+	// Creates and returns a DOM element for the date filter dropdown (newest/oldest)
 	createDateFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -165,7 +167,7 @@ class Polling {
 		})
 		return col;
 	}
-	/* Creating dom element for search filter*/
+	// Creates and returns a DOM element for the search filter input
 	createSearchFilter(){
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -182,7 +184,7 @@ class Polling {
 		col.appendChild(searchFilter)
 		return col;
 	}
-	/* Creating dom element for column based on column width*/
+	// Creates and returns a column DOM element with specified width
 	createCol(message, col_width){
 		var col_width = (col_width) ? col_width : 3;
 		var col = creEl("div", 'w-col w-col-'+col_width);
@@ -191,13 +193,13 @@ class Polling {
 		}
 		return col;
 	}
-	/*Creating bold text dom element*/
+	// Creates and returns a bold text element
 	creBoldText(text){
 		var boldText = creEl('b', 'bold-text');
 		boldText.innerHTML = text;
 		return boldText;
 	}
-	/*Creating Read and unread icon for list page*/
+	// Returns an image element for read or unread status icon
 	getCheckedIcon(status){
 		var img = creEl('img', 'is_read_icon')
 		if(status){
@@ -208,7 +210,7 @@ class Polling {
 		img.src = src;
 		return img
 	}
-	/*Download the file with the help of file url*/
+	// Downloads a file from the specified URL with the given filename
 	download(fileLink, fileName){
 		fetch(fileLink)
 		  .then(resp => resp.blob())
@@ -226,7 +228,7 @@ class Polling {
 		  })
 		  .catch(() => alert('oh no!'));
 	}
-	/*Display download file icon for detail and listing page*/
+	// Creates and returns a download link icon element for file attachments
 	downLoadLinkIcon(fileLink, type=''){
 		var $this = this;
 		var fileName = fileLink
@@ -247,7 +249,7 @@ class Polling {
 		})
 		return a;
 	}
-	/*Iframe view icon*/
+	// Creates and returns an iframe view link for viewing files in lightbox
 	viewDownLoadedFile(fileLink, item){
 		var $this = this;
 		var fileName = fileLink
@@ -266,7 +268,7 @@ class Polling {
 		
 		return a;
 	}
-	/*Creating dom element for message list*/
+	// Creates and returns a DOM element containing the polling list with pagination
 	craetePollingList(){
 		var $this = this;
 		var messageList = creEl('div', 'message-list');
@@ -304,7 +306,7 @@ class Polling {
 		
 		return messageList;
 	}
-	/*Creating dom element message list header*/
+	// Creates and returns the polling list header row with column titles
 	createPollingTitle(){
 		var title = ['', 'Poll Title', 'Type', , 'Activity Type', 'Date']
 		var row = creEl('div', 'w-row')
@@ -324,14 +326,14 @@ class Polling {
 		})
 		return row;
 	}
-	/*Refreshing the message list*/
+	// Refreshes the polling list display with current filtered and paginated data
 	refreshData(){
 		var polling = document.getElementById("polling");
 		polling.innerHTML = "";
 		this.makePollingList();
 		
 	}
-	/*hide and show message list and details page*/
+	// Shows the polling list page and hides the details page
 	showListPage(){
 		var pollingFilter = document.getElementById("polling-filter");
 		var polling = document.getElementById("polling");
@@ -342,7 +344,7 @@ class Polling {
 		pollingDetails.style.display = 'none';
 		pollingHeading.style.display = 'block';
 	}
-	/*Creating back button dom element for */
+	// Creates and returns a back button element for the detail page
 	detailPageBackButton(){
 		var $this = this;
 		var backButton = creEl('a', 'w-previous')
@@ -356,7 +358,7 @@ class Polling {
 		return backButton;
 	}
 	
-	/*Foramated date for list and details page*/
+	// Formats a date string for display in list or detail page format
 	formatedDate(dateString, type=''){
 		const monthText = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 		var date = new Date(dateString);
@@ -369,7 +371,7 @@ class Polling {
 		}
 		return newDate;
 	}
-	/* Creating DOM element for detail page */
+	// Creates and returns the detail page content container with polling details
 	detailPageContain(item){
 		var contain = creEl('div', 'detail-contain  w-row', 'detail-contain');
 		
@@ -417,8 +419,8 @@ class Polling {
 		
 		return contain;
 	}
-	/* API for make message unread to read */
 	/*Need to remove*/
+	// Makes an API call to mark a polling notification as read
 	readApiCall(messageId){
 		var data = {
 			 "objectId" : messageId
@@ -433,8 +435,8 @@ class Polling {
 			console.log('responseText', responseText)
 		}
 	}
-	/* Calling readAPI and manupulating current message data*/
 	/*Need to remove*/
+	// Marks a polling notification as read and updates the message data
 	makeRead(item){                       
 		/*API Call for read unread API*/
 		if(!item.is_read){
@@ -450,7 +452,7 @@ class Polling {
 		this.messageData = messageData;
 		this.refreshData();
 	}
-    /* Hide and show detail page and append the content */	
+	// Displays the polling detail page and marks the polling notification as read
 	displayDetailsPage(){
 		var item = this.$currentDetailsData;
 		var $this = this;
@@ -479,7 +481,7 @@ class Polling {
 
 		
 	}
-	/* Creating dom element pagination */
+	// Creates and returns pagination controls for navigating polling pages
 	createPagination(){
 		var $this = this;
 		var pagination = creEl('div', 'w-pagination-wrapper', 'polling-body');
@@ -506,7 +508,7 @@ class Polling {
 		
 		return pagination;
 	}
-	/* Creating dom element for filter header */
+	// Creates and appends the polling filter header with all filter elements
 	makePollingFilter(){
 		var pollingFilter = document.getElementById("polling-filter");
 		/*Filter*/
@@ -519,7 +521,7 @@ class Polling {
 		pollingHeader.appendChild(searchFilter);
 		pollingFilter.appendChild(pollingHeader);
 	}
-	/* Creating dom element for message list */
+	// Creates and appends the polling list with title and items
 	makePollingList(){
 		var polling = document.getElementById("polling");
 		
@@ -540,6 +542,7 @@ class Polling {
 		polling.appendChild(pagination);
 		
 	}
+	// Fetches polling edit data from API for user-editable pollings
 	getPollingEditData(){
 		var $this = this;
 		var currentDetailsData = $this.$currentDetailsData;
@@ -571,7 +574,7 @@ class Polling {
 			} 
 		}
 	}
-	/* Initialize iframe for view button */
+	// Initializes iframe lightbox for viewing file attachments
 	initiateLightbox(){
 		var $this = this;
 		console.log('testing');
@@ -594,10 +597,12 @@ class Polling {
 class PollingApi {
 	$isLoading = true;
 	$messageData = '';
+	// Initializes PollingApi instance and fetches polling data
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		this.getPollingData();
 	}
+	// Fetches polling data from API and creates Polling instance
 	getPollingData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;

@@ -30,12 +30,14 @@ function creEl(name,className,idName){
  * @param accountEmail - email id of member
  */
 class showLeaderboard {
+	// Initializes the leaderboard with member ID and response data, then renders the leaderboard
 	constructor(webflowMemberId,responseText){
 		this.responseText = responseText;
 		this.webflowMemberId = webflowMemberId;
 		this.renderLeaderboard(this.responseText);
 	}
   
+  // Renders the attendance leaderboard grid with lab names and their scores
 renderLeaderboard(responseText) {
 	console.log(responseText);
 	const output = responseText.output;

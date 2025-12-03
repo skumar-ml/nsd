@@ -11,6 +11,7 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
+// Creates a DOM element with optional class and id attributes
 function creEl(name, className, idName) {
 	var el = document.createElement(name);
 	if (className) {
@@ -32,12 +33,13 @@ class checkInForm {
 	$incheckIn = false;
 	$selected_labs = [];
 	$selected_session = [];
+	// Initializes the instructor check-in form with member ID and labs data
 	constructor(webflowMemberId, labsData) {
 		this.webflowMemberId = webflowMemberId;
 		this.labsData = labsData;
 		this.view();
 	}
-	/*Creating pagination array object*/
+	// Creates a paginated list from items array with page and per_page parameters
 	paginatorList(items, page, per_page) {
 
 		//Alphabetical order sorting
@@ -67,7 +69,7 @@ class checkInForm {
 			data: paginatedItems
 		};
 	}
-	// clear filter select box data
+	// Resets all filter select boxes to empty values
 	resetFilter() {
 		var studentData = this.$currentLab.studentData;
 
@@ -83,7 +85,7 @@ class checkInForm {
 
 
 	}
-	/* Creating the DOM element for instructor checked in filter*/
+	// Creates and returns a DOM element for the instructor check-in filter dropdown
 	createInstructorCheckInFilter() {
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -112,7 +114,7 @@ class checkInForm {
 		})
 		return col;
 	}
-	/* Creating the DOM element for student checked in filter*/
+	// Creates and returns a DOM element for the student check-in filter dropdown
 	createStudentCheckInFilter() {
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -141,7 +143,7 @@ class checkInForm {
 		})
 		return col;
 	}
-	/* Creating dom element for search filter*/
+	// Creates and returns a DOM element for the search filter input
 	createSearchFilter() {
 		var $this = this;
 		var col = creEl("div", 'col');
@@ -164,7 +166,7 @@ class checkInForm {
 		col.appendChild(searchFilter)
 		return col;
 	}
-	/* Creating dom element for filter header */
+	// Creates and returns the attendance filter header with all filter elements
 	makeAttendanceFilter() {
 		//var attendanceFilter = document.getElementById("attendance-filter");
 		/*Filter*/
@@ -178,7 +180,7 @@ class checkInForm {
 		//attendanceFilter.appendChild(attendanceHeader);
 		return attendanceHeader;
 	}
-	/*Filter api response based on current seleted filter value*/
+	// Filters student data based on currently selected filter values
 	filterstudentData() {
 		//this.studentData = this.filterData;
 		console.log('this.$currentLab', this.$currentLab)
@@ -216,7 +218,7 @@ class checkInForm {
 		this.$currentLabStudent = this.paginatorList(studentData)
 		this.refreshData();
 	}
-	/* Creating dom element for column based on column width*/
+	// Creates and returns a column DOM element with specified width
 	createCol(message, col_width) {
 		var col_width = (col_width) ? col_width : 3;
 		var col = creEl("div", 'w-col w-col-' + col_width);
@@ -225,7 +227,7 @@ class checkInForm {
 		}
 		return col;
 	}
-	/*Creating Read and unread icon for list page*/
+	// Returns an image element for checked or unchecked status icon
 	getCheckedIcon(status) {
 		var img = creEl('img', 'is_read_icon')
 		if (status) {
@@ -236,7 +238,7 @@ class checkInForm {
 		img.src = src;
 		return img
 	}
-	/* Display Labs select box for instructor */
+	// Displays the instructor attendance check-in form with session and lab selection
 	view() {
 		var accordionDiv = document.getElementById("instructor-attendance");
 		var row = creEl('div', 'w-row ');
@@ -273,7 +275,7 @@ class checkInForm {
 		row.appendChild(col)
 		accordionDiv.appendChild(row);
 	}
-	/* Get session select box append in dom element */
+	// Creates and returns a session selection dropdown element
 	get_session() {
 
 		var $this = this;
@@ -310,7 +312,7 @@ class checkInForm {
 		select.appendChild(sessionSelectBox)
 		return select;
 	}
-	// Hide student list and pagination when lab select box is empty
+	// Hides student list and pagination when no lab is selected
 	hideStudentListList() {
 		var studentList = document.getElementById('student-list');
 		var studentListFilter = document.getElementsByClassName('student-list-filter')[0];
@@ -325,7 +327,7 @@ class checkInForm {
 			btn.style.display = 'none';
 		}
 	}
-	// Hide student list and pagination based on session and labs empty data
+	// Hides student list and pagination when session or lab selection is empty
 	hideShowUI() {
 		var studentlist = document.getElementById('student-list');
 		var btn = document.getElementsByClassName('student-list-head')[0];
@@ -342,7 +344,7 @@ class checkInForm {
 			paginationStudentList.style.display = 'none';
 		}
 	}
-	// Create labs select box and append html element 
+	// Creates and returns a lab selection dropdown element based on selected session
 	get_Labs() {
 		var $this = this;
 		// Get all labs data
@@ -370,7 +372,7 @@ class checkInForm {
 		select.appendChild(sessionSelectBox)
 		sessionFilter.appendChild(select)
 	}
-	/*Creating dom element message list header*/
+	// Creates and returns the attendance list header row with column titles
 	createAttendanceTitle() {
 		var title = ['Student Name', 'Student Self Check-In', 'Instructor Check-In']
 		//var title = ['Student Name', 'Check-in']
@@ -387,7 +389,7 @@ class checkInForm {
 		})
 		return row;
 	}
-	/*Creating DOM element for student list*/
+	// Displays the student list with attendance status for the selected lab
 	displayStudentList(labId, type = '') {
 
 
@@ -485,18 +487,18 @@ class checkInForm {
 
 		//return studentlist;
 	}
-	/*Update current attendance data*/
+	// Updates attendance data by calling the check-in API
 	updateAttendanceData(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId) {
 		this.callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId);
 
 	}
-	/*Get tick icon for checked in*/
+	// Returns an image element for the check-in icon
 	getCheckInIcon() {
 		var img = creEl('img', 'checkedInIcon')
 		img.src = 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/6437ec2c6bc4131717b36b93_checkin.svg';
 		return img
 	}
-	/*API call for checked in*/
+	// Makes an API call to update student attendance check-in status
 	callCheckedInApi(studentId, isInstructorCheckin, attendanceId, isSelfCheckin, timezoneId, submissionId) {
 		var currentLab = this.$currentLab;
 		console.log('currentLab', currentLab)
@@ -528,7 +530,7 @@ class checkInForm {
 
 	}
 
-	/* Creating dom element pagination */
+	// Creates and returns pagination controls for navigating student list pages
 	createPagination() {
 		var $this = this;
 		var pagination = creEl('div', 'w-pagination-wrapper', 'notification-body');
@@ -556,7 +558,7 @@ class checkInForm {
 
 		return pagination;
 	}
-	/*Refresh currrnt student list data*/
+	// Refreshes the student list display with current filtered and paginated data
 	refreshData() {
 		var studentlist = document.getElementById('student-list');
 		var paginationStuList = document.getElementById('pagination-student-list');
@@ -565,6 +567,7 @@ class checkInForm {
 		var sessionSelectBox = document.getElementById('select-timezone');
 		this.displayStudentList(sessionSelectBox.value);
 	}
+	// Fetches updated labs data from API and refreshes the student list
 	getUpdatedLabsData(labId) {
 		var xhr = new XMLHttpRequest()
 		var $this = this;
@@ -594,11 +597,12 @@ class checkInForm {
 class LabsData {
 	$isLoading = true;
 	$studentData = '';
+	// Initializes LabsData instance and fetches labs data from API
 	constructor(webflowMemberId) {
 		this.webflowMemberId = webflowMemberId;
 		this.getLabsData();
 	}
-	// Get labs and session data from API and creating instructor checking forms
+	// Fetches labs and session data from API and creates the instructor check-in form
 	getLabsData() {
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'block';

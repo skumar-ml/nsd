@@ -6,10 +6,12 @@ Brief Logic: Fetches notification data from API and calculates unread count. Upd
 Are there any dependent JS files: No
 */
 class NotificationCount {
+	// Initializes the notification count instance and fetches notification data
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		this.getNotificationData();
 	}
+	// Displays the unread notification count badge next to the bell icon
 	displayUnreadMessage(messageData){
 		var notificationBudge = document.getElementsByClassName("notification-budge")[0];
 		var notificationCount = document.getElementsByClassName("notification-count")[0];
@@ -24,6 +26,7 @@ class NotificationCount {
 			notificationBudge.appendChild(notificationMessage)
 		}
 	}
+	// Fetches notification data from the API and displays unread count
 	getNotificationData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;

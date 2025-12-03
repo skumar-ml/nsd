@@ -12,6 +12,7 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
+// Creates a DOM element with optional class and id attributes
 function creEl(name, className, idName) {
 	var el = document.createElement(name);
 	if (className) {
@@ -23,6 +24,7 @@ function creEl(name, className, idName) {
 	return el;
 }
 class BriefsUpsellModal {
+	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {
 		this.modal = document.getElementById('briefs-upsell-modal');
 		this.modalBg = document.getElementById('briefs-upsell-modal-bg');
@@ -59,6 +61,7 @@ class BriefsUpsellModal {
 		this.bindBriefModalCloseEvents();
 		this.loadStoredBriefSelection();
 	}
+	// Shows the briefs upsell modal if user is admin and brief event not already added
 	showBriefsUpsellModal() {
 		if (!this.memberData || !this.memberData.isAdmin) {
 			return;
@@ -73,6 +76,7 @@ class BriefsUpsellModal {
 		this.modal.style.display = 'flex';
 		this.modalBg.setAttribute('aria-hidden', 'false');
 	}
+	// Hides the briefs upsell modal and updates aria attributes
 	hideBriefsUpsellModal() {
 		if (!this.modal || !this.modalBg) {
 			return;
@@ -81,6 +85,7 @@ class BriefsUpsellModal {
 		this.modal.style.display = 'none';
 		this.modalBg.removeAttribute('aria-hidden');
 	}
+	// Binds event handlers for closing the briefs modal via close button or background click
 	bindBriefModalCloseEvents() {
 		if (this.modalClose) {
 			this.modalClose.addEventListener('click', (event) => {
@@ -92,6 +97,7 @@ class BriefsUpsellModal {
 			this.modalBg.addEventListener('click', () => this.hideBriefsUpsellModal());
 		}
 	}
+	// Binds event handlers to brief CTA buttons for adding brief events to cart
 	bindBriefCtaButton() {
 		if (!this.briefCtaButtons || !this.briefCtaButtons.length) {
 			return;
@@ -122,6 +128,7 @@ class BriefsUpsellModal {
 			});
 		});
 	}
+	// Initializes the briefs upsell modal by caching elements and fetching brief events
 	initializeBriefsUpsellModal() {
 		if (!this.memberData || !this.memberData.isAdmin) {
 			return;
@@ -132,6 +139,7 @@ class BriefsUpsellModal {
 		this.updateBriefCtaState();
 		this.fetchBriefEvents();
 	}
+	// Caches brief modal DOM elements and stores default button styles
 	cacheBriefModalElements() {
 		this.briefEventsContainers = Array.from(document.querySelectorAll('[data-cart="briefEvents-container"]'));
 		this.briefEventsContainer = this.briefEventsContainers[0] || null;
@@ -160,16 +168,19 @@ class BriefsUpsellModal {
 			this.briefCtaDefaultDisplay = this.briefCtaButton.style.display || '';
 		}
 	}
+	// Sets the selected brief events wrapper elements from DOM
 	setSelectedBriefEventsWrappers() {
 		this.selectedBriefEventsWrappers = Array.from(document.querySelectorAll('.selected_brief_events'));
 		this.selectedBriefEventsWrapper = this.selectedBriefEventsWrappers[0] || null;
 	}
+	// Returns array of selected brief events wrapper elements
 	getSelectedBriefEventsWrappers() {
 		if (Array.isArray(this.selectedBriefEventsWrappers) && this.selectedBriefEventsWrappers.length) {
 			return this.selectedBriefEventsWrappers;
 		}
 		return this.selectedBriefEventsWrapper ? [this.selectedBriefEventsWrapper] : [];
 	}
+	// Fetches brief events from API and renders them in the modal
 	async fetchBriefEvents() {
 		if (typeof this.fetchData !== 'function') {
 			return;
@@ -188,6 +199,7 @@ class BriefsUpsellModal {
 			this.renderBriefEventsError();
 		}
 	}
+	// Renders brief events as cards in the modal containers
 	renderBriefEvents() {
 		const containers = this.getBriefEventsContainers();
 		if (!containers.length) {
@@ -219,6 +231,7 @@ class BriefsUpsellModal {
 		this.syncBriefCardsWithSelection();
 		this.restoreBriefSelectionFromStorage();
 	}
+	// Renders error message when brief events fail to load
 	renderBriefEventsError() {
 		const containers = this.getBriefEventsContainers();
 		if (!containers.length) {
@@ -230,6 +243,7 @@ class BriefsUpsellModal {
 			container.innerHTML = errorMarkup;
 		});
 	}
+	// Builds HTML markup for a single brief event card
 	buildBriefEventMarkup(briefEvent) {
 		const price = this.formatCurrency(briefEvent.price);
 		const savedAmount = parseFloat(briefEvent.saved_amount || 0);
@@ -256,6 +270,7 @@ class BriefsUpsellModal {
 			</div>
 		`;
 	}
+	// Formats a numeric amount as currency string with dollar sign
 	formatCurrency(amount) {
 		const numericAmount = parseFloat(typeof amount !== 'undefined' && amount !== null ? amount : 0) || 0;
 		const formatted = this.numberWithCommas
@@ -263,6 +278,7 @@ class BriefsUpsellModal {
 			: numericAmount.toFixed(2);
 		return `$${formatted}`;
 	}
+	// Binds click event handlers to brief event cards for selection
 	bindBriefEventCards() {
 		const containers = this.getBriefEventsContainers();
 		if (!containers.length) {
@@ -282,6 +298,7 @@ class BriefsUpsellModal {
 			});
 		});
 	}
+	// Selects a brief event by ID and updates UI state
 	selectBriefEvent(eventId) {
 		const selected = this.briefEvents.find(
 			(event) => String(event.eventId) === String(eventId)
@@ -300,6 +317,7 @@ class BriefsUpsellModal {
 		}
 		this.updateBriefCtaState();
 	}
+	// Updates the total amount when a brief event is selected or changed
 	updateBriefAmount(nextSelection) {
 		const totalAmountInput = document.getElementById('totalAmount');
 		if (!totalAmountInput) {
@@ -317,6 +335,7 @@ class BriefsUpsellModal {
 		}
 		this.refreshTotalPriceVisibility();
 	}
+	// Synchronizes brief event card visual state with current selection
 	syncBriefCardsWithSelection() {
 		const containers = this.getBriefEventsContainers();
 		if (!containers.length) {
@@ -341,6 +360,7 @@ class BriefsUpsellModal {
 			});
 		});
 	}
+	// Renders the selected brief event summary in the sidebar
 	renderSelectedBriefSummary() {
 		this.setSelectedBriefEventsWrappers();
 		const wrappers = this.getSelectedBriefEventsWrappers();
@@ -358,6 +378,7 @@ class BriefsUpsellModal {
 			wrapperEl.appendChild(fragment);
 		});
 	}
+	// Builds DOM fragment for selected brief event summary with remove button
 	buildSelectedBriefSummaryFragment() {
 		const fragment = document.createDocumentFragment();
 		const format = this.extractBriefFormat(this.selectedBriefEvent.title);
@@ -411,6 +432,7 @@ class BriefsUpsellModal {
 		}
 		return fragment;
 	}
+	// Extracts brief format (LD, PF, or LD + PF) from brief event title
 	extractBriefFormat(title) {
 		if (!title) {
 			return '';
@@ -427,6 +449,7 @@ class BriefsUpsellModal {
 		}
 		return title;
 	}
+	// Updates brief CTA button visibility and text based on selection state
 	updateBriefCtaState() {
 		if (!this.briefCtaButtons || !this.briefCtaButtons.length) {
 			return;
@@ -474,6 +497,7 @@ class BriefsUpsellModal {
 			}
 		});
 	}
+	// Clears the selected brief event and updates total amount
 	clearBriefSelection() {
 		if (!this.selectedBriefEvent && !this.appliedBriefEvent) {
 			return;
@@ -519,6 +543,7 @@ class BriefsUpsellModal {
 		this.briefTotalsRestored = false;
 		this.refreshTotalPriceVisibility();
 	}
+	// Loads stored brief selection from localStorage
 	loadStoredBriefSelection() {
 		if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
 			return;
@@ -536,6 +561,7 @@ class BriefsUpsellModal {
 			console.warn('Unable to parse stored brief selection:', error);
 		}
 	}
+	// Persists brief selection to localStorage and checkout data
 	persistBriefSelection(selection) {
 		if (typeof window === 'undefined') {
 			return;
@@ -556,6 +582,7 @@ class BriefsUpsellModal {
 		}
 		this.briefSelectionFromStorage = selection || null;
 	}
+	// Restores brief selection from localStorage and applies it to the UI
 	restoreBriefSelectionFromStorage() {
 		if (this.briefSelectionRestored || !this.briefSelectionFromStorage) {
 			return;
@@ -573,6 +600,7 @@ class BriefsUpsellModal {
 		this.updateBriefCtaState();
 		this.briefSelectionRestored = true;
 	}
+	// Finds matching brief event from loaded events based on stored selection
 	findStoredBriefSelectionMatch() {
 		if (!this.briefSelectionFromStorage) {
 			return null;
@@ -588,6 +616,7 @@ class BriefsUpsellModal {
 		}
 		return this.briefSelectionFromStorage;
 	}
+	// Ensures brief event price is added to total amount when restoring from storage
 	ensureBriefTotalsApplied(selection) {
 		if (this.briefTotalsRestored) {
 			return;
@@ -606,6 +635,7 @@ class BriefsUpsellModal {
 		this.refreshTotalPriceVisibility();
 		this.briefTotalsRestored = true;
 	}
+	// Returns array of selected brief event IDs
 	getSelectedBriefEventIds() {
 		if (!this.selectedBriefEvent) {
 			return [];
@@ -615,6 +645,7 @@ class BriefsUpsellModal {
 		ids.add(selected.eventId);
 		return Array.from(ids);
 	}
+	// Returns array of brief events container elements
 	getBriefEventsContainers() {
 		if (Array.isArray(this.briefEventsContainers) && this.briefEventsContainers.length) {
 			return this.briefEventsContainers;
@@ -636,6 +667,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	$initCheckout = null;
 	$selectedProgram = []
     $isAboundedProgram =false;
+	// Initializes CheckOutWebflow instance and sets up checkout flow
 	constructor(apiBaseUrl, memberData) {
 		super();
 		this.baseUrl = apiBaseUrl;
@@ -647,6 +679,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 		this.renderPortalData();
 	}
+	// Toggles visibility of season info wrapper based on admin status
 	toggleSeasonInfoVisibility() {
 		const wrappers = document.querySelectorAll('.setup-season-info-wrapper');
 		if (!wrappers || !wrappers.length) {
@@ -665,7 +698,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			}
 		});
 	}
-	// Create tags
+	// Creates HTML markup for supplementary program tags
 	createTags(suppData) {
 		var html = "";
 
@@ -680,7 +713,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		return html;
 	}
 
-	// Manipulating single supplementary program list
+	// Creates DOM element for a single supplementary program cart item
 	createCartList(suppData) {
 		var coreProductContainer = creEl("div", "core-product-container");
 		var $this = this;
@@ -766,11 +799,12 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 		return coreProductContainer;
 	}
-	// formating price in comma based value
+	// Formats a number with comma separators for thousands
 	numberWithCommas(x) {
 		return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 	}
 
+	// Displays selected supplementary programs in desktop and mobile sidebars
 	displaySelectedSuppProgram(selectedIds) {
 		var selectedSuppPro = document.getElementById("selected_supplimentary_program");
 		var selectedSuppProMob = document.getElementById("selected_supplimentary_program_mob");
@@ -779,7 +813,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		this.displaySelectedSuppPrograms(selectedIds, selectedSuppPro);
 		this.displaySelectedSuppPrograms(selectedIds, selectedSuppProMob);
 	}
-	// This method use to display selected supplementary program in sidebar
+	// Displays selected supplementary programs list in the specified container
 	displaySelectedSuppPrograms(suppIds, selectedSuppPro) {
 		var $this = this;
 		// Filtering selected Supplementary program id from all Supplementary program data
@@ -835,6 +869,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 
 	}
+	// Removes a supplementary program from selection and updates UI
 	removeSuppProgram(suppId) {
 		var suppProIdE = document.getElementById("suppProIds");
 		var arrayIds = JSON.parse(suppProIdE.value);
@@ -875,7 +910,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			})
 		}
 	}
-	// Method is use update supplementary program price after tab change
+	// Updates total price display including core product and supplementary programs
 	updateOnlyTotalAmount() {
 		// Webflow total price dom element
 		var totalPriceText = document.getElementById("totalPrice");
@@ -896,7 +931,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			totalPriceTextMob.innerHTML = this.numberWithCommas(amount.toFixed(2));
 		}
 	}
-	// Update total price when checkbox clicked for supplementary program
+	// Updates total amount when supplementary program checkbox is toggled
 	updateAmount(checkEvent, amount) {
 		// Sum of supplementary program price
 		var totalAmountInput = document.getElementById("totalAmount");
@@ -951,6 +986,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			this.updateCheckOutData({supplementaryProgramIds: selectedIds});
 		//}
 	}
+	// Refreshes total price visibility based on selected supplementary programs and brief events
 	refreshTotalPriceVisibility(selectedIds) {
 		let suppIds = [];
 		if (Array.isArray(selectedIds)) {
@@ -971,6 +1007,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		const shouldShow = suppIds.length > 0 || Boolean(this.appliedBriefEvent);
 		this.toggleTotalPriceVisibility(shouldShow);
 	}
+	// Toggles visibility of total price divs based on whether items are selected
 	toggleTotalPriceVisibility(shouldShow) {
 		const totalPriceDiv = document.getElementById("totalPriceDiv");
 		if (totalPriceDiv) {
@@ -989,7 +1026,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			}
 		}
 	}
-	// Get API data with the help of endpoint
+	// Fetches data from the API endpoint
 	async fetchData(endpoint) {
 		try {
 			const response = await fetch(`${this.baseUrl}${endpoint}`);
@@ -1003,7 +1040,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			throw error;
 		}
 	}
-	// API call for checkout URL 
+	// Creates Stripe checkout URLs for ACH, card, and pay later payment methods
 	initializeStripePayment(paymentType = "", checkoutID = "", $baseUrl="createCheckoutUrlsByProgram") {
 		return new Promise((resolve, reject) => {
 			var suppProIdE = document.getElementById('suppProIds');
@@ -1108,6 +1145,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	/**
 	 * For automation testing updating checkout url in hidden field
 	 */
+	// Adds checkout session IDs to hidden form fields for automation testing
 	addSessionId() {
 		var localCheckOutData = localStorage.getItem('checkOutData')
 		if (localCheckOutData != undefined) {
@@ -1127,6 +1165,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			checkout_student_details.appendChild(payLaterSession)
 		}
 	}
+	// Formats program date string to YYYY-MM-DD HH:MM:SS.MICROSECONDS format
 	getProgramFormattedDate($date) {
 		if($date == undefined){
 			return false;
@@ -1144,7 +1183,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		const formattedDate = `${dateObj.getFullYear()}-${pad(dateObj.getMonth() + 1)}-${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}.000000`;
 		return formattedDate;
 	}
-	// API call for checkout URL 
+	// Updates student details in database and stores checkout data in localStorage
 	updateStudentDetails(checkoutUrl) {
 		var $this = this;
 		return new Promise((resolve, reject) => {
@@ -1214,7 +1253,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			}
 		});
 	}
-	// Hide and show tab for program selection, student infor and checkout payment
+	// Activates the specified checkout tab by adding active class
 	activateDiv(divId) {
 		var divIds = ["checkout_program", "checkout_student_details", "checkout_payment"];
 		// Remove the active class from all div elements
@@ -1222,7 +1261,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		// Add the active class to the div with the specified id
 		document.getElementById(divId).classList.add("active_checkout_tab");
 	}
-	// Managing next and previous button
+	// Sets up event handlers for next and previous navigation buttons in checkout flow
 	addEventForPrevNaxt() {
 		var initialCheckout = null
 		var next_page_1 = document.getElementById("next_page_1");
@@ -1307,6 +1346,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 		
 	}
+	// Reinitializes payment tab by resetting UI state and hiding payment links
 	reinitializePaymentTab(){
 		document.getElementsByClassName("bank-transfer-tab")[0].click();
 		document.getElementById('pay-now-link').closest('div').style.display = "none";
@@ -1341,7 +1381,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			return true;
 		}
 	}
-	// handle payment button click
+	// Sets up event handlers for payment method buttons (ACH, card, pay later)
 	handlePaymentEvent() {
 		var ach_payment = document.getElementById("ach_payment");
 		var card_payment = document.getElementById("card_payment");
@@ -1404,7 +1444,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			}, 1000);
 		});
 	}
-	// Update student data for addon supplementary program purchase
+	// Updates student form fields with data from localStorage for supplementary program purchase
 	updateSuppData() {
 		var studentFirstName = document.getElementById("Student-First-Name");
 		var studentLastName = document.getElementById("Student-Last-Name");

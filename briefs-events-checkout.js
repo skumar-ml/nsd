@@ -6,6 +6,7 @@ Brief Logic: Fetches briefs and events data from API and displays them in a grid
 Are there any dependent JS files: No
 */
 class BriefsEventsCheckout {
+    // Initializes the BriefsEventsCheckout instance with data and sets up modal handlers
     constructor(data) {
         this.data = data;
         this.selectedBriefs = [];
@@ -41,7 +42,7 @@ class BriefsEventsCheckout {
             return null;
         }
     }
-    // Pdf Modal Close Handler
+    // Adds event handler to close the PDF preview modal
     addCloseModalHandler() {
         if (this.closeBtn) {
         this.closeBtn.addEventListener("click", () => {
@@ -51,6 +52,7 @@ class BriefsEventsCheckout {
         }
     }
     
+    // Fetches briefs and events data from API and renders them in the appropriate accordion
     async getBriefsAndEvents() {
         const nextPage2Btn = document.getElementById('next_page_2');
         nextPage2Btn.style.display = 'none';
@@ -111,6 +113,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Renders brief cards in the single briefs accordion container
     renderBriefs(briefs) {
         const container = document.querySelector('[data-brief="single-briefs-accordion"] .briefs-accordion-item-body');
         if (!container) {
@@ -140,6 +143,7 @@ class BriefsEventsCheckout {
         this.attachPreviewHandlers(briefs);
     }
 
+    // Renders event cards in the annual events accordion container
     renderEvents(events) {
         const container = document.querySelector('[data-brief="annual-events-accordion"] .annual-subs-item-body');
         if (!container) {
@@ -168,8 +172,7 @@ class BriefsEventsCheckout {
         }
     }
 
-
-
+    // Displays a loading spinner in both accordion containers
     showLoading() {
         // Show loading in both accordion containers
         const annualContainer = document.querySelector('[data-brief="annual-events-accordion"] .annual-subs-item-body');
@@ -196,6 +199,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Creates and returns a DOM element for a single brief card
     createBriefCard(brief, isSelected = false) {
         const card = document.createElement('div');
         card.className = `brief-card ${isSelected ? 'red-border' : ''}`;
@@ -229,6 +233,7 @@ class BriefsEventsCheckout {
         return card;
     }
 
+    // Creates and returns a DOM element for a single event card
     createEventCard(event, isSelected = false) {
         const card = document.createElement('div');
         card.className = `annual-subs-card ${isSelected ? 'red-border' : ''}`;
@@ -269,6 +274,7 @@ class BriefsEventsCheckout {
         return card;
     }
 
+    // Toggles the selection state of a brief card and updates totals
     toggleBriefSelection(briefId, card) {
         const isSelected = card.classList.contains('red-border');
 
@@ -300,6 +306,7 @@ class BriefsEventsCheckout {
         this.debouncedUpdateTotal();
     }
 
+    // Debounces the updateTotal call to prevent excessive calculations
     debouncedUpdateTotal() {
         // Clear existing timeout
         if (this.updateTotalTimeout) {
@@ -312,6 +319,7 @@ class BriefsEventsCheckout {
         }, 100); // 100ms delay
     }
 
+    // Clears all selected briefs and removes visual selection indicators
     clearSelectedBriefs() {
         // Clear selected briefs array
         this.selectedBriefs = [];
@@ -329,6 +337,7 @@ class BriefsEventsCheckout {
         });
     }
 
+    // Clears all selected events and removes visual selection indicators
     clearSelectedEvents() {
         // Clear selected events array
         this.selectedEvents = [];
@@ -346,6 +355,7 @@ class BriefsEventsCheckout {
         });
     }
 
+    // Toggles the selection state of an event card and updates totals
     toggleEventSelection(eventId, card) {
         const isSelected = card.classList.contains('red-border');
         if (isSelected) {
@@ -379,6 +389,7 @@ class BriefsEventsCheckout {
         this.debouncedUpdateTotal();
     }
 
+    // Calculates the total price for selected briefs and events including credit card fees
     calculateTotal() {
         const isCreditCardSelected = this.isCreditCardSelected();
 
@@ -425,6 +436,7 @@ class BriefsEventsCheckout {
         return { briefsTotal, eventsTotal, total };
     }
 
+    // Updates the total amount display and order details based on selected items
     updateTotal() {
         // Calculate total from selected briefs and events
         const { briefsTotal, eventsTotal, total } = this.calculateTotal();
@@ -459,6 +471,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Displays an error message in both accordion containers
     showError(message) {
         // Show error in both accordion containers
         const annualContainer = document.querySelector('[data-brief="annual-events-accordion"] .annual-subs-item-body');
@@ -478,14 +491,17 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Initializes the checkout by setting up navigation and initial state
     init() {
         console.log('BriefsCheckout initialized');
         this.setupNavigation();
         this.setInitialState();
     }
 
+    // Sets up accordion functionality with default selection and event listeners
     setupAccordion() {
         // Set default accordion as selected
+        // Sets default accordion as selected
         this.selectAccordion('annual-events-accordion', "onload");
 
         // Add click event listeners to accordion headers
@@ -511,6 +527,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Selects and opens the specified accordion, handling mutual exclusion logic
     selectAccordion(accordionType, type = "") {
         // Check if the same accordion is already selected and open
         // Commented out to allow multiple accordions to be open at the same time
@@ -610,6 +627,7 @@ class BriefsEventsCheckout {
         console.log('Selected accordion:', accordionType);
     }
 
+    // Toggles the current accordion open/closed state without re-rendering content
     toggleCurrentAccordion(accordionType) {
         // Toggle the current accordion without re-rendering content
         if (accordionType === 'annual-events-accordion') {
@@ -677,6 +695,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Fixes the height of the accordion after content is rendered
     fixAccordionHeight(accordionType) {
         // Fix the height of the accordion after content is rendered
         if (accordionType === 'annual-events-accordion') {
@@ -710,6 +729,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Sets the initial UI state by hiding payment section and showing briefs selection
     setInitialState() {
         // Ensure payment method section is initially hidden
         const paymentSection = document.querySelector('[data-briefs-checkout="select-payment-method"]');
@@ -727,6 +747,7 @@ class BriefsEventsCheckout {
         this.updatePayNowButtonVisibility();
     }
 
+    // Shows the pay now button in order details sidebar and payment method section
     showPayNowButton() {
         // Show pay now button in order details sidebar
         const payNowButton = document.querySelector('[data-briefs-checkout="pay-now"]');
@@ -741,6 +762,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Hides the pay now button in order details sidebar and payment method section
     hidePayNowButton() {
         // Hide pay now button in order details sidebar
         const payNowButton = document.querySelector('[data-briefs-checkout="pay-now"]');
@@ -755,6 +777,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Sets up navigation buttons and payment method tab listeners
     setupNavigation() {
         // Setup next_page_2 button to show payment method
         const nextPage2Btn = document.getElementById('next_page_2');
@@ -786,6 +809,7 @@ class BriefsEventsCheckout {
         this.setupPayNowButtons();
     }
 
+    // Sets up event listeners for payment method tab changes
     setupPaymentMethodTabs() {
         const paymentTabs = document.querySelectorAll('.payment-cards-tabs-menu .w-tab-link');
         paymentTabs.forEach(tab => {
@@ -804,6 +828,7 @@ class BriefsEventsCheckout {
         });
     }
 
+    // Forces refresh of order details to show updated prices
     refreshOrderDetails() {
         // Force refresh the order details to show updated prices
         if (this.selectedBriefs.length > 0 || this.selectedEvents.length > 0) {
@@ -811,6 +836,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Updates pay now button visibility based on current tab state
     updatePayNowButtonVisibility() {
         // Check if we're currently on the payment method tab
         const paymentSection = document.querySelector('[data-briefs-checkout="select-payment-method"]');
@@ -823,6 +849,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Sets up event listeners for all pay now buttons
     setupPayNowButtons() {
         // Setup pay now button with data-briefs-checkout="pay-now"
         const payNowElements = document.querySelectorAll('[data-briefs-checkout="pay-now"]');
@@ -843,6 +870,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Shows the payment method section and validates that items are selected
     showPaymentMethod() {
         // Validate that at least one item is selected
         if (this.selectedBriefs.length === 0 && this.selectedEvents.length === 0) {
@@ -869,6 +897,7 @@ class BriefsEventsCheckout {
         this.updateOrderDetails();
     }
 
+    // Shows the briefs selection section and hides payment method
     showBriefsSelection() {
         // Show briefs selection
         const briefsSection = document.querySelector('[data-briefs-checkout="select-briefs"]');
@@ -886,6 +915,7 @@ class BriefsEventsCheckout {
         this.hidePayNowButton();
     }
 
+    // Updates the order details sidebar based on selected items
     updateOrderDetails() {
         const emptyOrderDetails = document.querySelector('[data-briefs-checkout="empty-order-details"]');
         const briefsOrderDetails = document.querySelector('[data-briefs-checkout="briefs-order-details"]');
@@ -904,6 +934,7 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Updates the items list in the order details sidebar with selected briefs and events
     updateItemsListInOrderDetails() {
         const briefsContainer = document.querySelector('[data-briefs-checkout="briefs-order-details"] .brief-flex-wrapper');
         if (!briefsContainer) return;
@@ -982,6 +1013,7 @@ class BriefsEventsCheckout {
         // Update total - this will be handled by updateTotal() method
     }
 
+    // Updates the total price display in the order details sidebar
     updateOrderTotalDisplay(total) {
         const totalElement = document.querySelector('[data-briefs-checkout="briefs-order-details"] .total-price-bold');
         if (totalElement) {
@@ -992,18 +1024,21 @@ class BriefsEventsCheckout {
         }
     }
 
+    // Deprecated method - kept for backward compatibility
     updateOrderTotal() {
         // This method is now deprecated - use updateOrderTotalDisplay instead
         // Keeping for backward compatibility but it should not be called directly
         console.warn('updateOrderTotal() is deprecated. Use updateOrderTotalDisplay() instead.');
     }
 
+    // Calculates the credit card amount with processing fees
     calculateCreditCardAmount(amount) {
         var total = (parseFloat(amount) + 0.3) / 0.971;
         let truncated = Math.floor(total * 100) / 100;
         return truncated;
     }
 
+    // Checks if credit card payment method is currently selected
     isCreditCardSelected() {
         const creditCardTab = document.querySelector('.credit-card-tab');
         const isSelected = creditCardTab && creditCardTab.classList.contains('w--current');
@@ -1011,6 +1046,7 @@ class BriefsEventsCheckout {
         return isSelected;
     }
 
+    // Returns an array of individual item amounts with base and final prices
     getIndividualAmounts() {
         const amounts = [];
 
@@ -1067,6 +1103,7 @@ class BriefsEventsCheckout {
         return amounts;
     }
 
+    // Validates payment data before processing checkout
     validatePaymentData() {
         // Check if member ID is available
         if (!this.data.memberId) {
@@ -1095,6 +1132,7 @@ class BriefsEventsCheckout {
 
         return true;
     }
+    // Processes the payment by creating checkout URL and redirecting to payment gateway
     payNow() {
         // Validate that at least one item is selected
         if (this.selectedBriefs.length === 0 && this.selectedEvents.length === 0) {
@@ -1213,15 +1251,18 @@ class BriefsEventsCheckout {
 
         xhr.send(JSON.stringify(checkoutData));
     }
+    // Activates the specified breadcrumb step in the checkout process
     activeBreadCrumb(activeId) {
         let breadCrumbList = document.querySelectorAll('.stepper-container ul li');
         breadCrumbList.forEach(element => element.classList.remove('active'))
         document.getElementById(activeId).classList.add('active')
 
     }
+    // Fetches member details from API (placeholder implementation)
     getMemberDetails() {
         // feth
     }
+     // Attaches preview handlers to all brief preview buttons
      attachPreviewHandlers(briefs) {
       document.querySelectorAll(".briefs-preview-btn").forEach((button) => {
         button.addEventListener("click", async (e) => {

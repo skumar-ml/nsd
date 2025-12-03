@@ -6,11 +6,12 @@ Brief Logic: Calls checkMemberExist API to verify member existence across MongoD
 Are there any dependent JS files: No
 */
 class checkMember {
+	// Initializes the checkMember instance and triggers member data verification
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		this.checkMemberData();
 	}
-	// Get API data with the help of endpoint
+	// Fetches data from the specified URL endpoint
 	async fetchData(url) {
 		try {
 			const response = await fetch(`${url}`);
@@ -24,6 +25,7 @@ class checkMember {
 			return false;
 		}
 	}
+	// Checks member existence across different systems and updates status fields
 	async checkMemberData(){
 		var checkMember = await this.fetchData('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/checkMemberExist/'+this.webflowMemberId)
 		if(checkMember){

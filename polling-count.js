@@ -6,12 +6,13 @@ Brief Logic: Fetches polling data from API and calculates unread count. Updates 
 Are there any dependent JS files: No
 */
 class PollingNotificationCount {
+	// Initializes the polling notification count instance and fetches polling data
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		this.getPollingData();
 	}
 	
-	/*Polling Data*/
+	// Displays the unread polling assignment count badge
 	displayUnreadPolling(messageData){
 		var pollingBudge = document.getElementsByClassName("polling-budge")[0];
 		var pollingCount = document.getElementsByClassName("polling-count")[0];
@@ -23,6 +24,7 @@ class PollingNotificationCount {
 		notificationPolling.innerHTML = unreadPolling.length;
 		pollingBudge.appendChild(notificationPolling)
 	}
+	// Fetches polling data from the API and displays unread polling count
 	getPollingData(){
 		var xhr = new XMLHttpRequest()
 		var $this = this;
