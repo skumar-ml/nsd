@@ -270,8 +270,11 @@ class BriefsUpsellModal {
 		}
 		this.selectedBriefEvent = selected;
 		this.syncBriefCardsWithSelection();
-		// Reset briefEventAdded when selecting a new brief (switching)
+		// Check if selected brief matches the applied brief
 		if (this.appliedBriefEvent) {
+			const isSameBrief = String(this.appliedBriefEvent.eventId) === String(selected.eventId);
+			this.briefEventAdded = isSameBrief;
+		} else {
 			this.briefEventAdded = false;
 		}
 		this.updateBriefCtaState();
@@ -415,12 +418,18 @@ class BriefsUpsellModal {
 			button.style.display = shouldShow ? defaultDisplay || '' : 'none';
 			// Update button text based on state
 			if (shouldShow) {
-				// Priority: Added > Switch Bundle > Add to Cart
-				if (this.briefEventAdded) {
+				// Check if selected brief matches applied brief
+				const isSameBrief = this.appliedBriefEvent && this.selectedBriefEvent &&
+					String(this.appliedBriefEvent.eventId) === String(this.selectedBriefEvent.eventId);
+				
+				if (isSameBrief) {
+					// Selected brief is the same as applied brief - show "Added"
 					button.textContent = 'Added';
 				} else if (this.appliedBriefEvent) {
+					// Different brief is applied - show "Switch Bundle"
 					button.textContent = 'Switch Bundle';
 				} else {
+					// No brief applied yet - show "Add to Cart"
 					button.textContent = 'Add to Cart';
 				}
 			}
