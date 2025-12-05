@@ -11,7 +11,6 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
-// Creates a DOM element with optional class and id attributes
 function creEl(name,className,idName){
   var el = document.createElement(name);
 	if(className){

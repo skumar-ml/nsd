@@ -122,7 +122,6 @@ function creEl(name,className,idName){
 	   * Render single json form data
 	   * @param responseText - single form object provided by API
 	   */
-	  // responseText is an object corresponding to MongoDB collection
 	  renderFormData(responseText){
 		  var $this = this;
 			$this.$completedForm = responseText.formCompletedList;

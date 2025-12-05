@@ -6,11 +6,13 @@ Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tr
 Are there any dependent JS files: No
 */
 class SigninActivity {
+	// Initializes the SigninActivity instance and inserts sign-in activity data
 	constructor(webflowMemberId){
 		this.webflowMemberId = webflowMemberId;
 		//this.getNotificationData();
 		this.InsertSignInData();
 	}
+	// Inserts sign-in activity data into the database
 	InsertSignInData(){
 		var data = {
 			 "memberId" : this.webflowMemberId

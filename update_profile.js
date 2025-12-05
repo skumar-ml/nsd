@@ -47,7 +47,7 @@ class updateMember {
     //spinner.style.display = "none";
     return $this.$editMemberData;
   }
-
+  // Handles the update profile button click event
   handleUpdateProfileBtn() {
     var $this = this;
     var update_profiles = document.querySelectorAll(".update_profile");
@@ -104,7 +104,8 @@ class updateMember {
       }
     }
   }
-
+ 
+  // Handles the edit member button click event
   handleEditMember() {
     var $this = this;
     const editMemberBtn = document.getElementById("editMemberBtn");
@@ -127,6 +128,7 @@ class updateMember {
       modal.style.display = "flex";
     }
   }
+  // Updates the member information
   editMemberInfo(memberData) {
     var $this = this;
     var studentFirstName = document.getElementById("Student-First-Name");

@@ -11,17 +11,22 @@ Are there any dependent JS files: No
  * @param className - HTML element class attribute
  * @param idName - HTML element id attribute
  */
-// Creates a DOM element with optional class and id attributes
 function creEl(name, className, idName) {
-	var el = document.createElement(name);
-	if (className) {
-		el.className = className;
-	}
-	if (idName) {
-		el.setAttribute("id", idName);
-	}
-	return el;
+    var el = document.createElement(name);
+    if (className) {
+        el.className = className;
+    }
+    if (idName) {
+        el.setAttribute("id", idName);
+    }
+    return el;
 }
+/**
+ * Class for handling payment confirmation and upsell modal
+ * @param webFlowMemberId - WebFlow member ID
+ * @param apiBaseUrl - API base URL
+ * @param site_url - Site URL
+ */
 class PaymentConfirmation {
     $suppPro = [];
     // Initializes PaymentConfirmation instance and sets up event handlers
@@ -32,120 +37,120 @@ class PaymentConfirmation {
         this.programId = this.getURLParam('programId')
         this.sessionId = this.getURLParam('transactionID')
         this.cart_page_variant = localStorage.getItem('_ab_test_variant');
-        this.memberUrl = site_url +"members/"+ webFlowMemberId;
-        this.portal_home = site_url +"portal/home?from=success";
-        if(!this.programId || !this.sessionId){
+        this.memberUrl = site_url + "members/" + webFlowMemberId;
+        this.portal_home = site_url + "portal/home?from=success";
+        if (!this.programId || !this.sessionId) {
             return false;
         }
         this.setUpBackButtonTab();
         this.eventHandlerForUpSellModal();
         this.displaySupplementaryProgram();
-        
-        
-    }
-    
 
+
+    }
+
+    // Sets up the back button tab for the upsell modal
     setUpBackButtonTab() {
         var ibackbutton = document.getElementById("backbuttonstate");
         console.log("Value set", ibackbutton.value);
-            if ( ibackbutton.value == 1){
-                // initalize again slider
-                console.log("Value Set");
-                this.initSlickSlider();
-                
+        if (ibackbutton.value == 1) {
+            // initalize again slider
+            console.log("Value Set");
+            this.initSlickSlider();
+
+        }
+    }
+    // Handles the learn more click event for the upsell modal
+    handleLearnMoreClick(programDetailId) {
+        let prep_week_searchText = "topic prep week";
+
+        // Filter data for the clicked programDetailId
+        let tutoring_data = this.$suppPro.filter(i =>
+            i.label.toLowerCase().includes("tutoring") && i.programDetailId === programDetailId
+        );
+
+        let prep_week_data = this.$suppPro.filter(i =>
+            i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()) && i.programDetailId === programDetailId
+        );
+
+        let carePackageData = this.$suppPro.find(i => i.programDetailId === 21);
+
+        // Select modal elements
+        let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week');
+        let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring');
+
+        // If programDetailId == 21, show the care package modal
+        if (programDetailId === 21 && carePackageData) {
+            let modal = document.getElementById('care-package-modal');
+
+            if (modal) {
+                modal.classList.add('show');
+                modal.style.display = 'flex';
+                this.initializeProductSlider();
+
+                var $this = this;
+                const closeLinks = document.querySelectorAll('.upsell-close-link.order-details');
+                if (closeLinks) {
+                    closeLinks.forEach(closeLink => {
+                        closeLink.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            $this.hideUpSellModal(modal);
+                        });
+                    });
+                }
+            } else {
+                console.warn("Care package modal not found.");
             }
+            return;
+        }
+
+        // Ensure the correct modal opens based on clicked programDetailId
+        if (prep_week_data.length > 0) {
+
+            if (tutoringUpSellModal) tutoringUpSellModal.style.display = "none";
+            if (topicPrepUpSellModal) {
+                topicPrepUpSellModal.style.display = "flex";
+                this.updatePrepWeekModal(prep_week_data);
+            }
+        } else if (tutoring_data.length > 0) {
+
+            if (tutoringUpSellModal) {
+                tutoringUpSellModal.style.display = "flex";
+                this.updateTutoringModal(tutoring_data);
+            }
+            if (topicPrepUpSellModal) topicPrepUpSellModal.style.display = "none";
+        } else {
+            //console.warn(`No matching tutoring or prep week data found for programDetailId: ${programDetailId}.`);
+            return;
+        }
+
+        // Show the modal
+        this.displayUpSellModal();
     }
 
-        handleLearnMoreClick(programDetailId) {
-            let prep_week_searchText = "topic prep week";
-        
-            // Filter data for the clicked programDetailId
-            let tutoring_data = this.$suppPro.filter(i =>
-                i.label.toLowerCase().includes("tutoring") && i.programDetailId === programDetailId
-            );
-        
-            let prep_week_data = this.$suppPro.filter(i =>
-                i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()) && i.programDetailId === programDetailId
-            );
-        
-            let carePackageData = this.$suppPro.find(i => i.programDetailId === 21);
-        
-            // Select modal elements
-            let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week');
-            let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring');
-        
-            // If programDetailId == 21, show the care package modal
-            if (programDetailId === 21 && carePackageData) {
-                let modal = document.getElementById('care-package-modal');
-        
-                if (modal) {
-                    modal.classList.add('show');
-                    modal.style.display = 'flex';
-                    this.initializeProductSlider();
-        
-                    var $this = this;
-                    const closeLinks = document.querySelectorAll('.upsell-close-link.order-details');
-                    if (closeLinks) {
-                        closeLinks.forEach(closeLink => {
-                            closeLink.addEventListener('click', function (event) {
-                                event.preventDefault();
-                                $this.hideUpSellModal(modal);
-                            });
-                        });
-                    }
-                } else {
-                    console.warn("Care package modal not found.");
-                }
-                return;
-            }
-        
-            // Ensure the correct modal opens based on clicked programDetailId
-            if (prep_week_data.length > 0) {
-                
-                if (tutoringUpSellModal) tutoringUpSellModal.style.display = "none";
-                if (topicPrepUpSellModal) {
-                    topicPrepUpSellModal.style.display = "flex";
-                    this.updatePrepWeekModal(prep_week_data);
-                }
-            } else if (tutoring_data.length > 0) {
-                
-                if (tutoringUpSellModal) {
-                    tutoringUpSellModal.style.display = "flex";
-                    this.updateTutoringModal(tutoring_data);
-                }
-                if (topicPrepUpSellModal) topicPrepUpSellModal.style.display = "none";
-            } else {
-                //console.warn(`No matching tutoring or prep week data found for programDetailId: ${programDetailId}.`);
-                return;
-            }
-        
-            // Show the modal
-            this.displayUpSellModal();
-        }
-        
-        
-        
-        initializeProductSlider() {
+
+    // Initializes the product slider for the care package modal
+    initializeProductSlider() {
         // Initialize the main slider
         var $sliderFor = $('.slider-for');
         if (!$sliderFor.hasClass('slick-initialized')) {
             $sliderFor.slick({
                 slidesToShow: 1,
                 slidesToScroll: 1,
-                arrows: false, 
+                arrows: false,
                 fade: true,
                 asNavFor: '.slider-nav',
                 responsive: [
                     {
                         breakpoint: 568,
                         settings: {
-                            fade: false 
+                            fade: false
                         }
                     }
                 ]
             });
         }
-    
+
         const productDetails = [
             { content: "Limited Edition NSD Hoodie - Stay warm, look sharp, and rep NSD in this premium, unisex sweatshirt. Made from soft, high-quality fabric, it’s your new go-to for debate camp and beyond. Available only as part of the bundle, this hoodie is a must-have for every NSD student—grab yours before they’re gone!" },
             { content: "The Timer Every Debater Needs - From practice rounds at camp to final rounds at tournaments, the NSD Timer is your go-to tool for staying in control of the clock and perfecting your speeches." },
@@ -153,44 +158,44 @@ class PaymentConfirmation {
             { content: "NSD Hat: Where Comfort Meets Cool - Stay sharp and stylish with the unisex NSD hat, crafted for comfort and durability. Designed in a sleek, classic colorway, it’s the perfect accessory to rep your NSD pride—whether at camp, a tournament, or out and about." },
             { content: "NSD Tote Bag - This NSD tote’s sturdy, high-quality materials hold all your essentials, yet remain sleek and easy to carry. With its clean design and iconic NSD logo, it adds a polished touch to your routine—whether you’re headed to a debate round or a coffee shop." }
         ];
-    
-        $sliderFor.on('afterChange', function(event, slick, currentSlide) {
+
+        $sliderFor.on('afterChange', function (event, slick, currentSlide) {
             console.log('Current Slide Index:', currentSlide);
             const productInfoElement = document.querySelector('.product-info');
-    
+
             if (productInfoElement) {
                 const content = productDetails[currentSlide].content;
                 console.log('Content to display:', content);
-    
+
                 const [name, description] = content.split(' - ');
-                
+
                 const productNameElement = productInfoElement.querySelector('.product-name_span-text');
                 console.log("Name", productNameElement);
                 const productDescriptionElement = productInfoElement.querySelector('.product-description-2');
                 console.log("Description", productDescriptionElement);
-    
+
                 if (productNameElement && productDescriptionElement) {
                     productNameElement.innerHTML = name;
                     productDescriptionElement.innerHTML = description;
-    
+
                     console.log('Updated Product Name:', productNameElement.innerHTML);
                     console.log('Updated Product Description:', productDescriptionElement.innerHTML);
                 }
             }
         });
-    
+
         var $sliderNav = $('.slider-nav');
         if (!$sliderNav.hasClass('slick-initialized')) {
             $sliderNav.slick({
                 slidesToShow: 5,
                 asNavFor: '.slider-for',
-                dots: false, 
+                dots: false,
                 centerMode: false,
                 focusOnSelect: true,
             });
         }
     }
-    
+
     // Sets up event handlers for upsell modal display based on page variant
     eventHandlerForUpSellModal() {
         let upSellModalBtn = document.getElementById('upsellModalBtn1')
@@ -202,23 +207,23 @@ class PaymentConfirmation {
             } else {
                 console.warn("portal_home is not defined.");
             }
-            
+
         })
 
         // Showing up-sell modal content based on cart page modal variant
-        if($this.cart_page_variant != undefined){
+        if ($this.cart_page_variant != undefined) {
             let topicPrepUpSellModal = document.querySelector('.upsell-modal-container.topic-prep-week')
-		    let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
-            if($this.cart_page_variant == 2){
+            let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
+            if ($this.cart_page_variant == 2) {
                 tutoringUpSellModal.style.display = "none";
                 topicPrepUpSellModal.style.display = "flex";
-            }else{
+            } else {
                 tutoringUpSellModal.style.display = "flex";
                 topicPrepUpSellModal.style.display = "none";
             }
         }
     }
-    
+
     // Displays the upsell modal with event handlers for close buttons
     displayUpSellModal() {
         const modal = document.getElementById('upsell-modal-1');
@@ -243,7 +248,7 @@ class PaymentConfirmation {
             }
         }
         const closeLinks = document.querySelectorAll('.upsell-close-link');
-        if(closeLinks != undefined){
+        if (closeLinks != undefined) {
             closeLinks.forEach(function (closeLink) {
                 console.log("SignIn Click Event Called");
                 closeLink.addEventListener('click', function (event) {
@@ -308,30 +313,30 @@ class PaymentConfirmation {
                 upSellTpwProgramId.value = prep_week_data[0].amount
             }
             // For mobile upsellTpwProgranId-1
-			var upsellTpwProgranIdMob = document.getElementById('upsellTpwProgranId-1');
-			if (upsellTpwProgranIdMob != undefined) {
-				upsellTpwProgranIdMob.setAttribute('programdetailid', prep_week_data[0].programDetailId)
+            var upsellTpwProgranIdMob = document.getElementById('upsellTpwProgranId-1');
+            if (upsellTpwProgranIdMob != undefined) {
+                upsellTpwProgranIdMob.setAttribute('programdetailid', prep_week_data[0].programDetailId)
                 upsellTpwProgranIdMob.setAttribute('programName', prep_week_data[0].label)
                 upsellTpwProgranIdMob.value = prep_week_data[0].amount
-			}
+            }
 
             let tpwTitle = document.querySelector("[upsell-modal='tpw-title']")
-			if(tpwTitle != undefined){
-				tpwTitle.innerHTML = prep_week_data[0].label
-			}
+            if (tpwTitle != undefined) {
+                tpwTitle.innerHTML = prep_week_data[0].label
+            }
             let tpwReadMore = document.querySelectorAll("[upsell-modal='tpw_read-more']")
-			if (tpwReadMore.length > 0) {
-				tpwReadMore.forEach(read_more_link => {
-					read_more_link.href = this.site_url + "topic-prep-week";
-				})
-			}
+            if (tpwReadMore.length > 0) {
+                tpwReadMore.forEach(read_more_link => {
+                    read_more_link.href = this.site_url + "topic-prep-week";
+                })
+            }
 
 
         }
     }
 
     //updateTutoringModal(tutoring_data) {
-        updateTutoringModal(tutoring_data) {
+    updateTutoringModal(tutoring_data) {
         if (tutoring_data.length > 0) {
             var tutoringAmount = document.getElementById('tuto-amount');
             if (tutoringAmount != undefined) {
@@ -352,47 +357,47 @@ class PaymentConfirmation {
                 upSellTutoringProgramId.value = tutoring_data[0].amount
             }
             // Mobile div id upsellTutoProgranId-1
-			var upsellTutoProgranIdMob = document.getElementById('upsellTutoProgranId-1');
-			if (upsellTutoProgranIdMob != undefined) {
-				upsellTutoProgranIdMob.setAttribute('programdetailid', tutoring_data[0].programDetailId)
+            var upsellTutoProgranIdMob = document.getElementById('upsellTutoProgranId-1');
+            if (upsellTutoProgranIdMob != undefined) {
+                upsellTutoProgranIdMob.setAttribute('programdetailid', tutoring_data[0].programDetailId)
                 upsellTutoProgranIdMob.setAttribute('programName', tutoring_data[0].label)
                 upsellTutoProgranIdMob.value = tutoring_data[0].amount
-			}
+            }
 
             //tutoring title
-			let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
-			if(tutoringTitle != undefined){
-				tutoringTitle.innerHTML = tutoring_data[0].label
-			}
+            let tutoringTitle = document.querySelector("[upsell-modal='tutoring-title']")
+            if (tutoringTitle != undefined) {
+                tutoringTitle.innerHTML = tutoring_data[0].label
+            }
 
             let tutoringReadMore = document.querySelectorAll("[upsell-modal='tutoring_read-more']")
-			if (tutoringReadMore.length > 0) {
-				tutoringReadMore.forEach(read_more_link => {
-					read_more_link.href = this.site_url + "debate-tutoring";
-				})
-			} 
+            if (tutoringReadMore.length > 0) {
+                tutoringReadMore.forEach(read_more_link => {
+                    read_more_link.href = this.site_url + "debate-tutoring";
+                })
+            }
         }
     }
 
     // Updates care package modal with pricing and program information
     updateCarePackageModal(care_package_data) {
 
-      // Care Package Data Update
-		if(care_package_data != undefined){
-			let carePackagePrice = document.querySelectorAll("[data-care-package='price']")
-			if (carePackagePrice.length > 0) {
-				carePackagePrice.forEach(cp_price => {
-					cp_price.innerHTML = "$"+care_package_data.amount;
-				})
-			}
-			let carePackageCheckbox = document.querySelectorAll("[data-care-package='checkbox']")
-			if (carePackageCheckbox.length > 0) {
-				carePackageCheckbox.forEach(cp_checkbox => {
-					cp_checkbox.setAttribute('programdetailid', care_package_data.programDetailId)
-					cp_checkbox.value = care_package_data.amount
-				})
-			}
-		}
+        // Care Package Data Update
+        if (care_package_data != undefined) {
+            let carePackagePrice = document.querySelectorAll("[data-care-package='price']")
+            if (carePackagePrice.length > 0) {
+                carePackagePrice.forEach(cp_price => {
+                    cp_price.innerHTML = "$" + care_package_data.amount;
+                })
+            }
+            let carePackageCheckbox = document.querySelectorAll("[data-care-package='checkbox']")
+            if (carePackageCheckbox.length > 0) {
+                carePackageCheckbox.forEach(cp_checkbox => {
+                    cp_checkbox.setAttribute('programdetailid', care_package_data.programDetailId)
+                    cp_checkbox.value = care_package_data.amount
+                })
+            }
+        }
     }
 
     // Handles buy now button clicks to add items to cart
@@ -456,20 +461,20 @@ class PaymentConfirmation {
         const data = {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
-            "successUrl": this.site_url+"members/"+ this.webFlowMemberId+"?paymentType=Supplementary",
-            "cancelUrl": this.site_url+"payment-confirmation?programId=" + encodeURIComponent(this.programId) + "&transactionID=" + encodeURIComponent(this.sessionId),
+            "successUrl": this.site_url + "members/" + this.webFlowMemberId + "?paymentType=Supplementary",
+            "cancelUrl": this.site_url + "payment-confirmation?programId=" + encodeURIComponent(this.programId) + "&transactionID=" + encodeURIComponent(this.sessionId),
             "label": programName,
-            "amount": parseFloat(amount*100),
+            "amount": parseFloat(amount * 100),
             "source": "success_page"
         };
         // Create the POST request
-        fetch(this.apiBaseUrl+"createCheckoutUrlForSupplementary", {
-                method: 'POST', // Specify the method
-                headers: {
-                    'Content-Type': 'application/json' // Specify the content type
-                },
-                body: JSON.stringify(data) // Convert the data to a JSON string
-            })
+        fetch(this.apiBaseUrl + "createCheckoutUrlForSupplementary", {
+            method: 'POST', // Specify the method
+            headers: {
+                'Content-Type': 'application/json' // Specify the content type
+            },
+            body: JSON.stringify(data) // Convert the data to a JSON string
+        })
             .then(response => {
                 if (!response.ok) {
                     // Handle the error response
@@ -490,88 +495,88 @@ class PaymentConfirmation {
             });
     }
 
-    
+    // Displays the supplementary program in the modal
     async displaySupplementaryProgram() {
-		let container2 = document.getElementById("checkout-supplimentary-data-2");
-		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
+        let container2 = document.getElementById("checkout-supplimentary-data-2");
+        let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
         // loader icon code
-			var spinner = document.getElementById("half-circle-spinner");
-			spinner.style.display = "block";
-		
-		// Get the container element
-		let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
-		let allApiData = apiData;
-		// Added in our Local Data
-		this.$suppPro = apiData;
-		let prep_week_searchText = "topic prep week";
-		let tutoring_week_searchText = "5 hours";
-        
-        
-		//let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
-		let variant_type = this.cart_page_variant;
-		variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
-		let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
+        var spinner = document.getElementById("half-circle-spinner");
+        spinner.style.display = "block";
+
+        // Get the container element
+        let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
+        let allApiData = apiData;
+        // Added in our Local Data
+        this.$suppPro = apiData;
+        let prep_week_searchText = "topic prep week";
+        let tutoring_week_searchText = "5 hours";
+
+
+        //let variant_type = _vwo_exp[_vwo_exp_ids[0]].combination_chosen;
+        let variant_type = this.cart_page_variant;
+        variant_type = variant_type != undefined || variant_type != null ? variant_type : "";
+        let prep_week_data = apiData.filter(i => i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()))
         //console.log(prep_week_data);
-		let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))       
+        let tutoring_data = apiData.filter(i => i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()))
         let care_package_data = apiData.find(i => i.programDetailId == 21);
 
-		this.updatePrepWeekModal(prep_week_data);
+        this.updatePrepWeekModal(prep_week_data);
         this.updateTutoringModal(tutoring_data);
         this.updateCarePackageModal(care_package_data);
-      		
-		
+
+
         if (variant_type == 1) {
             apiData = apiData.filter(i => !i.label.toLowerCase().includes(prep_week_searchText.toLowerCase()));
         } else {
             apiData = apiData.filter(i => !i.label.toLowerCase().includes(tutoring_week_searchText.toLowerCase()));
-          
+
         }
-		
-		apiData = apiData.filter(i => i.programDetailId != 21);
 
-		if(!apiData.length){
-			swiperSlideWrapper.style.display="none";
-		}
-	    if(!allApiData.length){
-			swiperSlideWrapper.style.display="none";
-		}
-		
-		if (container2 == undefined) return;
-		
-		if (swiperSlideWrapper == undefined) return
+        apiData = apiData.filter(i => i.programDetailId != 21);
 
-		swiperSlideWrapper.innerHTML = "";
-		allApiData.forEach(item => {
-			item.forumType = "Public Forum";
-			//slider div
-			/*let swiperSlide = creEl('div', 'you-might_slide-item')
-			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
-			swiperSlide.appendChild(outerShadowDiv1)
-			swiperSlideWrapper.prepend(swiperSlide)*/
+        if (!apiData.length) {
+            swiperSlideWrapper.style.display = "none";
+        }
+        if (!allApiData.length) {
+            swiperSlideWrapper.style.display = "none";
+        }
+
+        if (container2 == undefined) return;
+
+        if (swiperSlideWrapper == undefined) return
+
+        swiperSlideWrapper.innerHTML = "";
+        allApiData.forEach(item => {
+            item.forumType = "Public Forum";
+            //slider div
+            /*let swiperSlide = creEl('div', 'you-might_slide-item')
+            const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
+            swiperSlide.appendChild(outerShadowDiv1)
+            swiperSlideWrapper.prepend(swiperSlide)*/
 
             let swiperSlide = document.createElement("div");
             swiperSlide.classList.add("you-might_slide-item");
             const updatedSlide = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
             swiperSlideWrapper.prepend(updatedSlide);
 
-		});
+        });
         this.initSlickSlider();
         this.buyNow();
         // loader icon code
-			
-			spinner.style.display = "none";
-		if(apiData.length == 0){
-			container2.style.display = "none";
-			return;
-		}
-	}
-	// Initializes Slick slider for "You Might" and "Why Families" sections
-	initSlickSlider() {
-		var $slider = $('.you-might_slick-slider');
-		// Check if the slider is already initialized
-		if (!$slider.hasClass('slick-initialized')) {
 
-			var slickSettings = {
+        spinner.style.display = "none";
+        if (apiData.length == 0) {
+            container2.style.display = "none";
+            return;
+        }
+    }
+    // Initializes Slick slider for "You Might" and "Why Families" sections
+    initSlickSlider() {
+        var $slider = $('.you-might_slick-slider');
+        // Check if the slider is already initialized
+        if (!$slider.hasClass('slick-initialized')) {
+
+            var slickSettings = {
                 speed: 300,
                 slidesToShow: 1,
                 slidesToScroll: 1,
@@ -581,33 +586,33 @@ class PaymentConfirmation {
                 arrows: false,
                 dots: true,
             };
-			// Initialize you might slider
-			var $sliderYouMight = $slider.slick(slickSettings);
+            // Initialize you might slider
+            var $sliderYouMight = $slider.slick(slickSettings);
             var $sliderFamilies = $(".why-families_slick-slider").slick(
                 slickSettings
-              );
+            );
 
-			// Shared navigation logic for the "You Might" slider
-			$('.left-arrow-slick').click(function () {
-				console.log("You Might: Left arrow clicked.");
-				$sliderYouMight.slick('slickPrev');
-			});
+            // Shared navigation logic for the "You Might" slider
+            $('.left-arrow-slick').click(function () {
+                console.log("You Might: Left arrow clicked.");
+                $sliderYouMight.slick('slickPrev');
+            });
 
-			$('.right-arrow-slick').click(function () {
-				console.log("You Might: Right arrow clicked.");
-				$sliderYouMight.slick('slickNext');
-			});
+            $('.right-arrow-slick').click(function () {
+                console.log("You Might: Right arrow clicked.");
+                $sliderYouMight.slick('slickNext');
+            });
             // Shared navigation logic for the "Why Families" slider
             $(".families-left-arrow").click(function () {
                 console.log("Why Families: Left arrow clicked.");
                 $sliderFamilies.slick("slickPrev");
-              });
+            });
 
-              $(".families-right-arrow").click(function () {
+            $(".families-right-arrow").click(function () {
                 console.log("Why Families: Right arrow clicked.");
                 $sliderFamilies.slick("slickNext");
-              });
-		}
+            });
+        }
 
     }
     // Checks if learn more button should be shown for a given program ID
@@ -617,17 +622,17 @@ class PaymentConfirmation {
     }
     // New UpSell Program / Supplementary
     // Displays a single supplementary program card in the slider
-	displaySingleSuppProgram(item, size, slideDiv) {
+    displaySingleSuppProgram(item, size, slideDiv) {
         var $this = this;
-    
+
         // Create the first wrapper
         const flexWrapper1 = document.createElement("div");
         flexWrapper1.classList.add("you-might-flex-wrapper");
-    
+
         // Create the text block wrapper
         const textBlockWrapper = document.createElement("div");
         textBlockWrapper.classList.add("text-block-wrapper");
-    
+
         item.tags.forEach(tag => {
             const tagDiv = document.createElement("div");
             tagDiv.classList.add("payment-conf-tag");
@@ -635,66 +640,66 @@ class PaymentConfirmation {
             tagDiv.textContent = tag.name;
             textBlockWrapper.appendChild(tagDiv);
         });
-    
+
         flexWrapper1.appendChild(textBlockWrapper);
         slideDiv.appendChild(flexWrapper1); // Append to slideDiv
-    
+
         // Create the second wrapper
         const flexWrapper2 = document.createElement("div");
         flexWrapper2.classList.add("you-might-flex-wrapper");
-    
+
         const courseInfoDiv = document.createElement("div");
         const campNameDiv = document.createElement("div");
         campNameDiv.classList.add("camp-name");
         campNameDiv.textContent = item.label;
         courseInfoDiv.appendChild(campNameDiv);
-    
+
         const priceWrapper = document.createElement("div");
         priceWrapper.classList.add("price-wrapper", "upsell");
-    
+
         const saveItem = document.createElement("div");
         saveItem.classList.add("price-item");
-    
+
         const saveLabel = document.createElement("div");
         saveLabel.classList.add("save-amount");
         saveLabel.textContent = "Save";
-    
+
         const saveAmount = document.createElement("div");
         saveAmount.classList.add("save-amount");
         saveAmount.textContent = "$" + (parseFloat(item.disc_amount) - parseFloat(item.amount)).toFixed(2);
-    
+
         saveItem.appendChild(saveLabel);
         saveItem.appendChild(saveAmount);
-    
+
         const originalPriceDiv = document.createElement("div");
         originalPriceDiv.classList.add("price-item", "upsell");
         originalPriceDiv.innerHTML = `<div class='original-price'>$${item.disc_amount}</div>`;
-    
+
         const discountedPriceDiv = document.createElement("div");
         discountedPriceDiv.classList.add("price-item", "upsell");
         discountedPriceDiv.innerHTML = `<div class='discounted-price text-blue'>$${item.amount}</div>`;
-    
+
         priceWrapper.appendChild(saveItem);
         priceWrapper.appendChild(originalPriceDiv);
         priceWrapper.appendChild(discountedPriceDiv);
-    
+
         courseInfoDiv.appendChild(priceWrapper);
         flexWrapper2.appendChild(courseInfoDiv);
-    
+
         const buttonContainer = document.createElement("div");
         buttonContainer.classList.add("mob-width-100");
         const buttonDiv = document.createElement("div");
         buttonDiv.classList.add("button_add-to-card", "marginbottom-10px");
-    
+
         const buyNowButton = document.createElement("a");
         buyNowButton.href = "#";
         buyNowButton.classList.add("main-button-26", "red", "add-to-card", "upsell_add_to_card", "padding-with-full-width", "w-button");
         buyNowButton.style.width = "100%";
         buyNowButton.textContent = "Buy Now";
-    
+
         const hiddenDiv = document.createElement("div");
         hiddenDiv.classList.add("hide", "w-embed");
-    
+
         const checkbox = document.createElement("input");
         checkbox.classList.add("w-checkbox-input", "core-checkbox", "suppCheckbox", "hide");
         checkbox.id = "upsellTpwProgranId-1";
@@ -705,14 +710,14 @@ class PaymentConfirmation {
         checkbox.setAttribute("data-name", "Checkbox");
         checkbox.setAttribute("programname", item.label);
         hiddenDiv.appendChild(checkbox);
-    
+
         buttonDiv.appendChild(buyNowButton);
         buttonDiv.appendChild(hiddenDiv);
 
         buttonContainer.appendChild(buttonDiv);
 
         let learnMoreButton = null;
-         var $this = this;
+        var $this = this;
         // Learn More Button (Only for specific program IDs)
         if (this.shouldShowLearnMore(item.programDetailId)) {
             learnMoreButton = document.createElement("a");
@@ -720,19 +725,19 @@ class PaymentConfirmation {
             learnMoreButton.href = "#";
             learnMoreButton.classList.add("main-button", "red", "alternate", "upsell", "w-button");
             learnMoreButton.textContent = "Learn More";
-             // Attach event listener
+            // Attach event listener
             learnMoreButton.addEventListener("click", (event) => {
                 //Call handleLearnMore function
-              $this.handleLearnMoreClick(item.programDetailId);
-          });
+                $this.handleLearnMoreClick(item.programDetailId);
+            });
             buttonContainer.appendChild(learnMoreButton);
         }
-    
+
         flexWrapper2.appendChild(buttonContainer);
         slideDiv.appendChild(flexWrapper2); // Append to slideDiv
-    
+
         return slideDiv; // Return the updated slideDiv
     }
-    
+
 }
 
