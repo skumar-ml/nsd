@@ -667,7 +667,7 @@ class NSDPortal {
 
         //Add iframe when it's live and above certain screenwidth
         var iframeClassName = (is_live && window.innerWidth > 1200 && !added_by_admin) ? "iframe-lightbox-link" : "";
-        var link_text;
+        var link_text = "#";
         var form_link_text = (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice') ? 'Invoice' : 'Form';
         if (added_by_admin) {
             link_text = "Completed";
