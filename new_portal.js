@@ -560,7 +560,7 @@ class NSDPortal {
                 src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
                 loading="lazy" alt=""></div>
             </div>
-            ${this.resourceList()}
+            ${this.resourceList() || '<div class="pre-camp_subtitle">Camp resource available soon...</div>'}
         `;
         }
         
