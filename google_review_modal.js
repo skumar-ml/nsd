@@ -15,6 +15,9 @@ class GoogleReviewModal {
     this.isStudent = memberData.accountType === "student";
     this.baseApiUrl = memberData.baseApiUrl;
 
+    // Allow QA to drive test dates/behaviour via query params
+    this.testOverrides = this.getTestOverrides();
+
     this.googleReviewData = localStorage.getItem("googleReviewData")
       ? JSON.parse(atob(localStorage.getItem("googleReviewData")))
       : {};
@@ -22,6 +25,23 @@ class GoogleReviewModal {
     this.clearGoogleReviewData(); // Clear if student changed
 
     this.init();
+  }
+
+  // Reads optional test overrides from the URL, e.g.
+  // ?googleReviewTest=1&startDate=2025-06-01&endDate=2025-06-20&forceShow=1
+  getTestOverrides() {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.get("googleReviewTest")) return null;
+
+    const parseDate = (val) => (val ? new Date(val) : null);
+
+    return {
+      enabled: true,
+      startDate: parseDate(params.get("startDate")),
+      endDate: parseDate(params.get("endDate")),
+      lastShownDate: params.get("lastShownDate") || null,
+      forceShow: params.get("forceShow") === "1" || params.get("forceShow") === "true",
+    };
   }
 
   // Sets up close button event listeners and checks eligibility for review
@@ -44,6 +64,32 @@ class GoogleReviewModal {
 
   // Checks if the student is eligible for Google review based on program completion data
   isEligibleForReview() {
+    // Test harness: skip network and use query param dates
+    if (this.testOverrides?.enabled) {
+      const now = new Date();
+      const startDate = this.testOverrides.startDate || now;
+      const endDate = this.testOverrides.endDate || now;
+      const data = {
+        startDate,
+        endDate,
+        memberId: this.memberId,
+        studentEmail: this.studentEmail,
+      };
+      if (this.testOverrides.lastShownDate) {
+        data.lastShownDate = this.testOverrides.lastShownDate;
+      }
+      this.updateGoogleReviewData(data);
+
+      if (this.testOverrides.forceShow) {
+        this.showModal();
+        const today = new Date().toISOString().split("T")[0];
+        this.updateGoogleReviewData({ lastShownDate: today });
+      } else {
+        this.checkConditionsAndShowModal();
+      }
+      return;
+    }
+
     if (this.googleReviewData && Object.keys(this.googleReviewData).length > 0) {
       this.checkConditionsAndShowModal();
     } else {
@@ -91,28 +137,43 @@ class GoogleReviewModal {
 
     const currentDate = new Date();
 
-    const oneDayAfterEndDate = new Date(endDate);
-    oneDayAfterEndDate.setDate(endDate.getDate() + 1);
+    // Check if camp has started
+    if (currentDate < startDate) {
+      return;
+    }
 
-    
-    if (currentDate >= startDate && currentDate < oneDayAfterEndDate) {
-      const totalCampDuration = endDate - startDate;
-      const elapsedCampDuration = currentDate - startDate;
-      const completionPercentage = (elapsedCampDuration / totalCampDuration) * 100;
+    // Calculate completion percentage for camps in progress
+    const totalCampDuration = endDate - startDate;
+    const elapsedCampDuration = currentDate - startDate;
+    const completionPercentage = totalCampDuration > 0 
+      ? (elapsedCampDuration / totalCampDuration) * 100 
+      : 0;
 
-      const today = new Date().toISOString().split("T")[0];
-      const lastShownDate = this.googleReviewData.lastShownDate || "";
+    // Check if camp is finished OR halfway through
+    const isCampFinished = currentDate >= endDate;
+    const isHalfwayThrough = completionPercentage >= 50 && currentDate < endDate;
 
-      if (lastShownDate === today) {
-       // console.log("Modal already shown today.");
+    if (!isCampFinished && !isHalfwayThrough) {
+      return;
+    }
+
+    // Check if modal was shown within the last month
+    const lastShownDate = this.googleReviewData.lastShownDate;
+    if (lastShownDate) {
+      const lastShown = new Date(lastShownDate);
+      const oneMonthAgo = new Date();
+      oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+      if (lastShown > oneMonthAgo) {
+        // Modal was shown within the last month, don't show again
         return;
       }
-
-      if (completionPercentage >= 75) {
-        this.showModal();
-        this.updateGoogleReviewData({ lastShownDate: today });
-      }
     }
+
+    // Show modal and update last shown date
+    this.showModal();
+    const today = new Date().toISOString().split("T")[0];
+    this.updateGoogleReviewData({ lastShownDate: today });
   }
 
   // Displays the Google review modal by adding show class and setting display to flex
@@ -128,4 +189,13 @@ class GoogleReviewModal {
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const memberData = {
+    baseApiUrl: "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/",
+    accountEmail: "vickey.jain@techment.com",
+    accountType: "student",
+    memberId: "639ae841e3d1790004f29b80",
+  };
 
+  new GoogleReviewModal(memberData);
+});
