@@ -93,7 +93,7 @@ class BriefManager {
             // Get recommended subscription based on user's briefs
             const recommendedSubscription = this.getRecommendedSubscription(subscriptionOptions, briefAnalysis);
 
-            const getAccessBriefsContainers = document.querySelectorAll('.briefs-flex-wrapper');
+            const getAccessBriefsContainers = document.querySelectorAll('.brief-info-flex-wrapper');
             if (recommendedSubscription) {
                 getAccessBriefsContainers.forEach(container => {
                     container.style.display = 'block';
