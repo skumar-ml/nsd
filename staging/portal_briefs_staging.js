@@ -96,7 +96,7 @@ class BriefManager {
             const getAccessBriefsContainers = document.querySelectorAll('.brief-info-flex-wrapper');
             if (recommendedSubscription) {
                 getAccessBriefsContainers.forEach(container => {
-                    container.style.display = 'block';
+                    container.style.display = 'flex';
                 });
             }
             // Update the upsell elements with dynamic content
