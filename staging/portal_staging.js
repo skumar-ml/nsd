@@ -532,7 +532,14 @@ class NSDPortal {
         // Create pre-camp content
         const preCampContent = this.createPreCampContent(session, sessionInvoices);
         if (preCampContent) {
-            campInfoWrapper.appendChild(preCampContent);
+            // Append all children from the fragment to the wrapper
+            if (preCampContent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                while (preCampContent.firstChild) {
+                    campInfoWrapper.appendChild(preCampContent.firstChild);
+                }
+            } else {
+                campInfoWrapper.appendChild(preCampContent);
+            }
         }
 
         // Create during-camp content if program has started
@@ -625,8 +632,8 @@ class NSDPortal {
 
     // Create pre-camp content
     createPreCampContent(session, invoiceData) {
-        const campInfoWrapper = document.createElement('div');
-        campInfoWrapper.className = 'camp-info-wrapper';
+        // Create a container fragment to hold all content (no wrapper class)
+        const contentContainer = document.createDocumentFragment();
 
         const formList = session.formList || [];
         const formCompletedList = session.formCompletedList || [];
@@ -661,7 +668,7 @@ class NSDPortal {
                 <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg" loading="lazy" alt="">
             </div>
         `;
-        campInfoWrapper.appendChild(headerDiv);
+        contentContainer.appendChild(headerDiv);
 
         // Create forms section
         let formsSection = null;
@@ -685,7 +692,7 @@ class NSDPortal {
                     </div>
                 </div>
             `;
-            campInfoWrapper.appendChild(progressDiv);
+            contentContainer.appendChild(progressDiv);
         }
 
         // Check if all forms are completed
@@ -699,16 +706,16 @@ class NSDPortal {
             viewAllFormsButton.setAttribute('data-portal', 'view-all-forms');
             viewAllFormsButton.className = 'main-button inline-block w-button';
             viewAllFormsButton.textContent = 'Registration Forms';
-            campInfoWrapper.appendChild(viewAllFormsButton);
+            contentContainer.appendChild(viewAllFormsButton);
         } else if (formsSection) {
-            campInfoWrapper.appendChild(formsSection);
+            contentContainer.appendChild(formsSection);
         } else if (formList.length === 0 || totalForms === 0) {
             // Show message when forms list is empty
             const noFormsMessage = document.createElement('div');
             noFormsMessage.className = 'pre-camp_subtitle';
             noFormsMessage.style.opacity = '0.7';
             noFormsMessage.textContent = 'Forms not available for this program';
-            campInfoWrapper.appendChild(noFormsMessage);
+            contentContainer.appendChild(noFormsMessage);
         }
 
         // Create invoices section - only show if not all invoices are completed
@@ -722,7 +729,7 @@ class NSDPortal {
             if (!allInvoicesCompleted) {
                 const invoicesSection = this.createInvoicesSection(invoiceData, session);
                 if (invoicesSection) {
-                    campInfoWrapper.appendChild(invoicesSection);
+                    contentContainer.appendChild(invoicesSection);
                 }
             }
         }
@@ -730,10 +737,10 @@ class NSDPortal {
         // Create resources section
         const resourcesSection = this.createResourcesSection(session);
         if (resourcesSection) {
-            campInfoWrapper.appendChild(resourcesSection);
+            contentContainer.appendChild(resourcesSection);
         }
 
-        return campInfoWrapper;
+        return contentContainer;
     }
 
     // Create forms section
