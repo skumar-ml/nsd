@@ -468,7 +468,7 @@ class NSDPortal {
         tabsDiv.setAttribute('data-duration-out', '100');
 
         const tabMenu = document.createElement('div');
-        tabMenu.className = 'camp-tabs-flex-wrapper w-tab-menu';
+        tabMenu.className = 'camp-tabs-wrapper w-tab-menu';
         tabMenu.setAttribute('data-portal', 'program-tabs');
         tabMenu.setAttribute('role', 'tablist');
 
