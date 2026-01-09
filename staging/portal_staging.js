@@ -504,7 +504,7 @@ class NSDPortal {
         const button = document.createElement('a');
         const programName = session.programDetail?.programName || 'Program';
         button.href = `#w-tabs-${studentIndex + 2}-data-w-pane-${sessionIndex}`;
-        button.className = `main-button camp-program-tab w-tab-link ${isActive}`;
+        button.className = `camp-program-tab w-tab-link ${isActive}`;
         button.textContent = programName;
         button.setAttribute('data-w-tab', `Tab ${tabIndex}`);
         button.setAttribute('id', `w-tabs-${studentIndex + 2}-data-w-tab-${sessionIndex}`);
