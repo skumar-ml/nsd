@@ -11,7 +11,7 @@ class NSDPortal {
         this.baseUrl = config.baseUrl;
         this.allSessions = [];
         this.invoiceData = [];
-
+        this.userName = config.userName;
         this.init();
     }
 
@@ -132,9 +132,15 @@ class NSDPortal {
             this.invoiceData = await this.fetchData(`getInvoiceList/${this.webflowMemberId}/current`) || [];
             console.log('Invoice data:', this.invoiceData);
 
+            // Extract briefs data
+            const briefsData = apiResponse.brief || [];
+
+            // Hide or show free/paid resources based on API response
+            this.hidePortalData(apiResponse.studentData || [], briefsData);
+
             // Handle briefs
-            if (apiResponse.brief && apiResponse.brief.length > 0 && typeof BriefManager !== 'undefined') {
-                new BriefManager(apiResponse.brief, {
+            if (briefsData.length > 0 && typeof BriefManager !== 'undefined') {
+                new BriefManager(briefsData, {
                     webflowMemberId: this.webflowMemberId,
                     accountEmail: this.accountEmail,
                     baseUrl: this.baseUrl
@@ -143,12 +149,51 @@ class NSDPortal {
 
             // Render portal
             this.renderPortal();
+            this.updateHeading();
 
         } catch (error) {
             console.error('Error loading portal data:', error);
         } finally {
             if (spinner) spinner.style.display = 'none';
             if (nsdPortal) nsdPortal.style.display = 'block';
+        }
+    }
+
+    // Update the heading
+    updateHeading() {
+        const headings = document.querySelectorAll('[data-portal="heading"]');
+        if (headings) {
+            headings.forEach(heading => {
+                heading.textContent = `Welcome, ${this.userName}!`;
+            });
+        }
+    }
+
+    // Hides or shows free/paid resources based on API response data
+    hidePortalData(responseText, briefsData) {
+        if (briefsData.length > 0) {
+            const paidResources = document.getElementById("paid-resources");
+            if (paidResources) {
+                paidResources.style.display = "block";
+            }
+        } else if (responseText == "No data Found") {
+            const freeResources = document.getElementById("free-resources");
+            if (freeResources) {
+                freeResources.style.display = "block";
+            }
+        } else if (responseText.length == 0) {
+            const freeResources = document.getElementById("free-resources");
+            if (freeResources) {
+                freeResources.style.display = "block";
+            }
+        } else {
+            if (!(localStorage.getItem('locat') === null)) {
+                localStorage.removeItem('locat');
+            }
+            const paidResources = document.getElementById("paid-resources");
+            if (paidResources) {
+                paidResources.style.display = "block";
+            }
         }
     }
 
