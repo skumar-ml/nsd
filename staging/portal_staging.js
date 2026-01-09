@@ -171,6 +171,20 @@ class NSDPortal {
 
     // Hides or shows free/paid resources based on API response data
     hidePortalData(responseText, briefsData) {
+        // Handle camp-tab visibility based on student data availability
+        const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
+        const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
+        campTabs.forEach(tab => {
+            tab.style.display = hasStudentData ? "block" : "none";
+        });
+
+        // Handle briefs-tab visibility based on briefs data availability
+        const briefsTabs = document.querySelectorAll('[data-portal="briefs-tab"]');
+        const hasBriefsData = briefsData && Array.isArray(briefsData) && briefsData.length > 0;
+        briefsTabs.forEach(tab => {
+            tab.style.display = hasBriefsData ? "block" : "none";
+        });
+
         if (briefsData.length > 0) {
             const paidResources = document.getElementById("paid-resources");
             if (paidResources) {
