@@ -175,14 +175,14 @@ class NSDPortal {
         const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
         const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
         campTabs.forEach(tab => {
-            tab.style.display = hasStudentData ? "block" : "none";
+            tab.style.display = hasStudentData ? "flex" : "none";
         });
 
         // Handle briefs-tab visibility based on briefs data availability
         const briefsTabs = document.querySelectorAll('[data-portal="briefs-tab"]');
         const hasBriefsData = briefsData && Array.isArray(briefsData) && briefsData.length > 0;
         briefsTabs.forEach(tab => {
-           tab.style.display = hasBriefsData ? "block" : "none";
+           tab.style.display = hasBriefsData ? "flex" : "none";
         });
 
         if (briefsData.length > 0) {
