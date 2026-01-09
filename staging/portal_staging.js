@@ -804,7 +804,7 @@ class NSDPortal {
             .map(item => `
                 <a href="${item.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
                     <div class="resources-div">
-                        <div class="resources-text">${item.label}</div>
+                        <div class="resources-text-blue">${item.label}</div>
                     </div>
                 </a>
             `).join('');
