@@ -11,7 +11,7 @@ class NSDPortal {
         this.baseUrl = config.baseUrl;
         this.allSessions = [];
         this.invoiceData = [];
-        
+
         this.init();
     }
 
@@ -37,7 +37,7 @@ class NSDPortal {
     // Transform API response to flat session array
     transformApiResponse(apiResponse) {
         const sessions = [];
-        
+
         if (!apiResponse || !apiResponse.studentData) {
             console.warn('No studentData in API response');
             return sessions;
@@ -49,9 +49,9 @@ class NSDPortal {
         apiResponse.studentData.forEach((studentObj, studentIndex) => {
             const studentName = Object.keys(studentObj)[0];
             const studentData = studentObj[studentName];
-            
+
             console.log(`Processing student ${studentIndex + 1}: ${studentName}`);
-            
+
             // Process currentSession
             if (studentData.currentSession && Array.isArray(studentData.currentSession)) {
                 console.log(`  - Found ${studentData.currentSession.length} current sessions`);
@@ -68,7 +68,7 @@ class NSDPortal {
                     }
                 });
             }
-            
+
             // Process futureSession
             if (studentData.futureSession && Array.isArray(studentData.futureSession)) {
                 console.log(`  - Found ${studentData.futureSession.length} future sessions`);
@@ -85,7 +85,7 @@ class NSDPortal {
                     }
                 });
             }
-            
+
             // Process pastSession
             if (studentData.pastSession && Array.isArray(studentData.pastSession)) {
                 console.log(`  - Found ${studentData.pastSession.length} past sessions`);
@@ -112,14 +112,14 @@ class NSDPortal {
     async loadPortalData() {
         const spinner = document.getElementById('half-circle-spinner');
         const nsdPortal = document.getElementById('nsdPortal');
-        
+
         if (spinner) spinner.style.display = 'block';
         if (nsdPortal) nsdPortal.style.display = 'none';
 
         try {
             // Fetch portal details
             const apiResponse = await this.fetchData(`getPortalDetails/${this.webflowMemberId}`);
-            
+
             if (!apiResponse) {
                 throw new Error('No data received from API');
             }
@@ -127,11 +127,11 @@ class NSDPortal {
             // Transform and store sessions
             this.allSessions = this.transformApiResponse(apiResponse);
             console.log('Transformed sessions:', this.allSessions.length);
-            
+
             // Fetch invoice data
             this.invoiceData = await this.fetchData(`getInvoiceList/${this.webflowMemberId}/current`) || [];
             console.log('Invoice data:', this.invoiceData);
-            
+
             // Handle briefs
             if (apiResponse.brief && apiResponse.brief.length > 0 && typeof BriefManager !== 'undefined') {
                 new BriefManager(apiResponse.brief, {
@@ -143,7 +143,7 @@ class NSDPortal {
 
             // Render portal
             this.renderPortal();
-            
+
         } catch (error) {
             console.error('Error loading portal data:', error);
         } finally {
@@ -190,11 +190,11 @@ class NSDPortal {
     // Group sessions by student
     groupSessionsByStudent() {
         const studentsMap = {};
-        
+
         this.allSessions.forEach(session => {
             const studentKey = session.studentKey || this.getStudentName(session);
             const studentEmail = session.studentDetail?.studentEmail || '';
-            
+
             if (!studentsMap[studentKey]) {
                 studentsMap[studentKey] = {
                     studentName: studentKey,
@@ -202,10 +202,10 @@ class NSDPortal {
                     sessions: []
                 };
             }
-            
+
             studentsMap[studentKey].sessions.push(session);
         });
-        
+
         return studentsMap;
     }
 
@@ -218,7 +218,7 @@ class NSDPortal {
                 if (typeof Webflow !== 'undefined' && Webflow.require('tabs')) {
                     Webflow.require('tabs').redraw();
                 }
-                
+
                 // Initialize nested program tabs for the first (active) student tab
                 this.initializeNestedProgramTabs(0);
 
@@ -227,13 +227,13 @@ class NSDPortal {
 
                 // Initialize lightbox for forms
                 this.initiateLightbox();
-                
+
                 // Initialize tooltips for invoice payment messages
                 this.initializeToolTips();
-                
+
                 // Attach event handlers to invoice payment links
                 this.attachInvoicePaymentHandlers();
-                
+
                 console.log('Webflow tabs initialized successfully');
             } catch (error) {
                 console.error('Error initializing Webflow tabs:', error);
@@ -257,7 +257,7 @@ class NSDPortal {
                             this.onStudentTabChange(studentTabIndex);
                         }
                     }
-                    
+
                     // Check for program tab changes within nested tabs
                     const activeProgramTab = document.querySelector('.program-tab-content .w-tab-link.w--current');
                     if (activeProgramTab) {
@@ -280,7 +280,7 @@ class NSDPortal {
     // Handle student tab change event
     onStudentTabChange(studentIndex) {
         console.log('Student tab changed to index:', studentIndex);
-        
+
         // Initialize nested program tabs for this student
         setTimeout(() => {
             this.initializeNestedProgramTabs(studentIndex);
@@ -293,10 +293,10 @@ class NSDPortal {
         if (tabIndex >= 0 && tabIndex < this.allSessions.length) {
             const session = this.allSessions[tabIndex];
             console.log('Tab changed to:', session.programDetail?.programName);
-            
+
             // Update the active tab pane content if needed
             this.updateTabContent(tabIndex);
-            
+
             // Re-initialize lightbox for the active tab
             setTimeout(() => {
                 this.initiateLightbox();
@@ -336,14 +336,14 @@ class NSDPortal {
     updateTabContent(tabIndex) {
         const session = this.allSessions[tabIndex];
         const tabPane = document.querySelector(`#w-tabs-0-data-w-pane-${tabIndex}`);
-        
+
         if (!tabPane || !session) {
             return;
         }
 
         // Re-render the entire tab pane content to ensure it's up to date
         this.renderTabPaneContent(tabPane, session, tabIndex);
-        
+
         // Get invoice data for this session
         const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
         const sessionInvoices = this.invoiceData.find(i => i.paymentId === paymentId);
@@ -352,11 +352,11 @@ class NSDPortal {
         if (sessionInvoices && sessionInvoices.invoiceList) {
             const invoiceContainer = document.getElementById(`invoice_${paymentId}`);
             const duringInvoiceContainer = document.getElementById(`during_invoice_${paymentId}`);
-            
+
             if (invoiceContainer) {
                 this.updateInvoiceList(invoiceContainer, sessionInvoices.invoiceList, paymentId);
             }
-            
+
             if (duringInvoiceContainer) {
                 this.updateInvoiceList(duringInvoiceContainer, sessionInvoices.invoiceList, paymentId);
             }
@@ -416,7 +416,10 @@ class NSDPortal {
         // Get unique program names for tags
         const programNames = [...new Set(studentData.sessions.map(s => s.programDetail?.programName).filter(Boolean))];
         const programTagsHTML = programNames.map((programName, idx) => {
-            const tagClass = idx % 2 === 0 ? 'student-program-pink-tag' : 'student-program-blue-tag';
+            // Find sessions for this program and check if any have forms available
+            const programSessions = studentData.sessions.filter(s => s.programDetail?.programName === programName);
+            const hasForms = programSessions.some(s => s.formList && s.formList.length > 0);
+            const tagClass = hasForms ? 'student-program-pink-tag' : 'student-program-blue-tag';
             return `
                 <div class="${tagClass}">
                     <div class="student-prog-text">${programName}</div>
@@ -474,7 +477,7 @@ class NSDPortal {
 
         // Create tabs for each program/session
         sessions.forEach((session, sessionIndex) => {
-            if(session.sessionType === "past"){
+            if (session.sessionType === "past") {
                 return;
             }
             const programTabIndex = sessionIndex + 1;
@@ -610,7 +613,7 @@ class NSDPortal {
 
         // Create pre-camp content
         const preCampContent = this.createPreCampContent(session, sessionInvoices);
-        
+
         // Create during-camp content
         const duringCampContent = this.createDuringCampContent(session, sessionInvoices);
 
@@ -618,7 +621,7 @@ class NSDPortal {
         while (tabPane.firstChild) {
             tabPane.removeChild(tabPane.firstChild);
         }
-        
+
         // Add pre-camp section
         if (preCampContent) {
             tabPane.appendChild(preCampContent);
@@ -638,22 +641,22 @@ class NSDPortal {
         const formList = session.formList || [];
         const formCompletedList = session.formCompletedList || [];
         const deadlineDate = session.programDetail?.deadlineDate;
-        
+
         // Calculate total forms FIRST (count all forms, not just live ones, for display)
         // This ensures we show the total count even if forms aren't live yet
         const totalForms = this.countTotalForms(formList, false, true);
-        
+
         // Initialize total form count (will be incremented as forms are rendered for verification)
         session._totalFormCount = 0;
-        
+
         // Calculate completed forms - filter out invoice forms from completed count
         // Only count forms where isInvoice == "No" OR form_sub_type is 'dropoff' or 'pickup'
-        const completedFormsOnly = formCompletedList.filter(i => 
+        const completedFormsOnly = formCompletedList.filter(i =>
             i.isInvoice == "No" || i.form_sub_type == 'dropoff' || i.form_sub_type == 'pickup'
         );
         const completedForms = completedFormsOnly.length;
 
-        const deadlineText = deadlineDate 
+        const deadlineText = deadlineDate
             ? `Needs to be completed by ${this.formatDate(deadlineDate)}`
             : '';
 
@@ -662,7 +665,7 @@ class NSDPortal {
         headerDiv.className = 'camp-header-flex';
         headerDiv.innerHTML = `
             <div>
-                <div class="pre-camp_title-text">Registration Forms &amp; Resources</div>
+                <div class="dashboard-node-header">Registration Forms &amp; Resources</div>
             </div>
             <div class="cross-icon">
                 <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg" loading="lazy" alt="">
@@ -697,7 +700,7 @@ class NSDPortal {
 
         // Check if all forms are completed
         const allFormsCompleted = totalForms > 0 && completedForms >= totalForms && progressPercentage === 100;
-        
+
         // Add forms section after progress, or show message if no forms
         if (allFormsCompleted && formList.length > 0) {
             // Show "View All Forms" button when all forms are completed
@@ -724,7 +727,7 @@ class NSDPortal {
             const completedInvoices = invoices.filter(i => i.is_completed).length;
             const totalInvoices = invoices.length;
             const allInvoicesCompleted = totalInvoices > 0 && completedInvoices >= totalInvoices;
-            
+
             // Hide invoice section if all invoices are completed
             if (!allInvoicesCompleted) {
                 const invoicesSection = this.createInvoicesSection(invoiceData, session);
@@ -746,7 +749,7 @@ class NSDPortal {
     // Create forms section
     createFormsSection(formList, formCompletedList, session) {
         const container = document.createElement('div');
-        
+
         let formsHTML = this.renderFormCategories(formList, formCompletedList, session);
         if (!formsHTML) {
             return null;
@@ -791,10 +794,10 @@ class NSDPortal {
     createResourcesSection(session) {
         const container = document.createElement('div');
         const uploadedContent = session.uploadedContent || [];
-        
+
         // Get past programs for this student
         const pastPrograms = this.getPastProgramsForStudent(session);
-        
+
         // Build resources HTML (uploadedContent goes in resources_wrapper)
         const resourcesHTML = uploadedContent
             .filter(item => item.label && item.uploadedFiles && item.uploadedFiles[0])
@@ -822,12 +825,12 @@ class NSDPortal {
 
         container.innerHTML = `
             <div>
-                <div class="pre-camp_title-text">Resources</div>
                 ${uploadedContent.length > 0 ? `
+                <div class="dashboard-node-header margin-bottom-20">Resources</div>
                 <div class="resources_wrapper">
                     ${resourcesHTML}
-                </div>
-                ` : ''}
+                </div> 
+            </div>` : ''}
                 ${pastPrograms.length > 0 ? `
                 <div class="sem-classes-info-div">
                     <p class="portal-node-title-dashboard">Past Program</p>
@@ -836,7 +839,7 @@ class NSDPortal {
                     </div>
                 </div>
                 ` : ''}
-            </div>
+            
         `;
 
         return container;
@@ -846,19 +849,19 @@ class NSDPortal {
     getPastProgramsForStudent(session) {
         const studentKey = session.studentKey || this.getStudentName(session);
         const studentEmail = session.studentDetail?.studentEmail || '';
-        
+
         // Find all past sessions for this student
         const pastSessions = this.allSessions.filter(s => {
             const sessionStudentKey = s.studentKey || this.getStudentName(s);
             const sessionStudentEmail = s.studentDetail?.studentEmail || '';
-            return s.sessionType === 'past' && 
-                   (sessionStudentKey === studentKey || sessionStudentEmail === studentEmail);
+            return s.sessionType === 'past' &&
+                (sessionStudentKey === studentKey || sessionStudentEmail === studentEmail);
         });
 
         // Extract unique program names
         const uniquePrograms = [];
         const seenPrograms = new Set();
-        
+
         pastSessions.forEach(session => {
             const programName = session.programDetail?.programName;
             if (programName && !seenPrograms.has(programName)) {
@@ -888,7 +891,7 @@ class NSDPortal {
                     <div class="dm-sans line-height-20">During camp</div>
                 </div>
                 <div class="pre-camp_title-div">
-                    <div class="pre-camp_title-text">Resources/Camp Topic</div>
+                    <div class="dashboard-node-header">Resources/Camp Topic</div>
                 </div>
             </div>
             ${campTopic ? `
@@ -923,12 +926,12 @@ class NSDPortal {
     // Render form categories
     renderFormCategories(formList, formCompletedList, session) {
         let html = '';
-        
+
         // Track total forms count (only non-invoice forms)
         let totalFormCount = 0;
-        
+
         formList.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
-        
+
         formList.forEach(category => {
             if (!category.forms || category.forms.length === 0) {
                 return;
@@ -946,7 +949,7 @@ class NSDPortal {
 
         // Store total form count for progress calculation
         session._totalFormCount = totalFormCount;
-        
+
         return html;
     }
 
@@ -966,8 +969,8 @@ class NSDPortal {
             return '';
         }
 
-        const gridId = isInvoiceCategory 
-            ? `invoice_${paymentId}` 
+        const gridId = isInvoiceCategory
+            ? `invoice_${paymentId}`
             : `form_${paymentId}`;
         const gridClass = isInvoiceCategory ? 'invoice_grid' : 'form_grid';
 
@@ -1021,11 +1024,11 @@ class NSDPortal {
         const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
         const studentEmail = session.studentDetail?.studentEmail || '';
         const programDetailId = session.programDetail?.programDetailId || '';
-        
+
         // Check if program is live (before deadline)
         const deadlineDate = session.programDetail?.deadlineDate;
         const isLiveProgram = this.checkProgramDeadline(deadlineDate);
-        
+
         // Track total form count (only for live forms with type == 'forms')
         // This matches portal.js logic where $totalForm++ only happens when is_live && type == 'forms'
         if (isLive && type === 'forms') {
@@ -1063,7 +1066,7 @@ class NSDPortal {
         // Add iframe when it's live and above certain screenwidth
         const iframeClassName = (isLive && window.innerWidth > 1200 && !added_by_admin) ? "iframe-lightbox-link" : "";
         const form_link_text = (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice') ? 'Invoice' : 'Form';
-        
+
         // Update link text for invoice forms
         if (isLive && !added_by_admin && (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice')) {
             if (isCompleted) {
@@ -1073,7 +1076,7 @@ class NSDPortal {
             }
         }
 
-        const iconUrl = isCompleted 
+        const iconUrl = isCompleted
             ? 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png'
             : 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png';
 
@@ -1084,7 +1087,7 @@ class NSDPortal {
                 <img width="20" loading="lazy" src="${iconUrl}" alt="">
                 <div class="dm-sans bold-500${completedClass}">${formName}</div>
                 <a href="${link}" class="dashboard_link-block w-inline-block ${iframeClassName}">
-                    <div class="dm-sans opacity-70">${linkText}</div>
+                    <div class="dm-sans medium-red-with-opacity">${linkText}</div>
                 </a>
             </div>
         `;
@@ -1166,7 +1169,7 @@ class NSDPortal {
             if (paymentLinks.length > 0) {
                 // Sort payment links by title
                 const sortedLinks = [...paymentLinks].sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-                linkHTML = sortedLinks.map(link => 
+                linkHTML = sortedLinks.map(link =>
                     `<a href="#" class="dashboard_link-block w-inline-block ${link.paymentType}" data-invoice-id="${invoice.invoice_id}" data-payment-link-id="${link.paymentLinkId}" data-amount="${link.amount}" data-payment-id="${paymentId}" data-invoice-name="${invoiceName}">
                         <div class="dm-sans opacity-70">${link.title}</div>
                     </a>`
@@ -1245,13 +1248,13 @@ class NSDPortal {
                         e.preventDefault();
                         paymentLink.innerHTML = "<div class='dm-sans opacity-70'>Processing...</div>";
                         $this.initializeStripePayment(
-                            invoice.invoice_id, 
-                            invoice.invoiceName, 
-                            link.amount, 
-                            link.paymentLinkId, 
-                            paymentLink, 
-                            link.title, 
-                            link.paymentType, 
+                            invoice.invoice_id,
+                            invoice.invoiceName,
+                            link.amount,
+                            link.paymentLinkId,
+                            paymentLink,
+                            link.title,
+                            link.paymentType,
                             paymentId
                         );
                     });
@@ -1299,9 +1302,9 @@ class NSDPortal {
             const sessionPaymentId = s.studentDetail?.uniqueIdentification || s.paymentId;
             return sessionPaymentId === paymentId;
         });
-        
+
         const studentName = session?.studentDetail?.studentName || { first: '', last: '' };
-        
+
         const data = {
             "email": this.accountEmail,
             "name": studentName,
@@ -1340,7 +1343,7 @@ class NSDPortal {
     // Render resources
     renderResources(session, isDuringCamp = false) {
         const uploadedContent = session.uploadedContent || [];
-        
+
         if (uploadedContent.length === 0) {
             return '';
         }
@@ -1350,7 +1353,7 @@ class NSDPortal {
             .map(item => `
                 <a href="${item.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
                     <div class="resources-div">
-                        <div class="resources-text">${item.label}</div>
+                        <div class="resources-text-blue">${item.label}</div>
                     </div>
                 </a>
             `).join('');
@@ -1522,11 +1525,11 @@ class NSDPortal {
             tip.innerHTML = '';
             tip.classList.add('tooltip');
             tip.textContent = el.getAttribute('tip');
-            
+
             const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px';
             const y = el.hasAttribute('tip-top') ? '-100%' : '0';
             tip.style.transform = `translate(${x}, ${y})`;
-            
+
             el.appendChild(tip);
             el.onpointermove = e => {
                 if (e.target !== e.currentTarget) return;
@@ -1548,27 +1551,27 @@ class NSDPortal {
     attachInvoicePaymentHandlers() {
         const $this = this;
         const paymentLinks = document.querySelectorAll('[data-invoice-id][data-payment-link-id]');
-        
+
         paymentLinks.forEach(link => {
             // Skip if already has handler
             if (link.dataset.handlerAttached === 'true') {
                 return;
             }
-            
-            link.addEventListener('click', function(e) {
+
+            link.addEventListener('click', function (e) {
                 e.preventDefault();
                 const invoiceId = this.dataset.invoiceId;
                 const paymentLinkId = this.dataset.paymentLinkId;
                 const amount = parseFloat(this.dataset.amount);
                 const paymentId = this.dataset.paymentId;
                 const invoiceName = this.dataset.invoiceName || 'Invoice';
-                const paymentType = this.classList.contains('stripe') ? 'stripe' : 
-                                   this.classList.contains('paypal') ? 'paypal' : 'other';
+                const paymentType = this.classList.contains('stripe') ? 'stripe' :
+                    this.classList.contains('paypal') ? 'paypal' : 'other';
                 const linkTitle = this.textContent.trim();
-                
+
                 // Update link text to show processing
                 this.innerHTML = '<div class="dm-sans opacity-70">Processing...</div>';
-                
+
                 $this.initializeStripePayment(
                     invoiceId,
                     invoiceName,
@@ -1580,7 +1583,7 @@ class NSDPortal {
                     paymentId
                 );
             });
-            
+
             link.dataset.handlerAttached = 'true';
         });
     }
