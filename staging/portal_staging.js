@@ -175,14 +175,14 @@ class NSDPortal {
         const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
         const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
         campTabs.forEach(tab => {
-            //tab.style.display = hasStudentData ? "block" : "none";
+            tab.style.display = hasStudentData ? "block" : "none";
         });
 
         // Handle briefs-tab visibility based on briefs data availability
         const briefsTabs = document.querySelectorAll('[data-portal="briefs-tab"]');
         const hasBriefsData = briefsData && Array.isArray(briefsData) && briefsData.length > 0;
         briefsTabs.forEach(tab => {
-           // tab.style.display = hasBriefsData ? "block" : "none";
+           tab.style.display = hasBriefsData ? "block" : "none";
         });
 
         if (briefsData.length > 0) {
@@ -534,11 +534,16 @@ class NSDPortal {
         const tabContent = document.createElement('div');
         tabContent.className = 'w-tab-content program-tab-content';
 
-        // Create tabs for each program/session
-        sessions.forEach((session, sessionIndex) => {
-            if (session.sessionType === "past") {
-                return;
-            }
+        // Filter out past sessions - they should only show in past program card
+        const sessionsToShow = sessions.filter(s => s.sessionType !== "past");
+
+        // Hide program tabs if no current/future sessions available
+        if (sessionsToShow.length === 0) {
+            tabMenu.style.display = 'none';
+        }
+
+        // Create tabs for each program/session (only current/future)
+        sessionsToShow.forEach((session, sessionIndex) => {
             const programTabIndex = sessionIndex + 1;
             const isActive = sessionIndex === 0 ? 'w--current' : '';
             const isTabActive = sessionIndex === 0 ? 'w--tab-active' : '';
@@ -551,6 +556,34 @@ class NSDPortal {
             const programTabPane = this.createProgramTabPane(session, programTabIndex, isTabActive, studentIndex, sessionIndex);
             tabContent.appendChild(programTabPane);
         });
+
+        // If no current/future sessions, show past programs card
+        if (sessionsToShow.length === 0) {
+            const pastSessions = sessions.filter(s => s.sessionType === "past");
+            if (pastSessions.length > 0) {
+                // Get past programs for the first past session (to identify the student)
+                const pastPrograms = this.getPastProgramsForStudent(pastSessions[0]);
+                if (pastPrograms.length > 0) {
+                    const pastProgramsHTML = pastPrograms
+                        .map(program => `
+                            <div class="announcement-flex-wrapper">
+                                <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
+                                <p class="poppins-para no-margin-bottom">${program.programName}</p>
+                            </div>
+                        `).join('');
+
+                    const pastProgramCard = document.createElement('div');
+                    pastProgramCard.className = 'sem-classes-info-div';
+                    pastProgramCard.innerHTML = `
+                        <p class="portal-node-title-dashboard">Past Program</p>
+                        <div data-portal="past-classe-list">
+                            ${pastProgramsHTML}
+                        </div>
+                    `;
+                    tabContent.appendChild(pastProgramCard);
+                }
+            }
+        }
 
         tabsDiv.appendChild(tabMenu);
         tabsDiv.appendChild(tabContent);
