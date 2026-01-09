@@ -472,11 +472,12 @@ class NSDPortal {
         tabHeader.setAttribute('aria-selected', studentIndex === 0 ? 'true' : 'false');
         tabHeader.setAttribute('tabindex', studentIndex === 0 ? '0' : '-1');
 
-        // Get unique program names for tags
-        const programNames = [...new Set(studentData.sessions.map(s => s.programDetail?.programName).filter(Boolean))];
+        // Get unique program names for tags - only show current programs
+        const currentSessions = studentData.sessions.filter(s => s.sessionType === "current");
+        const programNames = [...new Set(currentSessions.map(s => s.programDetail?.programName).filter(Boolean))];
         const programTagsHTML = programNames.map((programName, idx) => {
             // Find sessions for this program and check if any have forms available
-            const programSessions = studentData.sessions.filter(s => s.programDetail?.programName === programName);
+            const programSessions = currentSessions.filter(s => s.programDetail?.programName === programName);
             const hasForms = programSessions.some(s => s.formList && s.formList.length > 0);
             const tagClass = hasForms ? 'student-program-pink-tag' : 'student-program-blue-tag';
             return `
@@ -486,13 +487,16 @@ class NSDPortal {
             `;
         }).join('');
 
+        // Hide student-programs-wrapper if no current programs
+        const programsWrapperStyle = programNames.length === 0 ? 'style="display: none;"' : '';
+
         tabHeader.innerHTML = `
             <div class="width-100">
                 <div class="student-program-info-wrapper">
                     <div class="student-name">${studentData.studentName}</div>
                     <div class="student-id">${studentData.studentEmail}</div>
                 </div>
-                <div class="student-programs-wrapper">
+                <div class="student-programs-wrapper" ${programsWrapperStyle}>
                     ${programTagsHTML}
                 </div>
             </div>
