@@ -1091,9 +1091,10 @@ class NSDPortal {
         if (countCallback && !isInvoiceCategory) {
             countCallback(liveFormCount);
         }
-
+        // add class name dynamically invoice-wrapper or forms-wrapper
+        const wrapperClass = isInvoiceCategory ? 'invoice-wrapper' : 'forms-wrapper';
         return `
-            <div>
+            <div class="${wrapperClass}">
                 <div class="pre-camp_subtitle blue">${categoryName}</div>
                 <div class="pre-camp_grid ${gridClass}" id="${gridId}">
                     ${formsHTML}
