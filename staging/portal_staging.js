@@ -472,8 +472,11 @@ class NSDPortal {
         tabHeader.setAttribute('aria-selected', studentIndex === 0 ? 'true' : 'false');
         tabHeader.setAttribute('tabindex', studentIndex === 0 ? '0' : '-1');
 
-        // Get unique program names for tags - only show current programs
-        const currentSessions = studentData.sessions.filter(s => s.sessionType === "current");
+        // Get unique program names for tags - only show current programs, exclude programDetailId 21(NSD Merch / Care Package program)
+        const currentSessions = studentData.sessions.filter(s => 
+            s.sessionType === "current" && 
+            s.programDetail?.programDetailId != 21
+        );
         const programNames = [...new Set(currentSessions.map(s => s.programDetail?.programName).filter(Boolean))];
         const programTagsHTML = programNames.map((programName, idx) => {
             // Find sessions for this program and check if any have forms available
@@ -538,8 +541,11 @@ class NSDPortal {
         const tabContent = document.createElement('div');
         tabContent.className = 'w-tab-content program-tab-content';
 
-        // Filter out past sessions - they should only show in past program card
-        const sessionsToShow = sessions.filter(s => s.sessionType !== "past");
+        // Filter out past sessions and programDetailId 21(NSD Merch / Care Package program) - they should only show in past program card
+        const sessionsToShow = sessions.filter(s => 
+            s.sessionType !== "past" && 
+            s.programDetail?.programDetailId != 21
+        );
 
         // Hide program tabs if no current/future sessions available
         if (sessionsToShow.length === 0) {
