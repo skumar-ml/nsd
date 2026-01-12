@@ -810,7 +810,7 @@ class NSDPortal {
             viewAllFormsButton.href = '#';
             viewAllFormsButton.setAttribute('data-portal', 'view-all-forms');
             viewAllFormsButton.className = 'main-button inline-block w-button';
-            viewAllFormsButton.textContent = 'Registration Forms';
+            viewAllFormsButton.textContent = 'View All Forms';
             contentContainer.appendChild(viewAllFormsButton);
         } else if (formsSection) {
             contentContainer.appendChild(formsSection);
