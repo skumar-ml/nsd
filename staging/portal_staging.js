@@ -806,12 +806,14 @@ class NSDPortal {
         // Add forms section after progress, or show message if no forms
         if (allFormsCompleted && formList.length > 0) {
             // Show "View All Forms" button when all forms are completed
+            const buttonWrapper = document.createElement('div');
             const viewAllFormsButton = document.createElement('a');
             viewAllFormsButton.href = '#';
             viewAllFormsButton.setAttribute('data-portal', 'view-all-forms');
             viewAllFormsButton.className = 'main-button inline-block w-button';
             viewAllFormsButton.textContent = 'View All Forms';
-            contentContainer.appendChild(viewAllFormsButton);
+            buttonWrapper.appendChild(viewAllFormsButton);
+            contentContainer.appendChild(buttonWrapper);
         } else if (formsSection) {
             contentContainer.appendChild(formsSection);
         } else if (formList.length === 0 || totalForms === 0) {
