@@ -876,7 +876,7 @@ class NSDPortal {
 
         container.innerHTML = `
             <a href="#" data-portal="view-all-invoices" class="main-button inline-block hide w-button">View All Invoices</a>
-                <div>
+                <div class="invoice-wrapper">
                 <div class="pre-camp_subtitle blue">Invoices</div>
                 <div class="pre-camp_grid" id="invoice_${paymentId}">
                 </div>
