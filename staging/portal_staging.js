@@ -808,7 +808,7 @@ class NSDPortal {
             // Show "View All Forms" button when all forms are completed
             const buttonWrapper = document.createElement('div');
             const viewAllFormsButton = document.createElement('a');
-            viewAllFormsButton.href = '#';
+            viewAllFormsButton.href = 'https://www.nsdebatecamp.com/portal/registration';
             viewAllFormsButton.setAttribute('data-portal', 'view-all-forms');
             viewAllFormsButton.className = 'main-button inline-block w-button';
             viewAllFormsButton.textContent = 'View All Forms';
