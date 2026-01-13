@@ -278,13 +278,15 @@ class BriefsUpsellModal {
 				</div>
 			</div>
 			<div class="bundle-price-info">
-				<div class="dm-sans bundle">
+				<div class="bundle-price-info-flex-wrapper">
+				<div class="dm-sans ">
 					<strong class="bundle-price-red">${price}</strong><span>/Year</span><br>
 				</div>
-				<div class="dm-sans green-center">
+				<div class="dm-sans green">
 					<span class="text-green">Save ${this.formatCurrency(savedAmount)}</span><br>
 				</div>
-				<div class="dm-sans center-text-small">
+				</div>
+				<div class="dm-sans text-small">
 					<span>${description}</span><br>
 				</div>
 			</div>
