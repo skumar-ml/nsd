@@ -196,6 +196,7 @@ class BriefsUpsellModal {
 			});
 			this.debateEventId = response.debateEventId;
 			this.renderBriefEvents();
+			this.selectBriefEvent(this.debateEventId)
 		} catch (error) {
 			console.error('Error fetching brief events:', error);
 			this.renderBriefEventsError();
@@ -269,7 +270,7 @@ class BriefsUpsellModal {
 		const description = briefEvent.description || '';
 		return `
 			<div class="bundle-info-flex">
-				<div class="bundle-checkbox-wrapper" aria-hidden="true">
+				<div class="bundle-checkbox-wrapper hide" aria-hidden="true">
 					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
 				</div>
 				<div class="dm-sans bundle-name">
@@ -441,6 +442,7 @@ class BriefsUpsellModal {
 			const handleRemove = (event) => {
 				event.preventDefault();
 				this.clearBriefSelection();
+				this.selectBriefEvent(this.debateEventId);
 			};
 			removeBtn.addEventListener('click', handleRemove);
 			removeBtn.addEventListener('keydown', (event) => {
