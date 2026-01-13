@@ -273,7 +273,7 @@ class BriefsUpsellModal {
 				<div class="bundle-checkbox-wrapper hide" aria-hidden="true">
 					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
 				</div>
-				<div class="dm-sans bundle-name">
+				<div class="dm-sans bundle-type">
 					<span>${briefEvent.title}</span><br>
 				</div>
 			</div>
@@ -370,7 +370,7 @@ class BriefsUpsellModal {
 				const cardId = card.getAttribute('data-brief-event-id');
 				const isSelected = selectedId && String(cardId) === String(selectedId);
 				card.classList.toggle('brief-card-selected', Boolean(isSelected));
-				card.classList.toggle('selected-red', Boolean(isSelected));
+				//card.classList.toggle('selected-red', Boolean(isSelected));
 				const checkboxIcon = card.querySelector('.bundle-checkbox');
 				if (checkboxIcon) {
 					checkboxIcon.classList.toggle('checked', Boolean(isSelected));
