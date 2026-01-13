@@ -52,6 +52,7 @@ class BriefsUpsellModal {
 			unchecked: 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/691ec94934f1278c4ad69157_square-check.svg'
 		};
 		this.briefEvents = [];
+		this.debateEventId = null;
 		this.selectedBriefEvent = null;
 		this.appliedBriefEvent = null;
 		this.briefEventAdded = false;
@@ -186,13 +187,14 @@ class BriefsUpsellModal {
 			return;
 		}
 		try {
-			const response = await this.fetchData('getBriefDetails');
+			const response = await this.fetchData('getBriefDetails?programId='+this.memberData.programId);
 			const events = response && Array.isArray(response.briefEvents) ? response.briefEvents : [];
 			this.briefEvents = events.sort((a, b) => {
 				const aOrder = typeof a.displayOrder === 'number' ? a.displayOrder : 0;
 				const bOrder = typeof b.displayOrder === 'number' ? b.displayOrder : 0;
 				return aOrder - bOrder;
 			});
+			this.debateEventId = response.debateEventId;
 			this.renderBriefEvents();
 		} catch (error) {
 			console.error('Error fetching brief events:', error);
@@ -230,6 +232,7 @@ class BriefsUpsellModal {
 		this.bindBriefEventCards();
 		this.syncBriefCardsWithSelection();
 		this.restoreBriefSelectionFromStorage();
+		this.filterBriefEventsByDebateId();
 	}
 	// Renders error message when brief events fail to load
 	renderBriefEventsError() {
@@ -241,6 +244,22 @@ class BriefsUpsellModal {
 			'<p class="dm-sans center-text-small">Unable to load brief events right now. Please try again later.</p>';
 		containers.forEach((container) => {
 			container.innerHTML = errorMarkup;
+		});
+	}
+	// Filters brief event elements to show only the one matching debateEventId
+	filterBriefEventsByDebateId() {
+		if (!this.debateEventId) {
+			return;
+		}
+		// Find all elements with data-brief-event-id attribute in the entire document
+		const allElements = document.querySelectorAll('[data-brief-event-id]');
+		allElements.forEach((element) => {
+			const eventId = element.getAttribute('data-brief-event-id');
+			if (eventId === String(this.debateEventId)) {
+				element.style.display = '';
+			} else {
+				element.style.display = 'none';
+			}
 		});
 	}
 	// Builds HTML markup for a single brief event card
