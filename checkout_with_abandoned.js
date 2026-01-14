@@ -404,7 +404,7 @@ class BriefsUpsellModal {
 	buildSelectedBriefSummaryFragment() {
 		const fragment = document.createDocumentFragment();
 		const format = this.extractBriefFormat(this.selectedBriefEvent.title);
-		const freeBriefName = `NSD Briefs 2025-2026 (${format}) FREE`;
+		const freeBriefName = `NSD Briefs 2025-2026 (${format})`;
 		const paidBriefName = `NSD Briefs 2026-2027 (${format})`;
 
 		const headingContainer = creEl('div', 'horizontal-div supp-program');
@@ -433,6 +433,10 @@ class BriefsUpsellModal {
 
 		const offeringPrice = creEl('div', 'dm-sans offering-price');
 		offeringPrice.textContent = this.formatCurrency(this.selectedBriefEvent.price);
+
+		const offeringPriceFree = creEl('div', 'dm-sans offering-price');
+		offeringPriceFree.textContent = 'FREE';
+		offeringPrice.prepend(offeringPriceFree);
 
 		row.prepend(infoContainer, offeringPrice);
 		wrapper.appendChild(row);
