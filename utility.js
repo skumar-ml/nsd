@@ -41,6 +41,49 @@ class NSDUtilityClass {
         }
         return false;
     }
+
+    // Updates all portal links with test parameters if present
+    static updateAllPortalLinks() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const testMemberId = urlParams.get('testMemberId');
+        const testAccountEmail = urlParams.get('testAccountEmail');
+        const testAccountType = urlParams.get('testAccountType');
+        if(!testMemberId && !testAccountEmail && !testAccountType){
+        return;
+        }
+        const allPortalLinks = document.querySelectorAll('a[href*="/portal/"]');
+                
+        allPortalLinks.forEach((link) => {
+        const currentHref = link.getAttribute('href');
+        
+        // Skip if no href
+        if (!currentHref) {
+            return;
+        }
+        
+        // Check if it's a portal URL (starts with /portal/ or contains /portal/)
+        if (currentHref.startsWith('/portal/') || currentHref.includes('/portal/')) {
+            try {
+            // Create URL object
+            const url = new URL(currentHref, window.location.origin);
+            
+            // Add or update testMemberId parameter
+            url.searchParams.set('testMemberId', testMemberId);
+            
+            // Add or update testAccountEmail parameter
+            url.searchParams.set('testAccountEmail', testAccountEmail);
+            
+            // Add or update testAccountType parameter
+            url.searchParams.set('testAccountType', testAccountType);
+            
+            // Update the link
+            link.setAttribute('href', url.pathname + url.search);
+            } catch (error) {
+            console.error('Error updating link:', error);
+            }
+        }
+        });
+    }
 }
 
 
