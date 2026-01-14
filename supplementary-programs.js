@@ -419,7 +419,11 @@ function creEl(name,className,idName){
 			var spinner = document.getElementById('half-circle-spinner-2');  
 		  	spinner.style.display = 'none';
 			var responseText =  JSON.parse(xhr.responseText);
-			$this.makeList(responseText)
+			if(responseText && responseText.studentData && responseText.studentData.length > 0){
+				responseText = responseText.studentData;
+				$this.makeList(responseText)
+			}
+			
 		var spinner = document.getElementById('half-circle-spinner');
 		spinner.style.display = 'none';
 		  }	
