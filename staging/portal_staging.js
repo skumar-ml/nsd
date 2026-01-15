@@ -548,7 +548,7 @@ class NSDPortal {
         );
 
         // Hide program tabs if no current/future sessions available
-        if (sessionsToShow.length === 0) {
+        if (sessionsToShow.length === 1) {
             tabMenu.style.display = 'none';
         }
 
@@ -576,14 +576,14 @@ class NSDPortal {
                 if (pastPrograms.length > 0) {
                     const pastProgramsHTML = pastPrograms
                         .map(program => `
-                            <div class="announcement-flex-wrapper">
+                            <div class="past-program-flex-wrapper">
                                 <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
                                 <p class="poppins-para no-margin-bottom">${program.programName}</p>
                             </div>
                         `).join('');
 
                     const pastProgramCard = document.createElement('div');
-                    pastProgramCard.className = 'sem-classes-info-div';
+                    pastProgramCard.className = 'past-program-div';
                     pastProgramCard.innerHTML = `
                         <p class="portal-node-title-dashboard">Past Program</p>
                         <div data-portal="past-classe-list">
@@ -879,8 +879,8 @@ class NSDPortal {
         container.innerHTML = `
             <a href="#" data-portal="view-all-invoices" class="main-button inline-block hide w-button">View All Invoices</a>
                 <div class="invoice-wrapper">
-                <div class="pre-camp_subtitle blue">Invoices</div>
-                <div class="pre-camp_grid" id="invoice_${paymentId}">
+                <div class="registration-info-title">Invoices</div>
+                <div class="registration-info-wrapper" id="invoice_${paymentId}">
                 </div>
                 </div>
         `;
@@ -913,10 +913,10 @@ class NSDPortal {
                 </a>
             `).join('');
 
-        // Build past programs HTML (goes in sem-classes-info-div)
+        // Build past programs HTML (goes in past-program-div)
         const pastProgramsHTML = pastPrograms
             .map(program => `
-                <div class="announcement-flex-wrapper">
+                <div class="past-program-flex-wrapper">
                     <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
                     <p class="poppins-para no-margin-bottom">${program.programName}</p>
                 </div>
@@ -936,7 +936,7 @@ class NSDPortal {
                 </div> 
             </div>` : ''}
                 ${pastPrograms.length > 0 ? `
-                <div class="sem-classes-info-div">
+                <div class="past-program-div">
                     <p class="portal-node-title-dashboard">Past Program</p>
                     <div data-portal="past-classe-list">
                         ${pastProgramsHTML}
@@ -1009,7 +1009,7 @@ class NSDPortal {
             ${invoiceData && invoiceData.invoiceList ? `
             <div>
                 <div class="pre-camp_subtitle">Invoice</div>
-                <div class="pre-camp_grid" id="during_invoice_${paymentId}">
+                <div class="registration-info-wrapper" id="during_invoice_${paymentId}">
                 </div>
             </div>
             ` : ''}
@@ -1097,8 +1097,8 @@ class NSDPortal {
         const wrapperClass = isInvoiceCategory ? 'invoice-wrapper' : 'forms-wrapper';
         return `
             <div class="${wrapperClass}">
-                <div class="pre-camp_subtitle blue">${categoryName}</div>
-                <div class="pre-camp_grid ${gridClass}" id="${gridId}">
+                <div class="registration-info-title">${categoryName}</div>
+                <div class="registration-info-wrapper ${gridClass}" id="${gridId}">
                     ${formsHTML}
                 </div>
             </div>
@@ -1188,7 +1188,7 @@ class NSDPortal {
         const completedClass = isCompleted ? ' completed_form' : '';
 
         return `
-            <div class="pre-camp_row">
+            <div class="registration-info-grid">
                 <img width="20" loading="lazy" src="${iconUrl}" alt="">
                 <div class="dm-sans bold-500${completedClass}">${formName}</div>
                 <a href="${link}" class="dashboard_link-block w-inline-block ${iframeClassName}">
@@ -1217,7 +1217,7 @@ class NSDPortal {
                         </div>
                     </div>
                 </div>
-                <div class="pre-camp_grid invoice_grid" id="invoice_${paymentId}">
+                <div class="registration-info-wrapper invoice_grid" id="invoice_${paymentId}">
                     ${this.renderInvoiceList(invoices, paymentId)}
                 </div>
             </div>
@@ -1289,7 +1289,7 @@ class NSDPortal {
         const tooltipHTML = paymentProcessMsg ? `<span class="info_text" tip="${paymentProcessMsg}" tip-top tip-left>i</span>` : '';
 
         return `
-            <div class="pre-camp_row" data-invoice-id="${invoice.invoice_id}">
+            <div class="registration-info-grid" data-invoice-id="${invoice.invoice_id}">
                 <img width="20" loading="lazy" src="${iconUrl}" alt="">
                 <div class="dm-sans bold-500 ${completedClass}">${invoiceName}</div>
                 <div class="linkContainer">
@@ -1304,7 +1304,7 @@ class NSDPortal {
     createSingleInvoiceElement(invoice, paymentId) {
         const $this = this;
         const preCampRow = document.createElement('div');
-        preCampRow.classList.add('pre-camp_row');
+        preCampRow.classList.add('registration-info-grid');
 
         const editable = invoice.is_completed || false;
         const completed = (editable && (invoice.status == 'Complete' || !invoice.status));
