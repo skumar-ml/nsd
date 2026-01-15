@@ -110,6 +110,10 @@ class BriefsUpsellModal {
 			button.dataset.briefCtaBound = 'true';
 			button.addEventListener('click', (event) => {
 				event.preventDefault();
+				// If no brief event is selected, select the debateEventId
+				if (!this.selectedBriefEvent && this.debateEventId) {
+					this.selectBriefEvent(this.debateEventId);
+				}
 				if (this.selectedBriefEvent) {
 					this.updateBriefAmount(this.selectedBriefEvent);
 					this.renderSelectedBriefSummary();
@@ -196,7 +200,7 @@ class BriefsUpsellModal {
 			});
 			this.debateEventId = response.debateEventId;
 			this.renderBriefEvents();
-			this.selectBriefEvent(this.debateEventId)
+			//this.selectBriefEvent(this.debateEventId)
 		} catch (error) {
 			console.error('Error fetching brief events:', error);
 			this.renderBriefEventsError();
@@ -315,7 +319,7 @@ class BriefsUpsellModal {
 					if (!briefId) {
 						return;
 					}
-					this.selectBriefEvent(briefId);
+					//this.selectBriefEvent(briefId);
 				});
 			});
 		});
@@ -433,11 +437,9 @@ class BriefsUpsellModal {
 
 		const offeringPrice = creEl('div', 'dm-sans offering-price');
 		offeringPrice.textContent = this.formatCurrency(this.selectedBriefEvent.price);
-
 		const offeringPriceFree = creEl('div', 'dm-sans offering-price');
 		offeringPriceFree.textContent = 'FREE';
 		offeringPrice.prepend(offeringPriceFree);
-
 		row.prepend(infoContainer, offeringPrice);
 		wrapper.appendChild(row);
 
@@ -448,7 +450,7 @@ class BriefsUpsellModal {
 			const handleRemove = (event) => {
 				event.preventDefault();
 				this.clearBriefSelection();
-				this.selectBriefEvent(this.debateEventId);
+				//this.selectBriefEvent(this.debateEventId);
 			};
 			removeBtn.addEventListener('click', handleRemove);
 			removeBtn.addEventListener('keydown', (event) => {
@@ -481,45 +483,43 @@ class BriefsUpsellModal {
 		if (!this.briefCtaButtons || !this.briefCtaButtons.length) {
 			return;
 		}
-		const shouldShow = Boolean(this.selectedBriefEvent);
+		// Always show the button
 		this.briefCtaButtons.forEach((button) => {
 			const defaultDisplay = this.briefCtaDefaultDisplays
 				? this.briefCtaDefaultDisplays.get(button)
 				: this.briefCtaDefaultDisplay;
-			button.style.display = shouldShow ? defaultDisplay || '' : 'none';
+			button.style.display = defaultDisplay || '';
 			// Update button text based on state
-			if (shouldShow) {
-				// Check if selected brief matches applied brief
-				const isSameBrief = this.appliedBriefEvent && this.selectedBriefEvent &&
-					String(this.appliedBriefEvent.eventId) === String(this.selectedBriefEvent.eventId);
-				
-				if (isSameBrief) {
-					// Selected brief is the same as applied brief - show "Added" and disable
-					button.textContent = 'Added';
-					button.style.pointerEvents = 'none';
-					button.style.color = 'rgb(255, 255, 255)';
-					button.style.backgroundColor = 'gray';
+			// Check if selected brief matches applied brief
+			const isSameBrief = this.appliedBriefEvent && this.selectedBriefEvent &&
+				String(this.appliedBriefEvent.eventId) === String(this.selectedBriefEvent.eventId);
+			
+			if (isSameBrief) {
+				// Selected brief is the same as applied brief - show "Added" and disable
+				button.textContent = 'Added';
+				button.style.pointerEvents = 'none';
+				button.style.color = 'rgb(255, 255, 255)';
+				button.style.backgroundColor = 'gray';
+			} else {
+				// Restore original styles when not "Added"
+				const defaultStyles = this.briefCtaDefaultStyles ? this.briefCtaDefaultStyles.get(button) : null;
+				if (defaultStyles) {
+					button.style.pointerEvents = defaultStyles.pointerEvents || '';
+					button.style.color = defaultStyles.color || '';
+					button.style.backgroundColor = defaultStyles.backgroundColor || '';
 				} else {
-					// Restore original styles when not "Added"
-					const defaultStyles = this.briefCtaDefaultStyles ? this.briefCtaDefaultStyles.get(button) : null;
-					if (defaultStyles) {
-						button.style.pointerEvents = defaultStyles.pointerEvents || '';
-						button.style.color = defaultStyles.color || '';
-						button.style.backgroundColor = defaultStyles.backgroundColor || '';
-					} else {
-						// Reset to default if no stored styles
-						button.style.pointerEvents = '';
-						button.style.color = '';
-						button.style.backgroundColor = '';
-					}
-					
-					if (this.appliedBriefEvent) {
-						// Different brief is applied - show "Switch Bundle"
-						button.textContent = 'Switch Bundle';
-					} else {
-						// No brief applied yet - show "Add to Cart"
-						button.textContent = 'Add to Cart';
-					}
+					// Reset to default if no stored styles
+					button.style.pointerEvents = '';
+					button.style.color = '';
+					button.style.backgroundColor = '';
+				}
+				
+				if (this.appliedBriefEvent) {
+					// Different brief is applied - show "Switch Bundle"
+					button.textContent = 'Switch Bundle';
+				} else {
+					// No brief applied yet - show "Add to Cart"
+					button.textContent = 'Add to Cart';
 				}
 			}
 		});
