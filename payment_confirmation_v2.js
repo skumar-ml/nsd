@@ -461,7 +461,8 @@ class PaymentConfirmation {
         const data = {
             "sessionId": this.sessionId,
             "programId": parseInt(programId),
-            "successUrl": this.site_url + "members/" + this.webFlowMemberId + "?paymentType=Supplementary",
+            //"successUrl": this.site_url + "members/" + this.webFlowMemberId + "?paymentType=Supplementary",
+            "successUrl":this.site_url + "portal/dashboard?paymentType=Supplementary",
             "cancelUrl": this.site_url + "payment-confirmation?programId=" + encodeURIComponent(this.programId) + "&transactionID=" + encodeURIComponent(this.sessionId),
             "label": programName,
             "amount": parseFloat(amount * 100),

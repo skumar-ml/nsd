@@ -483,8 +483,10 @@ class NSDPortal {
             "paymentId": paymentId,
             "paymentLinkId": paymentLinkId,
             "memberId": this.webflowMemberId,
-            "successUrl": encodeURI("https://www.nsdebatecamp.com/members/" + this.webflowMemberId + "?programName=" + title),
-            "cancelUrl": "https://www.nsdebatecamp.com/members/" + this.webflowMemberId,
+            "successUrl": "https://www.nsdebatecamp.com/portal/dashboard?programName=" + title,
+            "cancelUrl": "https://www.nsdebatecamp.com/portal/dashboard",
+            //"successUrl": encodeURI("https://www.nsdebatecamp.com/members/" + this.webflowMemberId + "?programName=" + title),
+            //"cancelUrl": "https://www.nsdebatecamp.com/members/" + this.webflowMemberId,
         }
         // console.log('data', data)
         // return;

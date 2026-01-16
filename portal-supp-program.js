@@ -597,10 +597,10 @@ class DisplaySuppProgram {
       sessionId: "",
       paymentId: paymentId,
       programId: parseInt(programId),
-      successUrl:
-        this.memberData.site_url + "members/" + this.memberData.memberId+"?paymentType=portal",
-      cancelUrl:
-        this.memberData.site_url + "members/" + this.memberData.memberId,
+      //successUrl: this.memberData.site_url + "members/" + this.memberData.memberId+"?paymentType=portal",
+      successUrl: this.memberData.site_url + "portal/dashboard?paymentType=portal",
+      //cancelUrl: this.memberData.site_url + "members/" + this.memberData.memberId,
+      cancelUrl: this.memberData.site_url + "portal/dashboard",
       label: programName,
       amount: parseFloat(amount * 100),
       source: "portal_page",
