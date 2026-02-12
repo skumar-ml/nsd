@@ -115,6 +115,7 @@ class BriefsUpsellModal {
 					this.selectBriefEvent(this.debateEventId);
 				}
 				if (this.selectedBriefEvent) {
+                    //this.appliedBriefEvent = this.selectedBriefEvent;
 					this.updateBriefAmount(this.selectedBriefEvent);
 					this.renderSelectedBriefSummary();
 					this.briefEventAdded = true;
@@ -193,6 +194,7 @@ class BriefsUpsellModal {
 		try {
 			const response = await this.fetchData('getBriefDetails?programId='+this.memberData.programId);
 			const events = response && Array.isArray(response.briefEvents) ? response.briefEvents : [];
+
 			this.briefEvents = events.sort((a, b) => {
 				const aOrder = typeof a.displayOrder === 'number' ? a.displayOrder : 0;
 				const bOrder = typeof b.displayOrder === 'number' ? b.displayOrder : 0;
@@ -200,6 +202,7 @@ class BriefsUpsellModal {
 			});
 			this.debateEventId = response.debateEventId;
 			this.renderBriefEvents();
+			//this.bindBriefCtaButton();
 			//this.selectBriefEvent(this.debateEventId)
 		} catch (error) {
 			console.error('Error fetching brief events:', error);
@@ -209,6 +212,7 @@ class BriefsUpsellModal {
 	// Renders brief events as cards in the modal containers
 	renderBriefEvents() {
 		const containers = this.getBriefEventsContainers();
+
 		if (!containers.length) {
 			return;
 		}
@@ -223,7 +227,7 @@ class BriefsUpsellModal {
 			const fragment = document.createDocumentFragment();
 			this.briefEvents.forEach((briefEvent) => {
 				const card = document.createElement('div');
-				card.className = 'bundle-gray-rounded-div';
+				card.className = 'debate-season-discount-price-info';
 				if (briefEvent.highlighted) {
 					card.classList.add('selected-red');
 				}
@@ -271,29 +275,18 @@ class BriefsUpsellModal {
 	buildBriefEventMarkup(briefEvent) {
 		const price = this.formatCurrency(briefEvent.price);
 		const savedAmount = parseFloat(briefEvent.saved_amount || 0);
+		let cleanPrice = parseFloat(price.replace('$', ''));
+        let total = cleanPrice + Number(savedAmount);
 		const description = briefEvent.description || '';
 		return `
 			<div class="bundle-info-flex">
 				<div class="bundle-checkbox-wrapper hide" aria-hidden="true">
 					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
 				</div>
-				<div class="dm-sans bundle-type">
-					<span>${briefEvent.title}</span><br>
-				</div>
+			
 			</div>
-			<div class="bundle-price-info">
-				<div class="bundle-price-info-flex-wrapper">
-				<div class="dm-sans ">
-					<strong class="bundle-price-red">${price}</strong><span>/Year</span><br>
-				</div>
-				<div class="dm-sans green">
-					<span class="text-green">Save ${this.formatCurrency(savedAmount)}</span><br>
-				</div>
-				</div>
-				<div class="dm-sans text-small">
-					<span>${description}</span><br>
-				</div>
-			</div>
+             <div data-brief-event-title="LD Annual" class="debate-season-discount-price-info"><img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6981fb3eb1bacc158e3abf16_Group%2019354.svg" loading="lazy" alt="" class="debate-season-icon"><div><div class="debate-season-info-flex"><div><div class="debate-season-orig-price"> $${total}
+             </div></div><div class="dm-sans bundle"><strong class="price-text-red">${price}</strong><span>/Year</span><br></div><div class="save-price">Save ${this.formatCurrency(savedAmount)}<br></div></div><div class="debate-season-sub-title">${description}<br></div></div></div>
 		`;
 	}
 	// Formats a numeric amount as currency string with dollar sign
@@ -1750,7 +1743,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			e.preventDefault();
 			payNowLink.style.pointerEvents = "none";
 			payNowLink.innerHTML = "Processing..";
-			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
@@ -1760,7 +1752,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			e.preventDefault();
 			payNowLinkMo.style.pointerEvents = "none";
 			payNowLinkMo.innerHTML = "Processing..";
-			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
@@ -1771,7 +1762,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			e.preventDefault();
 			payNowLink3.style.pointerEvents = "none";
 			payNowLink3.innerHTML = "Processing..";
-			//console.log("click payNow Button")
 			let activePaymentLink = document.querySelector('.checkout_payment .w--tab-active a');
 			activePaymentLink.click();
 		})
