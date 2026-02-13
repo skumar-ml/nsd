@@ -292,9 +292,6 @@ class BriefsUpsellModal {
 				<div class="bundle-checkbox-wrapper hide" aria-hidden="true">
 					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
 				</div>
-				<div class="dm-sans bundle-type">
-					<span>${briefEvent.title}</span><br>
-				</div>
 			</div>
 		     <div class="season-header"><div class="debate-season-title"><span>Next Season</span><br></div><div class="debate-season-sub-title"><span>${description}</span><br></div></div> 
              <div data-brief-event-title="LD Annual" class="debate-season-discount-price-info"><img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6981fb3eb1bacc158e3abf16_Group%2019354.svg" loading="lazy" alt="" class="debate-season-icon"><div><div class="debate-season-info-flex"><div><div class="debate-season-orig-price"> $${total}
