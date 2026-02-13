@@ -206,7 +206,7 @@ class BriefsUpsellModal {
 				return aOrder - bOrder;
 			});
 			this.debateEventId = response.debateEventId;
-			//this.renderBriefEvents();
+			this.renderBriefEvents();
 			//this.selectBriefEvent(this.debateEventId)
 		} catch (error) {
 			console.error('Error fetching brief events:', error);
@@ -280,11 +280,22 @@ class BriefsUpsellModal {
 	// Builds HTML markup for a single brief event card
 	buildBriefEventMarkup(briefEvent) {
 		const price = this.formatCurrency(briefEvent.price);
+		//console.log("Price", price);
 		const savedAmount = parseFloat(briefEvent.saved_amount || 0);
+		//console.log("Saved Amount", savedAmount);
 		let cleanPrice = parseFloat(price.replace('$', ''));
         let total = cleanPrice + Number(savedAmount);
+		//console.log("Total", total);
 		const description = briefEvent.description || '';
 		return `
+		     	<div class="bundle-info-flex">
+				<div class="bundle-checkbox-wrapper hide" aria-hidden="true">
+					<img src="${this.briefCheckboxIcons.unchecked}" class="bundle-checkbox" alt="">
+				</div>
+				<div class="dm-sans bundle-type">
+					<span>${briefEvent.title}</span><br>
+				</div>
+			</div>
 		     <div class="season-header"><div class="debate-season-title"><span>Next Season</span><br></div><div class="debate-season-sub-title"><span>${description}</span><br></div></div> 
              <div data-brief-event-title="LD Annual" class="debate-season-discount-price-info"><img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6981fb3eb1bacc158e3abf16_Group%2019354.svg" loading="lazy" alt="" class="debate-season-icon"><div><div class="debate-season-info-flex"><div><div class="debate-season-orig-price"> $${total}
              </div></div><div class="dm-sans bundle"><strong class="price-text-red">${price}</strong><span>/Year</span><br></div><div class="save-price">Save ${this.formatCurrency(savedAmount)}<br></div></div></div></div>
