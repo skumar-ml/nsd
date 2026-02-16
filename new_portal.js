@@ -1,464 +1,1396 @@
-/*
-Purpose: Primary NSD portal experience that aggregates forms, invoices, briefs, and supplementary data for the current season.
+/**
+ * NSD Portal - Staging
+ * Fetches and renders portal data from getPortalDetails API
+ * Based on dummy_api_responce.json structure
+ */
 
-Brief Logic: Fetches forms, invoices, briefs, and supplementary program data from API. Aggregates and displays all data in organized grid layouts with filtering and navigation.
-
-Are there any dependent JS files: No
-*/
 class NSDPortal {
-    $completedForm = [];
-    $completedFormOnly = [];
-    $completedInvoiceOnly = [];
-    $formsList = [];
-    $programCategory = {};
-    $programDetail = {};
-    $studentDetail = {};
-    $totalForm = 0;
-    $totalInvoice = 0;	 
-    $isLiveProgram = true;
-    $uploadedContent = {};
-    $startDate = '';
-    $endDate = '';
-    $deadlineDate = '';
-    /**New Variable */
-    $allStudentData = []
-    // Initializes the NSD portal instance and fetches portal and supplementary data
-    constructor(webflowMemberId, accountEmail, apiBaseUrl) {
-        this.webflowMemberId = webflowMemberId;
-        this.accountEmail = accountEmail;
-        this.baseUrl = apiBaseUrl;
-        this.getPortalData();
-        this.getSuppPortalData();
+    constructor(config) {
+        this.webflowMemberId = config.memberId || config.webflowMemberId;
+        this.accountEmail = config.accountEmail;
+        this.baseUrl = config.baseUrl;
+        this.allSessions = [];
+        this.invoiceData = [];
+        this.userName = config.userName;
+        this.init();
     }
-    // Fetches data from the API endpoint
+
+    async init() {
+        await this.loadPortalData();
+    }
+
+    // Fetch data from API
     async fetchData(endpoint) {
         try {
             const response = await fetch(`${this.baseUrl}${endpoint}`);
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
             return data;
         } catch (error) {
-            //console.error("Error fetching data:", error);
-            //throw error;
+            console.error('Error fetching data:', error);
+            return null;
         }
     }
-    // Fetches portal data including forms, invoices, and briefs from API
-    async getPortalData() {
-        // API call
-        const nsdSuppDataPortal = document.getElementById('nsdSuppDataPortal');
-        const curr_dashboard_title = document.getElementById('curr_dashboard_title');
-        const supp_dashboard_title = document.getElementById('supp_dashboard_title');
-	const nsdPortal = document.getElementById('nsdPortal');
-        var spinner = document.getElementById('half-circle-spinner');
-        spinner.style.display = 'block';
-	nsdPortal.style.display = 'none';
-        // const data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current");
-	 var data = [];
-	 var invoiceData = [];
-	 var briefsData = []; 
-	try {
-		//Invoice Changes, Calling invoice and form API 
-		[data, invoiceData] = await Promise.all(
-	            [this.fetchData("getCompletedForm/" + this.webflowMemberId + "/current"),
-	                this.fetchData("getInvoiceList/" + this.webflowMemberId + "/current")
-	            ]
-	        );
-		briefsData = data.brief || []; 
-		data = data.studentData || [];
-	        if (briefsData.length > 0) {
-	            new BriefManager(briefsData, {
-					 "webflowMemberId": this.webflowMemberId,
-					 "accountEmail": this.accountEmail,
-					 "baseUrl": this.baseUrl
-				})
-	        }
-	} catch (error) {
-		spinner.style.display = 'none';
-        }
-        // Hide free and paid resources
-        this.hidePortalData(data, briefsData)
-        // hide spinner
-        spinner.style.display = 'none';
-        // display supplementary program dom element 
-        if(data.length> 0){
-            nsdSuppDataPortal.style.display = 'block';
-            curr_dashboard_title.style.display = 'block';
-            supp_dashboard_title.style.display = 'block';
-	    nsdPortal.style.display = 'block';
-        } 
-        // create portal student program tabs
-        //this.createPortalTabs(data);
 
-	//Invoice Changes
-	this.$allStudentData = data;
-        this.createPortalTabs(data, invoiceData);
-        setTimeout(this.updateInvoiceData(invoiceData), 1000)
-        this.initializeToolTips();
-	
-        // Re initialize webflow tabs after API call 
-        Webflow.require('tabs').redraw();
+    // Transform API response to flat session array
+    transformApiResponse(apiResponse) {
+        const sessions = [];
+
+        if (!apiResponse || !apiResponse.studentData) {
+            console.warn('No studentData in API response');
+            return sessions;
+        }
+
+        console.log('Transforming API response, studentData length:', apiResponse.studentData.length);
+
+        // Process each student in studentData array
+        apiResponse.studentData.forEach((studentObj, studentIndex) => {
+            const studentName = Object.keys(studentObj)[0];
+            const studentData = studentObj[studentName];
+
+            console.log(`Processing student ${studentIndex + 1}: ${studentName}`);
+
+            // Process currentSession
+            if (studentData.currentSession && Array.isArray(studentData.currentSession)) {
+                console.log(`  - Found ${studentData.currentSession.length} current sessions`);
+                studentData.currentSession.forEach((session, sessionIndex) => {
+                    if (session && session.programDetail && session.studentDetail) {
+                        sessions.push({
+                            ...session,
+                            sessionType: 'current',
+                            studentKey: studentName
+                        });
+                        console.log(`    Added current session ${sessionIndex + 1}: ${session.programDetail.programName}`);
+                    } else {
+                        console.warn(`    Skipping invalid current session ${sessionIndex + 1}`);
+                    }
+                });
+            }
+
+            // Process futureSession
+            if (studentData.futureSession && Array.isArray(studentData.futureSession)) {
+                console.log(`  - Found ${studentData.futureSession.length} future sessions`);
+                studentData.futureSession.forEach((session, sessionIndex) => {
+                    if (session && session.programDetail && session.studentDetail) {
+                        sessions.push({
+                            ...session,
+                            sessionType: 'future',
+                            studentKey: studentName
+                        });
+                        console.log(`    Added future session ${sessionIndex + 1}: ${session.programDetail.programName}`);
+                    } else {
+                        console.warn(`    Skipping invalid future session ${sessionIndex + 1}`);
+                    }
+                });
+            }
+
+            // Process pastSession
+            if (studentData.pastSession && Array.isArray(studentData.pastSession)) {
+                console.log(`  - Found ${studentData.pastSession.length} past sessions`);
+                studentData.pastSession.forEach((session, sessionIndex) => {
+                    if (session && session.programDetail && session.studentDetail) {
+                        sessions.push({
+                            ...session,
+                            sessionType: 'past',
+                            studentKey: studentName
+                        });
+                        console.log(`    Added past session ${sessionIndex + 1}: ${session.programDetail.programName}`);
+                    } else {
+                        console.warn(`    Skipping invalid past session ${sessionIndex + 1}`);
+                    }
+                });
+            }
+        });
+
+        console.log(`Total sessions transformed: ${sessions.length}`);
+        return sessions;
     }
+
+    // Load portal data from API
+    async loadPortalData() {
+        const spinner = document.getElementById('half-circle-spinner');
+        const nsdPortal = document.getElementById('nsdPortal');
+
+        if (spinner) spinner.style.display = 'block';
+        if (nsdPortal) nsdPortal.style.display = 'none';
+
+        try {
+            // Fetch portal details
+            const apiResponse = await this.fetchData(`getPortalDetails/${this.webflowMemberId}`);
+
+            if (!apiResponse) {
+                throw new Error('No data received from API');
+            }
+
+            // Transform and store sessions
+            this.allSessions = this.transformApiResponse(apiResponse);
+            console.log('Transformed sessions:', this.allSessions.length);
+
+            // Fetch invoice data
+            this.invoiceData = await this.fetchData(`getInvoiceList/${this.webflowMemberId}/current`) || [];
+            console.log('Invoice data:', this.invoiceData);
+
+            // Extract briefs data
+            const briefsData = apiResponse.brief || [];
+
+            // Hide or show free/paid resources based on API response
+            this.hidePortalData(apiResponse.studentData || [], briefsData);
+
+            // Handle briefs
+            if (briefsData.length > 0 && typeof BriefManager !== 'undefined') {
+                new BriefManager(briefsData, {
+                    webflowMemberId: this.webflowMemberId,
+                    accountEmail: this.accountEmail,
+                    baseUrl: this.baseUrl
+                });
+            }
+
+            // Render portal
+            this.renderPortal();
+            this.updateHeading();
+
+        } catch (error) {
+            console.error('Error loading portal data:', error);
+        } finally {
+            if (spinner) spinner.style.display = 'none';
+            if (nsdPortal) nsdPortal.style.display = 'block';
+        }
+    }
+
+    // Update the heading
+    updateHeading() {
+        const headings = document.querySelectorAll('[data-portal="heading"]');
+        if (headings) {
+            headings.forEach(heading => {
+                heading.textContent = `Welcome, ${this.userName}!`;
+            });
+        }
+    }
+
     // Hides or shows free/paid resources based on API response data
     hidePortalData(responseText, briefsData) {
+        // Handle camp-tab visibility based on student data availability
+        const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
+        const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
+        campTabs.forEach(tab => {
+            tab.style.display = hasStudentData ? "flex" : "none";
+        });
+
+        // Handle briefs-tab visibility based on briefs data availability
+        const briefsTabs = document.querySelectorAll('[data-portal="briefs-tab"]');
+        const hasBriefsData = briefsData && Array.isArray(briefsData) && briefsData.length > 0;
+        briefsTabs.forEach(tab => {
+           tab.style.display = hasBriefsData ? "flex" : "none";
+        });
+
         if (briefsData.length > 0) {
-            document.getElementById("paid-resources").style.display = "block";
+            const paidResources = document.getElementById("paid-resources");
+            if (paidResources) {
+                paidResources.style.display = "block";
+            }
         } else if (responseText == "No data Found") {
-            document.getElementById("free-resources").style.display = "block";
-            // commented for update profile modal 
-            // setTimeout(() => {
-            //     console.log("ready!");
-            //     this.updateMemberFirstName();
-            // }, "3000");
+            const freeResources = document.getElementById("free-resources");
+            if (freeResources) {
+                freeResources.style.display = "block";
+            }
         } else if (responseText.length == 0) {
-            document.getElementById("free-resources").style.display = "block";
-            // commented for update profile modal 
-            // setTimeout(() => {
-            //     console.log("ready!");
-            //     this.updateMemberFirstName();
-            // }, "3000");
+            const freeResources = document.getElementById("free-resources");
+            if (freeResources) {
+                freeResources.style.display = "block";
+            }
         } else {
             if (!(localStorage.getItem('locat') === null)) {
                 localStorage.removeItem('locat');
             }
-            document.getElementById("paid-resources").style.display = "block";
+            const paidResources = document.getElementById("paid-resources");
+            if (paidResources) {
+                paidResources.style.display = "block";
+            }
         }
     }
-    // Creates portal tabs for multiple student programs with invoice data
-    createPortalTabs(tabsData, invoiceData) {
-        const nsd_portal_container = document.getElementById('nsdPortal');
-        var is_notification = false;
-        var notificationDiv = this.creEl('div', 'notification_container');
-        // Create the main portal tab container
-        const portalTabs = document.createElement('div');
-        portalTabs.className = 'portal-tab w-tabs';
-        portalTabs.setAttribute('data-current', 'Tab 1');
-        portalTabs.setAttribute('data-easing', 'ease');
-        portalTabs.setAttribute('data-duration-in', '300');
-        portalTabs.setAttribute('data-duration-out', '100');
 
-        // Create the tab menu container
-        const tabMenus = document.createElement('div');
-        tabMenus.className = 'portal-tab-menus w-tab-menu';
-        tabMenus.setAttribute('role', 'tablist');
+    // Render the main portal
+    renderPortal() {
+        const container = document.getElementById('nsdPortal');
+        if (!container) {
+            console.error('Portal container not found');
+            return;
+        }
 
-        // Create the tab content container
-        const tabContent = document.createElement('div');
-        tabContent.className = 'portal-tab-content w-tab-content';
+        // Clear existing content
+        container.innerHTML = '';
 
-        // Loop through the tab data to create each tab and its content
-        tabsData.forEach((tab, index) => {
-            if (tab.failedPayment == undefined) {
-                const tabIndex = index + 1;
-                const isActive = index === 0 ? 'w--current' : '';
-                const isTabActive = index === 0 ? 'w--tab-active' : '';
-                this.updateGlobalVariable(tab);
-                // Create the tab header
-                const tabHeader = document.createElement('a');
-                tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`;
-                tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-                tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
-                tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
-                tabHeader.setAttribute('role', 'tab');
-                tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
-                tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-                tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
-		let dateString = "| "+this.$startDate.toLocaleString('default', { month: 'long' }) +" "+this.$startDate.getDate()+" - "+this.$endDate.toLocaleString('default', { month: 'long' })+" "+this.$endDate.getDate()
-                tabHeader.innerHTML = `
-                <div>
-                    <div class="current-program_content-div">
-                        <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} ${ (!tab.programDetail.hideDates) ? dateString: "" } </div>
-                    </div>
-                </div>
-            `;
-		
-		//Invoice Changes, Getting current tab invoice data
-                this.$invoices = invoiceData.find(i => i.paymentId == tab.studentDetail.uniqueIdentification)
-		if(this.$invoices.invoiceList != null){
-                    this.$completedInvoiceOnly = this.$completedInvoiceOnly + this.$invoices.invoiceList.filter(i=> i.is_completed == true).length
-                    console.log('this.$completedInvoiceOnly', this.$completedInvoiceOnly)
-                }
-		    
-                var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
-                // Append the tab header and content to their respective containers
-                tabMenus.appendChild(tabHeader);
-                tabContent.appendChild(tabPane);
-            } else {
-                is_notification = true;
-                tab.failedPayment.forEach(item => {
-                    let noText = this.creEl('span', 'noti_text');
-                    noText.innerHTML = 'A recent payment for ' + item['Student Name'] + ' register for the program ' + item['Program Name'] + ' has failed.';
-                    notificationDiv.appendChild(noText);
-                })
+        if (this.allSessions.length === 0) {
+            container.innerHTML = '<div class="no-data-message">No programs found</div>';
+            return;
+        }
+
+        console.log('Rendering portal with', this.allSessions.length, 'sessions');
+
+        // Group sessions by student
+        const studentsMap = this.groupSessionsByStudent();
+        const students = Object.keys(studentsMap);
+
+        if (students.length === 0) {
+            container.innerHTML = '<div class="no-data-message">No students found</div>';
+            return;
+        }
+
+        // Create student tabs structure
+        const tabsContainer = this.createStudentTabsContainer(studentsMap, students);
+        container.appendChild(tabsContainer);
+
+        // Initialize Webflow tabs and add event listeners
+        this.initializeWebflowTabs();
+    }
+
+    // Group sessions by student
+    groupSessionsByStudent() {
+        const studentsMap = {};
+
+        this.allSessions.forEach(session => {
+            const studentKey = session.studentKey || this.getStudentName(session);
+            const studentEmail = session.studentDetail?.studentEmail || '';
+
+            if (!studentsMap[studentKey]) {
+                studentsMap[studentKey] = {
+                    studentName: studentKey,
+                    studentEmail: studentEmail,
+                    sessions: []
+                };
             }
+
+            studentsMap[studentKey].sessions.push(session);
         });
 
-        // Append the tab menus and content to the main portal tab container
-        if (tabMenus) {
-            portalTabs.appendChild(tabMenus);
-        }
-        if (tabContent) {
-            portalTabs.appendChild(tabContent);
-        }
-        // Append the portal tabs to the body or a specific container
-        if (tabMenus && tabContent) {
-            // if (is_notification) {
-            //     nsd_portal_container.prepend(notificationDiv, portalTabs);
-            // } else {
-                nsd_portal_container.appendChild(portalTabs);
-            // }
-        }
-        //Initiate lightbox after dom element added
-        this.initiateLightbox()
-        // Cross Icon code
-        this.crossEvent();
-        // Update memberStack firstname after update modal closed
-        this.updateMemberFirstName();
+        return studentsMap;
+    }
 
+    // Initialize Webflow tabs with proper event handling
+    initializeWebflowTabs() {
+        // Wait for DOM to be ready
+        setTimeout(() => {
+            try {
+                // Initialize Webflow tabs if available
+                if (typeof Webflow !== 'undefined' && Webflow.require('tabs')) {
+                    Webflow.require('tabs').redraw();
+                }
+
+                // Initialize nested program tabs for the first (active) student tab
+                this.initializeNestedProgramTabs(0);
+
+                // Use MutationObserver to watch for tab changes
+                this.setupTabObserver();
+
+                // Initialize lightbox for forms
+                this.initiateLightbox();
+
+                // Initialize tooltips for invoice payment messages
+                this.initializeToolTips();
+
+                // Attach event handlers to invoice payment links
+                this.attachInvoicePaymentHandlers();
+
+                console.log('Webflow tabs initialized successfully');
+            } catch (error) {
+                console.error('Error initializing Webflow tabs:', error);
+            }
+        }, 300);
     }
-    // Sets up event handlers for cross icon clicks to close tabs
-    crossEvent() {
-        var crossIcon = document.querySelectorAll('.cross-icon')
-        crossIcon.forEach(e =>{
-            e.addEventListener("click", function (event) {
-                event.preventDefault();
-                const panLink = document.querySelectorAll('.w-tab-link');
-                panLink.forEach(element => {
-                    element.classList.remove('w--current');
-                });
-                const tabPan = document.querySelectorAll('.w-tab-pane');
-                tabPan.forEach(element => {
-                    element.classList.remove('w--tab-active');
-                });
-                Webflow.require('tabs').redraw();
+
+    // Setup observer for tab changes
+    setupTabObserver() {
+        const tabsContainer = document.querySelector('.portal-tab');
+        if (!tabsContainer) return;
+
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                    // Check for student tab changes
+                    const activeStudentTab = tabsContainer.querySelector('.student-program-info-link.w--current');
+                    if (activeStudentTab) {
+                        const studentTabIndex = Array.from(tabsContainer.querySelectorAll('.student-program-info-link')).indexOf(activeStudentTab);
+                        if (studentTabIndex >= 0) {
+                            this.onStudentTabChange(studentTabIndex);
+                        }
+                    }
+
+                    // Check for program tab changes within nested tabs
+                    const activeProgramTab = document.querySelector('.program-tab-content .w-tab-link.w--current');
+                    if (activeProgramTab) {
+                        // Re-initialize lightbox when program tab changes
+                        setTimeout(() => {
+                            this.initiateLightbox();
+                        }, 150);
+                    }
+                }
             });
-        })
+        });
+
+        observer.observe(tabsContainer, {
+            attributes: true,
+            attributeFilter: ['class'],
+            subtree: true
+        });
     }
-    // Updates global variables with form, invoice, and program data from tab
-    updateGlobalVariable(tab) {
-        this.$completedForm = tab.formCompletedList;
-	    
-	//Invoice Changes, Only getting form and invoice related completed form
-        this.$completedFormOnly = tab.formCompletedList.filter(i => i.isInvoice == "No" || i.form_sub_type == 'dropoff' || i.form_sub_type == 'pickup');
-        this.$completedInvoiceOnly = tab.formCompletedList.filter(i => (i.isInvoice == "Yes" && i.form_sub_type == 'dropoff_invoice') || (i.isInvoice == "Yes" && i.form_sub_type == 'pickup_invoice') ).length;
-        this.invoiceData = []
-	    this.$totalInvoice = 0;    
-        this.$formsList = tab.formList;
-        this.$programCategory = tab.programCategory;
-        this.$studentDetail = tab.studentDetail;
-        this.$programDetail = tab.programDetail;
-        this.$uploadedContent = tab.uploadedContent;
-        this.$totalForm = 0;
-        this.checkProgramDeadline();
-        this.$startDate = new Date(this.$programDetail.startDate);
-        this.$endDate = new Date(this.$programDetail.endDate);
-        this.$deadlineDate = new Date(this.$programDetail.deadlineDate);
+
+    // Handle student tab change event
+    onStudentTabChange(studentIndex) {
+        console.log('Student tab changed to index:', studentIndex);
+
+        // Initialize nested program tabs for this student
+        setTimeout(() => {
+            this.initializeNestedProgramTabs(studentIndex);
+            this.initiateLightbox();
+        }, 200);
     }
-	
-    // Creates and returns a tab pane element with pre-camp and during-camp content
-    tabPane(index, tabIndex, isTabActive, tab) {
-        // Update global data
-        // Create the tab content
+
+    // Handle tab change event (legacy - for backward compatibility)
+    onTabChange(tabIndex) {
+        if (tabIndex >= 0 && tabIndex < this.allSessions.length) {
+            const session = this.allSessions[tabIndex];
+            console.log('Tab changed to:', session.programDetail?.programName);
+
+            // Update the active tab pane content if needed
+            this.updateTabContent(tabIndex);
+
+            // Re-initialize lightbox for the active tab
+            setTimeout(() => {
+                this.initiateLightbox();
+            }, 150);
+        }
+    }
+
+    // Initialize nested program tabs for a specific student
+    initializeNestedProgramTabs(studentIndex) {
+        // Find the student tab pane
+        const studentTabPane = document.querySelector(`#w-tabs-1-data-w-pane-${studentIndex}`);
+        if (!studentTabPane) {
+            console.warn(`Student tab pane not found for index ${studentIndex}`);
+            return;
+        }
+
+        // Find the nested program tabs container within this student tab pane
+        const nestedTabsContainer = studentTabPane.querySelector('.portal-tab.w-tabs');
+        if (!nestedTabsContainer) {
+            console.warn(`Nested program tabs container not found for student index ${studentIndex}`);
+            return;
+        }
+
+        // Re-initialize Webflow tabs for the nested container
+        if (typeof Webflow !== 'undefined' && Webflow.require('tabs')) {
+            try {
+                // Force Webflow to re-initialize the nested tabs
+                Webflow.require('tabs').redraw();
+                console.log(`Nested program tabs initialized for student index ${studentIndex}`);
+            } catch (error) {
+                console.error('Error initializing nested program tabs:', error);
+            }
+        }
+    }
+
+    // Update tab content dynamically
+    updateTabContent(tabIndex) {
+        const session = this.allSessions[tabIndex];
+        const tabPane = document.querySelector(`#w-tabs-0-data-w-pane-${tabIndex}`);
+
+        if (!tabPane || !session) {
+            return;
+        }
+
+        // Re-render the entire tab pane content to ensure it's up to date
+        this.renderTabPaneContent(tabPane, session, tabIndex);
+
+        // Get invoice data for this session
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const sessionInvoices = this.invoiceData.find(i => i.paymentId === paymentId);
+
+        // Update invoice containers if they exist
+        if (sessionInvoices && sessionInvoices.invoiceList) {
+            const invoiceContainer = document.getElementById(`invoice_${paymentId}`);
+            const duringInvoiceContainer = document.getElementById(`during_invoice_${paymentId}`);
+
+            if (invoiceContainer) {
+                this.updateInvoiceList(invoiceContainer, sessionInvoices.invoiceList, paymentId);
+            }
+
+            if (duringInvoiceContainer) {
+                this.updateInvoiceList(duringInvoiceContainer, sessionInvoices.invoiceList, paymentId);
+            }
+        }
+    }
+
+    // Create student tabs container with nested program tabs
+    createStudentTabsContainer(studentsMap, students) {
+        const tabsDiv = document.createElement('div');
+        tabsDiv.className = 'portal-tab w-tabs';
+        tabsDiv.setAttribute('data-current', 'Tab 1');
+        tabsDiv.setAttribute('data-easing', 'ease');
+        tabsDiv.setAttribute('data-duration-in', '300');
+        tabsDiv.setAttribute('data-duration-out', '100');
+
+        const tabMenu = document.createElement('div');
+        tabMenu.className = 'portal-tab-menus no-margin-bottom w-tab-menu';
+        tabMenu.setAttribute('role', 'tablist');
+
+        const tabContent = document.createElement('div');
+        tabContent.className = 'portal-tab-content mob-margin-top-20 w-tab-content';
+
+        // Create tabs for each student
+        students.forEach((studentKey, studentIndex) => {
+            const studentData = studentsMap[studentKey];
+            const tabIndex = studentIndex + 1;
+            const isActive = studentIndex === 0 ? 'w--current' : '';
+            const isTabActive = studentIndex === 0 ? 'w--tab-active' : '';
+
+            // Create student tab header
+            const studentTabHeader = this.createStudentTabHeader(studentData, tabIndex, isActive, studentIndex);
+            tabMenu.appendChild(studentTabHeader);
+
+            // Create student tab pane with nested program tabs
+            const studentTabPane = this.createStudentTabPane(studentData, tabIndex, isTabActive, studentIndex);
+            tabContent.appendChild(studentTabPane);
+        });
+
+        tabsDiv.appendChild(tabMenu);
+        tabsDiv.appendChild(tabContent);
+
+        return tabsDiv;
+    }
+
+    // Create student tab header
+    createStudentTabHeader(studentData, tabIndex, isActive, studentIndex) {
+        const tabHeader = document.createElement('a');
+        tabHeader.className = `student-program-info-link w-inline-block w-tab-link ${isActive}`;
+        tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        tabHeader.setAttribute('id', `w-tabs-1-data-w-tab-${studentIndex}`);
+        tabHeader.setAttribute('href', `#w-tabs-1-data-w-pane-${studentIndex}`);
+        tabHeader.setAttribute('role', 'tab');
+        tabHeader.setAttribute('aria-controls', `w-tabs-1-data-w-pane-${studentIndex}`);
+        tabHeader.setAttribute('aria-selected', studentIndex === 0 ? 'true' : 'false');
+        tabHeader.setAttribute('tabindex', studentIndex === 0 ? '0' : '-1');
+
+        // Get unique program names for tags - only show current programs, exclude programDetailId 21(NSD Merch / Care Package program)
+        const currentSessions = studentData.sessions.filter(s => 
+            s.sessionType === "current" && 
+            s.programDetail?.programDetailId != 21
+        );
+        const programNames = [...new Set(currentSessions.map(s => s.programDetail?.programName).filter(Boolean))];
+        const programTagsHTML = programNames.map((programName, idx) => {
+            // Find sessions for this program and check if any have forms available
+            const programSessions = currentSessions.filter(s => s.programDetail?.programName === programName);
+            const hasForms = programSessions.some(s => s.formList && s.formList.length > 0);
+            const tagClass = hasForms ? 'student-program-pink-tag' : 'student-program-blue-tag';
+            return `
+                <div class="${tagClass}">
+                    <div class="student-prog-text">${programName}</div>
+                </div>
+            `;
+        }).join('');
+
+        // Hide student-programs-wrapper if no current programs
+        const programsWrapperStyle = programNames.length === 0 ? 'style="display: none;"' : '';
+
+        tabHeader.innerHTML = `
+            <div class="width-100">
+                <div class="student-program-info-wrapper">
+                    <div class="student-name">${studentData.studentName}</div>
+                    <div class="student-id">${studentData.studentEmail}</div>
+                </div>
+                <div class="student-programs-wrapper" ${programsWrapperStyle}>
+                    ${programTagsHTML}
+                </div>
+            </div>
+        `;
+
+        return tabHeader;
+    }
+
+    // Create student tab pane with nested program tabs
+    createStudentTabPane(studentData, tabIndex, isTabActive, studentIndex) {
+        const tabPane = document.createElement('div');
+        tabPane.className = `w-tab-pane ${isTabActive}`;
+        tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        tabPane.setAttribute('id', `w-tabs-1-data-w-pane-${studentIndex}`);
+        tabPane.setAttribute('role', 'tabpanel');
+        tabPane.setAttribute('aria-labelledby', `w-tabs-1-data-w-tab-${studentIndex}`);
+
+        // Create nested program tabs for this student
+        const programTabsContainer = this.createProgramTabsContainer(studentData.sessions, studentIndex);
+        tabPane.appendChild(programTabsContainer);
+
+        return tabPane;
+    }
+
+    // Create nested program tabs container for a student's sessions
+    createProgramTabsContainer(sessions, studentIndex) {
+        const tabsDiv = document.createElement('div');
+        tabsDiv.className = 'portal-tab w-tabs';
+        tabsDiv.setAttribute('data-current', 'Tab 1');
+        tabsDiv.setAttribute('data-easing', 'ease');
+        tabsDiv.setAttribute('data-duration-in', '300');
+        tabsDiv.setAttribute('data-duration-out', '100');
+
+        const tabMenu = document.createElement('div');
+        tabMenu.className = 'camp-tabs-wrapper w-tab-menu';
+        tabMenu.setAttribute('data-portal', 'program-tabs');
+        tabMenu.setAttribute('role', 'tablist');
+
+        const tabContent = document.createElement('div');
+        tabContent.className = 'w-tab-content program-tab-content';
+
+        // Filter out past sessions and programDetailId 21(NSD Merch / Care Package program) - they should only show in past program card
+        const sessionsToShow = sessions.filter(s => 
+            s.sessionType !== "past" && 
+            s.programDetail?.programDetailId != 21
+        );
+
+        // Hide program tabs if no current/future sessions available
+        if (sessionsToShow.length === 1) {
+            tabMenu.style.display = 'none';
+        }
+
+        // Create tabs for each program/session (only current/future)
+        sessionsToShow.forEach((session, sessionIndex) => {
+            const programTabIndex = sessionIndex + 1;
+            const isActive = sessionIndex === 0 ? 'w--current' : '';
+            const isTabActive = sessionIndex === 0 ? 'w--tab-active' : '';
+
+            // Create program tab button
+            const programTabButton = this.createProgramTabButton(session, programTabIndex, isActive, studentIndex, sessionIndex);
+            tabMenu.appendChild(programTabButton);
+
+            // Create program tab pane
+            const programTabPane = this.createProgramTabPane(session, programTabIndex, isTabActive, studentIndex, sessionIndex);
+            tabContent.appendChild(programTabPane);
+        });
+
+        // If no current/future sessions, show past programs card
+        if (sessionsToShow.length === 0) {
+            const pastSessions = sessions.filter(s => s.sessionType === "past");
+            if (pastSessions.length > 0) {
+                // Get past programs for the first past session (to identify the student)
+                const pastPrograms = this.getPastProgramsForStudent(pastSessions[0]);
+                if (pastPrograms.length > 0) {
+                    const pastProgramsHTML = pastPrograms
+                        .map(program => `
+                            <div class="past-program-flex-wrapper">
+                                <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
+                                <p class="poppins-para no-margin-bottom">${program.programName}</p>
+                                ${ program.isRefunded ? '<div class="refunded-rounded-div"><p class="poppins-para refunded-dark-gray-text">REFUNDED</p></div>' : '' }
+                            </div>
+                        `).join('');
+
+                    const pastProgramCard = document.createElement('div');
+                    pastProgramCard.className = 'past-program-div';
+                    pastProgramCard.innerHTML = `
+                        <p class="portal-node-title-dashboard">Past Program</p>
+                        <div data-portal="past-classe-list">
+                            ${pastProgramsHTML}
+                        </div>
+                    `;
+                    tabContent.appendChild(pastProgramCard);
+                }
+            }
+        }
+
+        tabsDiv.appendChild(tabMenu);
+        tabsDiv.appendChild(tabContent);
+
+        return tabsDiv;
+    }
+
+    // Create program tab button
+    createProgramTabButton(session, tabIndex, isActive, studentIndex, sessionIndex) {
+        const button = document.createElement('a');
+        const programName = session.programDetail?.programName || 'Program';
+        button.href = `#w-tabs-${studentIndex + 2}-data-w-pane-${sessionIndex}`;
+        button.className = `camp-program-tab w-tab-link ${isActive}`;
+        button.textContent = programName;
+        button.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        button.setAttribute('id', `w-tabs-${studentIndex + 2}-data-w-tab-${sessionIndex}`);
+        button.setAttribute('role', 'tab');
+        button.setAttribute('aria-controls', `w-tabs-${studentIndex + 2}-data-w-pane-${sessionIndex}`);
+        button.setAttribute('aria-selected', sessionIndex === 0 ? 'true' : 'false');
+        button.setAttribute('tabindex', sessionIndex === 0 ? '0' : '-1');
+        return button;
+    }
+
+    // Create program tab pane
+    createProgramTabPane(session, tabIndex, isTabActive, studentIndex, sessionIndex) {
+        const tabPane = document.createElement('div');
+        tabPane.className = `w-tab-pane ${isTabActive}`;
+        tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        tabPane.setAttribute('id', `w-tabs-${studentIndex + 2}-data-w-pane-${sessionIndex}`);
+        tabPane.setAttribute('role', 'tabpanel');
+        tabPane.setAttribute('aria-labelledby', `w-tabs-${studentIndex + 2}-data-w-tab-${sessionIndex}`);
+
+        // Get invoice data for this session
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const sessionInvoices = this.invoiceData.find(i => i.paymentId === paymentId);
+
+        // Create camp info wrapper
+        const campInfoWrapper = document.createElement('div');
+        campInfoWrapper.className = 'camp-info-wrapper';
+
+        // Create pre-camp content
+        const preCampContent = this.createPreCampContent(session, sessionInvoices);
+        if (preCampContent) {
+            // Append all children from the fragment to the wrapper
+            if (preCampContent.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+                while (preCampContent.firstChild) {
+                    campInfoWrapper.appendChild(preCampContent.firstChild);
+                }
+            } else {
+                campInfoWrapper.appendChild(preCampContent);
+            }
+        }
+
+        // Create during-camp content if program has started
+        if (this.hasProgramStarted(session)) {
+            const duringCampContent = this.createDuringCampContent(session, sessionInvoices);
+            if (duringCampContent) {
+                campInfoWrapper.appendChild(duringCampContent);
+            }
+        }
+
+        tabPane.appendChild(campInfoWrapper);
+
+        return tabPane;
+    }
+
+    // Create tab header
+    createTabHeader(session, tabIndex, isActive, index) {
+        const tabHeader = document.createElement('a');
+        tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`;
+        tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
+        tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
+        tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
+        tabHeader.setAttribute('role', 'tab');
+        tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
+        tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+        tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
+
+        const programName = session.programDetail?.programName || 'Program';
+        const studentName = this.getStudentName(session);
+        const dateString = this.getDateString(session);
+
+        tabHeader.innerHTML = `
+            <div>
+                <div class="current-program_content-div">
+                    <div class="dm-sans current-program_subtitle">${programName}</div>
+                    <div class="dm-sans opacity-70">${studentName} ${dateString}</div>
+                </div>
+            </div>
+        `;
+
+        return tabHeader;
+    }
+
+    // Create tab pane content
+    createTabPane(session, tabIndex, isTabActive, index) {
         const tabPane = document.createElement('div');
         tabPane.className = `w-tab-pane ${isTabActive}`;
         tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
         tabPane.setAttribute('id', `w-tabs-0-data-w-pane-${index}`);
         tabPane.setAttribute('role', 'tabpanel');
         tabPane.setAttribute('aria-labelledby', `w-tabs-0-data-w-tab-${index}`);
-        this.$formsList.sort(function (r, a) {
-            return r.sequence - a.sequence
-        });
-        var formList = this.$formsList.map(formCategory => this.formCategoryList(formCategory)).join('');
 
-	    // for online program invoice list
-        if(this.$programCategory.programCategoryId == 3333 && this.$invoices.invoiceList != null){
-            formList += this.invoiceList()
-        }
+        // Store session reference for dynamic updates
+        tabPane.dataset.sessionIndex = index;
+        tabPane.dataset.paymentId = session.studentDetail?.uniqueIdentification || session.paymentId || '';
 
-        let percentageAmount = (this.$completedForm.length) ? (100 * this.$completedForm.length) / this.$totalForm : 0;
-        if (percentageAmount == 100) {
-            formList = "";
-        }
-        var pre_camp_html = this.createPreCampContent(formList, percentageAmount);
-        var during_camp_html = this.createDuringCampContent();
-        
-	    tabPane.innerHTML = ``;
+        // Render tab content
+        this.renderTabPaneContent(tabPane, session, index);
 
-       if (!(percentageAmount == 100 && this.checkProgramStartDate())) {
-	      tabPane.innerHTML += `
-            <div class="pre-camp_div">
-                <!-- Pre camp content will come conditionally here -->
-                ${pre_camp_html.innerHTML || ''}
-            </div>
-        `;
-         } 
-        
-         //if (this.checkProgramStartDate() || percentageAmount == 100) {
-         // Updated logic now only camp will start then during_camp_html will show
-         if (this.checkProgramStartDate()) {
-             tabPane.innerHTML += `
-            <div class="during-camp_div">
-                <!-- During camp content will come conditionally here -->
-                ${during_camp_html.innerHTML || ''}
-            </div>
-        `;
-         }
-
-	// if (true) {
- 	//    		tabPane.insertAdjacentHTML('beforeend', `
- 	//       		<div class="pre-camp_div">
-	//            	<!-- Pre camp content will come conditionally here -->
-	//            	${pre_camp_html.innerHTML || ''}
- 	//       		</div>
- 	//   		`);
-	// }
-	// if (true) {
- 	//    		tabPane.insertAdjacentHTML('beforeend', `
- 	//       		<div class="during-camp_div">
-	//            <!-- During camp content will come conditionally here -->
-	//            ${during_camp_html.innerHTML || ''}
- 	//       		</div>
- 	//   		`);
-	// }
-
-        return tabPane
+        return tabPane;
     }
 
+    // Render tab pane content (can be called to update dynamically)
+    renderTabPaneContent(tabPane, session, index) {
+        // Get invoice data for this session
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const sessionInvoices = this.invoiceData.find(i => i.paymentId === paymentId);
 
-   //Invoice Changes
-    // Updates invoice data in both pre-camp and during-camp sections
-    updateInvoiceData(invoiceData) {
-        invoiceData.forEach(item => {
-            if (item.invoiceList != null) {
-                var invoiceContainer = document.getElementById('invoice_' + item.paymentId)
-                var duringInvoiceContainer = document.getElementById('during_invoice_' + item.paymentId)
-                if (invoiceContainer != null) {
-                    item.invoiceList.forEach(invoice => {
-			
-                        let preCampRow = this.singleInvoiceForm(invoice, item.paymentId)
-                        invoiceContainer.appendChild(preCampRow);
-			if(duringInvoiceContainer){
-                        	let duringCampRow = this.singleInvoiceForm(invoice, item.paymentId)
-                        	duringInvoiceContainer.appendChild(duringCampRow)
-			}
-                    })
+        // Create pre-camp content
+        const preCampContent = this.createPreCampContent(session, sessionInvoices);
+
+        // Create during-camp content
+        const duringCampContent = this.createDuringCampContent(session, sessionInvoices);
+
+        // Clear and populate tab pane
+        while (tabPane.firstChild) {
+            tabPane.removeChild(tabPane.firstChild);
+        }
+
+        // Add pre-camp section
+        if (preCampContent) {
+            tabPane.appendChild(preCampContent);
+        }
+
+        // Add during-camp section if program has started
+        if (duringCampContent && this.hasProgramStarted(session)) {
+            tabPane.appendChild(duringCampContent);
+        }
+    }
+
+    // Create pre-camp content
+    createPreCampContent(session, invoiceData) {
+        // Create a container fragment to hold all content (no wrapper class)
+        const contentContainer = document.createDocumentFragment();
+
+        const formList = session.formList || [];
+        const formCompletedList = session.formCompletedList || [];
+        const deadlineDate = session.programDetail?.deadlineDate;
+
+        // Calculate total forms FIRST (count all forms, not just live ones, for display)
+        // This ensures we show the total count even if forms aren't live yet
+        const totalForms = this.countTotalForms(formList, false, true);
+
+        // Initialize total form count (will be incremented as forms are rendered for verification)
+        session._totalFormCount = 0;
+
+        // Calculate completed forms - filter out invoice forms from completed count
+        // Only count forms where isInvoice == "No" OR form_sub_type is 'dropoff' or 'pickup'
+        const completedFormsOnly = formCompletedList.filter(i =>
+            i.isInvoice == "No" || i.form_sub_type == 'dropoff' || i.form_sub_type == 'pickup'
+        );
+        const completedForms = completedFormsOnly.length;
+
+        const deadlineText = deadlineDate
+            ? `Needs to be completed by ${this.formatDate(deadlineDate)}`
+            : '';
+
+        // Create header section
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'camp-header-flex';
+        headerDiv.innerHTML = `
+            <div>
+                <div class="dashboard-node-header">Registration Forms &amp; Resources</div>
+            </div>
+            <div class="cross-icon">
+                <img src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg" loading="lazy" alt="">
+            </div>
+        `;
+        contentContainer.appendChild(headerDiv);
+
+        // Create forms section
+        let formsSection = null;
+        if (formList.length > 0) {
+            formsSection = this.createFormsSection(formList, formCompletedList, session);
+        }
+
+        // Calculate progress percentage
+        const progressPercentage = totalForms > 0 ? Math.round((completedForms / totalForms) * 100) : 0;
+
+        // Create progress section - only show if deadline exists AND forms are available
+        if (deadlineText && formList.length > 0 && totalForms > 0) {
+            const progressDiv = document.createElement('div');
+            progressDiv.className = 'camp-progress-wrapper';
+            progressDiv.innerHTML = `
+                <div class="dm-sans camp-text">${deadlineText}</div>
+                <div class="camp-progress-container">
+                    <div class="camp-gray-text">${progressPercentage}% / ${completedForms} of ${totalForms} forms complete</div>
+                    <div class="camp-progress-bar">
+                        <div class="sub-div" style="width: ${progressPercentage}%;"></div>
+                    </div>
+                </div>
+            `;
+            contentContainer.appendChild(progressDiv);
+        }
+
+        // Check if all forms are completed
+        const allFormsCompleted = totalForms > 0 && completedForms >= totalForms && progressPercentage === 100;
+
+        // Add forms section after progress, or show message if no forms
+        if (allFormsCompleted && formList.length > 0) {
+            // Show "View All Forms" button when all forms are completed
+            const buttonWrapper = document.createElement('div');
+            const viewAllFormsButton = document.createElement('a');
+            viewAllFormsButton.href = 'https://www.nsdebatecamp.com/portal/registration';
+            viewAllFormsButton.setAttribute('data-portal', 'view-all-forms');
+            viewAllFormsButton.className = 'main-button inline-block w-button';
+            viewAllFormsButton.textContent = 'View All Forms';
+            buttonWrapper.appendChild(viewAllFormsButton);
+            contentContainer.appendChild(buttonWrapper);
+        } else if (formsSection) {
+            contentContainer.appendChild(formsSection);
+        } else if (formList.length === 0 || totalForms === 0) {
+            // Show message when forms list is empty
+            const noFormsMessage = document.createElement('div');
+            noFormsMessage.className = 'pre-camp_subtitle';
+            noFormsMessage.style.opacity = '0.7';
+            noFormsMessage.textContent = 'Forms not available for this program';
+            contentContainer.appendChild(noFormsMessage);
+        }
+
+        // Create invoices section - only show if not all invoices are completed
+        if (invoiceData && invoiceData.invoiceList) {
+            const invoices = invoiceData.invoiceList || [];
+            const completedInvoices = invoices.filter(i => i.is_completed).length;
+            const totalInvoices = invoices.length;
+            const allInvoicesCompleted = totalInvoices > 0 && completedInvoices >= totalInvoices;
+
+            // Hide invoice section if all invoices are completed
+            if (!allInvoicesCompleted) {
+                const invoicesSection = this.createInvoicesSection(invoiceData, session);
+                if (invoicesSection) {
+                    contentContainer.appendChild(invoicesSection);
                 }
             }
-        })
+        }
+
+        // Create resources section
+        const resourcesSection = this.createResourcesSection(session);
+        if (resourcesSection) {
+            contentContainer.appendChild(resourcesSection);
+        }
+
+        return contentContainer;
     }
-    // Creates and returns a DOM element for a single invoice form row
-    singleInvoiceForm(invoice, paymentId) {
-        var $this = this;
 
-        // Create the main container div with class 'pre-camp_row'
+    // Create forms section
+    createFormsSection(formList, formCompletedList, session) {
+        const container = document.createElement('div');
+
+        let formsHTML = this.renderFormCategories(formList, formCompletedList, session);
+        if (!formsHTML) {
+            return null;
+        }
+
+        container.innerHTML = `
+            <a href="#" data-portal="view-all-forms" class="main-button inline-block hide w-button">View All forms</a>
+            ${formsHTML}
+        `;
+
+        return container;
+    }
+
+    // Create invoices section
+    createInvoicesSection(invoiceData, session) {
+        const container = document.createElement('div');
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const invoices = invoiceData.invoiceList || [];
+        const completedInvoices = invoices.filter(i => i.is_completed).length;
+        const totalInvoices = invoices.length;
+        const progressPercentage = totalInvoices > 0 ? Math.round((completedInvoices / totalInvoices) * 100) : 0;
+
+        container.innerHTML = `
+            <a href="#" data-portal="view-all-invoices" class="main-button inline-block hide w-button">View All Invoices</a>
+                <div class="invoice-wrapper">
+                <div class="registration-info-title">Invoices</div>
+                <div class="registration-info-wrapper" id="invoice_${paymentId}">
+                </div>
+                </div>
+        `;
+
+        // Add invoices with proper event handlers
+        const invoiceContainer = container.querySelector(`#invoice_${paymentId}`);
+        if (invoiceContainer && invoices.length > 0) {
+            this.updateInvoiceList(invoiceContainer, invoices, paymentId);
+        }
+
+        return container;
+    }
+
+    // Create resources section
+    createResourcesSection(session) {
+        const container = document.createElement('div');
+        const uploadedContent = session.uploadedContent || [];
+
+        // Get past programs for this student
+        const pastPrograms = this.getPastProgramsForStudent(session);
+
+        // Build resources HTML (uploadedContent goes in resources_wrapper)
+        const resourcesHTML = uploadedContent
+            .filter(item => item.label && item.uploadedFiles && item.uploadedFiles[0])
+            .map(item => `
+                <a href="${item.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
+                    <div class="resources-div">
+                        <div class="resources-text-blue">${item.label}</div>
+                    </div>
+                </a>
+            `).join('');
+
+        // Build past programs HTML (goes in past-program-div)
+        const pastProgramsHTML = pastPrograms
+            .map(program => `
+                <div class="past-program-flex-wrapper">
+                    <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
+                    <p class="poppins-para no-margin-bottom">${program.programName}</p>
+                </div>
+            `).join('');
+
+        // Only show section if there are resources or past programs
+        if (uploadedContent.length === 0 && pastPrograms.length === 0) {
+            return null;
+        }
+
+        container.innerHTML = `
+            <div>
+                ${uploadedContent.length > 0 ? `
+                <div class="dashboard-node-header margin-bottom-20">Resources</div>
+                <div class="resources_wrapper">
+                    ${resourcesHTML}
+                </div> 
+            </div>` : ''}
+                ${pastPrograms.length > 0 ? `
+                <div class="past-program-div">
+                    <p class="portal-node-title-dashboard">Past Program</p>
+                    <div data-portal="past-classe-list">
+                        ${pastProgramsHTML}
+                    </div>
+                </div>
+                ` : ''}
+            
+        `;
+
+        return container;
+    }
+
+    // Get past programs for a specific student
+    getPastProgramsForStudent(session) {
+        const studentKey = session.studentKey || this.getStudentName(session);
+        const studentEmail = session.studentDetail?.studentEmail || '';
+
+        // Find all past sessions for this student
+        const pastSessions = this.allSessions.filter(s => {
+            const sessionStudentKey = s.studentKey || this.getStudentName(s);
+            const sessionStudentEmail = s.studentDetail?.studentEmail || '';
+            return s.sessionType === 'past' &&
+                (sessionStudentKey === studentKey || sessionStudentEmail === studentEmail);
+        });
+
+        // Extract unique program names
+        const uniquePrograms = [];
+        const seenPrograms = new Set();
+
+        pastSessions.forEach(session => {
+            const programName = session.programDetail?.programName;
+            if (programName && !seenPrograms.has(programName)) {
+                seenPrograms.add(programName);
+                uniquePrograms.push({
+                    programName: programName,
+                    programDetailId: session.programDetail?.programDetailId,
+                    isRefunded: session.isRefunded
+                });
+            }
+        });
+
+        return uniquePrograms;
+    }
+
+    // Create during-camp content
+    createDuringCampContent(session, invoiceData) {
+        const duringCampDiv = document.createElement('div');
+        duringCampDiv.className = 'during-camp_div';
+
+        const campTopic = session.programDetail?.campTopic || '';
+        const uploadedContent = session.uploadedContent || [];
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+
+        duringCampDiv.innerHTML = `
+            <div class="pre-camp_title-content-wrapper">
+                <div class="pre-camp_title-div bg-blue">
+                    <div class="dm-sans line-height-20">During camp</div>
+                </div>
+                <div class="pre-camp_title-div">
+                    <div class="dashboard-node-header">Resources/Camp Topic</div>
+                </div>
+            </div>
+            ${campTopic ? `
+            <div>
+                <div class="pre-camp_subtitle-wrapper">
+                    <div class="pre-camp_subtitle">Camp Topic</div>
+                </div>
+                <div>${campTopic}</div>
+            </div>
+            ` : 'Camp topic is not available for this camp'}
+            ${invoiceData && invoiceData.invoiceList ? `
+            <div>
+                <div class="pre-camp_subtitle">Invoice</div>
+                <div class="registration-info-wrapper" id="during_invoice_${paymentId}">
+                </div>
+            </div>
+            ` : ''}
+            ${this.renderResources(session, true)}
+        `;
+
+        // Add invoices with proper event handlers for during-camp section
+        if (invoiceData && invoiceData.invoiceList) {
+            const duringInvoiceContainer = duringCampDiv.querySelector(`#during_invoice_${paymentId}`);
+            if (duringInvoiceContainer && invoiceData.invoiceList.length > 0) {
+                this.updateInvoiceList(duringInvoiceContainer, invoiceData.invoiceList, paymentId);
+            }
+        }
+
+        return duringCampDiv;
+    }
+
+    // Render form categories
+    renderFormCategories(formList, formCompletedList, session) {
+        let html = '';
+
+        // Track total forms count (only non-invoice forms)
+        let totalFormCount = 0;
+
+        formList.sort((a, b) => (a.sequence || 0) - (b.sequence || 0));
+
+        formList.forEach(category => {
+            if (!category.forms || category.forms.length === 0) {
+                return;
+            }
+
+            const categoryHTML = this.renderFormCategory(category, formCompletedList, session, (count) => {
+                if (category.name !== 'Invoice') {
+                    totalFormCount += count;
+                }
+            });
+            if (categoryHTML) {
+                html += categoryHTML;
+            }
+        });
+
+        // Store total form count for progress calculation
+        session._totalFormCount = totalFormCount;
+
+        return html;
+    }
+
+    // Render single form category
+    renderFormCategory(category, formCompletedList, session, countCallback) {
+        const categoryName = category.name || 'Forms';
+        let forms = category.forms || [];
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const isInvoiceCategory = categoryName === 'Invoice';
+
+        // Filter invoice-related forms based on completion status
+        if (isInvoiceCategory) {
+            forms = this.filterInvoiceForms(forms, formCompletedList);
+        }
+
+        if (forms.length === 0) {
+            return '';
+        }
+
+        const gridId = isInvoiceCategory
+            ? `invoice_${paymentId}`
+            : `form_${paymentId}`;
+        const gridClass = isInvoiceCategory ? 'invoice_grid' : 'form_grid';
+
+        // Count live forms for progress (only non-invoice categories)
+        let liveFormCount = 0;
+        if (!isInvoiceCategory) {
+            liveFormCount = forms.filter(f => f.is_live).length;
+        }
+
+        let formsHTML = forms
+            .sort((a, b) => (a.sequence || 0) - (b.sequence || 0))
+            .map(form => this.renderSingleForm(form, formCompletedList, session, isInvoiceCategory ? 'invoices' : 'forms'))
+            .join('');
+
+        // Call callback to update total count
+        if (countCallback && !isInvoiceCategory) {
+            countCallback(liveFormCount);
+        }
+        // add class name dynamically invoice-wrapper or forms-wrapper
+        const wrapperClass = isInvoiceCategory ? 'invoice-wrapper' : 'forms-wrapper';
+        return `
+            <div class="${wrapperClass}">
+                <div class="registration-info-title">${categoryName}</div>
+                <div class="registration-info-wrapper ${gridClass}" id="${gridId}">
+                    ${formsHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    // Filter invoice-related forms based on completion status of dropoff/pickup forms
+    filterInvoiceForms(forms, formCompletedList) {
+        return forms.filter(item => {
+            if (item.form_sub_type == 'dropoff_invoice') {
+                const dFD = formCompletedList.find(item => item.form_sub_type == 'dropoff' && item.isInvoice == 'Yes');
+                return dFD != undefined;
+            } else if (item.form_sub_type == 'pickup_invoice') {
+                const aFD = formCompletedList.find(item => item.form_sub_type == 'pickup' && item.isInvoice == 'Yes');
+                return aFD != undefined;
+            } else {
+                return true;
+            }
+        });
+    }
+
+    // Render single form
+    renderSingleForm(form, formCompletedList, session, type = 'forms') {
+        const isCompleted = formCompletedList.some(f => f.formId === form.formId);
+        const isLive = form.is_live || false;
+        const formId = form.formId;
+        const formName = form.name || 'Form';
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const studentEmail = session.studentDetail?.studentEmail || '';
+        const programDetailId = session.programDetail?.programDetailId || '';
+
+        // Check if program is live (before deadline)
+        const deadlineDate = session.programDetail?.deadlineDate;
+        const isLiveProgram = this.checkProgramDeadline(deadlineDate);
+
+        // Track total form count (only for live forms with type == 'forms')
+        // This matches portal.js logic where $totalForm++ only happens when is_live && type == 'forms'
+        if (isLive && type === 'forms') {
+            if (!session._totalFormCount) {
+                session._totalFormCount = 0;
+            }
+            session._totalFormCount++;
+        }
+
+        let link = '#';
+        let linkText = 'Coming Soon';
+        let added_by_admin = false;
+
+        if (isLive) {
+            if (isCompleted) {
+                const completedForm = formCompletedList.find(f => f.formId === formId);
+                if (completedForm && completedForm.submissionId) {
+                    if (isLiveProgram && form.is_editable) {
+                        link = `https://www.jotform.com/edit/${completedForm.submissionId}?memberId=${this.webflowMemberId}&studentEmail=${studentEmail}&accountEmail=${this.accountEmail}&paymentId=${paymentId}&programDetailId=${programDetailId}`;
+                        linkText = 'Edit Form';
+                    } else {
+                        link = `https://www.jotform.com/submission/${completedForm.submissionId}`;
+                        linkText = 'View Form';
+                    }
+                } else {
+                    added_by_admin = true;
+                    linkText = 'Completed';
+                }
+            } else {
+                link = `https://form.jotform.com/${formId}?memberId=${this.webflowMemberId}&studentEmail=${studentEmail}&accountEmail=${this.accountEmail}&paymentId=${paymentId}&programDetailId=${programDetailId}`;
+                linkText = 'Go to Form';
+            }
+        }
+
+        // Add iframe when it's live and above certain screenwidth
+        const iframeClassName = (isLive && window.innerWidth > 1200 && !added_by_admin) ? "iframe-lightbox-link" : "";
+        const form_link_text = (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice') ? 'Invoice' : 'Form';
+
+        // Update link text for invoice forms
+        if (isLive && !added_by_admin && (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice')) {
+            if (isCompleted) {
+                linkText = (isLiveProgram && form.is_editable) ? `Edit ${form_link_text}` : `View ${form_link_text}`;
+            } else {
+                linkText = `Go to ${form_link_text}`;
+            }
+        }
+
+        const iconUrl = isCompleted
+            ? 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png'
+            : 'https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png';
+
+        const completedClass = isCompleted ? ' completed_form' : '';
+
+        return `
+            <div class="registration-info-grid">
+                <img width="20" loading="lazy" src="${iconUrl}" alt="">
+                <div class="dm-sans bold-500${completedClass}">${formName}</div>
+                <a href="${link}" class="dashboard_link-block w-inline-block ${iframeClassName}">
+                    <div class="dm-sans medium-red-with-opacity">${linkText}</div>
+                </a>
+            </div>
+        `;
+    }
+
+    // Render invoice section
+    renderInvoiceSection(invoiceData, session) {
+        const paymentId = session.studentDetail?.uniqueIdentification || session.paymentId;
+        const invoices = invoiceData.invoiceList || [];
+        const completedInvoices = invoices.filter(i => i.is_completed).length;
+        const totalInvoices = invoices.length;
+        const progressPercentage = totalInvoices > 0 ? Math.round((completedInvoices / totalInvoices) * 100) : 0;
+
+        return `
+            <div>
+                <div class="pre-camp_subtitle-wrapper">
+                    <div class="pre-camp_subtitle">Invoices</div>
+                    <div class="pre-camp_progress-container">
+                        <div class="pre-camp_subtitle opacity-50">${progressPercentage}% / ${completedInvoices} of ${totalInvoices} invoices complete</div>
+                        <div class="pre-camp_progress-bar">
+                            <div class="sub-div" style="width: ${progressPercentage}%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="registration-info-wrapper invoice_grid" id="invoice_${paymentId}">
+                    ${this.renderInvoiceList(invoices, paymentId)}
+                </div>
+            </div>
+        `;
+    }
+
+    // Render invoice list
+    renderInvoiceList(invoices, paymentId) {
+        if (!invoices || invoices.length === 0) {
+            return '';
+        }
+
+        return invoices.map(invoice => this.renderSingleInvoice(invoice, paymentId)).join('');
+    }
+
+    // Update invoice list with event handlers (for dynamic updates)
+    updateInvoiceList(container, invoices, paymentId) {
+        if (!container || !invoices || invoices.length === 0) {
+            return;
+        }
+
+        // Clear existing content
+        container.innerHTML = '';
+
+        // Add each invoice with proper event handlers
+        invoices.forEach(invoice => {
+            const invoiceElement = this.createSingleInvoiceElement(invoice, paymentId);
+            container.appendChild(invoiceElement);
+        });
+
+        // Initialize tooltips for payment process messages
+        this.initializeToolTips();
+    }
+
+    // Render single invoice (returns HTML string for initial render)
+    renderSingleInvoice(invoice, paymentId) {
+        const isCompleted = invoice.is_completed || false;
+        const status = invoice.status || '';
+        const isProcessing = status === 'Processing';
+        const isFailed = status === 'Failed';
+        const invoiceName = invoice.invoiceName || 'Invoice';
+        const editable = isCompleted;
+        const completed = (editable && (status == 'Complete' || !status));
+
+        let iconUrl = this.getCheckedInvoiceIcon(completed, isFailed, isProcessing);
+
+        const completedClass = completed ? ' completed_form' : 'inprogress';
+        let linkHTML = '';
+
+        if (editable && !isFailed) {
+            linkHTML = `<a href="#" class="dashboard_link-block w-inline-block"><div class="dm-sans opacity-70">${isProcessing ? 'Processing...' : 'Completed'}</div></a>`;
+        } else {
+            const paymentLinks = invoice.jotFormUrlLink || [];
+            if (paymentLinks.length > 0) {
+                // Sort payment links by title
+                const sortedLinks = [...paymentLinks].sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+                linkHTML = sortedLinks.map(link =>
+                    `<a href="#" class="dashboard_link-block w-inline-block ${link.paymentType}" data-invoice-id="${invoice.invoice_id}" data-payment-link-id="${link.paymentLinkId}" data-amount="${link.amount}" data-payment-id="${paymentId}" data-invoice-name="${invoiceName}">
+                        <div class="dm-sans opacity-70">${link.title}</div>
+                    </a>`
+                ).join('');
+            } else {
+                linkHTML = '<a href="#" class="dashboard_link-block w-inline-block"><div class="dm-sans opacity-70">Go to Invoice</div></a>';
+            }
+        }
+
+        // Add tooltip info if payment process message exists
+        const paymentProcessMsg = invoice.paymentProcessMsg || '';
+        const tooltipHTML = paymentProcessMsg ? `<span class="info_text" tip="${paymentProcessMsg}" tip-top tip-left>i</span>` : '';
+
+        return `
+            <div class="registration-info-grid" data-invoice-id="${invoice.invoice_id}">
+                <img width="20" loading="lazy" src="${iconUrl}" alt="">
+                <div class="dm-sans bold-500 ${completedClass}">${invoiceName}</div>
+                <div class="linkContainer">
+                    ${tooltipHTML}
+                    ${linkHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    // Create single invoice DOM element (for dynamic updates)
+    createSingleInvoiceElement(invoice, paymentId) {
+        const $this = this;
         const preCampRow = document.createElement('div');
-        preCampRow.classList.add('pre-camp_row');
+        preCampRow.classList.add('registration-info-grid');
 
+        const editable = invoice.is_completed || false;
+        const completed = (editable && (invoice.status == 'Complete' || !invoice.status));
+        const failed = (invoice.status == 'Failed');
+        const processing = (invoice.status == 'Processing');
+        const paymentProcessMsg = invoice.paymentProcessMsg || '';
+        const checkedInIcon = this.getCheckedInvoiceIcon(completed, failed, processing);
 
-        let editable = (invoice.is_completed) ? true : false;
-        let completed = (editable && (invoice.status == 'Complete' || !invoice.status));
-        let failed = (invoice.status == 'Failed');
-        let processing = (invoice.status == 'Processing');
-        let paymentProcessMsg = (invoice.paymentProcessMsg != '');
-        let checkedInIcon = this.getCheckedInvoiceIcon(completed, failed, processing);
-
-        // Create the image element
         const img = document.createElement('img');
         img.setAttribute('width', '20');
         img.setAttribute('src', checkedInIcon);
         img.setAttribute('loading', 'lazy');
         img.setAttribute('alt', '');
 
-        // Create the div with the text 'Dropoff Invoice Form'
-        let comClass = (completed)? "completed_form": 'inprogress';
+        const comClass = completed ? "completed_form" : 'inprogress';
         const completedForm = document.createElement('div');
-        completedForm.classList.add('dm-sans', 'bold-500', comClass );
+        completedForm.classList.add('dm-sans', 'bold-500', comClass);
         completedForm.textContent = invoice.invoiceName;
 
-        // Create the linkContainer div
         const linkContainer = document.createElement('div');
         linkContainer.classList.add('linkContainer');
-        var jotFormUrlLink = invoice.jotFormUrlLink;
+        const jotFormUrlLink = invoice.jotFormUrlLink || [];
 
-        let info_text = this.creEl('span', 'info_text')
-        info_text.innerHTML = 'i';
+        let info_text = null;
+        if (paymentProcessMsg) {
+            info_text = document.createElement('span');
+            info_text.className = 'info_text';
+            info_text.innerHTML = 'i';
+            info_text.setAttribute('tip', paymentProcessMsg);
+            info_text.setAttribute('tip-top', '');
+            info_text.setAttribute('tip-left', '');
+        }
+
         if (!editable || failed) {
-            jotFormUrlLink.sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
-            if (jotFormUrlLink.length > 0) {
-                jotFormUrlLink.forEach(link => {
-                    let paymentLink = document.createElement('a');
+            const sortedLinks = [...jotFormUrlLink].sort((a, b) => (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0));
+            if (sortedLinks.length > 0) {
+                sortedLinks.forEach(link => {
+                    const paymentLink = document.createElement('a');
                     paymentLink.classList.add('dashboard_link-block', 'w-inline-block', link.paymentType);
                     const paymentText = document.createElement('div');
                     paymentText.classList.add('dm-sans', 'opacity-70');
                     paymentText.textContent = link.title;
                     paymentLink.appendChild(paymentText);
 
-                    paymentLink.addEventListener('click', function () {
-                        paymentLink.innerHTML = "Processing..."
-                        $this.initializeStripePayment(invoice.invoice_id, invoice.invoiceName, link.amount, link.paymentLinkId, paymentLink, link.title, link.paymentType, paymentId)
-                    })
-                    linkContainer.appendChild(paymentLink)
-                })
+                    paymentLink.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        paymentLink.innerHTML = "<div class='dm-sans opacity-70'>Processing...</div>";
+                        $this.initializeStripePayment(
+                            invoice.invoice_id,
+                            invoice.invoiceName,
+                            link.amount,
+                            link.paymentLinkId,
+                            paymentLink,
+                            link.title,
+                            link.paymentType,
+                            paymentId
+                        );
+                    });
+                    linkContainer.appendChild(paymentLink);
+                });
             }
         } else {
-	    let paymentLink = document.createElement('a');
-            paymentLink = document.createElement('a');
+            const paymentLink = document.createElement('a');
             paymentLink.classList.add('dashboard_link-block', 'w-inline-block');
             const paymentText = document.createElement('div');
             paymentText.classList.add('dm-sans', 'opacity-70');
-            paymentText.textContent = (processing)? 'Processing...' : 'Completed';
+            paymentText.textContent = processing ? 'Processing...' : 'Completed';
             paymentLink.appendChild(paymentText);
-            linkContainer.appendChild(paymentLink)
+            linkContainer.appendChild(paymentLink);
         }
-        // Append image, completedForm, and linkContainer to preCampRow
+
         preCampRow.appendChild(img);
         preCampRow.appendChild(completedForm);
 
-        if (paymentProcessMsg) {
-            linkContainer.prepend(info_text)
-            info_text.setAttribute('tip', invoice.paymentProcessMsg)
-
-            info_text.setAttribute('tip-top', '')
-            info_text.setAttribute('tip-left', '')
+        if (info_text) {
+            linkContainer.prepend(info_text);
         }
 
         preCampRow.appendChild(linkContainer);
         return preCampRow;
     }
-    // Initializes tooltips for elements with tip attributes
-    initializeToolTips() {
-        const elements = [...document.querySelectorAll('[tip]')]
-        var i = 0;
-        for (const el of elements) {
-            console.log('el', el)
-            const tip = document.createElement('div')
-            tip.innerHTML = '';
-            tip.classList.add('tooltip')
-            tip.textContent = el.getAttribute('tip')
-            const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px'
-            const y = el.hasAttribute('tip-top') ? '-100%' : '0'
-            tip.style.transform = `translate(${x}, ${y})`
-            el.appendChild(tip)
-            el.onpointermove = e => {
-                if (e.target !== e.currentTarget) return
 
-                const rect = tip.getBoundingClientRect()
-                const rectWidth = rect.width + 16
-                const vWidth = window.innerWidth - rectWidth
-                const rectX = el.hasAttribute('tip-left') ? e.clientX - rectWidth : e.clientX + rectWidth
-                const minX = el.hasAttribute('tip-left') ? 0 : rectX
-                const maxX = el.hasAttribute('tip-left') ? vWidth : window.innerWidth
-                const x = rectX < minX ? rectWidth : rectX > maxX ? vWidth : e.clientX
-                tip.style.left = `${x}px`
-                tip.style.top = `${e.clientY}px`
-            }
-        }
-    }
-    // Returns the appropriate icon URL based on invoice status (processing, failed, or completed)
+    // Returns the appropriate icon URL based on invoice status
     getCheckedInvoiceIcon(status, failed, processing) {
-
         if (processing) {
             return "https://uploads-ssl.webflow.com/64091ce7166e6d5fb836545e/653a046b720f1634ea7288cc_loading-circles.gif";
         } else if (failed) {
@@ -472,10 +1404,17 @@ class NSDPortal {
 
     // Initializes Stripe payment checkout for invoice payment
     initializeStripePayment(invoice_id, title, amount, paymentLinkId, span, link_title, paymentType, paymentId) {
-        var centAmount = (amount*100).toFixed(2);
-        var data = {
+        const centAmount = (amount * 100).toFixed(2);
+        const session = this.allSessions.find(s => {
+            const sessionPaymentId = s.studentDetail?.uniqueIdentification || s.paymentId;
+            return sessionPaymentId === paymentId;
+        });
+
+        const studentName = session?.studentDetail?.studentName || { first: '', last: '' };
+
+        const data = {
             "email": this.accountEmail,
-            "name": this.$allStudentData.find(d => d.studentDetail.uniqueIdentification == paymentId).studentDetail.studentName,
+            "name": studentName,
             "label": title,
             "paymentType": paymentType,
             "amount": parseFloat(centAmount),
@@ -487,529 +1426,280 @@ class NSDPortal {
             "cancelUrl": "https://www.nsdebatecamp.com/portal/dashboard",
             //"successUrl": encodeURI("https://www.nsdebatecamp.com/members/" + this.webflowMemberId + "?programName=" + title),
             //"cancelUrl": "https://www.nsdebatecamp.com/members/" + this.webflowMemberId,
-        }
-        // console.log('data', data)
-        // return;
-        var xhr = new XMLHttpRequest()
-        var $this = this;
-        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true)
-        xhr.withCredentials = false
-        xhr.send(JSON.stringify(data))
+        };
+
+        const xhr = new XMLHttpRequest();
+        const $this = this;
+        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true);
+        xhr.withCredentials = false;
+        xhr.send(JSON.stringify(data));
         xhr.onload = function () {
-            let responseText = JSON.parse(xhr.responseText);
-            console.log('responseText', responseText)
-            if (responseText.success) {
-                span.innerHTML = link_title;
-                window.location.href = responseText.stripe_url;
-            }
-
-        }
-    }
-
-   // Returns HTML for invoice progress bar showing completion percentage
-   progressBarInvoice() {
-        let percentageAmount = (this.$completedInvoiceOnly) ? (100 * this.$completedInvoiceOnly) / this.$totalInvoice : 0;
-        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedInvoiceOnly} of ${(this.$totalInvoice)? this.$totalInvoice : 1} invoices complete</div>
-                <div class="pre-camp_progress-bar">
-                    <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
-                </div>`;
-    }
-
-	
-    
-	// Checks if the program start date has been reached
-	checkProgramStartDate(){
-		var currentDate = new Date(); 
-		return (currentDate >= this.$startDate) ? true : false;
-	}
-    // Creates and returns the pre-camp content div with forms and resources
-    createPreCampContent(formList) {
-        const preCampDiv = document.createElement('div');
-        preCampDiv.className = 'pre-camp_div';
-        if(formList){
-            preCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">Pre-camp</div>
-                </div>
-                <div>
-                    <div class="pre-camp_title-text">Registration Forms & Resources</div>
-                </div>
-                <div class="cross-icon" id="cross-icon"><img
-                src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
-                loading="lazy" alt=""></div>
-            </div>
-            <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Needs to be completed by ${ this.$deadlineDate.toLocaleString('default', { month: 'long' })} ${this.$deadlineDate.getDate()+this.getOrdinalSuffix(this.$deadlineDate.getDate())}</div>
-                <div class="pre-camp_progress-container">
-                ${this.progressBar()}
-                </div>
-            </div>
-            
-            ${formList}
-            ${this.resourceList()}
-        `;
-        }else{
-            preCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">Pre-camp</div>
-                </div>
-                <div>
-                    <div class="pre-camp_title-text">Resources</div>
-                </div>
-                <div class="cross-icon" id="cross-icon"><img
-                src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
-                loading="lazy" alt=""></div>
-            </div>
-            ${this.resourceList() || '<div class="pre-camp_subtitle">Camp resource available soon...</div>'}
-        `;
-        }
-        
-
-
-        return preCampDiv;
-    }
-
-   // Returns HTML for invoice list section with progress bar
-   invoiceList() {
-	   this.$totalInvoice +=  this.$invoices.invoiceList.length;
-        return `<div>
-                    <div class="pre-camp_subtitle-wrapper">
-                        <div class="pre-camp_subtitle">Invoices</div>
-                        <div class="pre-camp_progress-container">
-                        ${this.progressBarInvoice()}
-                        </div>
-                    </div>
-                    <div class="pre-camp_grid invoice_grid" id="invoice_${this.$studentDetail.uniqueIdentification}">
-                    </div>
-                    </div>`;	
-    }
-   
-    // Creates and returns HTML for a form category section
-    formCategoryList(formCategory) {
-        let invoiceForm = formCategory.name;
-        let invoiceClass = (invoiceForm == 'Invoice') ? "invoice_grid" : "form_grid";
-        formCategory.forms = this.filterInvoiceForms(formCategory.forms);
-        //Invoice Changes, Added div for preCamp section, when no form invoice present.
-        if (invoiceForm == 'Invoice' && !formCategory.forms.length) {
-            if (this.$invoices.invoiceList != null) {
-
-                return this.invoiceList();
-            }
-        }
-
-        if (!formCategory.forms.length) {
-            return;
-
-        }
-        //*Invoice Changes, updated grid item div class below, to append invoice related forms
-        let gridItem = (invoiceForm == 'Invoice') ? `invoice_${this.$studentDetail.uniqueIdentification}` : `form_${this.$studentDetail.uniqueIdentification}`;
-        
-        
-        if(invoiceForm == "Invoice"){
-            this.$totalInvoice = formCategory.forms.length + (this.$invoices.invoiceList != null ? this.$invoices.invoiceList.length : 0);
-            return `
-            <div>
-            <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Invoices</div>
-                <div class="pre-camp_progress-container">
-                ${this.progressBarInvoice()}
-                </div>
-            </div>
-            <div class="pre-camp_grid ${invoiceClass}" id="${gridItem}">
-                    ${this.formsList(formCategory,'invoices')}
-                </div>
-            </div>
-            `;
-        }
-        var formCategory = `<div>
-                <div class="pre-camp_subtitle">${formCategory.name}</div>
-                <div class="pre-camp_grid ${invoiceClass}" id="${gridItem}">
-                    ${this.formsList(formCategory, 'forms')}
-                </div>
-            </div>`;
-        return formCategory;
-    }
-    // Returns HTML string for list of forms in a category
-    formsList(formCategory, type) {
-        if (formCategory.forms.length == 0) {
-            return ''
-        }
-        var forms = formCategory.forms.sort(function (r, a) {
-            return r.sequence - a.sequence
-        }).map(form => this.singleForm(form, type)).join('')
-        return forms;
-    }
-    // Returns HTML string for a single form row with status icon and link
-    singleForm(form, type) {
-        //check it's editable
-        let editable = this.checkForm(form.formId);
-        let is_live = form.is_live;
-        let completed_form = (editable) ? ' completed_form' : '';
-        let checkedInIcon = this.getCheckedIcon(editable);
-        var added_by_admin = false;
-        var link ="#";
-        if (is_live) {
-            if (editable) {
-                let dbData = this.getFormData(form.formId)
-                if (dbData.submissionId) {
-                    if (this.$isLiveProgram && form.is_editable) {
-                        link = (form.formId) ? "https://www.jotform.com/edit/" + dbData.submissionId + "?memberId=" + this.webflowMemberId + "&studentEmail=" + this.$studentDetail.studentEmail + "&accountEmail=" + this.accountEmail + "&paymentId=" + this.$studentDetail.uniqueIdentification + "&programDetailId=" + this.$programDetail.programDetailId : "";
-                    } else {
-                        link = "https://www.jotform.com/submission/" + dbData.submissionId;
+            try {
+                const responseText = JSON.parse(xhr.responseText);
+                console.log('responseText', responseText);
+                if (responseText.success) {
+                    if (span) {
+                        span.innerHTML = `<div class='dm-sans opacity-70'>${link_title}</div>`;
                     }
-                } else {
-                    added_by_admin = true;
+                    window.location.href = responseText.stripe_url;
                 }
-            } else {
-                link = (form.formId) ? "https://form.jotform.com/" + form.formId + "?memberId=" + this.webflowMemberId + "&studentEmail=" + this.$studentDetail.studentEmail + "&accountEmail=" + this.accountEmail + "&paymentId=" + this.$studentDetail.uniqueIdentification + "&programDetailId=" + this.$programDetail.programDetailId : "";
+            } catch (error) {
+                console.error('Error processing payment response:', error);
             }
-        }
+        };
+    }
 
-        //Add iframe when it's live and above certain screenwidth
-        var iframeClassName = (is_live && window.innerWidth > 1200 && !added_by_admin) ? "iframe-lightbox-link" : "";
-        var link_text;
-        var form_link_text = (form.form_sub_type == 'dropoff_invoice' || form.form_sub_type == 'pickup_invoice') ? 'Invoice' : 'Form';
-        if (added_by_admin) {
-            link_text = "Completed";
-        } else if (is_live) {
-           link_text = (editable) ? ((this.$isLiveProgram && form.is_editable) ? "Edit "+form_link_text : "View "+form_link_text) : "Go to "+form_link_text;
-        } else {
-            link_text = "Coming Soon";
-        }
-        if (is_live && type == 'forms') {
-            this.$totalForm++;
-        }
-        var singleForm = `
-            <div class="pre-camp_row">
-                <img width="20" src="${checkedInIcon}" loading="lazy" alt="">
-                <div class="dm-sans bold-500 ${completed_form}">${form.name}</div>
-                <a href="${link}" class="dashboard_link-block w-inline-block ${iframeClassName}">
-                    <div class="dm-sans opacity-70">${link_text}</div>
-                </a>
-            </div>
-        `;
-        return singleForm;
-    }
-    // Returns HTML for progress bar showing form completion percentage
-    progressBar() {
-        let percentageAmount = (this.$completedFormOnly.length) ? (100 * this.$completedFormOnly.length) / this.$totalForm : 0;
-        return `<div class="pre-camp_subtitle opacity-50"> ${parseInt(percentageAmount)+'%'} / ${this.$completedFormOnly.length} of ${this.$totalForm} forms complete</div>
-                <div class="pre-camp_progress-bar">
-                    <div class="sub-div" style="width: ${percentageAmount+'%'};"></div>
-                </div>`;
-    }
-    // Creates and returns the during-camp content div with resources and camp topic
-    createDuringCampContent() {
-        const debateEvent = this.$programDetail.debateEvent;
-        const duringCampDiv = document.createElement('div');
-        duringCampDiv.className = 'during-camp_div';
-	let isInvoiceClass = (this.$invoices.invoiceList == null) ? 'hide' : '';
-        duringCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div id="w-node-_8e292b85-7013-e53b-a349-66617a361c36-b55b4cc9" class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">During camp</div>
-                </div>
-                <div class="pre-camp_title-div">
-                    <div class="pre-camp_title-text">Resources/Camp Topic</div>
-                </div>
-            </div>
-            ${ this.getCampTopicData() ? this.getCampTopicData() : 'Camp topic is not available for this camp'}
-            <div class="${isInvoiceClass}">
-                    <div class="pre-camp_subtitle">Invoice</div>
-                    <div class="pre-camp_grid" id="during_invoice_${this.$studentDetail.uniqueIdentification}">
-                    </div>
-                </div>
-            ${this.getAllResources()}
-        `;
+    // Render resources
+    renderResources(session, isDuringCamp = false) {
+        const uploadedContent = session.uploadedContent || [];
 
-        return duringCampDiv;
-    }
-    // Returns HTML for all resources section with uploaded content links
-    getAllResources(){
-        if(this.$uploadedContent.length == 0){
+        if (uploadedContent.length === 0) {
             return '';
         }
-        return `<div>
-                <div class="pre-camp_subtitle-wrapper">
-                        <div class="pre-camp_subtitle">Resources</div>
-                    </div>
-                <div class="resources_wrapper">
-                    ${this.$uploadedContent.map(uploadData => this.resourceLink(uploadData)).join('')}
-                </div>
-            </div>`;
-    }
-    // Returns HTML for resource list including camp topic and uploaded resources
-    resourceList() {
-        const debateEvent = this.$programDetail.debateEvent;
-        if (this.$uploadedContent.length || debateEvent == 'Lincoln-Douglas' ||  debateEvent == 'Public Forum') {
-            return `${this.getCampTopicData()}
-                    ${this.getAllResources()}`;
-        } else {
-            return '';
-        }
-    }
-    // Returns HTML for a single resource link element
-    resourceLink(uploadData) {
-        if (uploadData.label && uploadData.uploadedFiles[0]) {
-            return `<a href="${uploadData.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
+
+        const resourcesHTML = uploadedContent
+            .filter(item => item.label && item.uploadedFiles && item.uploadedFiles[0])
+            .map(item => `
+                <a href="${item.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
                     <div class="resources-div">
-                        <div class="resources-text">${uploadData.label}</div>
-                        </div>
-                </a>`;
-        } else {
+                        <div class="resources-text-blue">${item.label}</div>
+                    </div>
+                </a>
+            `).join('');
+
+        if (!resourcesHTML) {
+            return '';
+        }
+
+        return `
+            <div>
+                <div class="pre-camp_subtitle-wrapper">
+                    <div class="pre-camp_subtitle">Resources</div>
+                </div>
+                <div class="resources_wrapper">
+                    ${resourcesHTML}
+                </div>
+            </div>
+        `;
+    }
+
+    // Render progress bar
+    renderProgressBar(completed, total, percentage) {
+        return `
+            <div class="pre-camp_subtitle opacity-50">${percentage}% / ${completed} of ${total} forms complete</div>
+            <div class="pre-camp_progress-bar">
+                <div class="sub-div" style="width: ${percentage}%;"></div>
+            </div>
+        `;
+    }
+
+    // Helper methods
+    getStudentName(session) {
+        const studentDetail = session.studentDetail;
+        if (!studentDetail || !studentDetail.studentName) {
+            return '';
+        }
+        const first = studentDetail.studentName.first || '';
+        const last = studentDetail.studentName.last || '';
+        return `${first} ${last}`.trim();
+    }
+
+    getDateString(session) {
+        const programDetail = session.programDetail;
+        if (!programDetail || programDetail.hideDates) {
+            return '';
+        }
+
+        const startDate = programDetail.startDate;
+        const endDate = programDetail.endDate;
+
+        if (!startDate || !endDate) {
+            return '';
+        }
+
+        try {
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const startMonth = start.toLocaleString('default', { month: 'long' });
+            const endMonth = end.toLocaleString('default', { month: 'long' });
+            return `| ${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}`;
+        } catch (e) {
             return '';
         }
     }
-    /**
-     * Get Camp topic data 
-     */
-    // Returns HTML for camp topic section if topic data is available
-    getCampTopicData() {
-        let textContent = (this.$programDetail.campTopic) ? this.$programDetail.campTopic : "";
-        // const debateEvent = this.$programDetail.debateEvent;
-        // if (!textContent && debateEvent === "Lincoln-Douglas") {
-        //     textContent = "Resolved: The United States ought to adopt carbon pricing."
-        // } else if (!textContent && debateEvent === "Public Forum") {
-        //     textContent = "Resolved: The United States federal government should substantially expand its surveillance infrastructure along its southern border.";
-        // }
-        // console.log('debateEvent', debateEvent)
-        if(textContent){
-            return `<div>
-                        <div class="pre-camp_subtitle-wrapper">
-                            <div class="pre-camp_subtitle">Camp Topic</div>
-                        </div>
-                        ${textContent}
-                    </div>`;
-        }else{
-            return "";
-        }
-        
-    }
-    /*Filter Ivoice Related Forms based on forms id*/
-    // Filters invoice-related forms based on completion status of dropoff/pickup forms
-    filterInvoiceForms(forms) {
-        var newForms = forms.filter(item => {
-            if (item.form_sub_type == 'dropoff_invoice') {
-                var dFD = this.$completedForm.find(item => item.form_sub_type == 'dropoff' && item.isInvoice == 'Yes')
-                if (dFD != undefined) {
-                    return true
-                } else {
-                    return false
-                }
 
-            } else if (item.form_sub_type == 'pickup_invoice') {
-                var aFD = this.$completedForm.find(item => item.form_sub_type == 'pickup' && item.isInvoice == 'Yes')
-                if (aFD != undefined) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                return true
-            }
-        })
-        return newForms;
-    }
-    /**
-     * Check form's id in completedForm list (from MongoDB) and use to determine if form is editable
-     * @param formId - Jotform Id
-     */
-    // Checks if a form ID exists in the completed forms list
-    checkForm($formId) {
-        if ($formId) {
-            const found = this.$completedForm.some(el => el.formId == $formId);
-            return found;
-        }
-        return false;
-    }
-    /*Creating Read and unread icon for list page*/
-    // Returns the URL for checked or unchecked icon based on completion status
-    getCheckedIcon(status) {
-        if (status) {
-            return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png";
-        } else {
-            return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png";
+    formatDate(dateString) {
+        try {
+            const date = new Date(dateString);
+            const month = date.toLocaleString('default', { month: 'long' });
+            const day = date.getDate();
+            const suffix = this.getOrdinalSuffix(day);
+            return `${month} ${day}${suffix}`;
+        } catch (e) {
+            return '';
         }
     }
-    /**
-     * Get Completed Form data by form id
-     * @param formId - Jotform Id
-     */
-    // Returns the completed form data object for the specified form ID
-    getFormData($formId) {
-        let data = this.$completedForm.find(o => o.formId == $formId);
-        return data;
-    }
-    // Returns the ordinal suffix (st, nd, rd, th) for a given day number
+
     getOrdinalSuffix(day) {
-        if (day > 3 && day < 21) return 'th'; // Covers 11th to 20th
+        if (day > 3 && day < 21) return 'th';
         switch (day % 10) {
-            case 1:
-                return 'st';
-            case 2:
-                return 'nd';
-            case 3:
-                return 'rd';
-            default:
-                return 'th';
+            case 1: return 'st';
+            case 2: return 'nd';
+            case 3: return 'rd';
+            default: return 'th';
         }
     }
-    /**
-     * Check Program Deadline
-     */
-    // Checks if the program deadline has passed and updates isLiveProgram flag
-    checkProgramDeadline() {
-        var deadlineDate = this.$programDetail.deadlineDate.replace(/\\/g, '');
-        deadlineDate = deadlineDate.replace(/"/g, '')
-        var formatedDeadlineDate = new Date(deadlineDate);
-        var currentDate = new Date();
-        this.$isLiveProgram = (currentDate < formatedDeadlineDate) ? true : false;
+
+    countTotalForms(formList, includeInvoices = false, countAllForms = false) {
+        if (!formList || !Array.isArray(formList)) {
+            return 0;
+        }
+        return formList.reduce((total, category) => {
+            const forms = category.forms || [];
+            // Filter forms based on whether to include invoices
+            if (includeInvoices) {
+                return total + forms.filter(f => countAllForms || f.is_live).length;
+            } else {
+                // Exclude invoice forms (dropoff_invoice, pickup_invoice) from count
+                return total + forms.filter(f => {
+                    const isInvoiceForm = f.form_sub_type == 'dropoff_invoice' || f.form_sub_type == 'pickup_invoice';
+                    return (countAllForms || f.is_live) && !isInvoiceForm;
+                }).length;
+            }
+        }, 0);
     }
-    /**
-     * initialize Lightbox and rerender accordion after close the lightbox
-     */
-    // Initializes iframe lightbox for form previews
+
+    hasProgramStarted(session) {
+        const startDate = session.programDetail?.startDate;
+        if (!startDate) {
+            return false;
+        }
+        try {
+            const start = new Date(startDate);
+            const now = new Date();
+            return now >= start;
+        } catch (e) {
+            return false;
+        }
+    }
+
+    // Initialize iframe lightbox for form previews
     initiateLightbox() {
-        var $this = this;
-        [].forEach.call(document.getElementsByClassName("iframe-lightbox-link"), function (el) {
-            el.lightbox = new IframeLightbox(el, {
-                onClosed: function () {
-                    console.log('Iframe closed')
-                },
-                scrolling: true,
-            });
+        if (typeof IframeLightbox === 'undefined') {
+            return;
+        }
+
+        const iframeLinks = document.querySelectorAll('.iframe-lightbox-link');
+        iframeLinks.forEach(el => {
+            if (!el.lightbox) {
+                try {
+                    el.lightbox = new IframeLightbox(el, {
+                        onClosed: function () {
+                            console.log('Iframe closed');
+                        },
+                        scrolling: true,
+                    });
+                } catch (error) {
+                    console.error('Error initializing lightbox:', error);
+                }
+            }
         });
     }
-    /** Update Member Data using iframe code */
-    /**
-     * Update Member first name in portal after user profile update
-     */
-    // Updates member first name in portal after profile update modal is closed
-    updateMemberFirstName() {
-        var elements = document.getElementsByClassName("ms-portal-exit");
-        var myFunctionNew = function () {
-            var memberstack = localStorage.getItem("memberstack");
-            var memberstackData = JSON.parse(memberstack);
-            var webflowMemberId = memberstackData.information.id;
-            var firstName = memberstackData.information['first-name'];
-            var userFirstName2 = document.getElementById('userFirstName2');
-            var userFirstName1 = document.getElementById('userFirstName1');
-            userFirstName1.innerHTML = firstName;
-            userFirstName2.innerHTML = firstName;
-            console.log('firstName', firstName)
-        };
-        for (var i = 0; i < elements.length; i++) {
-            elements[i].addEventListener('click', myFunctionNew, false);
+
+    // Check if program deadline has passed
+    checkProgramDeadline(deadlineDate) {
+        if (!deadlineDate) {
+            return true; // Default to live if no deadline
+        }
+        try {
+            const deadline = deadlineDate.replace(/\\/g, '').replace(/"/g, '');
+            const formatedDeadlineDate = new Date(deadline);
+            const currentDate = new Date();
+            return currentDate < formatedDeadlineDate;
+        } catch (e) {
+            return true; // Default to live on error
         }
     }
-    /** Supplementary Program Code */
-    // Fetches supplementary program data from API and creates portal tabs
-    async getSuppPortalData() {
-        // API call
-        const tabsData = await this.fetchData("getSupplimentaryForm/" + this.webflowMemberId + "/current");
 
-        this.createSuppPortalTabs(tabsData);
+    // Initializes tooltips for elements with tip attributes
+    initializeToolTips() {
+        const elements = [...document.querySelectorAll('[tip]')];
+        for (const el of elements) {
+            // Skip if tooltip already initialized
+            if (el.querySelector('.tooltip')) {
+                continue;
+            }
 
+            const tip = document.createElement('div');
+            tip.innerHTML = '';
+            tip.classList.add('tooltip');
+            tip.textContent = el.getAttribute('tip');
+
+            const x = el.hasAttribute('tip-left') ? 'calc(-100% - 5px)' : '16px';
+            const y = el.hasAttribute('tip-top') ? '-100%' : '0';
+            tip.style.transform = `translate(${x}, ${y})`;
+
+            el.appendChild(tip);
+            el.onpointermove = e => {
+                if (e.target !== e.currentTarget) return;
+
+                const rect = tip.getBoundingClientRect();
+                const rectWidth = rect.width + 16;
+                const vWidth = window.innerWidth - rectWidth;
+                const rectX = el.hasAttribute('tip-left') ? e.clientX - rectWidth : e.clientX + rectWidth;
+                const minX = el.hasAttribute('tip-left') ? 0 : rectX;
+                const maxX = el.hasAttribute('tip-left') ? vWidth : window.innerWidth;
+                const x = rectX < minX ? rectWidth : rectX > maxX ? vWidth : e.clientX;
+                tip.style.left = `${x}px`;
+                tip.style.top = `${e.clientY}px`;
+            };
+        }
     }
-    // Creates portal tabs for supplementary programs
-    createSuppPortalTabs(tabsData) {
-        const nsd_portal_container = document.getElementById('nsdSuppDataPortal');
-        if (tabsData != "No data Found") {
-            // Create the main portal tab container
-            const portalTabs = document.createElement('div');
-            portalTabs.className = 'portal-tab w-tabs';
-            portalTabs.setAttribute('data-current', 'Tab 1');
-            portalTabs.setAttribute('data-easing', 'ease');
-            portalTabs.setAttribute('data-duration-in', '300');
-            portalTabs.setAttribute('data-duration-out', '100');
 
-            // Create the tab menu container
-            const tabMenus = document.createElement('div');
-            tabMenus.className = 'portal-tab-menus w-tab-menu';
-            tabMenus.setAttribute('role', 'tablist');
+    // Attach event handlers to invoice payment links (for HTML string rendered invoices)
+    attachInvoicePaymentHandlers() {
+        const $this = this;
+        const paymentLinks = document.querySelectorAll('[data-invoice-id][data-payment-link-id]');
 
-            // Create the tab content container
-            const tabContent = document.createElement('div');
-            tabContent.className = 'portal-tab-content w-tab-content';
+        paymentLinks.forEach(link => {
+            // Skip if already has handler
+            if (link.dataset.handlerAttached === 'true') {
+                return;
+            }
 
-            // Loop through the tab data to create each tab and its content
-            tabsData.forEach((tab, index) => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const invoiceId = this.dataset.invoiceId;
+                const paymentLinkId = this.dataset.paymentLinkId;
+                const amount = parseFloat(this.dataset.amount);
+                const paymentId = this.dataset.paymentId;
+                const invoiceName = this.dataset.invoiceName || 'Invoice';
+                const paymentType = this.classList.contains('stripe') ? 'stripe' :
+                    this.classList.contains('paypal') ? 'paypal' : 'other';
+                const linkTitle = this.textContent.trim();
 
-                const tabIndex = index + 1;
-                const isActive = index === 0 ? 'w--current' : '';
-                const isTabActive = index === 0 ? 'w--tab-active' : '';
-                var startDate = new Date(tab.programDetail.startDate);
-                var endDate = new Date(tab.programDetail.endDate);
+                // Update link text to show processing
+                this.innerHTML = '<div class="dm-sans opacity-70">Processing...</div>';
 
-                // Create the tab header
-                const tabHeader = document.createElement('a');
-                tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link`;
-                tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-                tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
-                tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
-                tabHeader.setAttribute('role', 'tab');
-                tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
-                tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-                tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
-                tabHeader.innerHTML = `
-                    <div>
-                        <div class="current-program_content-div">
-                            <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                            <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${ startDate.toLocaleString('default', { month: 'long' })} ${startDate.getDate()} - ${ endDate.toLocaleString('default', { month: 'long' })} ${endDate.getDate()} </div>
-                        </div>
-                    </div>
-                `;
-                var tabPane = this.suppTabPane(index, tabIndex, isTabActive);
-                tabMenus.appendChild(tabHeader);
-                tabContent.appendChild(tabPane);
+                $this.initializeStripePayment(
+                    invoiceId,
+                    invoiceName,
+                    amount,
+                    paymentLinkId,
+                    this,
+                    linkTitle,
+                    paymentType,
+                    paymentId
+                );
             });
 
-            // Append the tab menus and content to the main portal tab container
-            portalTabs.appendChild(tabMenus);
-            portalTabs.appendChild(tabContent);
-
-            // Append the portal tabs to the body or a specific container
-            nsd_portal_container.appendChild(portalTabs);
-            //Initiate lightbox after dom element added
-            this.initiateLightbox()
-        } else {
-            nsd_portal_container.innerHTML = "No Records found"
-        }
+            link.dataset.handlerAttached = 'true';
+        });
     }
-    // Creates and returns a supplementary program tab pane element
-    suppTabPane(index, tabIndex, isTabActive) {
-        // Update global data
-        // Create the tab content
-        const tabPane = document.createElement('div');
-        tabPane.className = `w-tab-pane`;
-        tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-        tabPane.setAttribute('id', `w-tabs-0-data-w-pane-${index}`);
-        tabPane.setAttribute('role', 'tabpanel');
-        tabPane.setAttribute('aria-labelledby', `w-tabs-0-data-w-tab-${index}`);
-        tabPane.innerHTML = `
-           <div>
-               <!-- Pre camp content will come conditionally here -->
-           </div>`;
 
-        return tabPane
-    }
-    // Creates a DOM element with optional class and id attributes
-    creEl(name, className, idName) {
-        var el = document.createElement(name);
-        if (className) {
-            el.className = className;
-        }
-        if (idName) {
-            el.setAttribute("id", idName)
-        }
-        return el;
+    // Method to refresh/update portal data
+    async refreshPortalData() {
+        console.log('Refreshing portal data...');
+        await this.loadPortalData();
     }
 }
-
-
-
-
-
-
