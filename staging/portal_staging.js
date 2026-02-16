@@ -920,6 +920,7 @@ class NSDPortal {
                 <div class="past-program-flex-wrapper">
                     <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
                     <p class="poppins-para no-margin-bottom">${program.programName}</p>
+                    ${ program.isRefunded ? '<div class="refunded-rounded-div"><p class="poppins-para refunded-dark-gray-text">REFUNDED</p></div>' : '' }
                 </div>
             `).join('');
 
