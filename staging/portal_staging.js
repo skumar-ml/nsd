@@ -118,7 +118,7 @@ class NSDPortal {
 
         try {
             // Fetch portal details
-            const apiResponse = await this.fetchData(`getPortalDetails/${this.webflowMemberId}`);
+            const apiResponse = await this.fetchData(`portal-details/${this.webflowMemberId}`);
 
             if (!apiResponse) {
                 throw new Error('No data received from API');
