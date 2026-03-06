@@ -12,6 +12,10 @@ class NSDPortal {
         this.allSessions = [];
         this.invoiceData = [];
         this.userName = config.userName;
+
+        // Log IDs to verify correct member is used
+        //console.log('NSDPortal init - memberId:', config.memberId, 'webflowMemberId:', config.webflowMemberId, 'resolvedId:', this.webflowMemberId);
+
         this.init();
     }
 
@@ -40,6 +44,11 @@ class NSDPortal {
 
         if (!apiResponse || !apiResponse.studentData) {
             console.warn('No studentData in API response');
+            return sessions;
+        }
+
+        if (!Array.isArray(apiResponse.studentData)) {
+            console.warn('studentData is not an array (got:', typeof apiResponse.studentData, '), skipping transform');
             return sessions;
         }
 
@@ -135,8 +144,15 @@ class NSDPortal {
             // Extract briefs data
             const briefsData = apiResponse.brief || [];
 
-            // Hide or show free/paid resources based on API response
-            this.hidePortalData(apiResponse.studentData || [], briefsData);
+            // Class enrollments (for online classes tab): used alongside brief/camp logic
+            const hasClassEnrollments = await this.checkClassEnrollments();
+            this.setOnlineClassTabVisibility(hasClassEnrollments);
+
+            // Normalize studentData to array (API may return string "No data Found" or object)
+            const studentData = Array.isArray(apiResponse.studentData) ? apiResponse.studentData : [];
+
+            // Hide or show free/paid resources (brief + camp + online-classes conditions)
+            this.hidePortalData(studentData, briefsData, hasClassEnrollments);
 
             // Handle briefs
             if (briefsData.length > 0 && typeof BriefManager !== 'undefined') {
@@ -169,11 +185,11 @@ class NSDPortal {
         }
     }
 
-    // Hides or shows free/paid resources based on API response data
-    hidePortalData(responseText, briefsData) {
+    // Hides or shows free/paid resources based on API response data (brief + camp + online-classes)
+    hidePortalData(responseText, briefsData, hasClassEnrollments = false) {
         // Handle camp-tab visibility based on student data availability
         const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
-        const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
+        const hasStudentData = Array.isArray(responseText) && responseText.length > 0;
         campTabs.forEach(tab => {
             tab.style.display = hasStudentData ? "flex" : "none";
         });
@@ -185,28 +201,73 @@ class NSDPortal {
            tab.style.display = hasBriefsData ? "flex" : "none";
         });
 
-        if (briefsData.length > 0) {
-            const paidResources = document.getElementById("paid-resources");
-            if (paidResources) {
-                paidResources.style.display = "block";
-            }
-        } else if (responseText == "No data Found") {
-            const freeResources = document.getElementById("free-resources");
-            if (freeResources) {
-                freeResources.style.display = "block";
-            }
-        } else if (responseText.length == 0) {
-            const freeResources = document.getElementById("free-resources");
-            if (freeResources) {
-                freeResources.style.display = "block";
-            }
-        } else {
+        // Free/paid resources: brief + camp conditions unchanged; add online-classes (enrollments)
+        const freeResources = document.getElementById("free-resources");
+        const paidResources = document.getElementById("paid-resources");
+
+        const hasBriefs = briefsData && briefsData.length > 0;
+
+        const showPaid = hasBriefs || hasStudentData || hasClassEnrollments;
+
+        if (showPaid) {
             if (!(localStorage.getItem('locat') === null)) {
                 localStorage.removeItem('locat');
             }
-            const paidResources = document.getElementById("paid-resources");
-            if (paidResources) {
-                paidResources.style.display = "block";
+            if (paidResources) paidResources.style.display = "block";
+            if (freeResources) freeResources.style.display = "none";
+        } else {
+            if (freeResources) freeResources.style.display = "block";
+            if (paidResources) paidResources.style.display = "none";
+        }
+    }
+
+    // Returns true if member has class enrollments (for online classes tab). Logs memberId and response.
+    async checkClassEnrollments() {
+        try {
+            console.log('Checking class enrollments for member:', this.webflowMemberId);
+            const endpoint = `classes/enrollments/${this.webflowMemberId}`;
+            const enrollmentData = await this.fetchData(endpoint);
+            console.log('Class enrollments response:', enrollmentData);
+
+            if (!enrollmentData || !enrollmentData.success) {
+                return false;
+            }
+            return Array.isArray(enrollmentData.enrollments) && enrollmentData.enrollments.length > 0;
+        } catch (error) {
+            console.error('Error while checking class enrollments:', error);
+            return false;
+        }
+    }
+
+    // Hide online-class tab and its pane when enrollments are empty; show when enrollments exist
+    setOnlineClassTabVisibility(hasEnrollments) {
+        const tab = document.querySelector('[data-portal="online-class-tab"]');
+        if (!tab) return;
+        const paneId = tab.getAttribute('aria-controls') || (tab.getAttribute('href') || '').replace('#', '');
+        const pane = paneId ? document.getElementById(paneId) : null;
+        const displayVal = hasEnrollments ? 'flex' : 'none';
+        tab.style.display = displayVal;
+        if (pane) pane.style.display = displayVal;
+
+        // When Classes tab is visible, make it the active tab so Tab 1 isn't left active
+        if (hasEnrollments) {
+            const tabList = tab.closest('[role="tablist"]') || tab.parentElement;
+            const tabContent = tab.closest('.w-tabs')?.querySelector('.w-tab-content') || pane?.parentElement;
+            if (tabList) {
+                tabList.querySelectorAll('[role="tab"], .w-tab-link').forEach(link => {
+                    link.classList.remove('w--tab-active', 'w--current');
+                    link.setAttribute('aria-selected', 'false');
+                    link.setAttribute('tabindex', '-1');
+                });
+                tab.classList.add('w--tab-active', 'w--current');
+                tab.setAttribute('aria-selected', 'true');
+                tab.setAttribute('tabindex', '0');
+            }
+            if (tabContent) {
+                tabContent.querySelectorAll('.w-tab-pane, [role="tabpanel"]').forEach(p => {
+                    p.classList.remove('w--tab-active');
+                });
+                if (pane) pane.classList.add('w--tab-active');
             }
         }
     }
@@ -1704,3 +1765,4 @@ class NSDPortal {
         await this.loadPortalData();
     }
 }
+
