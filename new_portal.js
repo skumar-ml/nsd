@@ -14,7 +14,7 @@ class NSDPortal {
         this.userName = config.userName;
 
         // Log IDs to verify correct member is used
-        console.log('NSDPortal init - memberId:', config.memberId, 'webflowMemberId:', config.webflowMemberId, 'resolvedId:', this.webflowMemberId);
+        //console.log('NSDPortal init - memberId:', config.memberId, 'webflowMemberId:', config.webflowMemberId, 'resolvedId:', this.webflowMemberId);
 
         this.init();
     }
@@ -1765,3 +1765,4 @@ class NSDPortal {
         await this.loadPortalData();
     }
 }
+
