@@ -12,6 +12,10 @@ class NSDPortal {
         this.allSessions = [];
         this.invoiceData = [];
         this.userName = config.userName;
+
+        // Log IDs to verify correct member is used
+        console.log('NSDPortal init - memberId:', config.memberId, 'webflowMemberId:', config.webflowMemberId, 'resolvedId:', this.webflowMemberId);
+
         this.init();
     }
 
@@ -138,6 +142,9 @@ class NSDPortal {
             // Hide or show free/paid resources based on API response
             this.hidePortalData(apiResponse.studentData || [], briefsData);
 
+            // Additionally, control free/paid resources based on class enrollments
+            await this.updateResourcesByClassEnrollment();
+
             // Handle briefs
             if (briefsData.length > 0 && typeof BriefManager !== 'undefined') {
                 new BriefManager(briefsData, {
@@ -185,29 +192,36 @@ class NSDPortal {
            tab.style.display = hasBriefsData ? "flex" : "none";
         });
 
-        if (briefsData.length > 0) {
-            const paidResources = document.getElementById("paid-resources");
-            if (paidResources) {
-                paidResources.style.display = "block";
+        // Free/paid resources visibility is now handled via class enrollments
+        // in updateResourcesByClassEnrollment()
+    }
+
+    // Checks class enrollments to decide whether to show free vs paid resources
+    async updateResourcesByClassEnrollment() {
+        try {
+            console.log('Checking class enrollments for member:', this.webflowMemberId);
+            const endpoint = `classes/enrollments/${this.webflowMemberId}`;
+            const enrollmentData = await this.fetchData(endpoint);
+            console.log('Class enrollments response:', enrollmentData);
+
+            if (!enrollmentData || !enrollmentData.success) {
+                console.warn('Unable to determine class enrollments; leaving resources visibility unchanged.');
+                return;
             }
-        } else if (responseText == "No data Found") {
+
+            const hasEnrollments = Array.isArray(enrollmentData.enrollments) && enrollmentData.enrollments.length > 0;
             const freeResources = document.getElementById("free-resources");
-            if (freeResources) {
-                freeResources.style.display = "block";
-            }
-        } else if (responseText.length == 0) {
-            const freeResources = document.getElementById("free-resources");
-            if (freeResources) {
-                freeResources.style.display = "block";
-            }
-        } else {
-            if (!(localStorage.getItem('locat') === null)) {
-                localStorage.removeItem('locat');
-            }
             const paidResources = document.getElementById("paid-resources");
-            if (paidResources) {
-                paidResources.style.display = "block";
+
+            if (hasEnrollments) {
+                if (freeResources) freeResources.style.display = "none";
+                if (paidResources) paidResources.style.display = "block";
+            } else {
+                if (paidResources) paidResources.style.display = "none";
+                if (freeResources) freeResources.style.display = "block";
             }
+        } catch (error) {
+            console.error('Error while checking class enrollments:', error);
         }
     }
 
