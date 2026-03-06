@@ -1412,6 +1412,9 @@ class CheckOutWebflow extends BriefsUpsellModal {
 				this.updateOnlineClassPriceForTab(activeTab);
 			}
 		}
+		if (divId === 'checkout_payment' && typeof this.updateCheckoutPaymentGreeting === 'function') {
+			this.updateCheckoutPaymentGreeting();
+		}
 	}
 	// Sets up event handlers for next and previous navigation buttons in checkout flow
 	addEventForPrevNaxt() {
@@ -1440,44 +1443,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 				}
 				$this.updateOldStudentList();
 				$this.displayStudentInfo("block");
-				// validation for student email different form Parent email
-				var isValidName = $this.checkUniqueStudentEmail();
-				if (isValidName) {
-					if (checkoutFormError) checkoutFormError.style.display = "none";
-					$this.activateDiv("checkout_payment");
-					// Checkout URLs and updateStudentDetails run when you call initializeStripePayment() later (e.g. from your API flow)
-					if (initialCheckout) {
-						initialCheckout.then(() => {
-							var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
-							$this.updateStudentDetails(checkoutData).then(()=>{
-								$this.$initCheckout = true;
-							});
-						})
-					}
-					$this.hideAndShowWhyFamilies('why-families-div', 'none')
-					$this.hideAndShowByClass('rated-debate-banner', 'none')
-					var sliderData = this.$suppPro = $this.$suppPro.filter(i => i.programDetailId != 21);
-					if(sliderData.length > 0){
-					      $this.hideShowDivById('checkout-supplimentary-data-2', 'block')
-					      $this.hideShowDivById('checkout-supplimentary-data-desktop', 'block')
-					}
-					$this.initSlickSlider();
-					$this.hideShowCartVideo('hide');
-					$this.activeBreadCrumb('pay-deposite')
-					const canShowBriefUpsell = Boolean($this.memberData && $this.memberData.isAdmin && !$this.$isAboundedProgram);
-					if(canShowBriefUpsell){
-						 // temp removed
-						//$this.displayUpSellModal();
-						// show briefs upsell modal
-						$this.showBriefsUpsellModal();
-					}{
-						$this.$isAboundedProgram = false;
-						$this.addToCart();
-					}
-					
-				} else {
-					if (checkoutFormError) checkoutFormError.style.display = "block";
-				}
 			}
 		});
 		}
@@ -1532,21 +1497,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 				}
 			}
 		}, 2000);
-	}
-	// validating duplicate email
-	checkUniqueStudentEmail() {
-		var sENameE = document.getElementById("Student-Email");
-		var sEmail = sENameE.value;
-		sEmail = sEmail.replace(/\s/g, "");
-		sEmail = sEmail.toLowerCase();
-		var pEmail = this.memberData.email;
-		pEmail = pEmail.replace(/\s/g, "");
-		pEmail = pEmail.toLowerCase();
-		if (sEmail == pEmail) {
-			return false;
-		} else {
-			return true;
-		}
 	}
 	// Sets up event handlers for payment method buttons (ACH, card, pay later)
 	handlePaymentEvent() {
@@ -1969,6 +1919,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			this.displaySupplementaryProgram();
 			this.updateOldStudentList();
 			try { this.eventForPayNowBtn(); } catch (e) { }
+			try { this.updateCheckoutPaymentGreeting(); } catch (e) { }
 		} catch (error) {
 		}
 	}
@@ -2063,6 +2014,26 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			.catch(function (err) {
 				return Promise.reject(err);
 			});
+	}
+
+	// Sets "Hi, [name]!" in checkout_payment h3 using logged-in user name from memberData
+	updateCheckoutPaymentGreeting() {
+		if (!this.isOnlineClassPage()) return;
+		var paymentEl = document.getElementById("checkout_payment");
+		if (!paymentEl) return;
+		var h3 = paymentEl.querySelector("h3");
+		if (!h3 || h3.textContent.indexOf("Hi,") === -1) return;
+		var name = "User";
+		if (this.memberData) {
+			var first = (this.memberData.firstName || this.memberData.first_name || "").trim();
+			if (first) {
+				name = first;
+			} else if (this.memberData.name) {
+				var parts = String(this.memberData.name).trim().split(/\s+/);
+				name = parts[0] || name;
+			}
+		}
+		h3.textContent = h3.textContent.replace(/\bUser\b/, name);
 	}
 
 	// Updates or creates hidden inputs (achUrlSession, cardUrlSession, payLaterUrlSession) used for payment redirects
