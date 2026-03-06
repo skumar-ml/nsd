@@ -1443,6 +1443,40 @@ class CheckOutWebflow extends BriefsUpsellModal {
 				}
 				$this.updateOldStudentList();
 				$this.displayStudentInfo("block");
+				// validation for student email different form Parent email
+				
+				if (checkoutFormError) checkoutFormError.style.display = "none";
+				$this.activateDiv("checkout_payment");
+				// Checkout URLs and updateStudentDetails run when you call initializeStripePayment() later (e.g. from your API flow)
+				if (initialCheckout) {
+					initialCheckout.then(() => {
+						var checkoutData = [$this.$checkoutData.achUrl, $this.$checkoutData.cardUrl, $this.$checkoutData.payLaterUrl];
+						$this.updateStudentDetails(checkoutData).then(()=>{
+							$this.$initCheckout = true;
+						});
+					})
+				}
+				$this.hideAndShowWhyFamilies('why-families-div', 'none')
+				$this.hideAndShowByClass('rated-debate-banner', 'none')
+				var sliderData = this.$suppPro = $this.$suppPro.filter(i => i.programDetailId != 21);
+				if(sliderData.length > 0){
+						$this.hideShowDivById('checkout-supplimentary-data-2', 'block')
+						$this.hideShowDivById('checkout-supplimentary-data-desktop', 'block')
+				}
+				$this.initSlickSlider();
+				$this.hideShowCartVideo('hide');
+				$this.activeBreadCrumb('pay-deposite')
+				const canShowBriefUpsell = Boolean($this.memberData && $this.memberData.isAdmin && !$this.$isAboundedProgram);
+				if(canShowBriefUpsell){
+						// temp removed
+					//$this.displayUpSellModal();
+					// show briefs upsell modal
+					$this.showBriefsUpsellModal();
+				}{
+					$this.$isAboundedProgram = false;
+					$this.addToCart();
+				}
+					
 			}
 		});
 		}
