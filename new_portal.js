@@ -146,6 +146,7 @@ class NSDPortal {
 
             // Class enrollments (for online classes tab): used alongside brief/camp logic
             const hasClassEnrollments = await this.checkClassEnrollments();
+            this.setOnlineClassTabVisibility(hasClassEnrollments);
 
             // Normalize studentData to array (API may return string "No data Found" or object)
             const studentData = Array.isArray(apiResponse.studentData) ? apiResponse.studentData : [];
@@ -236,6 +237,17 @@ class NSDPortal {
             console.error('Error while checking class enrollments:', error);
             return false;
         }
+    }
+
+    // Hide online-class tab and its pane when enrollments are empty; show when enrollments exist
+    setOnlineClassTabVisibility(hasEnrollments) {
+        const tab = document.querySelector('[data-portal="online-class-tab"]');
+        if (!tab) return;
+        const paneId = tab.getAttribute('aria-controls') || (tab.getAttribute('href') || '').replace('#', '');
+        const pane = paneId ? document.getElementById(paneId) : null;
+        const displayVal = hasEnrollments ? 'flex' : 'none';
+        tab.style.display = displayVal;
+        if (pane) pane.style.display = displayVal;
     }
 
     // Render the main portal
