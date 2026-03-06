@@ -47,6 +47,11 @@ class NSDPortal {
             return sessions;
         }
 
+        if (!Array.isArray(apiResponse.studentData)) {
+            console.warn('studentData is not an array (got:', typeof apiResponse.studentData, '), skipping transform');
+            return sessions;
+        }
+
         console.log('Transforming API response, studentData length:', apiResponse.studentData.length);
 
         // Process each student in studentData array
