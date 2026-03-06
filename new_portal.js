@@ -248,6 +248,28 @@ class NSDPortal {
         const displayVal = hasEnrollments ? 'flex' : 'none';
         tab.style.display = displayVal;
         if (pane) pane.style.display = displayVal;
+
+        // When Classes tab is visible, make it the active tab so Tab 1 isn't left active
+        if (hasEnrollments) {
+            const tabList = tab.closest('[role="tablist"]') || tab.parentElement;
+            const tabContent = tab.closest('.w-tabs')?.querySelector('.w-tab-content') || pane?.parentElement;
+            if (tabList) {
+                tabList.querySelectorAll('[role="tab"], .w-tab-link').forEach(link => {
+                    link.classList.remove('w--tab-active', 'w--current');
+                    link.setAttribute('aria-selected', 'false');
+                    link.setAttribute('tabindex', '-1');
+                });
+                tab.classList.add('w--tab-active', 'w--current');
+                tab.setAttribute('aria-selected', 'true');
+                tab.setAttribute('tabindex', '0');
+            }
+            if (tabContent) {
+                tabContent.querySelectorAll('.w-tab-pane, [role="tabpanel"]').forEach(p => {
+                    p.classList.remove('w--tab-active');
+                });
+                if (pane) pane.classList.add('w--tab-active');
+            }
+        }
     }
 
     // Render the main portal
