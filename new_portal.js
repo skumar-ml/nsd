@@ -139,11 +139,14 @@ class NSDPortal {
             // Extract briefs data
             const briefsData = apiResponse.brief || [];
 
-            // Hide or show free/paid resources based on API response
-            this.hidePortalData(apiResponse.studentData || [], briefsData);
+            // Class enrollments (for online classes tab): used alongside brief/camp logic
+            const hasClassEnrollments = await this.checkClassEnrollments();
 
-            // Additionally, control free/paid resources based on class enrollments
-            await this.updateResourcesByClassEnrollment();
+            // Normalize studentData to array (API may return string "No data Found" or object)
+            const studentData = Array.isArray(apiResponse.studentData) ? apiResponse.studentData : [];
+
+            // Hide or show free/paid resources (brief + camp + online-classes conditions)
+            this.hidePortalData(studentData, briefsData, hasClassEnrollments);
 
             // Handle briefs
             if (briefsData.length > 0 && typeof BriefManager !== 'undefined') {
@@ -176,11 +179,11 @@ class NSDPortal {
         }
     }
 
-    // Hides or shows free/paid resources based on API response data
-    hidePortalData(responseText, briefsData) {
+    // Hides or shows free/paid resources based on API response data (brief + camp + online-classes)
+    hidePortalData(responseText, briefsData, hasClassEnrollments = false) {
         // Handle camp-tab visibility based on student data availability
         const campTabs = document.querySelectorAll('[data-portal="camp-tab"]');
-        const hasStudentData = responseText && responseText !== "No data Found" && Array.isArray(responseText) && responseText.length > 0;
+        const hasStudentData = Array.isArray(responseText) && responseText.length > 0;
         campTabs.forEach(tab => {
             tab.style.display = hasStudentData ? "flex" : "none";
         });
@@ -192,12 +195,28 @@ class NSDPortal {
            tab.style.display = hasBriefsData ? "flex" : "none";
         });
 
-        // Free/paid resources visibility is now handled via class enrollments
-        // in updateResourcesByClassEnrollment()
+        // Free/paid resources: brief + camp conditions unchanged; add online-classes (enrollments)
+        const freeResources = document.getElementById("free-resources");
+        const paidResources = document.getElementById("paid-resources");
+
+        const hasBriefs = briefsData && briefsData.length > 0;
+
+        const showPaid = hasBriefs || hasStudentData || hasClassEnrollments;
+
+        if (showPaid) {
+            if (!(localStorage.getItem('locat') === null)) {
+                localStorage.removeItem('locat');
+            }
+            if (paidResources) paidResources.style.display = "block";
+            if (freeResources) freeResources.style.display = "none";
+        } else {
+            if (freeResources) freeResources.style.display = "block";
+            if (paidResources) paidResources.style.display = "none";
+        }
     }
 
-    // Checks class enrollments to decide whether to show free vs paid resources
-    async updateResourcesByClassEnrollment() {
+    // Returns true if member has class enrollments (for online classes tab). Logs memberId and response.
+    async checkClassEnrollments() {
         try {
             console.log('Checking class enrollments for member:', this.webflowMemberId);
             const endpoint = `classes/enrollments/${this.webflowMemberId}`;
@@ -205,23 +224,12 @@ class NSDPortal {
             console.log('Class enrollments response:', enrollmentData);
 
             if (!enrollmentData || !enrollmentData.success) {
-                console.warn('Unable to determine class enrollments; leaving resources visibility unchanged.');
-                return;
+                return false;
             }
-
-            const hasEnrollments = Array.isArray(enrollmentData.enrollments) && enrollmentData.enrollments.length > 0;
-            const freeResources = document.getElementById("free-resources");
-            const paidResources = document.getElementById("paid-resources");
-
-            if (hasEnrollments) {
-                if (freeResources) freeResources.style.display = "none";
-                if (paidResources) paidResources.style.display = "block";
-            } else {
-                if (paidResources) paidResources.style.display = "none";
-                if (freeResources) freeResources.style.display = "block";
-            }
+            return Array.isArray(enrollmentData.enrollments) && enrollmentData.enrollments.length > 0;
         } catch (error) {
             console.error('Error while checking class enrollments:', error);
+            return false;
         }
     }
 
