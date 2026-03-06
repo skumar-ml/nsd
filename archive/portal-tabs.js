@@ -163,11 +163,13 @@ class AccordionTabs {
     // calls api using webflow member ID
 		var xhr = new XMLHttpRequest()
 		var $this = this;
+		console.log("$this "+$this);
 		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId+"/current", true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {
     	let responseText =  JSON.parse(xhr.responseText); 
+			console.log('responseText', responseText)
 		  $this.viewtabs(responseText);
 		  $this.initiateTabs();
 		  if(responseText == "No data Found"){
