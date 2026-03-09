@@ -2410,10 +2410,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		let container3 = document.getElementById("checkout-supplimentary-data-desktop");
 		let newSlideWrapper = container3.querySelector('.you-might-slider-container')
 
-		// For Mobile Slider
-		let container4 = document.getElementById("checkout-supplimentary-data-mobile");
-		let mobileSlideWrapper = container4.querySelector('.you-might-slider-container-mobile')
-
 		if (this.$suppPro.length > 0) return;
 		// getSupplementaryProgram API call removed; use empty data so supplementary UI still runs
 		let apiData = [];
@@ -2446,28 +2442,21 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			swiperSlideWrapper.style.display="none";
 			// New Slider hide if no API data
 			newSlideWrapper.style.display = "none";
-
-			mobileSlideWrapper.style.display = "none";
-			
 		}
 		
 		if (container2 == undefined) return;
 
 		if(container3 == undefined) return;
-		if(container4 == undefined) return;
-		
+
 		if (swiperSlideWrapper == undefined) return
 
 		if (newSlideWrapper == undefined) return
-
-		if (mobileSlideWrapper == undefined) return
 
 		// Modal Content Update
 		
 
 		swiperSlideWrapper.innerHTML = "";
 		newSlideWrapper.innerHTML = "";
-		mobileSlideWrapper.innerHTML = "";
 
 		// Modal Content Update
 		let modalContent = document.querySelector(
@@ -2497,12 +2486,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			newSliderSlide.appendChild(newOuterShadowDiv1)
 			newSlideWrapper.prepend(newSliderSlide)
 
-			//Mobile slider div
-			let mobileSliderSlide = creEl('div', 'you-might_slide-item')
-			const mobileOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', mobileSliderSlide);
-			mobileSliderSlide.appendChild(mobileOuterShadowDiv1)
-			mobileSlideWrapper.prepend(mobileSliderSlide)
-
 			// Modal Content Update
 			const modalSingleContent = this.displayModalSuppProgram(item, "modal");
 			modalContent.prepend(modalSingleContent);
@@ -2514,7 +2497,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		if(apiData.length == 0){
 			container2.style.display = "none";
 			container3.style.display = "none";
-			container4.style.display = "none";
 			return;
 		}
 	}
@@ -2572,29 +2554,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			$('.you-might-right-arrow').click(function () {
 				//console.log("You Might: Right arrow clicked.");
 				$sliderYouMightNew.slick('slickNext');
-			});
-		}
-
-		// Mobile Slider
-		var $slider3 = $('.you-might-slider-container-mobile');
-		
-		if ($slider3.hasClass('slick-initialized')) {
-			$slider3.slick('destroy');
-			$slider3.slick('unslick'); // Destroy slick instance
-		}
-		// Check if the slider is already initialized
-		if (!$slider3.hasClass('slick-initialized')) {
-			// Initialize you might slider
-			var $sliderYouMightMobile = $slider3.slick(slickSettings);
-
-			$('.you-might-left-arrow').click(function () {
-				//console.log("You Might: Left arrow clicked.");
-				$sliderYouMightMobile.slick('slickPrev');
-			});
-	 
-			$('.you-might-right-arrow').click(function () {
-				//console.log("You Might: Right arrow clicked.");
-				$sliderYouMightMobile.slick('slickNext');
 			});
 		}
 
