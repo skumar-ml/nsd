@@ -1005,9 +1005,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					if (checkbox.checked) {
 						checkbox.checked = !checkbox.checked
 						this.updateAmount(checkbox, checkbox.value);
-						if(checkbox.closest('.you-might_slide-item')){
-							checkbox.closest('.you-might_slide-item').classList.toggle('border-red')
-						}	
 					}
 
 					// Find the corresponding "add-to-card" button inside the same parent div
@@ -2360,10 +2357,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 						}
 						// Optional: Add or remove a disabled class (if needed)
 						button.classList.toggle("disabled", checkbox.checked);
-						// Add red border in slider 
-						if(button.closest('.you-might_slide-item')){
-							button.closest('.you-might_slide-item').classList.toggle('border-red')
-						}
 						// update added text for same program in another section
 						var programDetailId = checkbox.getAttribute('programdetailid');
 						var elementSelector = ".supp_program_"+programDetailId;;
@@ -2402,14 +2395,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		});
 	}
 	async displaySupplementaryProgram() {
-		let container2 = document.getElementById("checkout-supplimentary-data-2");
-		let swiperSlideWrapper = container2.querySelector('.you-might_slick-slider')
-
-		
-		// New Slider with add-to-cart and learn more button
-		let container3 = document.getElementById("checkout-supplimentary-data-desktop");
-		let newSlideWrapper = container3.querySelector('.you-might-slider-container')
-
 		if (this.$suppPro.length > 0) return;
 		// getSupplementaryProgram API call removed; use empty data so supplementary UI still runs
 		let apiData = [];
@@ -2438,26 +2423,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 		apiData = apiData.filter(i => i.programDetailId != 21);
 
-		if(!apiData.length){
-			swiperSlideWrapper.style.display="none";
-			// New Slider hide if no API data
-			newSlideWrapper.style.display = "none";
-		}
-		
-		if (container2 == undefined) return;
-
-		if(container3 == undefined) return;
-
-		if (swiperSlideWrapper == undefined) return
-
-		if (newSlideWrapper == undefined) return
-
-		// Modal Content Update
-		
-
-		swiperSlideWrapper.innerHTML = "";
-		newSlideWrapper.innerHTML = "";
-
 		// Modal Content Update
 		let modalContent = document.querySelector(
 			".supp-programs-description-wrapper"
@@ -2474,18 +2439,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 		apiData.forEach(item => {
 			item.forumType = "Public Forum";
-			//slider div
-			let swiperSlide = creEl('div', 'you-might_slide-item')
-			const outerShadowDiv1 = this.displaySingleSuppProgram(item, 'desktop', swiperSlide);
-			swiperSlide.appendChild(outerShadowDiv1)
-			swiperSlideWrapper.prepend(swiperSlide)
-
-			//newSlider div
-			let newSliderSlide = creEl('div', 'you-might_slide-item')
-			const newOuterShadowDiv1 = this.newDisplaySingleSuppProgram(item, 'desktop', newSliderSlide);
-			newSliderSlide.appendChild(newOuterShadowDiv1)
-			newSlideWrapper.prepend(newSliderSlide)
-
 			// Modal Content Update
 			const modalSingleContent = this.displayModalSuppProgram(item, "modal");
 			modalContent.prepend(modalSingleContent);
@@ -2495,69 +2448,12 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		// Setup back button for browser and stripe checkout page
 		this.setUpBackButtonTab();
 		if(apiData.length == 0){
-			container2.style.display = "none";
-			container3.style.display = "none";
 			return;
 		}
 	}
 	initSlickSlider() {
-		var $slider = $('.you-might_slick-slider');
-		
-		if ($slider.hasClass('slick-initialized')) {
-			$slider.slick('destroy');
-			$slider.slick('unslick'); // Destroy slick instance
-		}
-		var slickSettings = {
-			speed: 300,
-			slidesToShow: 1,
-			slidesToScroll: 1,
-			infinite: false,
-			centerMode: false,
-			variableWidth: false,
-			arrows: false,
-			dots: true,
-			adaptiveHeight: true
-		};
-		// Check if the slider is already initialized
-		if (!$slider.hasClass('slick-initialized')) {
-			// Initialize you might slider
-			var $sliderYouMight = $slider.slick(slickSettings);
-
-			// Shared navigation logic for the "You Might" slider
-			$('.left-arrow-slick').click(function () {
-				//console.log("You Might: Left arrow clicked.");
-				$sliderYouMight.slick('slickPrev');
-			});
-
-			$('.right-arrow-slick').click(function () {
-				//console.log("You Might: Right arrow clicked.");
-				$sliderYouMight.slick('slickNext');
-			});
-		}
-		// New Slider
-		var $slider2 = $('.you-might-slider-container');
-		
-		if ($slider2.hasClass('slick-initialized')) {
-			$slider2.slick('destroy');
-			$slider2.slick('unslick'); // Destroy slick instance
-		}
-		// Check if the slider is already initialized
-		if (!$slider2.hasClass('slick-initialized')) {
-			// Initialize you might slider
-			var $sliderYouMightNew = $slider2.slick(slickSettings);
-
-			$('.you-might-left-arrow').click(function () {
-				//console.log("You Might: Left arrow clicked.");
-				$sliderYouMightNew.slick('slickPrev');
-			});
-	 
-			$('.you-might-right-arrow').click(function () {
-				//console.log("You Might: Right arrow clicked.");
-				$sliderYouMightNew.slick('slickNext');
-			});
-		}
-
 	}
+
 	updateUpSellModal(prep_week_data, tutoring_data, care_package_data) {
 
 		if (prep_week_data.length > 0) {
@@ -2917,7 +2813,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	newDisplaySingleSuppProgram(item, size, slideDiv) {
 		// Create main grid container
 		const gridDiv = document.createElement("div");
-		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid", "you-might");
+		gridDiv.classList.add("w-layout-grid", "payment-conf-program-grid");
 	  
 		// Left column container
 		const leftCol = document.createElement("div");
@@ -2990,12 +2886,12 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	  
 		// Right column buttons
 		const buttonDiv = document.createElement("div");
-		buttonDiv.classList.add("button-div", "you-might-buttons-wrapper");
+		buttonDiv.classList.add("button-div");
 	  
 		const addToCartBtn = document.createElement("a");
 		addToCartBtn.href = "#";
 		let programClass = "supp_program_"+item.programDetailId;
-		addToCartBtn.classList.add("main-button", "red", "add-to-card", "you-might-add-to-cart", "w-button", programClass);
+		addToCartBtn.classList.add("main-button", "red", "add-to-card", "w-button", programClass);
 		addToCartBtn.textContent = "Add to Cart";
 		const learnMoreBtn = document.createElement("a");
 		if(item.benefits.length > 0){
