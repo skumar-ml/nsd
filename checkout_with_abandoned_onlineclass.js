@@ -2428,8 +2428,8 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			".supp-programs-description-wrapper"
 		  );
 	  
-		if (!apiData.length) {
-		modalContent.style.display = "none";
+		if (modalContent && !apiData.length) {
+			modalContent.style.display = "none";
 		}
 	
 		if (modalContent == undefined) return;
