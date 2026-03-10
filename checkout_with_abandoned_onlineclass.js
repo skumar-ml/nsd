@@ -2686,7 +2686,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		let variant = 1;
 		//let topicPripUpSellModal = document.querySelector('.topic-prep_modal-container')
 		let tutoringUpSellModal = document.querySelector('.upsell-modal-container.tutoring')
-		if (window.getComputedStyle(tutoringUpSellModal).display != 'none') {
+		if (tutoringUpSellModal && window.getComputedStyle(tutoringUpSellModal).display != 'none') {
 			variant = 2;
 		}
 		return variant
