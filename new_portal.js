@@ -248,12 +248,6 @@ class NSDPortal {
 
     // Hide online-class tab and its pane when enrollments are empty; show when enrollments exist
     setOnlineClassTabVisibility(hasEnrollments) {
-       
-        const preCampElement = document.getElementById("hide_pre_camp");
-        if (preCampElement) {
-            preCampElement.style.display = hasStudentData ? "none" : "block";
-        }
-        
         const tab = document.querySelector('[data-portal="online-class-tab"]');
         if (!tab) return;
         const paneId = tab.getAttribute('aria-controls') || (tab.getAttribute('href') || '').replace('#', '');
@@ -262,27 +256,52 @@ class NSDPortal {
         tab.style.display = displayVal;
         if (pane) pane.style.display = displayVal;
 
-        // When Classes tab is visible, make it the active tab so Tab 1 isn't left active
-        if (hasEnrollments) {
-            const tabList = tab.closest('[role="tablist"]') || tab.parentElement;
-            const tabContent = tab.closest('.w-tabs')?.querySelector('.w-tab-content') || pane?.parentElement;
-            if (tabList) {
-                tabList.querySelectorAll('[role="tab"], .w-tab-link').forEach(link => {
-                    link.classList.remove('w--tab-active', 'w--current');
-                    link.setAttribute('aria-selected', 'false');
-                    link.setAttribute('tabindex', '-1');
-                });
-                tab.classList.add('w--tab-active', 'w--current');
-                tab.setAttribute('aria-selected', 'true');
-                tab.setAttribute('tabindex', '0');
+        // After toggling visibility, ensure the first visible tab in this group is active
+        const tabsRoot = tab.closest('.w-tabs') || document;
+        this.setFirstVisibleTabActive(tabsRoot);
+    }
+
+    // Ensure the first visible tab in each Webflow tabs component is selected by default
+    setFirstVisibleTabActive(rootElement) {
+        const scope = rootElement || document;
+        const tabContainers = scope.querySelectorAll('.w-tabs');
+
+        tabContainers.forEach(container => {
+            const tabMenu = container.querySelector('.w-tab-menu');
+            const tabContent = container.querySelector('.w-tab-content');
+            if (!tabMenu || !tabContent) return;
+
+            const tabLinks = Array.from(tabMenu.querySelectorAll('[role="tab"], .w-tab-link'));
+            if (!tabLinks.length) return;
+
+            // Find the first tab link that is actually visible
+            const firstVisibleTab = tabLinks.find(link => link.offsetParent !== null);
+            if (!firstVisibleTab) return;
+
+            // Reset all tabs
+            tabLinks.forEach(link => {
+                link.classList.remove('w--tab-active', 'w--current');
+                link.setAttribute('aria-selected', 'false');
+                link.setAttribute('tabindex', '-1');
+            });
+
+            // Activate the first visible tab
+            firstVisibleTab.classList.add('w--tab-active', 'w--current');
+            firstVisibleTab.setAttribute('aria-selected', 'true');
+            firstVisibleTab.setAttribute('tabindex', '0');
+
+            // Activate the corresponding pane
+            const paneId = firstVisibleTab.getAttribute('aria-controls') || (firstVisibleTab.getAttribute('href') || '').replace('#', '');
+            if (!paneId) return;
+
+            const panes = tabContent.querySelectorAll('.w-tab-pane, [role="tabpanel"]');
+            panes.forEach(p => p.classList.remove('w--tab-active'));
+
+            const activePane = tabContent.querySelector(`#${paneId}`);
+            if (activePane) {
+                activePane.classList.add('w--tab-active');
             }
-            if (tabContent) {
-                tabContent.querySelectorAll('.w-tab-pane, [role="tabpanel"]').forEach(p => {
-                    p.classList.remove('w--tab-active');
-                });
-                if (pane) pane.classList.add('w--tab-active');
-            }
-        }
+        });
     }
 
     // Render the main portal
@@ -351,6 +370,9 @@ class NSDPortal {
                 if (typeof Webflow !== 'undefined' && Webflow.require('tabs')) {
                     Webflow.require('tabs').redraw();
                 }
+
+                // Always ensure first visible tab is active after Webflow initializes
+                this.setFirstVisibleTabActive();
 
                 // Initialize nested program tabs for the first (active) student tab
                 this.initializeNestedProgramTabs(0);
@@ -458,6 +480,10 @@ class NSDPortal {
             try {
                 // Force Webflow to re-initialize the nested tabs
                 Webflow.require('tabs').redraw();
+
+                // Ensure first visible nested program tab is active
+                this.setFirstVisibleTabActive(nestedTabsContainer);
+
                 console.log(`Nested program tabs initialized for student index ${studentIndex}`);
             } catch (error) {
                 console.error('Error initializing nested program tabs:', error);
