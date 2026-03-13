@@ -194,6 +194,13 @@ class NSDPortal {
             tab.style.display = hasStudentData ? "flex" : "none";
         });
 
+        // Hide pre-camp Webflow component when user is enrolled (has camp/student data)
+        const preCampElement = document.getElementById("hide_pre_camp");
+        if (preCampElement) {
+            preCampElement.style.display = hasStudentData ? "none" : "block";
+        }
+ 
+
         // Handle briefs-tab visibility based on briefs data availability
         const briefsTabs = document.querySelectorAll('[data-portal="briefs-tab"]');
         const hasBriefsData = briefsData && Array.isArray(briefsData) && briefsData.length > 0;
@@ -241,6 +248,12 @@ class NSDPortal {
 
     // Hide online-class tab and its pane when enrollments are empty; show when enrollments exist
     setOnlineClassTabVisibility(hasEnrollments) {
+       
+        const preCampElement = document.getElementById("hide_pre_camp");
+        if (preCampElement) {
+            preCampElement.style.display = hasStudentData ? "none" : "block";
+        }
+        
         const tab = document.querySelector('[data-portal="online-class-tab"]');
         if (!tab) return;
         const paneId = tab.getAttribute('aria-controls') || (tab.getAttribute('href') || '').replace('#', '');
