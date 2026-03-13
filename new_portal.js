@@ -194,10 +194,10 @@ class NSDPortal {
             tab.style.display = hasStudentData ? "flex" : "none";
         });
 
-        // Hide pre-camp Webflow component when user is enrolled (has camp/student data)
+        // Show pre-camp Webflow component ONLY when student is enrolled in camp
         const preCampElement = document.querySelector(".hide_pre_camp");
         if (preCampElement) {
-            preCampElement.style.display = hasStudentData ? "none" : "block";
+            preCampElement.style.display = hasStudentData ? "block" : "none";
         }
  
 
