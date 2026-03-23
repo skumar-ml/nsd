@@ -304,6 +304,57 @@ class NSDPortal {
         });
     }
 
+    // Fallback activation for top-level portal tabs (camp/briefs/online-classes)
+    attachTopLevelTabFallbackHandlers() {
+        const topLevelTabs = document.querySelectorAll(
+            '[data-portal="camp-tab"], [data-portal="briefs-tab"], [data-portal="online-class-tab"]'
+        );
+
+        topLevelTabs.forEach(tab => {
+            if (tab.dataset.fallbackHandlerAttached === 'true') return;
+
+            tab.addEventListener('click', (e) => {
+                // Keep first click reliable if Webflow tab binding is late
+                e.preventDefault();
+                this.activateTabLink(tab);
+            });
+
+            tab.dataset.fallbackHandlerAttached = 'true';
+        });
+    }
+
+    // Generic tab activator for Webflow-style tab links
+    activateTabLink(tabLink) {
+        if (!tabLink) return;
+        const tabsRoot = tabLink.closest('.w-tabs');
+        if (!tabsRoot) return;
+
+        const tabMenu = tabsRoot.querySelector('.w-tab-menu');
+        const tabContent = tabsRoot.querySelector('.w-tab-content');
+        if (!tabMenu || !tabContent) return;
+
+        const tabLinks = Array.from(tabMenu.querySelectorAll('[role="tab"], .w-tab-link'));
+        tabLinks.forEach(link => {
+            link.classList.remove('w--tab-active', 'w--current');
+            link.setAttribute('aria-selected', 'false');
+            link.setAttribute('tabindex', '-1');
+        });
+
+        tabLink.classList.add('w--tab-active', 'w--current');
+        tabLink.setAttribute('aria-selected', 'true');
+        tabLink.setAttribute('tabindex', '0');
+
+        const paneId = tabLink.getAttribute('aria-controls') || (tabLink.getAttribute('href') || '').replace('#', '');
+        const panes = tabContent.querySelectorAll('.w-tab-pane, [role="tabpanel"]');
+        panes.forEach(pane => pane.classList.remove('w--tab-active'));
+
+        if (!paneId) return;
+        const activePane = tabContent.querySelector(`#${paneId}`) || document.getElementById(paneId);
+        if (activePane) {
+            activePane.classList.add('w--tab-active');
+        }
+    }
+
     // Render the main portal
     renderPortal() {
         const container = document.getElementById('nsdPortal');
@@ -388,6 +439,9 @@ class NSDPortal {
 
                 // Attach event handlers to invoice payment links
                 this.attachInvoicePaymentHandlers();
+
+                // Fallback for top-level tabs when Webflow handlers are delayed
+                this.attachTopLevelTabFallbackHandlers();
 
                 console.log('Webflow tabs initialized successfully');
             } catch (error) {
