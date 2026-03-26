@@ -14,6 +14,7 @@ function creEl(name, className, idName) {
 	}
 	return el;
   }
+  const _BASE_URL_ = "https://aws.nsdebatecamp.com";
   /**
    * CheckOutWebflow Class is used to intigrate with stripe payment.
    * In this API we pass baseUrl, memberData.
@@ -388,7 +389,7 @@ function creEl(name, className, idName) {
 			
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/createCheckoutUrlsByProgram", true)
+			xhr.open("POST", `${_BASE_URL_}/payment/camp/createCheckoutUrlsByProgram`, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function() {
@@ -484,7 +485,7 @@ function creEl(name, className, idName) {
 	  var xhr = new XMLHttpRequest()
 	  var $this = this;
 	  
-	  xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
+	  xhr.open("POST", `${_BASE_URL_}/payment/camp/updateStripeCheckoutDb`, true)
 	  xhr.withCredentials = false
 	  xhr.send(JSON.stringify(data))
 	  xhr.onload = function() {
