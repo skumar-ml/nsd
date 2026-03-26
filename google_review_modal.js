@@ -5,6 +5,9 @@ Brief Logic: Checks if student is eligible for Google review based on program co
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const FORMS_API_BASE = API_BASE_URL + "forms/camp/";
+
 class GoogleReviewModal {
   // Initializes the Google review modal with member data and sets up event handlers
   constructor(memberData) {
@@ -191,7 +194,7 @@ class GoogleReviewModal {
 
 document.addEventListener("DOMContentLoaded", () => {
   const memberData = {
-    baseApiUrl: "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/",
+    baseApiUrl: FORMS_API_BASE,
     accountEmail: "vickey.jain@techment.com",
     accountType: "student",
     memberId: "639ae841e3d1790004f29b80",

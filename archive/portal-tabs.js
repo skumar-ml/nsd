@@ -3,6 +3,9 @@
  * @param webflowMemberId - MemberId
  * @param accountEmail - Member Email
  */
+const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const FORMS_API_BASE = API_BASE_URL + "forms/camp";
+
 class AccordionTabs {
 	$activeTabID = "";
 	$activeMainTabID = "";
@@ -163,7 +166,7 @@ class AccordionTabs {
     // calls api using webflow member ID
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId+"/current", true)
+		xhr.open("GET", FORMS_API_BASE + "/getCompletedForm/" + $this.webflowMemberId + "/current", true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function() {

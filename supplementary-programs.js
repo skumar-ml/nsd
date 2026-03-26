@@ -5,6 +5,8 @@ Brief Logic: Fetches supplementary programs data from API and renders them in a 
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const FORMS_API_BASE = API_BASE_URL + "forms/camp";
 /**
  * 	
  * @param name - HTML element name
@@ -412,7 +414,7 @@ function creEl(name,className,idName){
 		  spinner.style.display = 'block';
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
-		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompletedForm/"+$this.webflowMemberId+"/current", true)
+		  xhr.open("GET", FORMS_API_BASE + "/getCompletedForm/" + $this.webflowMemberId + "/current", true)
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {
@@ -601,7 +603,7 @@ function creEl(name,className,idName){
 	  // calls api using webflow member ID
 		  var xhr = new XMLHttpRequest()
 		  var $this = this;
-		  xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getSupplimentaryForm/"+$this.webflowMemberId+"/"+this.dataType, true)
+		  xhr.open("GET", FORMS_API_BASE + "/getSupplimentaryForm/" + $this.webflowMemberId + "/" + this.dataType, true)
 		  xhr.withCredentials = false
 		  xhr.send()
 		  xhr.onload = function() {

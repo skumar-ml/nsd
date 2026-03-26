@@ -5,6 +5,9 @@ Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tr
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const AUTH_API_BASE = API_BASE_URL + "auth/camp";
+
 class SigninActivity {
 	// Initializes the SigninActivity instance and inserts sign-in activity data
 	constructor(webflowMemberId){
@@ -19,7 +22,7 @@ class SigninActivity {
 		}
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/signinActivity", true)
+		xhr.open("POST", AUTH_API_BASE + "/signinActivity", true)
 		xhr.withCredentials = false
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function() {

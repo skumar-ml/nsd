@@ -5,6 +5,9 @@ Brief Logic: Calls checkMemberExist API to verify member existence across MongoD
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const AUTH_API_BASE = API_BASE_URL + "auth/camp";
+
 class checkMember {
 	// Initializes the checkMember instance and triggers member data verification
 	constructor(webflowMemberId){
@@ -27,7 +30,7 @@ class checkMember {
 	}
 	// Checks member existence across different systems and updates status fields
 	async checkMemberData(){
-		var checkMember = await this.fetchData('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/checkMemberExist/'+this.webflowMemberId)
+		var checkMember = await this.fetchData(AUTH_API_BASE + '/checkMemberExist/' + this.webflowMemberId)
 		if(checkMember){
 			var exists_in_memberstack = document.getElementById('exists_in_memberstack')
 			var exists_in_mongodb = document.getElementById('exists_in_mongodb')
