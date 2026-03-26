@@ -23,6 +23,7 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+const _BASE_URL_ = "https://aws.nsdebatecamp.com";
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {
@@ -1359,7 +1360,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			localStorage.setItem("isAbandonedModalOpen", false);
 			var xhr = new XMLHttpRequest()
 			
-			xhr.open("POST", `${_BASE_URL_}/camp/updateStripeCheckoutDb`, true)
+			xhr.open("POST", `https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb`, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
