@@ -23,10 +23,9 @@ function creEl(name, className, idName) {
 	return el;
 }
 
-const API_BASE_URL =
-	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
-const PORTAL_API_BASE = API_BASE_URL + "portal/camp";
-const ATTENDANCE_API_BASE = API_BASE_URL + "attendance/camp";
+var API_BASE_URL = window.NSD_API.BASE_URL;
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE.replace(/\/$/, "");
+var ATTENDANCE_API_BASE = window.NSD_API.ATTENDANCE_API_BASE.replace(/\/$/, "");
 /**
  * Class for handling single competition
  * @param webflowMemberId - memberId

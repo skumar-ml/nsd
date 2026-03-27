@@ -5,9 +5,8 @@ Brief Logic: Checks if student is eligible for Google review based on program co
 
 Are there any dependent JS files: No
 */
-const API_BASE_URL =
-	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
-const FORMS_API_BASE = API_BASE_URL + "forms/camp/";
+var API_BASE_URL = window.NSD_API.BASE_URL;
+var FORMS_API_BASE = window.NSD_API.FORMS_API_BASE;
 
 class GoogleReviewModal {
   // Initializes the Google review modal with member data and sets up event handlers

@@ -23,8 +23,7 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
-const API_BASE_URL =
-	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
+var API_BASE_URL = window.NSD_API.BASE_URL;
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {

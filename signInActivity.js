@@ -5,9 +5,8 @@ Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tr
 
 Are there any dependent JS files: No
 */
-const API_BASE_URL =
-	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
-const AUTH_API_BASE = API_BASE_URL + "auth/camp";
+var API_BASE_URL = window.NSD_API.BASE_URL;
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE.replace(/\/$/, "");
 
 class SigninActivity {
 	// Initializes the SigninActivity instance and inserts sign-in activity data

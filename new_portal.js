@@ -1,8 +1,7 @@
-const API_BASE_URL =
-    typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
-const PORTAL_API_BASE = API_BASE_URL + "/portal/camp/";
-const PAYMENT_API_BASE = API_BASE_URL + "/payment/camp/";
-const ONLINE_CLASS_API_BASE = API_BASE_URL + "/online-class/camp/";
+var API_BASE_URL = window.NSD_API.BASE_URL;
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
+var ONLINE_CLASS_API_BASE = window.NSD_API.ONLINE_CLASS_API_BASE;
 
 /**
  * NSD Portal - Staging
