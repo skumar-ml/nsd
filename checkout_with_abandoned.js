@@ -23,7 +23,8 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
-const _BASE_URL_ = "https://aws.nsdebatecamp.com";
+const API_BASE_URL =
+	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {
@@ -1132,7 +1133,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			//return true;
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("POST", `${_BASE_URL_}/payment/camp/` + $baseUrl, true)
+			xhr.open("POST", `${API_BASE_URL}/payment/camp/` + $baseUrl, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -1268,7 +1269,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			localStorage.setItem("isAbandonedModalOpen", false);
 			var xhr = new XMLHttpRequest()
 			
-			xhr.open("POST", `${_BASE_URL_}/payment/camp/updateStripeCheckoutDb`, true)
+			xhr.open("POST", `${API_BASE_URL}/payment/camp/updateStripeCheckoutDb`, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {

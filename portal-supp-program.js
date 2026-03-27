@@ -5,11 +5,17 @@ Brief Logic: Fetches supplementary programs from API and renders them in a list 
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL =
+  typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
+const AUTH_API_BASE = API_BASE_URL + "/auth/camp/";
+const PAYMENT_API_BASE = API_BASE_URL + "/payment/camp/";
 class DisplaySuppProgram {
   $selectedProgram = [];
   // Initializes DisplaySuppProgram instance and sets up supplementary program display
   constructor(memberData) {
     this.memberData = memberData;
+    this.authApiBase = AUTH_API_BASE;
+    this.paymentApiBase = PAYMENT_API_BASE;
     this.displaySupplementaryProgram();
     this.updateOldStudentList();
     this.handlePaymentEvents();
@@ -31,9 +37,9 @@ class DisplaySuppProgram {
     }
     return el;
   }
-  async fetchData(endpoint) {
+  async fetchData(baseUrl, endpoint) {
     try {
-      const response = await fetch(`${this.memberData.baseUrl}${endpoint}`);
+      const response = await fetch(`${baseUrl}${endpoint}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -49,7 +55,7 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
    // var spinner = document.getElementById("half-circle-spinner");
    // spinner.style.display = "block";
-    let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.memberId);
+    let apiData = await this.fetchData(this.paymentApiBase, "getSupplementaryProgram/" + this.memberData.memberId);
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrappers = document.querySelectorAll(
@@ -551,6 +557,7 @@ class DisplaySuppProgram {
     var $this = this;
     try {
       const data = await this.fetchData(
+        this.authApiBase,
         "getAllPreviousStudents/" + this.memberData.memberId+"/false"
       );
       //finding unique value and sorting by firstName
@@ -606,7 +613,7 @@ class DisplaySuppProgram {
       source: "portal_page",
     };
     // Create the POST request
-    fetch(this.memberData.baseUrl + "createCheckoutUrlForSupplementary", {
+    fetch(this.paymentApiBase + "createCheckoutUrlForSupplementary", {
       method: "POST", // Specify the method
       headers: {
         "Content-Type": "application/json", // Specify the content type

@@ -6,7 +6,8 @@ Brief Logic: Maps camp IDs to schedules and fetches uploaded materials from API.
 Are there any dependent JS files: No
 */
 // Maps camp IDs to schedules and displays uploaded materials for the instructor portal
-const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const API_BASE_URL =
+	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
 const COACH_PORTAL_API = API_BASE_URL + "portal/camp";
 
 async function coachResources(coachCampId, memberId) {

@@ -5,6 +5,10 @@ Brief Logic: Initializes briefs and events, caches DOM elements, and fetches dat
 
 Are there any dependent JS files: No
 */
+const API_BASE_URL =
+    typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
+const PORTAL_API_BASE = API_BASE_URL + "/portal/camp/";
+const PAYMENT_API_BASE = API_BASE_URL + "/payment/camp/";
 class BriefManager {
     constructor(briefs, data) {
         // Array of briefs (each brief should have: title, pdf_url, doc_url)
@@ -15,6 +19,8 @@ class BriefManager {
         });
         // Store API data for making requests
         this.data = data;
+        this.portalApiBase = PORTAL_API_BASE;
+        this.paymentApiBase = PAYMENT_API_BASE;
 
         // Index of the currently selected brief
         this.currentBriefIndex = 0;
@@ -57,7 +63,7 @@ class BriefManager {
     // Fetches data from the API
     async fetchData(endpoint) {
         try {
-            let url = `${this.data.baseUrl}${endpoint}`;
+            let url = `${this.portalApiBase}${endpoint}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
 
@@ -356,7 +362,7 @@ class BriefManager {
         const self = this;
 
         // Use the brief event endpoint for subscription purchases
-        xhr.open("POST", `${this.data.baseUrl}createCheckoutUrlForBriefEvent`, true);
+        xhr.open("POST", `${this.paymentApiBase}createCheckoutUrlForBriefEvent`, true);
         xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', 'application/json');
 

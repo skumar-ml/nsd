@@ -1,3 +1,9 @@
+const API_BASE_URL =
+    typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ : "https://aws.nsdebatecamp.com";
+const PORTAL_API_BASE = API_BASE_URL + "/portal/camp/";
+const PAYMENT_API_BASE = API_BASE_URL + "/payment/camp/";
+const ONLINE_CLASS_API_BASE = API_BASE_URL + "/online-class/camp/";
+
 /**
  * NSD Portal - Staging
  * Fetches and renders portal data from getPortalDetails API
@@ -8,7 +14,9 @@ class NSDPortal {
     constructor(config) {
         this.webflowMemberId = config.memberId || config.webflowMemberId;
         this.accountEmail = config.accountEmail;
-        this.baseUrl = config.baseUrl;
+        this.portalApiBase = PORTAL_API_BASE;
+        this.paymentApiBase = PAYMENT_API_BASE;
+        this.onlineClassApiBase = ONLINE_CLASS_API_BASE;
         this.allSessions = [];
         this.invoiceData = [];
         this.userName = config.userName;
@@ -24,9 +32,9 @@ class NSDPortal {
     }
 
     // Fetch data from API
-    async fetchData(endpoint) {
+    async fetchData(baseUrl, endpoint) {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`);
+            const response = await fetch(`${baseUrl}${endpoint}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -127,7 +135,7 @@ class NSDPortal {
 
         try {
             // Fetch portal details
-            const apiResponse = await this.fetchData(`portal-details/${this.webflowMemberId}`);
+            let apiResponse = await this.fetchData(this.portalApiBase, `getPortalDetails/${this.webflowMemberId}`);
 
             if (!apiResponse) {
                 throw new Error('No data received from API');
@@ -138,7 +146,7 @@ class NSDPortal {
             console.log('Transformed sessions:', this.allSessions.length);
 
             // Fetch invoice data
-            this.invoiceData = await this.fetchData(`getInvoiceList/${this.webflowMemberId}/current`) || [];
+            this.invoiceData = await this.fetchData(this.portalApiBase, `getInvoiceList/${this.webflowMemberId}/current`) || [];
             console.log('Invoice data:', this.invoiceData);
 
             // Extract briefs data
@@ -159,7 +167,7 @@ class NSDPortal {
                 new BriefManager(briefsData, {
                     webflowMemberId: this.webflowMemberId,
                     accountEmail: this.accountEmail,
-                    baseUrl: this.baseUrl
+                    baseUrl: this.portalApiBase
                 });
             }
 
@@ -226,7 +234,7 @@ class NSDPortal {
         try {
             console.log('Checking class enrollments for member:', this.webflowMemberId);
             const endpoint = `classes/enrollments/${this.webflowMemberId}`;
-            const enrollmentData = await this.fetchData(endpoint);
+            const enrollmentData = await this.fetchData(this.onlineClassApiBase, endpoint);
             console.log('Class enrollments response:', enrollmentData);
 
             if (!enrollmentData || !enrollmentData.success) {
@@ -1492,7 +1500,7 @@ class NSDPortal {
 
         const xhr = new XMLHttpRequest();
         const $this = this;
-        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true);
+        xhr.open("POST", this.paymentApiBase + "createCheckoutUrlForInvoice", true);
         xhr.withCredentials = false;
         xhr.send(JSON.stringify(data));
         xhr.onload = function () {

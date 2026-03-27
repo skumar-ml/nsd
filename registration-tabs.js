@@ -5,7 +5,8 @@ Brief Logic: Fetches registration data from API and displays it in accordion tab
 
 Are there any dependent JS files: No
 */
-const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const API_BASE_URL =
+	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
 const FORMS_API_BASE = API_BASE_URL + "forms/camp";
 /**
  * Class for Handling multiple forms tabs

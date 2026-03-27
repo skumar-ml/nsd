@@ -25,7 +25,8 @@ function creEl(name, className, idName) {
 	return el;
 }
 
-const API_BASE_URL = "https://aws.nsdebatecamp.com/";
+const API_BASE_URL =
+	typeof _API_BASE_URL_ !== "undefined" ? _API_BASE_URL_ + "/" : "https://aws.nsdebatecamp.com/";
 const ATTENDANCE_API_BASE = API_BASE_URL + "attendance/camp";
 const PORTAL_API_BASE = API_BASE_URL + "portal/camp";
 /**
