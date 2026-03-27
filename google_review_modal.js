@@ -15,7 +15,6 @@ class GoogleReviewModal {
     this.studentEmail = memberData.accountEmail;
     this.memberId = memberData.memberId;
     this.isStudent = memberData.accountType === "student";
-    this.baseApiUrl = memberData.baseApiUrl;
 
     // Allow QA to drive test dates/behaviour via query params
     this.testOverrides = this.getTestOverrides();
@@ -96,7 +95,7 @@ class GoogleReviewModal {
       this.checkConditionsAndShowModal();
     } else {
       // Fetch program data
-      fetch(`${this.baseApiUrl}/getCompletedForm/${this.memberId}/current`)
+      fetch(`${FORMS_API_BASE}/getCompletedForm/${this.memberId}/current`)
         .then((response) => response.json())
         .then((campData) => {
           campData = campData.studentData || [];
@@ -193,7 +192,6 @@ class GoogleReviewModal {
 
 document.addEventListener("DOMContentLoaded", () => {
   const memberData = {
-    baseApiUrl: FORMS_API_BASE,
     accountEmail: "vickey.jain@techment.com",
     accountType: "student",
     memberId: "639ae841e3d1790004f29b80",
