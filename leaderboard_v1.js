@@ -5,6 +5,7 @@ Brief Logic: Fetches competition data from API and builds tabbed interface for d
 
 Are there any dependent JS files: No
 */
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 class NDFLeaderBoard {
     $competition = [];
     $allCompetition = [];
@@ -14,13 +15,13 @@ class NDFLeaderBoard {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
         this.accountType = accountType;
-        this.baseUrl = apiBaseUrl;
         this.getLeaderboardData();
     }
     // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            const response = await fetch(`${PORTAL_API_BASE}/${normalizedEndpoint}`);
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
@@ -38,7 +39,7 @@ class NDFLeaderBoard {
         // var competitionLocalData = localStorage.getItem("competitionData");
         var $this = this;   
             try {
-                const data = await $this.fetchData("getCompetitionDetails/" + $this.webflowMemberId);
+                const data = await $this.fetchData("/getCompetitionDetails/" + $this.webflowMemberId);
                 spinner.style.display = 'none';
                 $this.createPortalTabs(data)
                 

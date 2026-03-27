@@ -23,6 +23,8 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
@@ -197,7 +199,7 @@ class BriefsUpsellModal {
 			return;
 		}
 		try {
-			const response = await this.fetchData('getBriefDetails?programId='+this.memberData.programId);
+			const response = await this.fetchData(PORTAL_API_BASE, '/getBriefDetails?programId=' + this.memberData.programId);
 			const events = response && Array.isArray(response.briefEvents) ? response.briefEvents : [];
 			//console.log("Brief events inside render:", this.briefEvents);
 
@@ -700,7 +702,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	// Initializes CheckOutWebflow instance and sets up checkout flow
 	constructor(apiBaseUrl, memberData) {
 		super();
-		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData || {};
 		this.briefsUpsellEnabled = Boolean(this.memberData.isAdmin);
 		this.toggleSeasonInfoVisibility();
@@ -1057,9 +1058,10 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 	}
 	// Fetches data from the API endpoint
-	async fetchData(endpoint) {
+	async fetchData(baseUrl, endpoint) {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`);
+			const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+			const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
@@ -1825,7 +1827,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		const selectBox = document.getElementById('old-student')
 		var $this = this;
 		try {
-			const data = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId+"/true");
+			const data = await this.fetchData(AUTH_API_BASE, "/getAllPreviousStudents/" + this.memberData.memberId+"/true");
 			//finding unique value and sorting by firstName
 			const filterData = data.filter((item, index, self) =>
 				index === self.findIndex(obj => obj.studentEmail === item.studentEmail)
@@ -2029,7 +2031,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
-		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
+		let apiData = await this.fetchData(PAYMENT_API_BASE, "/getSupplementaryProgram/" + this.memberData.programId);
 
 		
 

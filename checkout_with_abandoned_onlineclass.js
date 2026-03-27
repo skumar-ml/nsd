@@ -23,6 +23,7 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
@@ -696,7 +697,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	// Initializes CheckOutWebflow instance and sets up checkout flow
 	constructor(apiBaseUrl, memberData) {
 		super();
-		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData || {};
 		this.briefsUpsellEnabled = Boolean(this.memberData.isAdmin);
 		if (this.memberData.productType === "online_class" && this.memberData.achAmount != null) {
@@ -1142,9 +1142,10 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 	}
 	// Fetches data from the API endpoint
-	async fetchData(endpoint) {
+	async fetchData(baseUrl, endpoint) {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`);
+			const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+			const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
@@ -2201,7 +2202,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			return;
 		}
 		try {
-			const rawData = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId + "/true");
+			const rawData = await this.fetchData(AUTH_API_BASE, "/getAllPreviousStudents/" + this.memberData.memberId + "/true");
 			// API may return array or { data: [] } / { students: [] }
 			const data = Array.isArray(rawData) ? rawData : (rawData && (rawData.data || rawData.students)) || [];
 			// Finding unique value and sorting by firstName (guard missing firstName/lastName)
