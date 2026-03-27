@@ -96,7 +96,7 @@ class GoogleReviewModal {
       this.checkConditionsAndShowModal();
     } else {
       // Fetch program data
-      fetch(`${this.baseApiUrl}getCompletedForm/${this.memberId}/current`)
+      fetch(`${this.baseApiUrl}/getCompletedForm/${this.memberId}/current`)
         .then((response) => response.json())
         .then((campData) => {
           campData = campData.studentData || [];
