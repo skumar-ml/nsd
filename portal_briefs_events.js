@@ -5,7 +5,6 @@ Brief Logic: Initializes briefs and events, caches DOM elements, and fetches dat
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefManager {
@@ -62,7 +61,8 @@ class BriefManager {
     // Fetches data from the API
     async fetchData(endpoint) {
         try {
-            let url = `${this.portalApiBase}${endpoint}`;
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            let url = `${this.portalApiBase}/${normalizedEndpoint}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
 
@@ -75,7 +75,7 @@ class BriefManager {
     }
     // return data {"briefEvents":[{"created_at":"2025-08-13 19:01:20.567000","description":"All LD briefs for the season","displayOrder":0,"eventId":1,"features":["Single event access","Comprehensive research","Strategic analysis"],"highlighted":false,"price":100,"saved_amount":35,"title":"PF Annual"},{"created_at":"2025-08-13 19:01:20.567000","description":"All PF briefs for the season","displayOrder":1,"eventId":2,"features":["Single event access","Comprehensive research","Strategic analysis"],"highlighted":false,"price":140,"saved_amount":"25","title":"LD Annual"},{"created_at":"2025-08-13 19:01:20.567000","description":"Both formats, one great price","displayOrder":3,"eventId":3,"features":["LD & PF formats","All season topics","Comprehensive research"],"highlighted":true,"price":216,"saved_amount":"84","title":"LD + PF Bundle"}],"briefs":[{"briefId":"68963c8bde6993aa325c7bfc","created_at":"2025-08-13 19:01:20.567000","description":"120+ cards, over 100 pages of evidence. Word and PDF format","displayOrder":0,"price":25,"title":"Sept/Oct 2025 (PF)","topic":"Resolved: The United Kingdom should rejoin the European Union."},{"briefId":"68963cec90f4f5fba187db31","created_at":"2025-08-13 19:01:37.980000","description":"120+ cards, over 100 pages of evidence. Word and PDF format","displayOrder":1,"price":25,"title":"Sept/Oct 2025 (LD)","topic":"Resolved: In the United States criminal justice system, plea bargaining is just."}]} 
     async getEvents() {
-        const response = await this.fetchData('getBriefDetails');
+        const response = await this.fetchData('/getBriefDetails');
         if (response) {
             return response.briefEvents;
         } else {

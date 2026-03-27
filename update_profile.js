@@ -5,7 +5,6 @@ Brief Logic: Fetches member data from API and populates form fields. Handles for
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 class updateMember {
   $editMemberData = [];
@@ -41,7 +40,7 @@ class updateMember {
     //spinner.style.display = "block";
     update_profile.forEach(el => el.style.display = 'none');
     // Preferred route from current API list.
-    $this.$editMemberData = await this.fetchData(AUTH_API_BASE + "getAllFamilyData/" + this.memberId);
+    $this.$editMemberData = await this.fetchData(AUTH_API_BASE + "/getAllFamilyData/" + this.memberId);
     console.log("itemIdData", $this.$editMemberData);
     if($this.$editMemberData){
       update_profile.forEach(el => el.style.display = 'block');
@@ -157,7 +156,7 @@ class updateMember {
 
     var xhr = new XMLHttpRequest();
     var $this = this;
-    xhr.open("POST", AUTH_API_BASE + "updateMemberStack", true);
+    xhr.open("POST", AUTH_API_BASE + "/updateMemberStack", true);
     xhr.withCredentials = false;
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {

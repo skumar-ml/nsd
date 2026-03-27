@@ -1,4 +1,3 @@
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 var ONLINE_CLASS_API_BASE = window.NSD_API.ONLINE_CLASS_API_BASE;
@@ -33,7 +32,8 @@ class NSDPortal {
     // Fetch data from API
     async fetchData(baseUrl, endpoint) {
         try {
-            const response = await fetch(`${baseUrl}${endpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -134,7 +134,7 @@ class NSDPortal {
 
         try {
             // Fetch portal details
-            let apiResponse = await this.fetchData(this.portalApiBase, `getPortalDetails/${this.webflowMemberId}`);
+            let apiResponse = await this.fetchData(this.portalApiBase, `/getPortalDetails/${this.webflowMemberId}`);
 
             if (!apiResponse) {
                 throw new Error('No data received from API');
@@ -145,7 +145,7 @@ class NSDPortal {
             console.log('Transformed sessions:', this.allSessions.length);
 
             // Fetch invoice data
-            this.invoiceData = await this.fetchData(this.portalApiBase, `getInvoiceList/${this.webflowMemberId}/current`) || [];
+            this.invoiceData = await this.fetchData(this.portalApiBase, `/getInvoiceList/${this.webflowMemberId}/current`) || [];
             console.log('Invoice data:', this.invoiceData);
 
             // Extract briefs data
@@ -232,7 +232,7 @@ class NSDPortal {
     async checkClassEnrollments() {
         try {
             console.log('Checking class enrollments for member:', this.webflowMemberId);
-            const endpoint = `classes/enrollments/${this.webflowMemberId}`;
+            const endpoint = `/classes/enrollments/${this.webflowMemberId}`;
             const enrollmentData = await this.fetchData(this.onlineClassApiBase, endpoint);
             console.log('Class enrollments response:', enrollmentData);
 

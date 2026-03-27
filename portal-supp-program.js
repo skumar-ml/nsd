@@ -5,7 +5,6 @@ Brief Logic: Fetches supplementary programs from API and renders them in a list 
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class DisplaySuppProgram {
@@ -38,7 +37,8 @@ class DisplaySuppProgram {
   }
   async fetchData(baseUrl, endpoint) {
     try {
-      const response = await fetch(`${baseUrl}${endpoint}`);
+      const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+      const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -54,7 +54,7 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
    // var spinner = document.getElementById("half-circle-spinner");
    // spinner.style.display = "block";
-    let apiData = await this.fetchData(this.paymentApiBase, "getSupplementaryProgram/" + this.memberData.memberId);
+    let apiData = await this.fetchData(this.paymentApiBase, "/getSupplementaryProgram/" + this.memberData.memberId);
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrappers = document.querySelectorAll(
@@ -557,7 +557,7 @@ class DisplaySuppProgram {
     try {
       const data = await this.fetchData(
         this.authApiBase,
-        "getAllPreviousStudents/" + this.memberData.memberId+"/false"
+        "/getAllPreviousStudents/" + this.memberData.memberId+"/false"
       );
       //finding unique value and sorting by firstName
       const filterData = data

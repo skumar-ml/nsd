@@ -5,7 +5,6 @@ Brief Logic: Fetches supplementary programs data from API and renders them in a 
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var FORMS_API_BASE = window.NSD_API.FORMS_API_BASE.replace(/\/$/, "");
 /**
  * 	

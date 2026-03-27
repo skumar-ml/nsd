@@ -5,7 +5,6 @@ Brief Logic: Checks localStorage or fetches cart data from API. Validates that c
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class AbandonedCartModal {
   // Initializes the AbandonedCartModal instance with provided data and sets up modal elements

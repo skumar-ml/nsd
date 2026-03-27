@@ -25,7 +25,6 @@ function creEl(name, className, idName) {
 	return el;
 }
 
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var ATTENDANCE_API_BASE = window.NSD_API.ATTENDANCE_API_BASE.replace(/\/$/, "");
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE.replace(/\/$/, "");
 /**

@@ -5,7 +5,6 @@ Brief Logic: Fetches family member data from API endpoint and sorts it with curr
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 class FamilyMember {
   $editMemberData = [];
@@ -20,7 +19,8 @@ class FamilyMember {
   // Fetches data from the API endpoint and returns the response
   async fetchData(baseUrl, endpoint) {
     try {
-      const response = await fetch(`${baseUrl}${endpoint}`);
+      const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+      const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -51,7 +51,7 @@ class FamilyMember {
   async displayFamilyMember() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
-    var familyData = await this.fetchData(this.authApiBase, "getAllFamilyData/" + this.memberId);
+    var familyData = await this.fetchData(this.authApiBase, "/getAllFamilyData/" + this.memberId);
     console.log("family Data", familyData);
     const FamilyMemberWrapper = document.querySelector(
       ".family-member-grid-wrapper"

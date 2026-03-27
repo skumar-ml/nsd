@@ -5,7 +5,6 @@ Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tr
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE.replace(/\/$/, "");
 
 class SigninActivity {

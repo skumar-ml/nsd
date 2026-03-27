@@ -5,7 +5,6 @@ Brief Logic: Initializes briefs and events, caches DOM elements, and fetches dat
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefManager {
@@ -62,7 +61,8 @@ class BriefManager {
     // Fetches data from the API
     async fetchData(endpoint) {
         try {
-            let url = `${this.portalApiBase}${endpoint}`;
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            let url = `${this.portalApiBase}/${normalizedEndpoint}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
 
@@ -75,7 +75,7 @@ class BriefManager {
     }
     
     async getEvents() {
-        const response = await this.fetchData('getBriefDetails');
+        const response = await this.fetchData('/getBriefDetails');
         if (response) {
             return response.briefEvents;
         } else {

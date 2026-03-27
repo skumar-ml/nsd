@@ -5,7 +5,6 @@ Brief Logic: Fetches briefs and events data from API and displays them in a grid
 
 Are there any dependent JS files: No
 */
-var API_BASE_URL = window.NSD_API.BASE_URL;
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsEventsCheckout {
@@ -32,9 +31,10 @@ class BriefsEventsCheckout {
 
     async fetchData(baseUrl, endpoint, memberId = null) {
         try {
-            let url = `${baseUrl}${endpoint}`;
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            let url = `${baseUrl}/${normalizedEndpoint}`;
             if (memberId) {
-                url = `${baseUrl}${endpoint}/${memberId}`;
+                url = `${baseUrl}/${normalizedEndpoint}/${memberId}`;
             }
 
             const response = await fetch(url);
@@ -64,7 +64,7 @@ class BriefsEventsCheckout {
 
         this.showLoading();
         try {
-            const response = await this.fetchData(this.portalApiBase, 'getBriefDetails');
+            const response = await this.fetchData(this.portalApiBase, '/getBriefDetails');
             if (response) {
                 // Store briefs and events data
                 this.data.briefs = response.briefs || [];
