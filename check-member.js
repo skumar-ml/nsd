@@ -34,9 +34,16 @@ class checkMember {
 			var exists_in_memberstack = document.getElementById('exists_in_memberstack')
 			var exists_in_mongodb = document.getElementById('exists_in_mongodb')
 			var exists_in_webflow = document.getElementById('exists_in_webflow')
-			exists_in_memberstack.value = checkMember.exists_in_memberstack
-			exists_in_mongodb.value = checkMember.exists_in_mongodb
-			exists_in_webflow.value = checkMember.exists_in_webflow
+			// Some pages do not render these debug inputs; only set values when present.
+			if (exists_in_memberstack) {
+				exists_in_memberstack.value = checkMember.exists_in_memberstack
+			}
+			if (exists_in_mongodb) {
+				exists_in_mongodb.value = checkMember.exists_in_mongodb
+			}
+			if (exists_in_webflow) {
+				exists_in_webflow.value = checkMember.exists_in_webflow
+			}
 		}
 	}
 }
