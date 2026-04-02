@@ -928,7 +928,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					const addToCardButton = parentDiv.querySelector('.add-to-card');
 					if (addToCardButton != undefined) {
 						// Change the button's innerHTML based on the checkbox state
-						addToCardButton.innerHTML = 'Add to Cart';
+						addToCardButton.innerHTML = 'Add';
 						addToCardButton.classList.remove('disabled');
 						addToCardButton.style.pointerEvents = 'auto';
 						addToCardButton.style.color = '';
@@ -1615,7 +1615,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 							var matchedAddCartBtn = document.querySelectorAll(elementSelector)
 							matchedAddCartBtn.forEach(add_to_card_btn => {
 								add_to_card_btn.closest("div")
-									add_to_card_btn.textContent = "Remove to Cart";
+									add_to_card_btn.textContent = "Remove";
 									add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable for toggling
 								add_to_card_btn.style.color = '#ffffff';
 								add_to_card_btn.style.backgroundColor = "gray";
@@ -1960,14 +1960,27 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					const checkbox = parent.querySelector(".suppCheckbox");
 
 					if (checkbox) {
-						// Toggle checkbox state on each click (Add <-> Remove)
-						checkbox.checked = !checkbox.checked;
+						const programDetailId = checkbox.getAttribute('programdetailid');
+						let selectedIds = [];
+						const suppProIdE = document.getElementById("suppProIds");
+						if (suppProIdE && suppProIdE.value) {
+							try {
+								selectedIds = JSON.parse(suppProIdE.value);
+							} catch (error) {
+								selectedIds = [];
+							}
+						}
+
+						// Use persisted selected IDs as source of truth (prevents refresh mismatch)
+						const isCurrentlySelected = selectedIds.includes(programDetailId);
+						const shouldSelect = !isCurrentlySelected;
+						checkbox.checked = shouldSelect;
 						$this.updateAmount(checkbox, checkbox.value);
 
-						const isChecked = checkbox.checked;
+						const isChecked = shouldSelect;
 
 						// Update the clicked button UI
-						button.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+						button.textContent = isChecked ? "Remove" : "Add";
 						button.style.pointerEvents = 'auto'; // Keep it clickable for toggling
 						if (isChecked) {
 							button.style.color = '#ffffff';
@@ -1986,13 +1999,17 @@ class CheckOutWebflow extends BriefsUpsellModal {
 						}
 
 						// Update the same program buttons in other sections
-						var programDetailId = checkbox.getAttribute('programdetailid');
 						if (programDetailId) {
 							var elementSelector = ".supp_program_" + programDetailId;
 							var matchedAddCartBtn = document.querySelectorAll(elementSelector);
 							matchedAddCartBtn.forEach(add_to_card_btn => {
-								add_to_card_btn.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+								add_to_card_btn.textContent = isChecked ? "Remove" : "Add";
 								add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable
+								const matchedParent = add_to_card_btn.closest("div");
+								const matchedCheckbox = matchedParent ? matchedParent.querySelector(".suppCheckbox") : null;
+								if (matchedCheckbox) {
+									matchedCheckbox.checked = isChecked;
+								}
 								if (add_to_card_btn.closest('.you-might_slide-item')) {
 									add_to_card_btn.closest('.you-might_slide-item').classList.toggle('border-red', isChecked);
 								}
@@ -2025,7 +2042,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
 					_care_package_add_to_card.forEach(add_to_card_btn => {
-						add_to_card_btn.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+						add_to_card_btn.textContent = isChecked ? "Remove" : "Add";
 						add_to_card_btn.style.pointerEvents = 'auto';
 						add_to_card_btn.classList.remove("disabled");
 						if (isChecked) {
@@ -2662,7 +2679,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		addToCartBtn.href = "#";
 		let programClass = "supp_program_"+item.programDetailId;
 		addToCartBtn.classList.add("main-button", "red", "add-to-card", "you-might-add-to-cart", "w-button", programClass);
-		addToCartBtn.textContent = "Add to Cart";
+		addToCartBtn.textContent = "Add";
 		const learnMoreBtn = document.createElement("a");
 		if(item.benefits.length > 0){
 			learnMoreBtn.href = "#";
@@ -2857,7 +2874,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		let programClass = "supp_program_"+item.programDetailId;
 		var buyNowBtn = creEl("a", "main-button red add-to-card supp-program w-button "+programClass);
 		buyNowBtn.href = "#";
-		buyNowBtn.textContent = "Add to Cart";
+		buyNowBtn.textContent = "Add";
 		// buyNowBtn.addEventListener("click", function (event) {
 		//   event.preventDefault();
 		//   $this.$selectedProgram = item;
