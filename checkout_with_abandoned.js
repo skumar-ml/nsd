@@ -1615,11 +1615,12 @@ class CheckOutWebflow extends BriefsUpsellModal {
 							var matchedAddCartBtn = document.querySelectorAll(elementSelector)
 							matchedAddCartBtn.forEach(add_to_card_btn => {
 								add_to_card_btn.closest("div")
-								add_to_card_btn.textContent = "Added";
-								add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
+									add_to_card_btn.textContent = "Remove to Cart";
+									add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable for toggling
 								add_to_card_btn.style.color = '#ffffff';
 								add_to_card_btn.style.backgroundColor = "gray";
 								//add_to_card_btn.style.textDecoration = "underline";
+									add_to_card_btn.classList.remove("disabled");
 							})
 							
 						}
@@ -1958,60 +1959,83 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					// Locate the child checkbox within the parent container
 					const checkbox = parent.querySelector(".suppCheckbox");
 
-					if (checkbox && !checkbox.checked) {
-						// Toggle the checkbox state
+					if (checkbox) {
+						// Toggle checkbox state on each click (Add <-> Remove)
 						checkbox.checked = !checkbox.checked;
-						//if(checkbox.checked){
 						$this.updateAmount(checkbox, checkbox.value);
-						//}
 
-						// Update the button text based on the checkbox state
-						button.textContent = checkbox.checked ? "Added" : "Add to Cart";
-						if(checkbox.checked){
-							button.style.pointerEvents = 'none'; // Disable pointer events
+						const isChecked = checkbox.checked;
+
+						// Update the clicked button UI
+						button.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+						button.style.pointerEvents = 'auto'; // Keep it clickable for toggling
+						if (isChecked) {
 							button.style.color = '#ffffff';
 							button.style.backgroundColor = "gray";
-							//button.style.textDecoration = "underline";
+							button.style.textDecoration = "none";
+						} else {
+							button.style.color = '';
+							button.style.backgroundColor = '#a51c30';
+							button.style.textDecoration = "none";
 						}
-						// Optional: Add or remove a disabled class (if needed)
-						button.classList.toggle("disabled", checkbox.checked);
-						// Add red border in slider 
-						if(button.closest('.you-might_slide-item')){
-							button.closest('.you-might_slide-item').classList.toggle('border-red')
-						}
-						// update added text for same program in another section
-						var programDetailId = checkbox.getAttribute('programdetailid');
-						var elementSelector = ".supp_program_"+programDetailId;;
-						var matchedAddCartBtn = document.querySelectorAll(elementSelector)
-						matchedAddCartBtn.forEach(add_to_card_btn => {
-							add_to_card_btn.closest("div")
-							add_to_card_btn.textContent = "Added";
-							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-							add_to_card_btn.style.color = '#ffffff';
-							add_to_card_btn.style.backgroundColor = "gray";
-							//add_to_card_btn.style.textDecoration = "underline";
-						})
-						//while ($this.$suppPro.length == 0) {
-							//console.log("$this.$suppPro.length", $this.$suppPro.length)
-						//}
-						setTimeout(() => {
-							const modal = document.getElementById('upsell-modal-1');
-							$this.hideUpSellModal(modal)
-						}, 100);
+						button.classList.remove("disabled");
 
+						// Add/remove red border in slider
+						if (button.closest('.you-might_slide-item')) {
+							button.closest('.you-might_slide-item').classList.toggle('border-red', isChecked);
+						}
+
+						// Update the same program buttons in other sections
+						var programDetailId = checkbox.getAttribute('programdetailid');
+						if (programDetailId) {
+							var elementSelector = ".supp_program_" + programDetailId;
+							var matchedAddCartBtn = document.querySelectorAll(elementSelector);
+							matchedAddCartBtn.forEach(add_to_card_btn => {
+								add_to_card_btn.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+								add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable
+								if (add_to_card_btn.closest('.you-might_slide-item')) {
+									add_to_card_btn.closest('.you-might_slide-item').classList.toggle('border-red', isChecked);
+								}
+								if (isChecked) {
+									add_to_card_btn.style.color = '#ffffff';
+									add_to_card_btn.style.backgroundColor = "gray";
+								} else {
+									add_to_card_btn.style.color = '';
+									add_to_card_btn.style.backgroundColor = '#a51c30';
+								}
+							});
+						}
+
+						// Keep existing UX: close modal only when adding
+						if (isChecked) {
+							setTimeout(() => {
+								const modal = document.getElementById('upsell-modal-1');
+								if (modal) $this.hideUpSellModal(modal);
+							}, 100);
+						}
 					}
 
 				}
 				//_care_package_add_to_card
 				if (this.classList.contains('care_package_add_to_card')) {
+					// Find the related checkbox (if present) to know whether we're adding or removing
+					const careParent = this.closest("div");
+					const careCheckbox = careParent ? careParent.querySelector(".suppCheckbox") : null;
+					const isChecked = careCheckbox ? careCheckbox.checked : false;
+
 					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
 					_care_package_add_to_card.forEach(add_to_card_btn => {
-						add_to_card_btn.textContent = "Added";
-						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-						add_to_card_btn.style.color = '#ffffff';
-						add_to_card_btn.style.backgroundColor = "gray";
-						//add_to_card_btn.style.textDecoration = "underline";
-					})
+						add_to_card_btn.textContent = isChecked ? "Remove to Cart" : "Add to Cart";
+						add_to_card_btn.style.pointerEvents = 'auto';
+						add_to_card_btn.classList.remove("disabled");
+						if (isChecked) {
+							add_to_card_btn.style.color = '#ffffff';
+							add_to_card_btn.style.backgroundColor = "gray";
+						} else {
+							add_to_card_btn.style.color = '';
+							add_to_card_btn.style.backgroundColor = '#a51c30';
+						}
+					});
 				}
 			});
 		});
