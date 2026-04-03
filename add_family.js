@@ -5,20 +5,22 @@ Brief Logic: Fetches family member data from API endpoint and sorts it with curr
 
 Are there any dependent JS files: No
 */
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 class FamilyMember {
   $editMemberData = [];
   // Initializes the FamilyMember instance with provided data and sets up family member display
   constructor(data) {
     this.memberId = data.memberId;
-    this.baseUrl = data.baseUrl;
+    this.authApiBase = AUTH_API_BASE;
     this.accountType = data.accountType;
     this.displayFamilyMember();
     this.handleEditMember();
   }
   // Fetches data from the API endpoint and returns the response
-  async fetchData(endpoint) {
+  async fetchData(baseUrl, endpoint) {
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`);
+      const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+      const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -49,7 +51,7 @@ class FamilyMember {
   async displayFamilyMember() {
     var spinner = document.getElementById("half-circle-spinner");
     spinner.style.display = "block";
-    var familyData = await this.fetchData("getAllFamilyData/" + this.memberId);
+    var familyData = await this.fetchData(this.authApiBase, "/getAllFamilyData/" + this.memberId);
     console.log("family Data", familyData);
     const FamilyMemberWrapper = document.querySelector(
       ".family-member-grid-wrapper"
@@ -252,7 +254,7 @@ class FamilyMember {
     console.log("data", data);
     var xhr = new XMLHttpRequest();
     var $this = this;
-    xhr.open("POST", $this.baseUrl + "updateMemberStack", true);
+    xhr.open("POST", this.authApiBase + "updateMemberStack", true);
     xhr.withCredentials = false;
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {
@@ -292,7 +294,7 @@ class FamilyMember {
     var $this = this;
     xhr.open(
       "DELETE",
-      $this.baseUrl + "deleteInvitedMember/" + memberData.email,
+      this.authApiBase + "deleteInvitedMember/" + memberData.email,
       true
     );
     xhr.withCredentials = false;

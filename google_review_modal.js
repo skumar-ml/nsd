@@ -5,6 +5,8 @@ Brief Logic: Checks if student is eligible for Google review based on program co
 
 Are there any dependent JS files: No
 */
+var FORMS_API_BASE = window.NSD_API.FORMS_API_BASE;
+
 class GoogleReviewModal {
   // Initializes the Google review modal with member data and sets up event handlers
   constructor(memberData) {
@@ -13,7 +15,6 @@ class GoogleReviewModal {
     this.studentEmail = memberData.accountEmail;
     this.memberId = memberData.memberId;
     this.isStudent = memberData.accountType === "student";
-    this.baseApiUrl = memberData.baseApiUrl;
 
     // Allow QA to drive test dates/behaviour via query params
     this.testOverrides = this.getTestOverrides();
@@ -94,7 +95,7 @@ class GoogleReviewModal {
       this.checkConditionsAndShowModal();
     } else {
       // Fetch program data
-      fetch(`${this.baseApiUrl}getCompletedForm/${this.memberId}/current`)
+      fetch(`${FORMS_API_BASE}/getCompletedForm/${this.memberId}/current`)
         .then((response) => response.json())
         .then((campData) => {
           campData = campData.studentData || [];
@@ -191,7 +192,6 @@ class GoogleReviewModal {
 
 document.addEventListener("DOMContentLoaded", () => {
   const memberData = {
-    baseApiUrl: "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/",
     accountEmail: "vickey.jain@techment.com",
     accountType: "student",
     memberId: "639ae841e3d1790004f29b80",

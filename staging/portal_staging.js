@@ -1,3 +1,6 @@
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
+
 /**
  * NSD Portal - Staging
  * Fetches and renders portal data from getPortalDetails API
@@ -8,7 +11,8 @@ class NSDPortal {
     constructor(config) {
         this.webflowMemberId = config.memberId || config.webflowMemberId;
         this.accountEmail = config.accountEmail;
-        this.baseUrl = config.baseUrl;
+        this.portalApiBase = PORTAL_API_BASE;
+        this.paymentApiBase = PAYMENT_API_BASE;
         this.allSessions = [];
         this.invoiceData = [];
         this.userName = config.userName;
@@ -20,9 +24,10 @@ class NSDPortal {
     }
 
     // Fetch data from API
-    async fetchData(endpoint) {
+    async fetchData(baseUrl, endpoint) {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -118,7 +123,7 @@ class NSDPortal {
 
         try {
             // Fetch portal details
-            const apiResponse = await this.fetchData(`portal-details/${this.webflowMemberId}`);
+            const apiResponse = await this.fetchData(this.portalApiBase, `/getPortalDetails/${this.webflowMemberId}`);
 
             if (!apiResponse) {
                 throw new Error('No data received from API');
@@ -129,7 +134,7 @@ class NSDPortal {
             console.log('Transformed sessions:', this.allSessions.length);
 
             // Fetch invoice data
-            this.invoiceData = await this.fetchData(`getInvoiceList/${this.webflowMemberId}/current`) || [];
+            this.invoiceData = await this.fetchData(this.portalApiBase, `/getInvoiceList/${this.webflowMemberId}/current`) || [];
             console.log('Invoice data:', this.invoiceData);
 
             // Extract briefs data
@@ -143,7 +148,7 @@ class NSDPortal {
                 new BriefManager(briefsData, {
                     webflowMemberId: this.webflowMemberId,
                     accountEmail: this.accountEmail,
-                    baseUrl: this.baseUrl
+                    baseUrl: this.portalApiBase
                 });
             }
 
@@ -1431,7 +1436,7 @@ class NSDPortal {
 
         const xhr = new XMLHttpRequest();
         const $this = this;
-        xhr.open("POST", this.baseUrl + "createCheckoutUrlForInvoice", true);
+        xhr.open("POST", this.paymentApiBase + "createCheckoutUrlForInvoice", true);
         xhr.withCredentials = false;
         xhr.send(JSON.stringify(data));
         xhr.onload = function () {

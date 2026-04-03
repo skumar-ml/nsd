@@ -22,6 +22,8 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+
+var ATTENDANCE_API_BASE = window.NSD_API.ATTENDANCE_API_BASE.replace(/\/$/, "");
 /**
  * Class for handling instructor checkInForm form
  * @param webflowMemberId - memberId
@@ -518,7 +520,7 @@ class checkInForm {
 		//   return;
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance/", true)
+		xhr.open("POST", ATTENDANCE_API_BASE + "/addStudentAttendance_v2", true)
 		xhr.withCredentials = false
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function () {
@@ -571,7 +573,7 @@ class checkInForm {
 	getUpdatedLabsData(labId) {
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
+		xhr.open("GET", ATTENDANCE_API_BASE + "/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function () {
@@ -608,7 +610,7 @@ class LabsData {
 		spinner.style.display = 'block';
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
+		xhr.open("GET", ATTENDANCE_API_BASE + "/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function () {

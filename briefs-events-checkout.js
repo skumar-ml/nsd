@@ -5,10 +5,14 @@ Brief Logic: Fetches briefs and events data from API and displays them in a grid
 
 Are there any dependent JS files: No
 */
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsEventsCheckout {
     // Initializes the BriefsEventsCheckout instance with data and sets up modal handlers
     constructor(data) {
         this.data = data;
+        this.portalApiBase = PORTAL_API_BASE;
+        this.paymentApiBase = PAYMENT_API_BASE;
         this.selectedBriefs = [];
         this.selectedEvents = [];
         this.currentView = 'briefs'; // 'briefs' or 'events'
@@ -25,11 +29,12 @@ class BriefsEventsCheckout {
         this.getBriefsAndEvents();
     }
 
-    async fetchData(endpoint, memberId = null) {
+    async fetchData(baseUrl, endpoint, memberId = null) {
         try {
-            let url = `${this.data.apiBaseURL}${endpoint}`;
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            let url = `${baseUrl}/${normalizedEndpoint}`;
             if (memberId) {
-                url = `${this.data.apiBaseURL}${endpoint}/${memberId}`;
+                url = `${baseUrl}/${normalizedEndpoint}/${memberId}`;
             }
 
             const response = await fetch(url);
@@ -59,7 +64,7 @@ class BriefsEventsCheckout {
 
         this.showLoading();
         try {
-            const response = await this.fetchData('getBriefDetails');
+            const response = await this.fetchData(this.portalApiBase, '/getBriefDetails');
             if (response) {
                 // Store briefs and events data
                 this.data.briefs = response.briefs || [];
@@ -1199,9 +1204,9 @@ class BriefsEventsCheckout {
         const xhr = new XMLHttpRequest();
         const self = this;
         if (this.selectedEvents.length > 0) {
-            xhr.open("POST", `${this.data.apiBaseURL}createCheckoutUrlForBriefEvent`, true);
+            xhr.open("POST", `${this.paymentApiBase}createCheckoutUrlForBriefEvent`, true);
         } else {
-            xhr.open("POST", `${this.data.apiBaseURL}createCheckoutUrlForBrief`, true);
+            xhr.open("POST", `${this.paymentApiBase}createCheckoutUrlForBrief`, true);
         }
         xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', 'application/json');

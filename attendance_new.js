@@ -24,6 +24,9 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+
+var ATTENDANCE_API_BASE = window.NSD_API.ATTENDANCE_API_BASE.replace(/\/$/, "");
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE.replace(/\/$/, "");
 /**
  * Class for handling student self CheckIn
  * @param webflowMemberId - memberId
@@ -215,7 +218,7 @@ class selfCheckInForm {
 
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/addStudentAttendance", true)
+		xhr.open("POST", ATTENDANCE_API_BASE + "/addStudentAttendance_v2", true)
 		xhr.withCredentials = false
 		xhr.send(JSON.stringify(data))
 		xhr.onload = function () {
@@ -263,7 +266,7 @@ class selfCheckInForm {
 	}
 	// Updates competition data in localStorage after check-in
 	async updatedCompetitionLocalData(){
-		const bgData = await this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + this.webflowMemberId);
+		const bgData = await this.fetchData(PORTAL_API_BASE + "/getCompetitionDetails/" + this.webflowMemberId);
 		localStorage.setItem("competitionData", JSON.stringify(bgData));
 	}
 }
@@ -285,7 +288,7 @@ class LabsData {
 		spinner.style.display = 'block';
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
+		xhr.open("GET", ATTENDANCE_API_BASE + "/getAttendanceDetailsByMemberId/" + $this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function () {

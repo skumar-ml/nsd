@@ -31,3 +31,11 @@ This folder contains utilities scripts used by NSD, including checkout customiza
 - `supplementary.css` – Styling for the supplementary accordion, labels, and expanded content states.
 - `update_profile.js` – Update-profile modal handler that loads member details, pre-fills the form, and submits changes.
 - `utility.js` – Tiny helper exposing `setupAdminViewListener` to toggle admin-only views via ID allowlists or query params.
+
+## API Domains (current)
+- `https://aws.nsdebatecamp.com/auth/camp/*` – member/account actions (example: `checkMemberExist`, `signinActivity`)
+- `https://aws.nsdebatecamp.com/attendance/camp/*` – attendance flows (example: `getAttendanceDetailsByMemberId`, `addStudentAttendance_v2`)
+- `https://aws.nsdebatecamp.com/portal/camp/*` – portal resources and competition data (example: `getCoachPortalData`, `getCompetitionDetails`)
+- `https://aws.nsdebatecamp.com/forms/camp/*` – registration/supplementary forms (example: `getCompletedForm`, `getSupplimentaryForm`)
+
+This repository still contains some legacy scripts (especially under `archive/`) that may reference the old API host. Keep new work on `aws.nsdebatecamp.com` endpoints.

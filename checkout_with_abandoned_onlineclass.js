@@ -23,6 +23,8 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {
@@ -695,7 +697,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	// Initializes CheckOutWebflow instance and sets up checkout flow
 	constructor(apiBaseUrl, memberData) {
 		super();
-		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData || {};
 		this.briefsUpsellEnabled = Boolean(this.memberData.isAdmin);
 		if (this.memberData.productType === "online_class" && this.memberData.achAmount != null) {
@@ -1141,9 +1142,10 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 	}
 	// Fetches data from the API endpoint
-	async fetchData(endpoint) {
+	async fetchData(baseUrl, endpoint) {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`);
+			const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+			const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
@@ -1223,7 +1225,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			//return true;
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("POST",`${_BASE_URL_}/camp/`+$baseUrl, true)
+			xhr.open("POST", `${PAYMENT_API_BASE}/` + $baseUrl, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -1359,7 +1361,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			localStorage.setItem("isAbandonedModalOpen", false);
 			var xhr = new XMLHttpRequest()
 			
-			xhr.open("POST", `${_BASE_URL_}/camp/updateStripeCheckoutDb`, true)
+			xhr.open("POST", `${PAYMENT_API_BASE}/updateStripeCheckoutDb`, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -1976,7 +1978,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 	// Calls createCheckoutUrlForOnlineClass API; returns a Promise that resolves with { achUrl, cardUrl, payLaterUrl } for redirect.
 	createCheckoutUrlForOnlineClass(classOfferingId) {
-		var apiUrl = `${_BASE_URL_}/camp/createCheckoutUrlForOnlineClass`;
+		var apiUrl = `${PAYMENT_API_BASE}/createCheckoutUrlForOnlineClass`;
 		var studentEmailEl = document.getElementById("Student-Email");
 		var studentFirstNameEl = document.getElementById("Student-First-Name");
 		var studentLastNameEl = document.getElementById("Student-Last-Name");
@@ -2200,7 +2202,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			return;
 		}
 		try {
-			const rawData = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId + "/true");
+			const rawData = await this.fetchData(AUTH_API_BASE, "/getAllPreviousStudents/" + this.memberData.memberId + "/true");
 			// API may return array or { data: [] } / { students: [] }
 			const data = Array.isArray(rawData) ? rawData : (rawData && (rawData.data || rawData.students)) || [];
 			// Finding unique value and sorting by firstName (guard missing firstName/lastName)

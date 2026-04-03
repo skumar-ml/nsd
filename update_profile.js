@@ -5,11 +5,11 @@ Brief Logic: Fetches member data from API and populates form fields. Handles for
 
 Are there any dependent JS files: No
 */
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
 class updateMember {
   $editMemberData = [];
   constructor(data) {
     this.memberId = data.memberId;
-    this.baseUrl = data.baseUrl;
     setTimeout(() => {
       this.getMemberData();
     }, 2000);
@@ -19,7 +19,7 @@ class updateMember {
   // Get API data with the help of endpoint
   async fetchData(endpoint) {
     try {
-      const response = await fetch(`${this.baseUrl}${endpoint}`);
+      const response = await fetch(endpoint);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -39,7 +39,8 @@ class updateMember {
     //var spinner = document.getElementById("half-circle-spinner");
     //spinner.style.display = "block";
     update_profile.forEach(el => el.style.display = 'none');
-    $this.$editMemberData = await this.fetchData("getItemId/" + this.memberId);
+    // Preferred route from current API list.
+    $this.$editMemberData = await this.fetchData(AUTH_API_BASE + "/getAllFamilyData/" + this.memberId);
     console.log("itemIdData", $this.$editMemberData);
     if($this.$editMemberData){
       update_profile.forEach(el => el.style.display = 'block');
@@ -155,7 +156,7 @@ class updateMember {
 
     var xhr = new XMLHttpRequest();
     var $this = this;
-    xhr.open("POST", $this.baseUrl + "updateMemberStack", true);
+    xhr.open("POST", AUTH_API_BASE + "/updateMemberStack", true);
     xhr.withCredentials = false;
     xhr.send(JSON.stringify(data));
     xhr.onload = function () {

@@ -5,11 +5,15 @@ Brief Logic: Fetches supplementary programs from API and renders them in a list 
 
 Are there any dependent JS files: No
 */
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class DisplaySuppProgram {
   $selectedProgram = [];
   // Initializes DisplaySuppProgram instance and sets up supplementary program display
   constructor(memberData) {
     this.memberData = memberData;
+    this.authApiBase = AUTH_API_BASE;
+    this.paymentApiBase = PAYMENT_API_BASE;
     this.displaySupplementaryProgram();
     this.updateOldStudentList();
     this.handlePaymentEvents();
@@ -31,9 +35,10 @@ class DisplaySuppProgram {
     }
     return el;
   }
-  async fetchData(endpoint) {
+  async fetchData(baseUrl, endpoint) {
     try {
-      const response = await fetch(`${this.memberData.baseUrl}${endpoint}`);
+      const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+      const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -49,7 +54,7 @@ class DisplaySuppProgram {
   async displaySupplementaryProgram() {
    // var spinner = document.getElementById("half-circle-spinner");
    // spinner.style.display = "block";
-    let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.memberId);
+    let apiData = await this.fetchData(this.paymentApiBase, "/getSupplementaryProgram/" + this.memberData.memberId);
     console.log("apiData", apiData);
     // Option A
     let swiperSlideWrappers = document.querySelectorAll(
@@ -551,7 +556,8 @@ class DisplaySuppProgram {
     var $this = this;
     try {
       const data = await this.fetchData(
-        "getAllPreviousStudents/" + this.memberData.memberId+"/false"
+        this.authApiBase,
+        "/getAllPreviousStudents/" + this.memberData.memberId+"/false"
       );
       //finding unique value and sorting by firstName
       const filterData = data
@@ -606,7 +612,7 @@ class DisplaySuppProgram {
       source: "portal_page",
     };
     // Create the POST request
-    fetch(this.memberData.baseUrl + "createCheckoutUrlForSupplementary", {
+    fetch(this.paymentApiBase + "createCheckoutUrlForSupplementary", {
       method: "POST", // Specify the method
       headers: {
         "Content-Type": "application/json", // Specify the content type

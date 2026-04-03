@@ -5,11 +5,12 @@ Brief Logic: Checks localStorage or fetches cart data from API. Validates that c
 
 Are there any dependent JS files: No
 */
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class AbandonedCartModal {
   // Initializes the AbandonedCartModal instance with provided data and sets up modal elements
   constructor(data) {
     this.data = data;
-    this.baseUrl = data.baseUrl;
+    this.paymentApiBase = PAYMENT_API_BASE;
     this.memberId = data.memberId;
     this.modalId = data.modalId;
     this.modal = document.getElementById(this.modalId);
@@ -138,7 +139,7 @@ class AbandonedCartModal {
   async fetchCartDataFromAPI() {
     try {
       const response = await fetch(
-        `${this.baseUrl}` + "getCheckoutURLByMemberId/" + this.memberId
+        this.paymentApiBase + "getCheckoutURLByMemberId/" + this.memberId
       );
       if (!response.ok) {
         throw new Error("Network response was not ok");

@@ -22,6 +22,9 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE.replace(/\/$/, "");
+var ATTENDANCE_API_BASE = window.NSD_API.ATTENDANCE_API_BASE.replace(/\/$/, "");
 /**
  * Class for handling single competition
  * @param webflowMemberId - memberId
@@ -272,7 +275,7 @@ class AccordionTabs {
 			spinner.style.display = 'none';
 		}else {
 			try {
-				const data = await $this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+				const data = await $this.fetchData(PORTAL_API_BASE + "/getCompetitionDetails/" + $this.webflowMemberId);
 				$this.renderLocalCompetitionsData(data)
 				spinner.style.display = 'none';
 				
@@ -281,7 +284,7 @@ class AccordionTabs {
 				throw error;
 			}
 		}
-		const bgData = await $this.fetchData("https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId);
+		const bgData = await $this.fetchData(PORTAL_API_BASE + "/getCompetitionDetails/" + $this.webflowMemberId);
 		localStorage.setItem("competitionData", JSON.stringify(bgData));
 	}
 	// Renders competition data from localStorage or API response
@@ -314,7 +317,7 @@ class AccordionTabs {
 		// calls api using webflow member ID
 		var xhr = new XMLHttpRequest()
 		var $this = this;
-		xhr.open("GET", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCompetitionDetails/" + $this.webflowMemberId, true)
+		xhr.open("GET", PORTAL_API_BASE + "/getCompetitionDetails/" + $this.webflowMemberId, true)
 		xhr.withCredentials = false
 		xhr.send()
 		xhr.onload = function () {
@@ -366,7 +369,7 @@ class AccordionTabs {
 	// Fetches live check-in data from API and displays notifications
 	async getLiveCheckInData() {
 		try {
-			const response = await fetch('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/checkForLiveAttendanceTime/' + this.webflowMemberId);
+			const response = await fetch(ATTENDANCE_API_BASE + '/checkForLiveAttendanceTime/' + this.webflowMemberId);
 			if (!response.ok) {
 				throw new Error('Network response was not ok');
 			}

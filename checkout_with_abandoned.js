@@ -23,6 +23,9 @@ function creEl(name, className, idName) {
 	}
 	return el;
 }
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE;
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefsUpsellModal {
 	// Initializes BriefsUpsellModal instance and sets up brief events modal
 	constructor() {
@@ -196,7 +199,7 @@ class BriefsUpsellModal {
 			return;
 		}
 		try {
-			const response = await this.fetchData('getBriefDetails?programId='+this.memberData.programId);
+			const response = await this.fetchData(PORTAL_API_BASE, '/getBriefDetails?programId=' + this.memberData.programId);
 			const events = response && Array.isArray(response.briefEvents) ? response.briefEvents : [];
 			//console.log("Brief events inside render:", this.briefEvents);
 
@@ -699,7 +702,6 @@ class CheckOutWebflow extends BriefsUpsellModal {
 	// Initializes CheckOutWebflow instance and sets up checkout flow
 	constructor(apiBaseUrl, memberData) {
 		super();
-		this.baseUrl = apiBaseUrl;
 		this.memberData = memberData || {};
 		this.briefsUpsellEnabled = Boolean(this.memberData.isAdmin);
 		this.toggleSeasonInfoVisibility();
@@ -926,7 +928,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					const addToCardButton = parentDiv.querySelector('.add-to-card');
 					if (addToCardButton != undefined) {
 						// Change the button's innerHTML based on the checkbox state
-						addToCardButton.innerHTML = 'Add to Cart';
+						addToCardButton.innerHTML = 'Add';
 						addToCardButton.classList.remove('disabled');
 						addToCardButton.style.pointerEvents = 'auto';
 						addToCardButton.style.color = '';
@@ -1056,9 +1058,10 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		}
 	}
 	// Fetches data from the API endpoint
-	async fetchData(endpoint) {
+	async fetchData(baseUrl, endpoint) {
 		try {
-			const response = await fetch(`${this.baseUrl}${endpoint}`);
+			const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+			const response = await fetch(`${baseUrl}/${normalizedEndpoint}`);
 			if (!response.ok) {
 				throw new Error("Network response was not ok");
 			}
@@ -1131,7 +1134,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			//return true;
 			var xhr = new XMLHttpRequest()
 			var $this = this;
-			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/"+$baseUrl, true)
+			xhr.open("POST", `${PAYMENT_API_BASE}/` + $baseUrl, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -1267,7 +1270,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 			localStorage.setItem("isAbandonedModalOpen", false);
 			var xhr = new XMLHttpRequest()
 			
-			xhr.open("POST", "https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/updateStripeCheckoutDb", true)
+			xhr.open("POST", `${PAYMENT_API_BASE}/updateStripeCheckoutDb`, true)
 			xhr.withCredentials = false
 			xhr.send(JSON.stringify(data))
 			xhr.onload = function () {
@@ -1612,11 +1615,12 @@ class CheckOutWebflow extends BriefsUpsellModal {
 							var matchedAddCartBtn = document.querySelectorAll(elementSelector)
 							matchedAddCartBtn.forEach(add_to_card_btn => {
 								add_to_card_btn.closest("div")
-								add_to_card_btn.textContent = "Added";
-								add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
+									add_to_card_btn.textContent = "Remove";
+									add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable for toggling
 								add_to_card_btn.style.color = '#ffffff';
 								add_to_card_btn.style.backgroundColor = "gray";
 								//add_to_card_btn.style.textDecoration = "underline";
+									add_to_card_btn.classList.remove("disabled");
 							})
 							
 						}
@@ -1824,7 +1828,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		const selectBox = document.getElementById('old-student')
 		var $this = this;
 		try {
-			const data = await this.fetchData("getAllPreviousStudents/" + this.memberData.memberId+"/true");
+			const data = await this.fetchData(AUTH_API_BASE, "/getAllPreviousStudents/" + this.memberData.memberId+"/true");
 			//finding unique value and sorting by firstName
 			const filterData = data.filter((item, index, self) =>
 				index === self.findIndex(obj => obj.studentEmail === item.studentEmail)
@@ -1955,60 +1959,100 @@ class CheckOutWebflow extends BriefsUpsellModal {
 					// Locate the child checkbox within the parent container
 					const checkbox = parent.querySelector(".suppCheckbox");
 
-					if (checkbox && !checkbox.checked) {
-						// Toggle the checkbox state
-						checkbox.checked = !checkbox.checked;
-						//if(checkbox.checked){
-						$this.updateAmount(checkbox, checkbox.value);
-						//}
+					if (checkbox) {
+						const programDetailId = checkbox.getAttribute('programdetailid');
+						let selectedIds = [];
+						const suppProIdE = document.getElementById("suppProIds");
+						if (suppProIdE && suppProIdE.value) {
+							try {
+								selectedIds = JSON.parse(suppProIdE.value);
+							} catch (error) {
+								selectedIds = [];
+							}
+						}
 
-						// Update the button text based on the checkbox state
-						button.textContent = checkbox.checked ? "Added" : "Add to Cart";
-						if(checkbox.checked){
-							button.style.pointerEvents = 'none'; // Disable pointer events
+						// Use persisted selected IDs as source of truth (prevents refresh mismatch)
+						const isCurrentlySelected = selectedIds.includes(programDetailId);
+						const shouldSelect = !isCurrentlySelected;
+						checkbox.checked = shouldSelect;
+						$this.updateAmount(checkbox, checkbox.value);
+
+						const isChecked = shouldSelect;
+
+						// Update the clicked button UI
+						button.textContent = isChecked ? "Remove" : "Add";
+						button.style.pointerEvents = 'auto'; // Keep it clickable for toggling
+						if (isChecked) {
 							button.style.color = '#ffffff';
 							button.style.backgroundColor = "gray";
-							//button.style.textDecoration = "underline";
+							button.style.textDecoration = "none";
+						} else {
+							button.style.color = '';
+							button.style.backgroundColor = '#a51c30';
+							button.style.textDecoration = "none";
 						}
-						// Optional: Add or remove a disabled class (if needed)
-						button.classList.toggle("disabled", checkbox.checked);
-						// Add red border in slider 
-						if(button.closest('.you-might_slide-item')){
-							button.closest('.you-might_slide-item').classList.toggle('border-red')
-						}
-						// update added text for same program in another section
-						var programDetailId = checkbox.getAttribute('programdetailid');
-						var elementSelector = ".supp_program_"+programDetailId;;
-						var matchedAddCartBtn = document.querySelectorAll(elementSelector)
-						matchedAddCartBtn.forEach(add_to_card_btn => {
-							add_to_card_btn.closest("div")
-							add_to_card_btn.textContent = "Added";
-							add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-							add_to_card_btn.style.color = '#ffffff';
-							add_to_card_btn.style.backgroundColor = "gray";
-							//add_to_card_btn.style.textDecoration = "underline";
-						})
-						//while ($this.$suppPro.length == 0) {
-							//console.log("$this.$suppPro.length", $this.$suppPro.length)
-						//}
-						setTimeout(() => {
-							const modal = document.getElementById('upsell-modal-1');
-							$this.hideUpSellModal(modal)
-						}, 100);
+						button.classList.remove("disabled");
 
+						// Add/remove red border in slider
+						if (button.closest('.you-might_slide-item')) {
+							button.closest('.you-might_slide-item').classList.toggle('border-red', isChecked);
+						}
+
+						// Update the same program buttons in other sections
+						if (programDetailId) {
+							var elementSelector = ".supp_program_" + programDetailId;
+							var matchedAddCartBtn = document.querySelectorAll(elementSelector);
+							matchedAddCartBtn.forEach(add_to_card_btn => {
+								add_to_card_btn.textContent = isChecked ? "Remove" : "Add";
+								add_to_card_btn.style.pointerEvents = 'auto'; // Keep it clickable
+								const matchedParent = add_to_card_btn.closest("div");
+								const matchedCheckbox = matchedParent ? matchedParent.querySelector(".suppCheckbox") : null;
+								if (matchedCheckbox) {
+									matchedCheckbox.checked = isChecked;
+								}
+								if (add_to_card_btn.closest('.you-might_slide-item')) {
+									add_to_card_btn.closest('.you-might_slide-item').classList.toggle('border-red', isChecked);
+								}
+								if (isChecked) {
+									add_to_card_btn.style.color = '#ffffff';
+									add_to_card_btn.style.backgroundColor = "gray";
+								} else {
+									add_to_card_btn.style.color = '';
+									add_to_card_btn.style.backgroundColor = '#a51c30';
+								}
+							});
+						}
+
+						// Keep existing UX: close modal only when adding
+						if (isChecked) {
+							setTimeout(() => {
+								const modal = document.getElementById('upsell-modal-1');
+								if (modal) $this.hideUpSellModal(modal);
+							}, 100);
+						}
 					}
 
 				}
 				//_care_package_add_to_card
 				if (this.classList.contains('care_package_add_to_card')) {
+					// Find the related checkbox (if present) to know whether we're adding or removing
+					const careParent = this.closest("div");
+					const careCheckbox = careParent ? careParent.querySelector(".suppCheckbox") : null;
+					const isChecked = careCheckbox ? careCheckbox.checked : false;
+
 					const _care_package_add_to_card = document.querySelectorAll(".care_package_add_to_card");
 					_care_package_add_to_card.forEach(add_to_card_btn => {
-						add_to_card_btn.textContent = "Added";
-						add_to_card_btn.style.pointerEvents = 'none'; // Disable pointer events
-						add_to_card_btn.style.color = '#ffffff';
-						add_to_card_btn.style.backgroundColor = "gray";
-						//add_to_card_btn.style.textDecoration = "underline";
-					})
+						add_to_card_btn.textContent = isChecked ? "Remove" : "Add";
+						add_to_card_btn.style.pointerEvents = 'auto';
+						add_to_card_btn.classList.remove("disabled");
+						if (isChecked) {
+							add_to_card_btn.style.color = '#ffffff';
+							add_to_card_btn.style.backgroundColor = "gray";
+						} else {
+							add_to_card_btn.style.color = '';
+							add_to_card_btn.style.backgroundColor = '#a51c30';
+						}
+					});
 				}
 			});
 		});
@@ -2028,7 +2072,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
 		if (this.$suppPro.length > 0) return;
 		// Get the container element
-		let apiData = await this.fetchData("getSupplementaryProgram/" + this.memberData.programId);
+		let apiData = await this.fetchData(PAYMENT_API_BASE, "/getSupplementaryProgram/" + this.memberData.programId);
 
 		
 
@@ -2635,7 +2679,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		addToCartBtn.href = "#";
 		let programClass = "supp_program_"+item.programDetailId;
 		addToCartBtn.classList.add("main-button", "red", "add-to-card", "you-might-add-to-cart", "w-button", programClass);
-		addToCartBtn.textContent = "Add to Cart";
+		addToCartBtn.textContent = "Add";
 		const learnMoreBtn = document.createElement("a");
 		if(item.benefits.length > 0){
 			learnMoreBtn.href = "#";
@@ -2830,7 +2874,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
 		let programClass = "supp_program_"+item.programDetailId;
 		var buyNowBtn = creEl("a", "main-button red add-to-card supp-program w-button "+programClass);
 		buyNowBtn.href = "#";
-		buyNowBtn.textContent = "Add to Cart";
+		buyNowBtn.textContent = "Add";
 		// buyNowBtn.addEventListener("click", function (event) {
 		//   event.preventDefault();
 		//   $this.$selectedProgram = item;

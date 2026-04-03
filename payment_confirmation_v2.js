@@ -21,6 +21,7 @@ function creEl(name, className, idName) {
     }
     return el;
 }
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 /**
  * Class for handling payment confirmation and upsell modal
  * @param webFlowMemberId - WebFlow member ID
@@ -31,7 +32,6 @@ class PaymentConfirmation {
     $suppPro = [];
     // Initializes PaymentConfirmation instance and sets up event handlers
     constructor(webFlowMemberId, apiBaseUrl, site_url) {
-        this.apiBaseUrl = apiBaseUrl;
         this.site_url = site_url;
         this.webFlowMemberId = webFlowMemberId;
         this.programId = this.getURLParam('programId')
@@ -279,7 +279,8 @@ class PaymentConfirmation {
     // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
-            const response = await fetch(`${this.apiBaseUrl}${endpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            const response = await fetch(`${PAYMENT_API_BASE}/${normalizedEndpoint}`);
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
@@ -469,7 +470,7 @@ class PaymentConfirmation {
             "source": "success_page"
         };
         // Create the POST request
-        fetch(this.apiBaseUrl + "createCheckoutUrlForSupplementary", {
+        fetch(PAYMENT_API_BASE + "/createCheckoutUrlForSupplementary", {
             method: 'POST', // Specify the method
             headers: {
                 'Content-Type': 'application/json' // Specify the content type
@@ -505,7 +506,7 @@ class PaymentConfirmation {
         spinner.style.display = "block";
 
         // Get the container element
-        let apiData = await this.fetchData("getSupplementaryProgram/" + this.programId);
+        let apiData = await this.fetchData("/getSupplementaryProgram/" + this.programId);
         let allApiData = apiData;
         // Added in our Local Data
         this.$suppPro = apiData;

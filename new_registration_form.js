@@ -5,6 +5,7 @@ Brief Logic: Fetches registration form data from API and displays forms in a gri
 
 Are there any dependent JS files: No
 */
+var FORMS_API_BASE = window.NSD_API.FORMS_API_BASE;
 class NSDPortal {
     $completedForm = [];
     $formsList = [];
@@ -20,13 +21,13 @@ class NSDPortal {
     constructor(webflowMemberId, accountEmail, apiBaseUrl) {
         this.webflowMemberId = webflowMemberId;
         this.accountEmail = accountEmail;
-        this.baseUrl = apiBaseUrl;
         this.getPortalData();
     }
     // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
-            const response = await fetch(`${this.baseUrl}${endpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            const response = await fetch(`${FORMS_API_BASE}/${normalizedEndpoint}`);
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
@@ -43,7 +44,7 @@ class NSDPortal {
         const curr_dashboard_title = document.getElementById('curr_dashboard_title');
         var spinner = document.getElementById('half-circle-spinner');
         spinner.style.display = 'block';
-        var data = await this.fetchData("getCompletedForm/" + this.webflowMemberId + "/all");
+        var data = await this.fetchData("/getCompletedForm/" + this.webflowMemberId + "/all");
         data = data.studentData || [];
         // Hide free and paid resources
         this.hidePortalData(data)

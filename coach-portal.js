@@ -6,6 +6,8 @@ Brief Logic: Maps camp IDs to schedules and fetches uploaded materials from API.
 Are there any dependent JS files: No
 */
 // Maps camp IDs to schedules and displays uploaded materials for the instructor portal
+var COACH_PORTAL_API = window.NSD_API.PORTAL_API_BASE;
+
 async function coachResources(coachCampId, memberId) {
 
   const coachResourceGrid = document.getElementById('coach-resource-grid');
@@ -73,7 +75,7 @@ async function coachResources(coachCampId, memberId) {
 async function getCoachData(memberId){
 	
 	try {
-		const response = await fetch('https://3yf0irxn2c.execute-api.us-west-1.amazonaws.com/dev/camp/getCoachPortalData/'+memberId);
+		const response = await fetch(COACH_PORTAL_API + '/getCoachPortalData/' + memberId);
 		if (!response.ok) {
 		throw new Error('Network response was not ok');
 		}

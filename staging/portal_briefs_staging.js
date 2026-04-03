@@ -5,6 +5,8 @@ Brief Logic: Initializes briefs and events, caches DOM elements, and fetches dat
 
 Are there any dependent JS files: No
 */
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE;
 class BriefManager {
     constructor(briefs, data) {
         // Array of briefs (each brief should have: title, pdf_url, doc_url)
@@ -15,6 +17,8 @@ class BriefManager {
         });
         // Store API data for making requests
         this.data = data;
+        this.portalApiBase = PORTAL_API_BASE;
+        this.paymentApiBase = PAYMENT_API_BASE;
 
         // Index of the currently selected brief
         this.currentBriefIndex = 0;
@@ -57,7 +61,8 @@ class BriefManager {
     // Fetches data from the API
     async fetchData(endpoint) {
         try {
-            let url = `${this.data.baseUrl}${endpoint}`;
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
+            let url = `${this.portalApiBase}/${normalizedEndpoint}`;
             const response = await fetch(url);
             if (!response.ok) throw new Error('Network response was not ok');
 
@@ -70,7 +75,7 @@ class BriefManager {
     }
     
     async getEvents() {
-        const response = await this.fetchData('getBriefDetails');
+        const response = await this.fetchData('/getBriefDetails');
         if (response) {
             return response.briefEvents;
         } else {
@@ -356,7 +361,7 @@ class BriefManager {
         const self = this;
 
         // Use the brief event endpoint for subscription purchases
-        xhr.open("POST", `${this.data.baseUrl}createCheckoutUrlForBriefEvent`, true);
+        xhr.open("POST", `${this.paymentApiBase}createCheckoutUrlForBriefEvent`, true);
         xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', 'application/json');
 
