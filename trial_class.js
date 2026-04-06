@@ -146,6 +146,11 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    const studentDescription = form.querySelector(".trial-form-student-desc-field")
+    if (studentDescription) {
+        studentDescription.value = studentDescription.value || ""
+    }
+
     const successBox = document.querySelector(".tc_form-done")
     const failBox = document.querySelector(".tc_form-fail")
 
@@ -195,6 +200,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             previous_experience: form
                 .querySelector("#previous_experience")
                 .value.trim(),
+            best_description: studentDescription ? studentDescription.value : "",
             landingURL: getLandingURL(),
         }
 
@@ -733,6 +739,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (previousExperience) {
                 previousExperience.value =
                     registration.previous_experience || ""
+            }
+
+            const resStudentDescription = rescheduleForm.querySelector("#res_student_description")
+            if (resStudentDescription) {
+                resStudentDescription.value = registration.best_description || ""
             }
 
             // Make all form fields read-only except class selection radios
