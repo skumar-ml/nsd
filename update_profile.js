@@ -41,7 +41,7 @@ class updateMember {
         update_profile.forEach((el) => (el.style.display = "none"))
         // Preferred route from current API list.
         $this.$editMemberData = await this.fetchData(
-            AUTH_API_BASE + "/getAllFamilyData/" + this.memberId,
+            AUTH_API_BASE + "/getItemId/" + this.memberId,
         )
         console.log("itemIdData", $this.$editMemberData)
         if ($this.$editMemberData) {
