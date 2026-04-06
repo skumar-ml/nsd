@@ -8,154 +8,158 @@ Are  there any dependent JS files: No
 /* Popup Modal CSS*/
 .abandoned-cart-modal,
 .google-review-modal {
-  display: none;
-  opacity: 0;
-  transition: opacity 0.3s ease, visibility 0s 0.3s;
+    display: none;
+    opacity: 0;
+    transition:
+        opacity 0.3s ease,
+        visibility 0s 0.3s;
 }
 
 .abandoned-cart-modal-bg[aria-hidden="false"],
 .google-review-modal-bg[aria-hidden="false"] {
-  display: block;
+    display: block;
 }
 
 .abandoned-cart-modal.show,
 .google-review-modal.show {
-  display: flex;
-  opacity: 1;
-  transition: opacity 0.3s ease, visibility 0s 0s;
+    display: flex;
+    opacity: 1;
+    transition:
+        opacity 0.3s ease,
+        visibility 0s 0s;
 }
 
 .google-review-modal-inner-wrapper {
-  overflow: auto;
-  scrollbar-color: gray transparent;
+    overflow: auto;
+    scrollbar-color: gray transparent;
 }
 
 /* camp nav banner active class styling */
 .nav-link-item.active {
-  background-color: rgba(241, 240, 238, 1);
-  color: #000;
-  border-radius: 100px;
+    background-color: rgba(241, 240, 238, 1);
+    color: #000;
+    border-radius: 100px;
 }
 
 /* Camp mobile arrow CSS */
 @media screen and (max-width: 375px) {
-  .arrow.margin-bottom-5 {
-    top: 80px !important;
-  }
+    .arrow.margin-bottom-5 {
+        top: 80px !important;
+    }
 }
 
 @media screen and (max-width: 768px) and (min-width: 568px) {
-  .arrow.margin-bottom-5 {
-    top: 83px !important;
-  }
+    .arrow.margin-bottom-5 {
+        top: 83px !important;
+    }
 }
 
 @media screen and (max-width: 767px) {
-  .arrow.margin-bottom-5.navbar {
-    top: 10px !important;
-  }
+    .arrow.margin-bottom-5.navbar {
+        top: 10px !important;
+    }
 }
 
 /* Global Used Elements CSS*/
 @media (max-width: 991px) {
-  .light-blue-div {
-    z-index: 1;
-  }
+    .light-blue-div {
+        z-index: 1;
+    }
 
-  .portal-sidebar-list-items.w-dropdown-list.open {
-    height: 100vh;
-  }
+    .portal-sidebar-list-items.w-dropdown-list.open {
+        height: 100vh;
+    }
 }
 
 .w-dropdown-list {
-  background: #FFF !important;
+    background: #fff !important;
 }
 
 /* Google Review Slider Element CSS*/
 .lfCQiA {
-  margin-bottom: 2vh !important;
+    margin-bottom: 2vh !important;
 }
 
 .w-dropdown:hover .w-dropdown-list {
-  display: block;
+    display: block;
 }
 
 /* Hide scrollbar in all devices */
 ::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 /* Swiper Pagination Override default CSS */
 .swiper-pagination-bullet {
-  width: 10px !important;
-  height: 10px !important;
+    width: 10px !important;
+    height: 10px !important;
 }
 
 .swiper-pagination {
-  bottom: 14vh !important;
+    bottom: 14vh !important;
 }
 
 /* For tablet to mobile breakpoints */
 @media (max-width: 991px) {
-  .swiper-pagination {
-    bottom: 12vh !important;
-  }
+    .swiper-pagination {
+        bottom: 12vh !important;
+    }
 }
 
 .swiper-pagination-bullet {
-  background: #fff !important;
+    background: #fff !important;
 }
 
 .swiper-button.swiper-btn-next,
 .swiper-button.swiper-btn-prev {
-  -webkit-tap-highlight-color: #0000;
+    -webkit-tap-highlight-color: #0000;
 }
 
 /* Slick Slider Dots Override Default CSS */
 .slick-dots li button:before {
-  color: #1b4f72 !important;
+    color: #1b4f72 !important;
 }
 
 .slick-dots li.slick-active button:before {
-  opacity: inherit !important;
+    opacity: inherit !important;
 }
 
 :root {
-  --swiper-pagination-color: #1b4f72;
+    --swiper-pagination-color: #1b4f72;
 }
 
 /* Testimonials nav circle colors */
 .w-slider-dot {
-  background: #CCCCCC;
-  font-size: 10px;
+    background: #cccccc;
+    font-size: 10px;
 }
 
 .w-slider-dot.w-active {
-  background: #A51C30;
-  font-size: 10px;
+    background: #a51c30;
+    font-size: 10px;
 }
 
 /* CSS for screens with width <= 568px */
 @media (max-width: 568px) {
-  .slick-slide img {
-    display: inline-block;
-    margin: 0 auto;
-  }
+    .slick-slide img {
+        display: inline-block;
+        margin: 0 auto;
+    }
 }
 
 /* Remove autofill background color in WebKit browsers */
 input:-webkit-autofill {
-  background-color: transparent !important;
-  box-shadow: 0 0 0px 1000px white inset !important;
+    background-color: transparent !important;
+    box-shadow: 0 0 0px 1000px white inset !important;
 }
 
 #Type-3,
 #student-age-2 {
-  outline: none !important;
-  /* Removes default blue outline */
+    outline: none !important;
+    /* Removes default blue outline */
 }
 
 input:focus,
 input:-webkit-autofill:focus {
-  outline: 1px solid #a51c30 !important;
+    outline: 1px solid #a51c30 !important;
 }

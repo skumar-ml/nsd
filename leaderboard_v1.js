@@ -5,28 +5,30 @@ Brief Logic: Fetches competition data from API and builds tabbed interface for d
 
 Are there any dependent JS files: No
 */
-var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE;
+var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 class NDFLeaderBoard {
-    $competition = [];
-    $allCompetition = [];
-    $programDetail = {};
+    $competition = []
+    $allCompetition = []
+    $programDetail = {}
     // Initializes the leaderboard instance and fetches competition data
     constructor(webflowMemberId, accountEmail, apiBaseUrl, accountType) {
-        this.webflowMemberId = webflowMemberId;
-        this.accountEmail = accountEmail;
-        this.accountType = accountType;
-        this.getLeaderboardData();
+        this.webflowMemberId = webflowMemberId
+        this.accountEmail = accountEmail
+        this.accountType = accountType
+        this.getLeaderboardData()
     }
     // Fetches data from the API endpoint
     async fetchData(endpoint) {
         try {
-            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "");
-            const response = await fetch(`${PORTAL_API_BASE}/${normalizedEndpoint}`);
+            const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
+            const response = await fetch(
+                `${PORTAL_API_BASE}/${normalizedEndpoint}`,
+            )
             if (!response.ok) {
-                throw new Error("Network response was not ok");
+                throw new Error("Network response was not ok")
             }
-            const data = await response.json();
-            return data;
+            const data = await response.json()
+            return data
         } catch (error) {
             //console.error("Error fetching data:", error);
             //throw error;
@@ -34,20 +36,20 @@ class NDFLeaderBoard {
     }
     // Fetches leaderboard data from API and creates portal tabs
     async getLeaderboardData() {
-        var spinner = document.getElementById('half-circle-spinner');
-        spinner.style.display = 'block';
+        var spinner = document.getElementById("half-circle-spinner")
+        spinner.style.display = "block"
         // var competitionLocalData = localStorage.getItem("competitionData");
-        var $this = this;   
-            try {
-                const data = await $this.fetchData("/getCompetitionDetails/" + $this.webflowMemberId);
-                spinner.style.display = 'none';
-                $this.createPortalTabs(data)
-                
-
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                throw error;
-            }
+        var $this = this
+        try {
+            const data = await $this.fetchData(
+                "/getCompetitionDetails/" + $this.webflowMemberId,
+            )
+            spinner.style.display = "none"
+            $this.createPortalTabs(data)
+        } catch (error) {
+            console.error("Error fetching data:", error)
+            throw error
+        }
     }
     // Creates HTML for the progress bar showing competition day progress
     createProgressBarHTML(title, progressPercentage, currentDay, totalDays) {
@@ -65,34 +67,36 @@ class NDFLeaderBoard {
                     </div>
                 </div>
             </div>
-        `;
+        `
     }
     // Updates global variables with competition and program details from tab data
     updateGlobalVariable(tab) {
-        this.$competition = tab.competition.find(item => item.is_live == true);
-        this.$allCompetition = tab.competition.filter(item => item.is_live == true);
-        this.$programDetail = tab.programDetail;;
-        this.$startDate = new Date(this.$programDetail.startDate);
-        this.$endDate = new Date(this.$programDetail.endDate);
+        this.$competition = tab.competition.find((item) => item.is_live == true)
+        this.$allCompetition = tab.competition.filter(
+            (item) => item.is_live == true,
+        )
+        this.$programDetail = tab.programDetail
+        this.$startDate = new Date(this.$programDetail.startDate)
+        this.$endDate = new Date(this.$programDetail.endDate)
     }
     /**
      * Calculate total day's of competition
      */
     // Calculates the total number of days in the competition
     getTotalComDays() {
-        var startDate = this.$startDate;
-        var endDate = this.$endDate;
+        var startDate = this.$startDate
+        var endDate = this.$endDate
 
         // Calculate the difference in milliseconds
-        var differenceInTime = endDate.getTime() - startDate.getTime();
+        var differenceInTime = endDate.getTime() - startDate.getTime()
 
         // Convert the difference from milliseconds to days
-        var differenceInDays = differenceInTime / (1000 * 3600 * 24);
+        var differenceInDays = differenceInTime / (1000 * 3600 * 24)
 
         // Round up to the next whole number
-        var roundedDifferenceInDays = Math.ceil(differenceInDays);
+        var roundedDifferenceInDays = Math.ceil(differenceInDays)
 
-        return roundedDifferenceInDays;
+        return roundedDifferenceInDays
     }
     /**
      * Calculate completed day of competition
@@ -100,84 +104,88 @@ class NDFLeaderBoard {
     // Calculates the number of completed days in the competition
     getCompletedComDays() {
         // Parse the start date and set the time to midnight (00:00:00)
-        var start = this.$startDate;
-        start.setHours(0, 0, 0, 0);
+        var start = this.$startDate
+        start.setHours(0, 0, 0, 0)
 
         // Get the current date and time
-        var now = new Date();
+        var now = new Date()
 
         // Calculate the difference in milliseconds
-        var differenceInTime = now - start;
+        var differenceInTime = now - start
 
         // Convert the difference from milliseconds to days
-        var differenceInDays = differenceInTime / (1000 * 3600 * 24);
+        var differenceInDays = differenceInTime / (1000 * 3600 * 24)
 
         // Round up to the next whole number
-        var roundedDifferenceInDays = Math.ceil(differenceInDays);
+        var roundedDifferenceInDays = Math.ceil(differenceInDays)
 
-        return (roundedDifferenceInDays > 0 )? roundedDifferenceInDays: 0;
+        return roundedDifferenceInDays > 0 ? roundedDifferenceInDays : 0
     }
     // Calculates the percentage of competition days completed
-    getPercentageComDay(){
-        var completedDay = this.getCompletedComDays();
-        var totalDay =  this.getTotalComDays();
-        return (completedDay) ? (100 * completedDay) / totalDay : 0;
+    getPercentageComDay() {
+        var completedDay = this.getCompletedComDays()
+        var totalDay = this.getTotalComDays()
+        return completedDay ? (100 * completedDay) / totalDay : 0
     }
     // Creates and returns a tab pane element with progress bar and leaderboard
     tabPane(index, tabIndex, isTabActive, tab) {
-
-        const tabPane = document.createElement('div');
-        tabPane.className = `w-tab-pane ${isTabActive}`;
-        tabPane.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-        tabPane.setAttribute('id', `w-tabs-0-data-w-pane-${index}`);
-        tabPane.setAttribute('role', 'tabpanel');
-        tabPane.setAttribute('aria-labelledby', `w-tabs-0-data-w-tab-${index}`);
-
+        const tabPane = document.createElement("div")
+        tabPane.className = `w-tab-pane ${isTabActive}`
+        tabPane.setAttribute("data-w-tab", `Tab ${tabIndex}`)
+        tabPane.setAttribute("id", `w-tabs-0-data-w-pane-${index}`)
+        tabPane.setAttribute("role", "tabpanel")
+        tabPane.setAttribute("aria-labelledby", `w-tabs-0-data-w-tab-${index}`)
 
         tabPane.innerHTML = `
         ${this.createProgressBarHTML()}
         ${this.createLeaderboard()}
-       `;
+       `
 
         return tabPane
     }
     // Creates portal tabs for multiple competitions with tab navigation
     createPortalTabs(tabsData) {
-        const nsd_portal_container = document.getElementById('leaderboard');
+        const nsd_portal_container = document.getElementById("leaderboard")
         // Create the main portal tab container
-        const portalTabs = document.createElement('div');
-        portalTabs.className = 'portal-tab w-tabs';
-        portalTabs.setAttribute('data-current', 'Tab 1');
-        portalTabs.setAttribute('data-easing', 'ease');
-        portalTabs.setAttribute('data-duration-in', '300');
-        portalTabs.setAttribute('data-duration-out', '100');
+        const portalTabs = document.createElement("div")
+        portalTabs.className = "portal-tab w-tabs"
+        portalTabs.setAttribute("data-current", "Tab 1")
+        portalTabs.setAttribute("data-easing", "ease")
+        portalTabs.setAttribute("data-duration-in", "300")
+        portalTabs.setAttribute("data-duration-out", "100")
 
         // Create the tab menu container
-        const tabMenus = document.createElement('div');
-        tabMenus.className = 'portal-tab-menus w-tab-menu';
-        tabMenus.setAttribute('role', 'tablist');
+        const tabMenus = document.createElement("div")
+        tabMenus.className = "portal-tab-menus w-tab-menu"
+        tabMenus.setAttribute("role", "tablist")
 
         // Create the tab content container
-        const tabContent = document.createElement('div');
-        tabContent.className = 'portal-tab-content w-tab-content';
+        const tabContent = document.createElement("div")
+        tabContent.className = "portal-tab-content w-tab-content"
 
         // Loop through the tab data to create each tab and its content
         tabsData.forEach((tab, index) => {
-            const tabIndex = index + 1;
-            const isActive = index === 0 ? 'w--current' : '';
-            const isTabActive = index === 0 ? 'w--tab-active' : '';
-            this.updateGlobalVariable(tab);
+            const tabIndex = index + 1
+            const isActive = index === 0 ? "w--current" : ""
+            const isTabActive = index === 0 ? "w--tab-active" : ""
+            this.updateGlobalVariable(tab)
             // Create the tab header
-            const tabHeader = document.createElement('a');
-            tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`;
-            tabHeader.setAttribute('data-w-tab', `Tab ${tabIndex}`);
-            tabHeader.setAttribute('id', `w-tabs-0-data-w-tab-${index}`);
-            tabHeader.setAttribute('href', `#w-tabs-0-data-w-pane-${index}`);
-            tabHeader.setAttribute('role', 'tab');
-            tabHeader.setAttribute('aria-controls', `w-tabs-0-data-w-pane-${index}`);
-            tabHeader.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
-            tabHeader.setAttribute('tabindex', index === 0 ? '0' : '-1');
-            //${ this.$startDate.toLocaleString('default', { month: 'long' })} ${ this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()} 
+            const tabHeader = document.createElement("a")
+            tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`
+            tabHeader.setAttribute("data-w-tab", `Tab ${tabIndex}`)
+            tabHeader.setAttribute("id", `w-tabs-0-data-w-tab-${index}`)
+            tabHeader.setAttribute("href", `#w-tabs-0-data-w-pane-${index}`)
+            tabHeader.setAttribute("role", "tab")
+            tabHeader.setAttribute(
+                "aria-controls",
+                `w-tabs-0-data-w-pane-${index}`,
+            )
+            tabHeader.setAttribute(
+                "aria-selected",
+                index === 0 ? "true" : "false",
+            )
+            tabHeader.setAttribute("tabindex", index === 0 ? "0" : "-1")
+            //${ this.$startDate.toLocaleString('default', { month: 'long' })} ${ this.$startDate.getDate()} - ${ this.$endDate.toLocaleString('default', { month: 'long' })} ${this.$endDate.getDate()}
             tabHeader.innerHTML = `
                 <div>
                     <div class="current-program_content-div">
@@ -185,63 +193,81 @@ class NDFLeaderBoard {
                         <div class="dm-sans opacity-70">${this.$competition.competitionName} </div>
                     </div>
                 </div>
-            `;
+            `
 
-            var tabPane = this.tabPane(index, tabIndex, isTabActive, tab);
+            var tabPane = this.tabPane(index, tabIndex, isTabActive, tab)
             // Append the tab header and content to their respective containers
-            tabMenus.appendChild(tabHeader);
-            tabContent.appendChild(tabPane);
-
-        });
+            tabMenus.appendChild(tabHeader)
+            tabContent.appendChild(tabPane)
+        })
 
         // Append the tab menus and content to the main portal tab container
         if (tabMenus) {
-            portalTabs.appendChild(tabMenus);
+            portalTabs.appendChild(tabMenus)
         }
         if (tabContent) {
-            portalTabs.appendChild(tabContent);
+            portalTabs.appendChild(tabContent)
         }
         // Append the portal tabs to the body or a specific container
         if (tabMenus && tabContent) {
-            nsd_portal_container.appendChild(portalTabs);
+            nsd_portal_container.appendChild(portalTabs)
         }
-        Webflow.require('tabs').redraw();
+        Webflow.require("tabs").redraw()
     }
     // Creates and returns HTML for a single leaderboard row with rank, team name, and points
     createLeaderboardRow(rank, title, points, myTeam) {
-        var trophyUrl = this.getTrophyUrl(rank, points);
-        var $this = this;
-        if($this.accountType == 'parent'){
-            console.log('test 1')
-            var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true))
-        }else{
-            console.log('test 2')
-            var myTeamData = this.$allCompetition.filter(item => item.points.find(data=>data.teamName == title && data.myTeam == true) && item.email == $this.accountEmail)
+        var trophyUrl = this.getTrophyUrl(rank, points)
+        var $this = this
+        if ($this.accountType == "parent") {
+            console.log("test 1")
+            var myTeamData = this.$allCompetition.filter((item) =>
+                item.points.find(
+                    (data) => data.teamName == title && data.myTeam == true,
+                ),
+            )
+        } else {
+            console.log("test 2")
+            var myTeamData = this.$allCompetition.filter(
+                (item) =>
+                    item.points.find(
+                        (data) => data.teamName == title && data.myTeam == true,
+                    ) && item.email == $this.accountEmail,
+            )
         }
-        console.log('myTeamData', myTeamData)
+        console.log("myTeamData", myTeamData)
 
-
-        myTeam = (myTeamData.length > 0) ? true :false;
-        const trophyIcon = trophyUrl ? `<img src="${trophyUrl}" alt="Trophy Icon">` : rank;
-        var myTeamClass = (myTeam) ? 'my_team_points' : '';
+        myTeam = myTeamData.length > 0 ? true : false
+        const trophyIcon = trophyUrl
+            ? `<img src="${trophyUrl}" alt="Trophy Icon">`
+            : rank
+        var myTeamClass = myTeam ? "my_team_points" : ""
         return `
             <div class="row ${myTeamClass}">
                 <div class="dm-sans row-data">${trophyIcon}</div>
                 <div class="dm-sans row-data">${title}</div>
                 <div class="dm-sans row-data align-center">${points}</div>
             </div>
-        `;
+        `
     }
     // Creates and returns HTML for the complete leaderboard table
     createLeaderboard() {
-       this.$competition.points.sort(function (r, a) {
+        this.$competition.points.sort(function (r, a) {
             //return a.point - r.point
             if (r.point === a.point) {
-                return a.longestStreak - r.longestStreak; // Second priority
+                return a.longestStreak - r.longestStreak // Second priority
             }
-            return a.point - r.point; // First priority
-        });
-        const rows = this.$competition.points.map((data, i) => this.createLeaderboardRow(i + 1, data.teamName, data.point, data.myTeam)).join('');
+            return a.point - r.point // First priority
+        })
+        const rows = this.$competition.points
+            .map((data, i) =>
+                this.createLeaderboardRow(
+                    i + 1,
+                    data.teamName,
+                    data.point,
+                    data.myTeam,
+                ),
+            )
+            .join("")
         return `
             <div class="leaderboard-wrapper">
                 <h1 class="dm-sans table-heading">Leaderboard</h1>
@@ -263,18 +289,18 @@ class NDFLeaderBoard {
                 </div>
                 <div class="code-embed-4 w-embed w-script"></div>
             </div>
-        `;
+        `
     }
     // Returns the trophy icon URL for top 3 ranks, or empty string for others
     getTrophyUrl(rank, points) {
         if (rank == 1 && points) {
-            return 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6674399b030b15665fab28c8_np_trophy_1047539_000000%201%20(1).svg'
+            return "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/6674399b030b15665fab28c8_np_trophy_1047539_000000%201%20(1).svg"
         } else if (rank == 2 && points) {
-            return 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667439f7a9ce9eac1aa9b98a_np_trophy_1047539_000000%201%20(4).svg'
+            return "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667439f7a9ce9eac1aa9b98a_np_trophy_1047539_000000%201%20(4).svg"
         } else if (rank == 3 && points) {
-            return 'https://cdn.prod.website-files.com/6271a4bf060d543533060f47/66743ae4de11954be86a3c7f_np_trophy_1047539_000000%201%20(5).svg'
+            return "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/66743ae4de11954be86a3c7f_np_trophy_1047539_000000%201%20(5).svg"
         } else {
-            return '';
+            return ""
         }
     }
 }

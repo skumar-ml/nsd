@@ -3,6 +3,7 @@
 This folder contains utilities scripts used by NSD, including checkout customizations, abandoned cart modals, attendance tracking helpers.
 
 ## Used File and Description
+
 - `abandoned-cart-modal.js` – Client-side modal logic that detects stale checkout data and nudges members to recover their cart.
 - `add_family.js` – Loader for the family member grid that fetches household profiles, sorts them, and wires edit actions.
 - `attendance-leaderboard.js` – Renders the attendance leaderboard grid showing lab names and their current scores.
@@ -33,6 +34,7 @@ This folder contains utilities scripts used by NSD, including checkout customiza
 - `utility.js` – Tiny helper exposing `setupAdminViewListener` to toggle admin-only views via ID allowlists or query params.
 
 ## API Domains (current)
+
 - `https://aws.nsdebatecamp.com/auth/camp/*` – member/account actions (example: `checkMemberExist`, `signinActivity`)
 - `https://aws.nsdebatecamp.com/attendance/camp/*` – attendance flows (example: `getAttendanceDetailsByMemberId`, `addStudentAttendance_v2`)
 - `https://aws.nsdebatecamp.com/portal/camp/*` – portal resources and competition data (example: `getCoachPortalData`, `getCompetitionDetails`)

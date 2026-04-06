@@ -5,45 +5,43 @@ Brief Logic:
 Contains the CSS for the onboarding progress bar widget.
 Are  there any dependent JS files: No
 */
-.main{
-    
+.main {
     display: flex;
-   
+
     align-items: center;
-    
+
     flex-direction: column;
-    
+
     margin-bottom: 25px;
 }
 .container_pb {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     box-shadow: 0 4px 11px 0 rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-  }
+}
 .main .container_pb .fade img {
     width: 40px;
 }
-.main .head p{
+.main .head p {
     text-align: left;
     padding-left: 10px;
     padding-top: 10px;
     color: #000;
     font-weight: 700;
     font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: "DM Sans", sans-serif;
 }
-.main ul{
+.main ul {
     display: flex;
     padding-left: 0 !important;
-       
 }
-#create-account{
+#create-account {
     padding-left: 10px;
 }
-#attend-class{
+#attend-class {
     padding-right: 10px;
 }
-.main ul li{
+.main ul li {
     list-style: none;
     display: flex;
     flex-direction: column;
@@ -52,7 +50,7 @@ Are  there any dependent JS files: No
     opacity: 0.5;
 }
 
-ul li .text{
+ul li .text {
     font-size: 14px;
     font-weight: 600;
     color: #000;
@@ -61,7 +59,7 @@ ul li .text{
 
 /* Progress Div Css  */
 
-ul li .progress{
+ul li .progress {
     width: 152px;
     height: 23px;
     border-radius: 6px;
@@ -75,7 +73,7 @@ ul li .progress{
 ul li .progress {
     z-index: 1;
 }
-.progress::after{
+.progress::after {
     content: " ";
     position: absolute;
     width: 80px;
@@ -83,120 +81,117 @@ ul li .progress {
     background-color: rgba(68, 68, 68, 0.781);
     right: 152px;
 }
-.one::after{
+.one::after {
     display: none;
 }
-ul li .progress .uil{
+ul li .progress .uil {
     display: none;
 }
-ul li .progress p{
+ul li .progress p {
     font-size: 14px;
 }
 
 /* Active Css  */
 
-li.fade.active{
-    opacity: 1; 
+li.fade.active {
+    opacity: 1;
 }
 
-
-.progress.one{
-    background-color: #A51C30;
+.progress.one {
+    background-color: #a51c30;
 }
-.progress.two{
-    background-color: #A51C30;
+.progress.two {
+    background-color: #a51c30;
 }
-.progress.three{
-    background-color: #72A6CA;
+.progress.three {
+    background-color: #72a6ca;
 }
-.progress.four{
-    background-color: #1B4F72;
+.progress.four {
+    background-color: #1b4f72;
 }
 
 /* Progress bar */
 
-.progress.two::after{
-    background-image: linear-gradient(to right, #d28d97,#d28d97);
+.progress.two::after {
+    background-image: linear-gradient(to right, #d28d97, #d28d97);
 }
-.progress.three::after{
-    background-image: linear-gradient(to right, #d28d97,#d28d97);
+.progress.three::after {
+    background-image: linear-gradient(to right, #d28d97, #d28d97);
 }
-.progress.four::after{
-    background-image: linear-gradient(to right, #b8d2e4, #1B4F72);
+.progress.four::after {
+    background-image: linear-gradient(to right, #b8d2e4, #1b4f72);
 }
 
 /* Media Query */
-@media(max-width:1550px){
-     ul li .progress{
+@media (max-width: 1550px) {
+    ul li .progress {
         width: 145px;
         height: 23px;
-     }
-    .progress::after{
+    }
+    .progress::after {
         right: 145px;
     }
-    ul li .progress p{
+    ul li .progress p {
         font-size: 12px;
     }
-    ul li .text{
+    ul li .text {
         font-size: 12px;
         font-weight: 600;
         color: #000;
     }
 }
-@media (min-width:1230px) and (max-width:1300px){
-    .main .container_pb{
-        width:740px;
+@media (min-width: 1230px) and (max-width: 1300px) {
+    .main .container_pb {
+        width: 740px;
     }
-    ul li .progress{
+    ul li .progress {
         width: 120px;
         height: 20px;
-     }
-    .progress::after{
+    }
+    .progress::after {
         right: 120px;
     }
     .main .head p {
-    font-size: 12px;
-    }
-    ul li .progress p{
         font-size: 12px;
     }
-    ul li .text{
+    ul li .progress p {
+        font-size: 12px;
+    }
+    ul li .text {
         font-size: 12px;
         font-weight: 600;
         color: #000;
     }
 }
 
-
 @media (max-width: 768px) {
-    
-    ul li .icon{
+    ul li .icon {
         font-size: 25px;
         margin: 0 30px;
     }
-    ul li .text{
+    ul li .text {
         font-size: 10px;
         line-height: 15px;
         text-align: center;
     }
-    ul li .progress{
+    ul li .progress {
         width: 98px;
         height: 34px;
         border-radius: 12px;
     }
-    ul li .progress p{
+    ul li .progress p {
         margin-bottom: 0;
     }
-    ul li .progress::after{
+    ul li .progress::after {
         width: 80px;
         height: 8px;
-        z-index:0;
+        z-index: 0;
     }
-    .progress::after{
+    .progress::after {
         right: 98px;
     }
-    
-    .main .head p{
+
+    .main .head p {
         font-size: 10px;
     }
 }

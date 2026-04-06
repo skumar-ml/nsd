@@ -5,27 +5,27 @@ Brief Logic: Sends POST request to API with memberId to log sign-in activity. Tr
 
 Are there any dependent JS files: No
 */
-var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE.replace(/\/$/, "");
+var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE.replace(/\/$/, "")
 
 class SigninActivity {
-	// Initializes the SigninActivity instance and inserts sign-in activity data
-	constructor(webflowMemberId){
-		this.webflowMemberId = webflowMemberId;
-		//this.getNotificationData();
-		this.InsertSignInData();
-	}
-	// Inserts sign-in activity data into the database
-	InsertSignInData(){
-		var data = {
-			 "memberId" : this.webflowMemberId
-		}
-		var xhr = new XMLHttpRequest()
-		var $this = this;
-		xhr.open("POST", AUTH_API_BASE + "/signinActivity", true)
-		xhr.withCredentials = false
-		xhr.send(JSON.stringify(data))
-		xhr.onload = function() {
-			let responseText = xhr.responseText;
-		}
-	}
+    // Initializes the SigninActivity instance and inserts sign-in activity data
+    constructor(webflowMemberId) {
+        this.webflowMemberId = webflowMemberId
+        //this.getNotificationData();
+        this.InsertSignInData()
+    }
+    // Inserts sign-in activity data into the database
+    InsertSignInData() {
+        var data = {
+            memberId: this.webflowMemberId,
+        }
+        var xhr = new XMLHttpRequest()
+        var $this = this
+        xhr.open("POST", AUTH_API_BASE + "/signinActivity", true)
+        xhr.withCredentials = false
+        xhr.send(JSON.stringify(data))
+        xhr.onload = function () {
+            let responseText = xhr.responseText
+        }
+    }
 }
