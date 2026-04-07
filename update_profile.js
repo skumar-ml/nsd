@@ -162,40 +162,50 @@ class updateMember {
 
         var xhr = new XMLHttpRequest()
         var $this = this
+        const resetEditButton = () => {
+            editMemberBtn.innerHTML = "Save"
+            editMemberBtn.classList.remove("disabled")
+            editMemberBtn.style.pointerEvents = "auto"
+        }
         xhr.open("POST", AUTH_API_BASE + "/updateMemberStack", true)
         xhr.withCredentials = false
         xhr.send(JSON.stringify(data))
         xhr.onload = function () {
-            let responseText = JSON.parse(xhr.responseText)
-            console.log(xhr.responseText, responseText)
+            if (xhr.status !== 200) {
+                console.log("Error", xhr.statusText)
+                alert(
+                    "Unable to update your profile. Please contact to administration",
+                )
+                resetEditButton()
+                return
+            }
+            try {
+                let responseText = JSON.parse(xhr.responseText)
+                console.log(xhr.responseText, responseText)
+            } catch (error) {
+                console.log("Error parsing response", error)
+            }
             const addFamilyMemberEditModals = document.querySelector(
                 ".update-profile-modal",
             )
-            $this.getMemberData().then((data) => {
-                setTimeout(() => {
-                    console.log("updated")
-                    $this.closeModal(addFamilyMemberEditModals)
-                    $this.updateUserName(studentFirstName.value)
-                    editMemberBtn.innerHTML = "Save"
-                    editMemberBtn.classList.remove("disabled")
-                    editMemberBtn.style.pointerEvents = "auto"
-                }, 1000)
-            })
+            $this.getMemberData()
+                .then(() => {
+                    setTimeout(() => {
+                        console.log("updated")
+                        $this.closeModal(addFamilyMemberEditModals)
+                        $this.updateUserName(studentFirstName.value)
+                        resetEditButton()
+                    }, 1000)
+                })
+                .catch((error) => {
+                    console.log("Error refreshing member data", error)
+                    resetEditButton()
+                })
         }
-        xhr.onreadystatechange = function (oEvent) {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    console.log(xhr.responseText)
-                } else {
-                    console.log("Error", xhr.statusText)
-                    alert(
-                        "Unable to update your profile. Please contact to administration",
-                    )
-                    editMemberBtn.innerHTML = "Save"
-                    editMemberBtn.classList.remove("disabled")
-                    editMemberBtn.style.pointerEvents = "auto"
-                }
-            }
+        xhr.onerror = function () {
+            console.log("Network error while updating member profile")
+            alert("Unable to update your profile. Please contact to administration")
+            resetEditButton()
         }
     }
     updateUserName(studentFirstName) {
