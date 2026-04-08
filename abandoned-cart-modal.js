@@ -162,7 +162,7 @@ class AbandonedCartModal {
         try {
             const response = await fetch(
                 this.paymentApiBase +
-                    "getCheckoutURLByMemberId/" +
+                    "/getCheckoutURLByMemberId/" +
                     this.memberId,
             )
             if (!response.ok) {
