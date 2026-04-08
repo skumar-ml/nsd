@@ -361,7 +361,7 @@ class BriefManager {
         const self = this;
 
         // Use the brief event endpoint for subscription purchases
-        xhr.open("POST", `${this.paymentApiBase}createCheckoutUrlForBriefEvent`, true);
+        xhr.open("POST", `${this.paymentApiBase}/createCheckoutUrlForBriefEvent`, true);
         xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', 'application/json');
 

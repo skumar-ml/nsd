@@ -1445,13 +1445,13 @@ class BriefsEventsCheckout {
         if (this.selectedEvents.length > 0) {
             xhr.open(
                 "POST",
-                `${this.paymentApiBase}createCheckoutUrlForBriefEvent`,
+                `${this.paymentApiBase}/createCheckoutUrlForBriefEvent`,
                 true,
             )
         } else {
             xhr.open(
                 "POST",
-                `${this.paymentApiBase}createCheckoutUrlForBrief`,
+                `${this.paymentApiBase}/createCheckoutUrlForBrief`,
                 true,
             )
         }

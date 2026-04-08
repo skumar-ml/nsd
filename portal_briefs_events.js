@@ -416,7 +416,7 @@ class BriefManager {
         // Use the brief event endpoint for subscription purchases
         xhr.open(
             "POST",
-            `${this.paymentApiBase}createCheckoutUrlForBriefEvent`,
+            `${this.paymentApiBase}/createCheckoutUrlForBriefEvent`,
             true,
         )
         xhr.withCredentials = false
