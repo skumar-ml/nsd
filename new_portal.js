@@ -162,6 +162,7 @@ class NSDPortal {
     if (nsdPortal) nsdPortal.style.display = "none"
 
     try {
+      console.log("Step-1: Fetching portal details")
       // Fetch portal details
       let apiResponse = await this.fetchData(
         this.portalApiBase,
@@ -172,10 +173,12 @@ class NSDPortal {
         throw new Error("No data received from API")
       }
 
+      console.log("Step-2: Transforming API response")
       // Transform and store sessions
       this.allSessions = this.transformApiResponse(apiResponse)
       console.log("Transformed sessions:", this.allSessions.length)
 
+      console.log("Step-3: Fetching invoice data")
       // Fetch invoice data
       this.invoiceData =
         (await this.fetchData(
@@ -184,11 +187,14 @@ class NSDPortal {
         )) || []
       console.log("Invoice data:", this.invoiceData)
 
+      console.log("Step-4: Extracting briefs data")
       // Extract briefs data
       const briefsData = apiResponse.brief || []
 
       // Class enrollments (for online classes tab): used alongside brief/camp logic
+      console.log("Step-5: Checking class enrollments")
       const hasClassEnrollments = await this.checkClassEnrollments()
+      console.log("Class enrollments:", hasClassEnrollments)
       this.setOnlineClassTabVisibility(hasClassEnrollments)
 
       // Normalize studentData to array (API may return string "No data Found" or object)
@@ -197,9 +203,11 @@ class NSDPortal {
         : []
 
       // Hide or show free/paid resources (brief + camp + online-classes conditions)
+      console.log("Step-6: Hiding or showing free/paid resources")
       this.hidePortalData(studentData, briefsData, hasClassEnrollments)
 
       // Handle briefs
+      console.log("Step-7: Handling briefs")
       if (briefsData.length > 0 && typeof BriefManager !== "undefined") {
         new BriefManager(briefsData, {
           webflowMemberId: this.webflowMemberId,
@@ -209,11 +217,13 @@ class NSDPortal {
       }
 
       // Render portal
+      console.log("Step-8: Rendering portal")
       this.renderPortal()
       this.updateHeading()
     } catch (error) {
       console.error("Error loading portal data:", error)
     } finally {
+      console.log("Step-9: Finalizing portal data")
       if (spinner) spinner.style.display = "none"
       if (nsdPortal) nsdPortal.style.display = "block"
     }
