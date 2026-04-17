@@ -29,7 +29,7 @@ class NSDPortal {
     await this.loadPortalData()
   }
 
-  // Fetch data from API
+  // Fetch data from API (handles plain-text "No data Found" and non-JSON 200 responses)
   async fetchData(baseUrl, endpoint) {
     try {
       const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
@@ -37,8 +37,16 @@ class NSDPortal {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      const data = await response.json()
-      return data
+      const text = await response.text()
+      const trimmed = text.trim()
+      if (!trimmed || trimmed === "No data Found") {
+        if (normalizedEndpoint.includes("getInvoiceList")) return []
+        if (normalizedEndpoint.includes("getPortalDetails")) {
+          return { studentData: [], brief: [] }
+        }
+        return null
+      }
+      return JSON.parse(trimmed)
     } catch (error) {
       console.error("Error fetching data:", error)
       return null
@@ -170,7 +178,7 @@ class NSDPortal {
       )
 
       if (!apiResponse) {
-        throw new Error("No data received from API")
+        apiResponse = { studentData: [], brief: [] }
       }
 
       console.log("Step-2: Transforming API response")

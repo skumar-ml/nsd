@@ -551,7 +551,7 @@ class SupplementaryProgram {
     /*Call API to get student list with program details*/
     callApi() {
         var spinner = document.getElementById("half-circle-spinner-2")
-        spinner.style.display = "block"
+        if (spinner) spinner.style.display = "block"
         var xhr = new XMLHttpRequest()
         var $this = this
         xhr.open(
@@ -565,20 +565,28 @@ class SupplementaryProgram {
         xhr.withCredentials = false
         xhr.send()
         xhr.onload = function () {
-            var spinner = document.getElementById("half-circle-spinner-2")
-            spinner.style.display = "none"
-            var responseText = JSON.parse(xhr.responseText)
-            if (
-                responseText &&
-                responseText.studentData &&
-                responseText.studentData.length > 0
-            ) {
-                responseText = responseText.studentData
-                $this.makeList(responseText)
+            var spinner2 = document.getElementById("half-circle-spinner-2")
+            if (spinner2) spinner2.style.display = "none"
+            var mainSpinner = document.getElementById("half-circle-spinner")
+            try {
+                var raw = (xhr.responseText || "").trim()
+                if (!raw || raw === "No data Found") {
+                    return
+                }
+                var responseText = JSON.parse(raw)
+                if (
+                    responseText &&
+                    responseText.studentData &&
+                    responseText.studentData.length > 0
+                ) {
+                    responseText = responseText.studentData
+                    $this.makeList(responseText)
+                }
+            } catch (e) {
+                console.error("getCompletedForm response error:", e)
+            } finally {
+                if (mainSpinner) mainSpinner.style.display = "none"
             }
-
-            var spinner = document.getElementById("half-circle-spinner")
-            spinner.style.display = "none"
         }
     }
 }
@@ -820,16 +828,22 @@ class SupplementaryTabs {
         xhr.withCredentials = false
         xhr.send()
         xhr.onload = function () {
-            spinner.style.display = "none"
-            let responseText = JSON.parse(xhr.responseText)
-            $this.viewstabs(responseText)
-            $this.initiateTabs()
-            if (responseText == "No data Found") {
-                spinner.style.display = "none"
-                return false
-            }
-            // formData = responseText[index]
-            responseText.forEach((formData, index) => {
+            try {
+                if (spinner) spinner.style.display = "none"
+                const raw = (xhr.responseText || "").trim()
+                if (!raw || raw === "No data Found") {
+                    $this.viewstabs("No data Found")
+                    $this.initiateTabs()
+                    return
+                }
+                let responseText = JSON.parse(raw)
+                $this.viewstabs(responseText)
+                $this.initiateTabs()
+                if (responseText == "No data Found") {
+                    return false
+                }
+                // formData = responseText[index]
+                responseText.forEach((formData, index) => {
                 /* if form is not available, disble the code */
                 if (formData.formList.length > 0) {
                     setTimeout(function () {
@@ -846,6 +860,17 @@ class SupplementaryTabs {
             setTimeout(function () {
                 $this.setCurrentActiveTag()
             }, 500) // YY: may remove timeout
+            } catch (e) {
+                console.error("getSupplimentaryForm response error:", e)
+                try {
+                    $this.viewstabs("No data Found")
+                    $this.initiateTabs()
+                } catch (inner) {
+                    console.error(inner)
+                }
+            } finally {
+                if (spinner) spinner.style.display = "none"
+            }
         }
     }
 }

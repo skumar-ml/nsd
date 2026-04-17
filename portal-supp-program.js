@@ -42,11 +42,15 @@ class DisplaySuppProgram {
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
-            const data = await response.json()
-            return data
+            const text = await response.text()
+            const trimmed = text.trim()
+            if (!trimmed || trimmed === "No data Found") {
+                return []
+            }
+            return JSON.parse(trimmed)
         } catch (error) {
             console.error("Error fetching data:", error)
-            throw error
+            return []
         }
     }
 
@@ -85,7 +89,7 @@ class DisplaySuppProgram {
             ".supp-programs-description-wrapper",
         )
 
-        if (!apiData.length) {
+        if (!apiData.length && swiperSlideWrapperM) {
             swiperSlideWrapperM.style.display = "none"
         }
 
