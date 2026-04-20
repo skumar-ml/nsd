@@ -46,9 +46,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const infoContainer = optionLabel.querySelector(
                 ".trial-class-info-container",
             )
-            const optionRadio = optionLabel.querySelector(
-                "input[type='radio']",
-            )
+            const optionRadio = optionLabel.querySelector("input[type='radio']")
 
             if (!infoContainer) return
 
@@ -68,8 +66,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         el.setAttribute("role", "status")
         el.setAttribute("aria-live", "polite")
         el.setAttribute("aria-busy", "true")
-        el.style.cssText =
-            "padding:1.25rem 1rem;text-align:center;color:inherit;"
         el.textContent = "Loading available trial classes…"
         gridEl.appendChild(el)
         return el
@@ -82,8 +78,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         el.setAttribute("role", "status")
         el.setAttribute("aria-live", "polite")
         el.setAttribute("aria-busy", "true")
-        el.style.cssText =
-            "display:block;padding:2rem 1rem;text-align:center;max-width:36rem;margin:0 auto;color:inherit;"
         const p = document.createElement("p")
         p.style.margin = "0"
         p.textContent = "Loading your registration…"
@@ -101,7 +95,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         const templateClone = template.cloneNode(true)
         template.remove()
         mountTrialOptionsLoader(grid)
-
         ;(async () => {
             try {
                 const res = await fetch(
@@ -131,7 +124,9 @@ document.addEventListener("DOMContentLoaded", async function () {
                         timeEl.textContent = `${start} - ${end} EST`
                     }
 
-                    const gradeEl = clone.querySelector(".trial-class_grade-info")
+                    const gradeEl = clone.querySelector(
+                        ".trial-class_grade-info",
+                    )
                     if (gradeEl) {
                         gradeEl.textContent = `${item.grade_label}`
                     }
@@ -192,16 +187,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     if (gradeSelect && !manageToken) {
         gradeSelect.disabled = true
-        gradeSelect.innerHTML =
-            '<option value="">Loading grades…</option>'
+        gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
         ;(async () => {
             try {
                 const res = await fetch(
                     `${window.NSD_API.TRIAL_CLASS_API_BASE}/getGrades`,
                 )
                 const grades = await res.json()
-                gradeSelect.innerHTML =
-                    '<option value="">Select Grade</option>'
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
 
                 grades.forEach((grade) => {
                     const option = document.createElement("option")
@@ -211,8 +204,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 })
             } catch (err) {
                 console.error("Error loading payment grades", err)
-                gradeSelect.innerHTML =
-                    '<option value="">Select Grade</option>'
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
             } finally {
                 gradeSelect.disabled = false
             }
