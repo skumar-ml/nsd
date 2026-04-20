@@ -169,6 +169,7 @@ class NSDPortal {
   // Load portal data from API
   async loadPortalData() {
     const spinner = document.getElementById("half-circle-spinner")
+    const spinner3 = document.getElementById("half-circle-spinner-3")
     const nsdPortal = document.getElementById("nsdPortal")
 
     if (spinner) spinner.style.display = "block"
@@ -238,6 +239,7 @@ class NSDPortal {
     } finally {
       console.log("Step-9: Finalizing portal data")
       if (spinner) spinner.style.display = "none"
+      if (spinner3) spinner3.style.display = "none"
       if (nsdPortal) nsdPortal.style.display = "block"
     }
   }
