@@ -29,13 +29,18 @@ class NSDPortal {
     await this.loadPortalData()
   }
 
-  // Fetch data from API (handles plain-text "No data Found" and non-JSON 200 responses)
+  // Fetch data from API (handles "No data Found", non-JSON, and fallback on 5xx)
   async fetchData(baseUrl, endpoint) {
     try {
       const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
       const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Graceful fallback so portal UI can still render empty states on API failure.
+        if (normalizedEndpoint.includes("getInvoiceList")) return []
+        if (normalizedEndpoint.includes("getPortalDetails")) {
+          return { studentData: [], brief: [] }
+        }
+        return null
       }
       const text = await response.text()
       const trimmed = text.trim()
