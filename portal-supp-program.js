@@ -665,7 +665,7 @@ class DisplaySuppProgram {
             source: "portal_page",
         }
         // Create the POST request
-        fetch(this.paymentApiBase + "createCheckoutUrlForSupplementary", {
+        fetch(this.paymentApiBase + "/createCheckoutUrlForSupplementary", {
             method: "POST", // Specify the method
             headers: {
                 "Content-Type": "application/json", // Specify the content type
