@@ -15,6 +15,7 @@ class updateMember {
         }, 2000)
         this.handleEditMember()
         this.handleUpdateProfileBtn()
+        this.attachEditProfileValidation()
     }
     // Get API data with the help of endpoint
     async fetchData(endpoint) {
@@ -110,6 +111,60 @@ class updateMember {
                 parentPhone.value = data.parentPhoneNumber
             }
         }
+        this.updateEditMemberBtnState()
+    }
+
+    // Determines whether a field should be validated in current UI state
+    isVisibleField(element) {
+        if (!element) return false
+        return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length)
+    }
+
+    // Validates required edit profile fields
+    isEditProfileFormValid() {
+        var studentFirstName = document.getElementById("Student-First-Name")
+        var studentLastName = document.getElementById("Student-Last-Name")
+        var studentEmail = document.getElementById("Student-Email")
+        var studentGrade = document.getElementById("Student-Grade")
+        var parentPhone = document.getElementById("parent-phone")
+
+        var requiredFields = [studentFirstName, studentLastName, studentEmail]
+        if (this.isVisibleField(studentGrade)) requiredFields.push(studentGrade)
+        if (this.isVisibleField(parentPhone)) requiredFields.push(parentPhone)
+
+        return requiredFields.every((field) => field && field.value.trim() !== "")
+    }
+
+    // Toggles Save button based on edit profile validation
+    updateEditMemberBtnState() {
+        const editMemberBtn = document.getElementById("editMemberBtn")
+        if (!editMemberBtn) return
+
+        const isValid = this.isEditProfileFormValid()
+        editMemberBtn.classList.toggle("disabled", !isValid)
+        editMemberBtn.style.pointerEvents = isValid ? "auto" : "none"
+        editMemberBtn.style.opacity = isValid ? "1" : "0.6"
+        editMemberBtn.style.filter = isValid ? "none" : "grayscale(100%)"
+        editMemberBtn.style.cursor = isValid ? "pointer" : "not-allowed"
+    }
+
+    // Adds real-time validation handlers for edit profile fields
+    attachEditProfileValidation() {
+        const fieldIds = [
+            "Student-First-Name",
+            "Student-Last-Name",
+            "Student-Email",
+            "Student-Grade",
+            "parent-phone",
+        ]
+        fieldIds.forEach((fieldId) => {
+            const field = document.getElementById(fieldId)
+            if (!field) return
+            field.addEventListener("input", () => this.updateEditMemberBtnState())
+            field.addEventListener("change", () => this.updateEditMemberBtnState())
+        })
+
+        this.updateEditMemberBtnState()
     }
 
     // Handles the edit member button click event
@@ -117,6 +172,10 @@ class updateMember {
         var $this = this
         const editMemberBtn = document.getElementById("editMemberBtn")
         editMemberBtn.addEventListener("click", function () {
+            if (!$this.isEditProfileFormValid()) {
+                $this.updateEditMemberBtnState()
+                return
+            }
             editMemberBtn.innerHTML = "Processing..."
             editMemberBtn.classList.add("disabled")
             editMemberBtn.style.pointerEvents = "none"
@@ -164,8 +223,7 @@ class updateMember {
         var $this = this
         const resetEditButton = () => {
             editMemberBtn.innerHTML = "Save"
-            editMemberBtn.classList.remove("disabled")
-            editMemberBtn.style.pointerEvents = "auto"
+            $this.updateEditMemberBtnState()
         }
         xhr.open("POST", AUTH_API_BASE + "/updateMemberStack", true)
         xhr.withCredentials = false
