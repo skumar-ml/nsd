@@ -29,13 +29,18 @@ class NSDPortal {
     await this.loadPortalData()
   }
 
-  // Fetch data from API (handles plain-text "No data Found" and non-JSON 200 responses)
+  // Fetch data from API (handles "No data Found", non-JSON, and fallback on 5xx)
   async fetchData(baseUrl, endpoint) {
     try {
       const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
       const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        // Graceful fallback so portal UI can still render empty states on API failure.
+        if (normalizedEndpoint.includes("getInvoiceList")) return []
+        if (normalizedEndpoint.includes("getPortalDetails")) {
+          return { studentData: [], brief: [] }
+        }
+        return null
       }
       const text = await response.text()
       const trimmed = text.trim()
@@ -164,6 +169,7 @@ class NSDPortal {
   // Load portal data from API
   async loadPortalData() {
     const spinner = document.getElementById("half-circle-spinner")
+    const spinner3 = document.getElementById("half-circle-spinner-3")
     const nsdPortal = document.getElementById("nsdPortal")
 
     if (spinner) spinner.style.display = "block"
@@ -233,6 +239,7 @@ class NSDPortal {
     } finally {
       console.log("Step-9: Finalizing portal data")
       if (spinner) spinner.style.display = "none"
+      if (spinner3) spinner3.style.display = "none"
       if (nsdPortal) nsdPortal.style.display = "block"
     }
   }
