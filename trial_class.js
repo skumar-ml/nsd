@@ -1,12 +1,15 @@
 /*
 Purpose: Trial class registration form with schedule selection, form submission, and manage/reschedule/cancel flows via token.
 
-Brief Logic: On DOMContentLoaded, hides all form containers by default. If no token is present in the URL, shows the standard registration form and populates available trial class slots and grade dropdown from the API. If a manage token is in the URL, fetches registration details and shows the registration card with prefilled student/parent info. Supports rescheduling (shows reschedule form with available slots) and cancellation via API calls. Handles success/error state display for both registration and reschedule form submissions.
+Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default. Reads URL token first: with a manage token, shows a loader until registration details load, then shows the manage card or invalid-token message. Without a token, shows the registration form immediately; trial class slot cards and grade options load asynchronously (loaders and “Loading grades…” for SEO). If a manage token is present, fetches registration details and shows the registration card with prefilled student/parent info. Supports rescheduling (shows reschedule form with available slots) and cancellation via API calls. Handles success/error state display for both registration and reschedule form submissions.
 
 Are there any dependent JS files: No
 */
 
 document.addEventListener("DOMContentLoaded", async function () {
+    const urlParams = new URLSearchParams(window.location.search)
+    const manageToken = urlParams.get("token")
+
     // By default hide all the form containers
     const trialClassFormContainer = document.querySelector(
         ".trial_class_form-container",
@@ -35,118 +38,182 @@ document.addEventListener("DOMContentLoaded", async function () {
         : null
     const template = document.querySelector(".tc_option-label")
 
-    if (wrapper && grid && template) {
-        const updateCardSelectionClass = (container) => {
-            if (!container) return
+    const updateCardSelectionClass = (container) => {
+        if (!container) return
 
-            const optionLabels = container.querySelectorAll(".tc_option-label")
-            optionLabels.forEach((optionLabel) => {
-                const infoContainer = optionLabel.querySelector(
-                    ".trial-class-info-container",
-                )
-                const optionRadio = optionLabel.querySelector(
-                    "input[type='radio']",
-                )
+        const optionLabels = container.querySelectorAll(".tc_option-label")
+        optionLabels.forEach((optionLabel) => {
+            const infoContainer = optionLabel.querySelector(
+                ".trial-class-info-container",
+            )
+            const optionRadio = optionLabel.querySelector("input[type='radio']")
 
-                if (!infoContainer) return
+            if (!infoContainer) return
 
-                if (optionRadio && optionRadio.checked) {
-                    infoContainer.classList.add("tc_card-selected")
-                } else {
-                    infoContainer.classList.remove("tc_card-selected")
-                }
-            })
+            if (optionRadio && optionRadio.checked) {
+                infoContainer.classList.add("tc_card-selected")
+            } else {
+                infoContainer.classList.remove("tc_card-selected")
+            }
+        })
+    }
+
+    /** Visible while trial class slot options load (SEO-friendly status text). */
+    const mountTrialOptionsLoader = (gridEl) => {
+        gridEl.innerHTML = ""
+        const el = document.createElement("div")
+        el.className = "tc-trial-options-loader"
+        el.setAttribute("role", "status")
+        el.setAttribute("aria-live", "polite")
+        el.setAttribute("aria-busy", "true")
+        el.textContent = "Loading available trial classes…"
+        gridEl.appendChild(el)
+        return el
+    }
+
+    /** Visible while manage registration (reschedule/cancel) data loads. */
+    const mountManageRegistrationLoader = () => {
+        const el = document.createElement("div")
+        el.className = "tc-manage-registration-loader"
+        el.setAttribute("role", "status")
+        el.setAttribute("aria-live", "polite")
+        el.setAttribute("aria-busy", "true")
+        const p = document.createElement("p")
+        p.style.margin = "0"
+        p.textContent = "Loading your registration…"
+        el.appendChild(p)
+        if (registrationCard && registrationCard.parentNode) {
+            registrationCard.parentNode.insertBefore(el, registrationCard)
+        } else {
+            document.body.appendChild(el)
         }
+        return el
+    }
 
+    // Registration form: show structure immediately; load slots in background (skip when managing via token).
+    if (!manageToken && wrapper && grid && template) {
         const templateClone = template.cloneNode(true)
         template.remove()
+        mountTrialOptionsLoader(grid)
+        ;(async () => {
+            try {
+                const res = await fetch(
+                    `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassDetail`,
+                )
+                const classes = await res.json()
+                grid.innerHTML = ""
+                const fragment = document.createDocumentFragment()
 
-        try {
-            const res = await fetch(
-                `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassDetail`,
-            )
-            const classes = await res.json()
-            const fragment = document.createDocumentFragment()
+                classes.forEach((item) => {
+                    const clone = templateClone.cloneNode(true)
 
-            classes.forEach((item) => {
-                const clone = templateClone.cloneNode(true)
+                    const dateEl = clone.querySelector(".trial-class_date")
+                    if (dateEl) {
+                        const date = new Date(item.start_time)
+                        dateEl.textContent = date.toLocaleDateString("en-US", {
+                            weekday: "short",
+                            month: "short",
+                            day: "numeric",
+                        })
+                    }
 
-                const dateEl = clone.querySelector(".trial-class_date")
-                if (dateEl) {
-                    const date = new Date(item.start_time)
-                    dateEl.textContent = date.toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                    })
-                }
+                    const timeEl = clone.querySelector(".trial-class_time-info")
+                    if (timeEl) {
+                        const start = utcDateToEasternTime(item.start_time)
+                        const end = utcDateToEasternTime(item.end_time)
+                        timeEl.textContent = `${start} - ${end} EST`
+                    }
 
-                const timeEl = clone.querySelector(".trial-class_time-info")
-                if (timeEl) {
-                    const start = utcDateToEasternTime(item.start_time)
-                    const end = utcDateToEasternTime(item.end_time)
-                    timeEl.textContent = `${start} - ${end} EST`
-                }
-
-                const gradeEl = clone.querySelector(".trial-class_grade-info")
-                if (gradeEl) {
-                    gradeEl.textContent = `${item.grade_label}`
-                }
-
-                const radio = clone.querySelector("input[type='radio']")
-                if (radio) {
-                    const uniqueId = "trial-class-" + item._id
-                    radio.id = uniqueId
-                    radio.value = item._id
-                    radio.name = "trial-class"
-                    clone.querySelector("label")?.setAttribute("for", uniqueId)
-                    radio.addEventListener("change", () =>
-                        updateCardSelectionClass(grid),
+                    const gradeEl = clone.querySelector(
+                        ".trial-class_grade-info",
                     )
-                }
+                    if (gradeEl) {
+                        gradeEl.textContent = `${item.grade_label}`
+                    }
 
-                clone.addEventListener("click", function () {
-                    const r = clone.querySelector("input[type='radio']")
-                    if (r) r.checked = true
-                    updateCardSelectionClass(grid)
+                    const radio = clone.querySelector("input[type='radio']")
+                    if (radio) {
+                        const uniqueId = "trial-class-" + item._id
+                        radio.id = uniqueId
+                        radio.value = item._id
+                        radio.name = "trial-class"
+                        clone
+                            .querySelector("label")
+                            ?.setAttribute("for", uniqueId)
+                        radio.addEventListener("change", () =>
+                            updateCardSelectionClass(grid),
+                        )
+                    }
+
+                    clone.addEventListener("click", function () {
+                        const r = clone.querySelector("input[type='radio']")
+                        if (r) r.checked = true
+                        updateCardSelectionClass(grid)
+                    })
+
+                    fragment.appendChild(clone)
                 })
 
-                fragment.appendChild(clone)
-            })
+                grid.appendChild(fragment)
+                updateCardSelectionClass(grid)
+            } catch (err) {
+                console.error("Error loading trial class details", err)
+                grid.innerHTML = ""
+                const errEl = document.createElement("div")
+                errEl.className = "tc-trial-options-error"
+                errEl.setAttribute("role", "alert")
+                errEl.style.cssText = "padding:1.25rem 1rem;text-align:center;"
+                errEl.textContent =
+                    "Could not load trial classes. Please refresh the page."
+                grid.appendChild(errEl)
+            }
+        })()
+    }
 
-            grid.appendChild(fragment)
-            updateCardSelectionClass(grid)
-        } catch (err) {
-            console.error("Error loading trial class details", err)
-        }
+    if (!manageToken && trialClassFormContainer) {
+        trialClassFormContainer.style.removeProperty("display")
+        trialClassFormContainer.style.setProperty(
+            "display",
+            "block",
+            "important",
+        )
     }
 
     const form = document.querySelector("#trial-class-form")
     if (!form) return
 
-    // Grade dropdown list
+    // Grade dropdown list (async; independent of slot cards)
     const gradeSelect = form.querySelector(".trial-form-select-field")
 
-    if (gradeSelect) {
-        try {
-            const res = await fetch(
-                `${window.NSD_API.TRIAL_CLASS_API_BASE}/getGrades`,
-            )
-            const grades = await res.json()
-            gradeSelect.innerHTML = '<option value="">Select Grade</option>'
+    if (gradeSelect && !manageToken) {
+        gradeSelect.disabled = true
+        gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
+        ;(async () => {
+            try {
+                const res = await fetch(
+                    `${window.NSD_API.TRIAL_CLASS_API_BASE}/getGrades`,
+                )
+                const grades = await res.json()
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
 
-            grades.forEach((grade) => {
-                const option = document.createElement("option")
-                option.value = grade.grade_name
-                option.textContent = grade.grade_name
-                gradeSelect.appendChild(option)
-            })
-        } catch (err) {
-            console.error("Error loading payment grades", err)
-        }
+                grades.forEach((grade) => {
+                    const option = document.createElement("option")
+                    option.value = grade.grade_name
+                    option.textContent = grade.grade_name
+                    gradeSelect.appendChild(option)
+                })
+            } catch (err) {
+                console.error("Error loading payment grades", err)
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
+            } finally {
+                gradeSelect.disabled = false
+            }
+        })()
     }
 
-    const studentDescription = form.querySelector(".trial-form-student-desc-field")
+    const studentDescription = form.querySelector(
+        ".trial-form-student-desc-field",
+    )
     if (studentDescription) {
         studentDescription.value = studentDescription.value || ""
     }
@@ -200,7 +267,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             previous_experience: form
                 .querySelector("#previous_experience")
                 .value.trim(),
-            best_description: studentDescription ? studentDescription.value : "",
+            best_description: studentDescription
+                ? studentDescription.value
+                : "",
             landingURL: getLandingURL(),
         }
 
@@ -252,13 +321,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     })
 
     // Manage registration view when token is present in the URL
-    const urlParams = new URLSearchParams(window.location.search)
-    const manageToken = urlParams.get("token")
-
     let registrationData = null
 
     if (manageToken) {
-        const registrationCard = document.querySelector(".tc_registration-card")
+        const manageLoaderEl = mountManageRegistrationLoader()
+
         const formContainer = document.querySelector(
             ".trial_class_form-container",
         )
@@ -278,6 +345,10 @@ document.addEventListener("DOMContentLoaded", async function () {
         } catch (err) {
             console.error("Error loading trial class registration", err)
             registrationData = null
+        } finally {
+            if (manageLoaderEl.parentNode) {
+                manageLoaderEl.remove()
+            }
         }
 
         // If token is invalid or expired, show the dedicated message and stop
@@ -505,16 +576,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     })
             })
         }
-    } else {
-        // No manage token: show the standard trial class registration form
-        if (trialClassFormContainer) {
-            trialClassFormContainer.style.removeProperty("display")
-            trialClassFormContainer.style.setProperty(
-                "display",
-                "block",
-                "important",
-            )
-        }
     }
 
     // If we have registrationData, prefill the reschedule form
@@ -741,9 +802,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                     registration.previous_experience || ""
             }
 
-            const resStudentDescription = rescheduleForm.querySelector("#res_student_description")
+            const resStudentDescription = rescheduleForm.querySelector(
+                "#res_student_description",
+            )
             if (resStudentDescription) {
-                resStudentDescription.value = registration.best_description || ""
+                resStudentDescription.value =
+                    registration.best_description || ""
             }
 
             // Make all form fields read-only except class selection radios
