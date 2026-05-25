@@ -112,7 +112,13 @@ class NSDPortal {
     )
     const notificationText = notificationContainer?.querySelector(".noti_text")
 
-    if (!formRow || !formsCategory || !invoiceCategory || !resourcesSection || !resourceLink) {
+    if (
+      !formRow ||
+      !formsCategory ||
+      !invoiceCategory ||
+      !resourcesSection ||
+      !resourceLink
+    ) {
       console.error("Required Webflow UI templates not found in tab pane")
       return false
     }
@@ -124,7 +130,9 @@ class NSDPortal {
     this.$resourceLinkTemplate = this.cloneTemplate(resourceLink)
 
     if (notificationContainer && notificationText) {
-      this.$notificationContainerTemplate = this.cloneTemplate(notificationContainer)
+      this.$notificationContainerTemplate = this.cloneTemplate(
+        notificationContainer
+      )
       this.$notificationTextTemplate = this.cloneTemplate(notificationText)
     }
 
@@ -195,7 +203,11 @@ class NSDPortal {
     portalRoot.style.display = ""
 
     const nsd_portal_container = document.getElementById("nsdPortal")
-    if (is_notification && nsd_portal_container && notificationFragment.childNodes.length) {
+    if (
+      is_notification &&
+      nsd_portal_container &&
+      notificationFragment.childNodes.length
+    ) {
       const notificationDiv = this.cloneNotificationContainer()
       if (notificationDiv) {
         notificationDiv.appendChild(notificationFragment)
@@ -243,11 +255,14 @@ class NSDPortal {
 
     if (titleEl) titleEl.textContent = programName
     if (textEls[0]) textEls[0].textContent = `${studentName} | ${dateRange}`
-    if (textEls[1]) textEls[1].textContent = `(${tab.studentDetail.currentYear})`
+    if (textEls[1])
+      textEls[1].textContent = `(${tab.studentDetail.currentYear})`
   }
   // Removes placeholder sections from cloned tab pane (keeps Webflow header/progress shell)
   clearDynamicSections(campInfoWrapper) {
-    const progressWrapper = campInfoWrapper.querySelector(".camp-progress-wrapper")
+    const progressWrapper = campInfoWrapper.querySelector(
+      ".camp-progress-wrapper"
+    )
     const pastProgram = campInfoWrapper.querySelector(".past-program-div")
     if (!progressWrapper) return
 
@@ -283,7 +298,9 @@ class NSDPortal {
     const formsFragment = this.renderFormCategories()
     this.populateProgressBar(campInfoWrapper)
 
-    const progressWrapper = campInfoWrapper.querySelector(".camp-progress-wrapper")
+    const progressWrapper = campInfoWrapper.querySelector(
+      ".camp-progress-wrapper"
+    )
     const pastProgram = campInfoWrapper.querySelector(".past-program-div")
 
     if (progressWrapper && formsFragment.childNodes.length) {
@@ -362,7 +379,9 @@ class NSDPortal {
 
     const gridWrapper = section.querySelector(".registration-info-wrapper")
     if (gridWrapper) {
-      gridWrapper.querySelectorAll(".registration-info-grid").forEach((row) => row.remove())
+      gridWrapper
+        .querySelectorAll(".registration-info-grid")
+        .forEach((row) => row.remove())
       gridWrapper.appendChild(this.formsList(formCategory))
     }
 
@@ -479,7 +498,8 @@ class NSDPortal {
     const linkTextEl = row.querySelector(".medium-red-with-opacity")
     if (linkEl) {
       linkEl.href = link || "#"
-      linkEl.className = `dashboard_link-block w-inline-block ${iframeClassName}`.trim()
+      linkEl.className =
+        `dashboard_link-block w-inline-block ${iframeClassName}`.trim()
     }
     if (linkTextEl) {
       linkTextEl.textContent = link_text
@@ -523,7 +543,9 @@ class NSDPortal {
     const wrapper = section.querySelector(".resources_wrapper")
     if (!wrapper) return null
 
-    wrapper.querySelectorAll(".resources-link-block").forEach((link) => link.remove())
+    wrapper
+      .querySelectorAll(".resources-link-block")
+      .forEach((link) => link.remove())
 
     const campTopicLink = this.createCampTopicResource()
     if (campTopicLink) wrapper.appendChild(campTopicLink)
@@ -614,7 +636,7 @@ class NSDPortal {
   // Returns the URL for checked or unchecked icon based on completion status
   getCheckedIcon(status) {
     if (status) {
-      return "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd773b1a8202a880f7bd8_check%20(2).svg"
+      return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png"
     } else {
       return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png"
     }
