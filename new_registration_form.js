@@ -83,58 +83,65 @@ class NSDPortal {
       document.getElementById("paid-resources").style.display = "block"
     }
   }
-  // Creates portal tabs for multiple student programs
+  // Returns the Webflow registration form tabs root (pre-built in Webflow)
+  getRegistrationFormRoot() {
+    return (
+      document.getElementById("registration-form-tab") ||
+      document.querySelector("#nsdPortal #registration-form-tab") ||
+      document.querySelector("#nsdPortal .registration-form-tab")
+    )
+  }
+  // Deep-clones a Webflow template node and strips active-state classes
+  cloneTemplate(node) {
+    const clone = node.cloneNode(true)
+    clone.classList.remove("w--current", "w--tab-active")
+    clone.removeAttribute("tabindex")
+    return clone
+  }
+  // Creates portal tabs for multiple student programs using Webflow HTML templates
   createPortalTabs(tabsData) {
-    const nsd_portal_container = document.getElementById("nsdPortal")
+    const portalRoot = this.getRegistrationFormRoot()
+    if (!portalRoot) {
+      console.error("registration-form-tab not found in Webflow DOM")
+      return
+    }
+
+    const tabMenus = portalRoot.querySelector(".w-tab-menu")
+    const tabContent = portalRoot.querySelector(".w-tab-content")
+    if (!tabMenus || !tabContent) {
+      console.error("Tab menu or content container not found")
+      return
+    }
+
+    const tabLinkTemplate = tabMenus.querySelector(".w-tab-link")
+    const tabPaneTemplate = tabContent.querySelector(".w-tab-pane")
+    if (!tabLinkTemplate || !tabPaneTemplate) {
+      console.error("Tab link or pane template not found")
+      return
+    }
+
     var is_notification = false
     var notificationDiv = this.creEl("div", "notification_container")
-    // Create the main portal tab container
-    const portalTabs = document.createElement("div")
-    portalTabs.className = "portal-tab w-tabs"
-    portalTabs.setAttribute("data-current", "Tab 1")
-    portalTabs.setAttribute("data-easing", "ease")
-    portalTabs.setAttribute("data-duration-in", "300")
-    portalTabs.setAttribute("data-duration-out", "100")
 
-    // Create the tab menu container
-    const tabMenus = document.createElement("div")
-    tabMenus.className = "portal-tab-menus w-tab-menu"
-    tabMenus.setAttribute("role", "tablist")
+    tabMenus.innerHTML = ""
+    tabContent.innerHTML = ""
 
-    // Create the tab content container
-    const tabContent = document.createElement("div")
-    tabContent.className = "portal-tab-content w-tab-content"
-
-    // Loop through the tab data to create each tab and its content
-    tabsData.forEach((tab, index) => {
+    var validTabIndex = 0
+    tabsData.forEach((tab) => {
       if (tab.failedPayment == undefined) {
-        const tabIndex = index + 1
-        const isActive = index === 0 ? "w--current" : ""
-        const isTabActive = index === 0 ? "w--tab-active" : ""
+        const tabIndex = validTabIndex + 1
+        const isActive = validTabIndex === 0
         this.updateGlobalVariable(tab)
-        // Create the tab header
-        const tabHeader = document.createElement("a")
-        tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link ${isActive}`
-        tabHeader.setAttribute("data-w-tab", `Tab ${tabIndex}`)
-        tabHeader.setAttribute("id", `w-tabs-0-data-w-tab-${index}`)
-        tabHeader.setAttribute("href", `#w-tabs-0-data-w-pane-${index}`)
-        tabHeader.setAttribute("role", "tab")
-        tabHeader.setAttribute("aria-controls", `w-tabs-0-data-w-pane-${index}`)
-        tabHeader.setAttribute("aria-selected", index === 0 ? "true" : "false")
-        tabHeader.setAttribute("tabindex", index === 0 ? "0" : "-1")
-        tabHeader.innerHTML = `
-                <div>
-                    <div class="current-program_content-div">
-                        <div class="dm-sans current-program_subtitle">${tab.programDetail.programName}</div>
-                        <div class="dm-sans opacity-70">${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last} | ${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate()} - ${this.$endDate.toLocaleString("default", { month: "long" })} ${this.$endDate.getDate()}</div>
-                        <div class="dm-sans opacity-70">(${tab.studentDetail.currentYear})</div>
-                    </div>
-                </div>
-            `
-        var tabPane = this.tabPane(index, tabIndex, isTabActive, tab)
-        // Append the tab header and content to their respective containers
+
+        const tabHeader = this.cloneTemplate(tabLinkTemplate)
+        this.populateTabLink(tabHeader, tab, validTabIndex, tabIndex, isActive)
         tabMenus.appendChild(tabHeader)
+
+        const tabPane = this.cloneTemplate(tabPaneTemplate)
+        this.populateTabPane(tabPane, tab, validTabIndex, tabIndex, isActive)
         tabContent.appendChild(tabPane)
+
+        validTabIndex++
       } else {
         is_notification = true
         tab.failedPayment.forEach((item) => {
@@ -150,27 +157,77 @@ class NSDPortal {
       }
     })
 
-    // Append the tab menus and content to the main portal tab container
-    if (tabMenus) {
-      portalTabs.appendChild(tabMenus)
+    if (validTabIndex === 0) {
+      portalRoot.style.display = "none"
+      return
     }
-    if (tabContent) {
-      portalTabs.appendChild(tabContent)
+
+    portalRoot.style.display = ""
+
+    const nsd_portal_container = document.getElementById("nsdPortal")
+    if (is_notification && nsd_portal_container) {
+      nsd_portal_container.prepend(notificationDiv)
     }
-    // Append the portal tabs to the body or a specific container
-    if (tabMenus && tabContent) {
-      // if (is_notification) {
-      //     nsd_portal_container.prepend(notificationDiv, portalTabs);
-      // } else {
-      nsd_portal_container.appendChild(portalTabs)
-      //}
-    }
+
     //Initiate lightbox after dom element added
     this.initiateLightbox()
     // Cross Icon code
     this.crossEvent()
     // Update memberStack firstname after update modal closed
     this.updateMemberFirstName()
+  }
+  // Populates a cloned tab link with program/student data
+  populateTabLink(tabHeader, tab, index, tabIndex, isActive) {
+    tabHeader.className = `current-programs_sub-div w-inline-block w-tab-link${isActive ? " w--current" : ""}`
+    tabHeader.setAttribute("data-w-tab", `Tab ${tabIndex}`)
+    tabHeader.setAttribute("id", `w-tabs-0-data-w-tab-${index}`)
+    tabHeader.setAttribute("href", `#w-tabs-0-data-w-pane-${index}`)
+    tabHeader.setAttribute("role", "tab")
+    tabHeader.setAttribute("aria-controls", `w-tabs-0-data-w-pane-${index}`)
+    tabHeader.setAttribute("aria-selected", isActive ? "true" : "false")
+    tabHeader.setAttribute("tabindex", isActive ? "0" : "-1")
+
+    const titleEl = tabHeader.querySelector(".rf-tab-link-title")
+    const textEls = tabHeader.querySelectorAll(".rf-tab-link-txt")
+    const programName = tab.programDetail.programName
+    const studentName = `${tab.studentDetail.studentName.first} ${tab.studentDetail.studentName.last}`
+    const dateRange = `${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate()} - ${this.$endDate.toLocaleString("default", { month: "long" })} ${this.$endDate.getDate()}`
+
+    if (titleEl) titleEl.textContent = programName
+    if (textEls[0]) textEls[0].textContent = `${studentName} | ${dateRange}`
+    if (textEls[1]) textEls[1].textContent = `(${tab.studentDetail.currentYear})`
+  }
+  // Populates a cloned tab pane with forms, invoices, and resources
+  populateTabPane(tabPane, tab, index, tabIndex, isActive) {
+    tabPane.className = `w-tab-pane${isActive ? " w--tab-active" : ""}`
+    tabPane.setAttribute("data-w-tab", `Tab ${tabIndex}`)
+    tabPane.setAttribute("id", `w-tabs-0-data-w-pane-${index}`)
+    tabPane.setAttribute("role", "tabpanel")
+    tabPane.setAttribute("aria-labelledby", `w-tabs-0-data-w-tab-${index}`)
+
+    const campInfoWrapper = tabPane.querySelector(".camp-info-wrapper")
+    if (!campInfoWrapper) return
+
+    this.$formsList.sort(function (r, a) {
+      return r.sequence - a.sequence
+    })
+
+    const headerEl = campInfoWrapper.querySelector(".camp-header-flex")
+    const headerHtml = headerEl ? headerEl.outerHTML : ""
+
+    const deadlineText = `Needs to be completed by ${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate() + this.getOrdinalSuffix(this.$startDate.getDate())}`
+    const formsHtml = this.renderFormCategories()
+    const resourcesHtml = this.renderResourcesSection()
+
+    campInfoWrapper.innerHTML = `
+      ${headerHtml}
+      <div class="camp-progress-wrapper">
+        <div class="dm-sans-54 camp-text">${deadlineText}</div>
+        <div class="camp-progress-container">${this.progressBar()}</div>
+      </div>
+      ${formsHtml}
+      ${resourcesHtml}
+    `
   }
   // Sets up event handlers for cross icon clicks to reset tab selection
   crossEvent() {
@@ -209,83 +266,31 @@ class NSDPortal {
     this.$startDate = new Date(this.$programDetail.startDate)
     this.$endDate = new Date(this.$programDetail.endDate)
   }
-  // Creates and returns a tab pane element with pre-camp content
-  tabPane(index, tabIndex, isTabActive, tab) {
-    // Update global data
-    // Create the tab content
-    const tabPane = document.createElement("div")
-    tabPane.className = `w-tab-pane ${isTabActive}`
-    tabPane.setAttribute("data-w-tab", `Tab ${tabIndex}`)
-    tabPane.setAttribute("id", `w-tabs-0-data-w-pane-${index}`)
-    tabPane.setAttribute("role", "tabpanel")
-    tabPane.setAttribute("aria-labelledby", `w-tabs-0-data-w-tab-${index}`)
-    this.$formsList.sort(function (r, a) {
-      return r.sequence - a.sequence
-    })
-    var formList = this.$formsList
+  // Renders all form categories (Forms and Invoices) using Webflow markup
+  renderFormCategories() {
+    return this.$formsList
       .map((formCategory) => this.formCategoryList(formCategory))
+      .filter(Boolean)
       .join("")
-    var pre_camp_html = this.createPreCampContent(formList)
-    var during_camp_html = this.createDuringCampContent()
-    let percentageAmount = this.$completedForm.length
-      ? (100 * this.$completedForm.length) / this.$totalForm
-      : 0
-
-    tabPane.innerHTML = `
-           <div class="pre-camp_div">
-               <!-- Pre camp content will come conditionally here -->
-               ${pre_camp_html.innerHTML || ""}
-           </div>
-       `
-
-    return tabPane
-  }
-  // Checks if the program start date has been reached
-  checkProgramStartDate() {
-    var currentDate = new Date()
-    return currentDate >= this.$startDate ? true : false
-  }
-  // Creates and returns the pre-camp content div with forms and resources
-  createPreCampContent(formList) {
-    const preCampDiv = document.createElement("div")
-    preCampDiv.className = "pre-camp_div"
-    preCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">Pre-camp</div>
-                </div>
-                <div>
-                    <div class="pre-camp_title-text">Registration Forms & Resources</div>
-                </div>
-                <div class="cross-icon" id="cross-icon"><img
-                src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd034e71af9888d9eb91d_icon%20(1).svg"
-                loading="lazy" alt=""></div>
-            </div>
-            <div class="pre-camp_subtitle-wrapper">
-                <div class="pre-camp_subtitle">Needs to be completed by ${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate() + this.getOrdinalSuffix(this.$startDate.getDate())}</div>
-                <div class="pre-camp_progress-container">
-                ${this.progressBar()}
-                </div>
-            </div>
-            ${formList}
-            ${this.resourceList()}
-        `
-
-    return preCampDiv
   }
   // Creates and returns HTML for a form category section
   formCategoryList(formCategory) {
+    const categoryName = formCategory.name || "Forms"
+    const isInvoiceCategory = categoryName === "Invoice"
     formCategory.forms = this.filterInvoiceForms(formCategory.forms)
     if (!formCategory.forms.length) {
       return
     }
-    var formCategory = `<div>
-                <div class="pre-camp_subtitle">${formCategory.name}</div>
-                <div class="pre-camp_grid">
-                    ${this.formsList(formCategory)}
+    const wrapperClass = isInvoiceCategory ? "invoice-wrapper" : ""
+    return `<div class="${wrapperClass}">
+                <a href="#" data-portal="view-all-${isInvoiceCategory ? "invoices" : "forms"}" class="main-button-67 inline-block hide w-button">View All ${isInvoiceCategory ? "Invoices" : "forms"}</a>
+                <div>
+                    <div class="registration-info-title">${categoryName === "Invoice" ? "Invoices" : categoryName}</div>
+                    <div class="registration-info-wrapper">
+                        ${this.formsList(formCategory)}
+                    </div>
                 </div>
             </div>`
-    return formCategory
   }
   // Returns HTML string for list of forms in a category
   formsList(formCategory) {
@@ -370,97 +375,57 @@ class NSDPortal {
         ? this.$isLiveProgram && form.is_editable
           ? "Edit " + form_link_text
           : "View " + form_link_text
-        : "Go to " + form_link_text
+        : "Go to " + form_link_text.toLowerCase()
     } else {
       link_text = "Coming Soon"
     }
     if (is_live) {
       this.$totalForm++
     }
-    var singleForm = `
-            <div class="pre-camp_row">
-                <img width="20" src="${checkedInIcon}" loading="lazy" alt="">
-                <div class="dm-sans bold-500 ${completed_form}">${form.name}</div>
-                <a href="${link}" class="dashboard_link-block w-inline-block ${iframeClassName}">
-                    <div class="dm-sans opacity-70">${link_text}</div>
+    return `
+            <div class="registration-info-grid">
+                <img loading="lazy" src="${checkedInIcon}" alt="">
+                <div class="dm-sans-54 bold-500${completed_form}">${form.name}</div>
+                <a href="${link || "#"}" class="dashboard_link-block w-inline-block ${iframeClassName}">
+                    <div class="dm-sans-54 medium-red-with-opacity">${link_text}</div>
                 </a>
             </div>
         `
-    return singleForm
   }
   // Returns HTML for progress bar showing form completion percentage
   progressBar() {
     let percentageAmount = this.$completedForm.length
       ? (100 * this.$completedForm.length) / this.$totalForm
       : 0
-    return `<div class="pre-camp_subtitle opacity-50">${parseInt(percentageAmount)}% / ${this.$completedForm.length} of ${this.$totalForm} forms complete</div>
-                <div class="pre-camp_progress-bar">
-                    <div class="sub-div" style="width: ${percentageAmount + "%"};"></div>
+    return `<div class="camp-gray-text">${parseInt(percentageAmount)}% / ${this.$completedForm.length} of ${this.$totalForm} forms completed</div>
+                <div class="camp-progress-bar">
+                    <div class="sub-div red-bg" style="width: ${percentageAmount}%;"></div>
                 </div>`
   }
-  // Creates and returns the during-camp content div with resources and camp topic
-  createDuringCampContent() {
+  // Returns HTML for resources section (camp topic + uploaded files)
+  renderResourcesSection() {
     const debateEvent = this.$programDetail.debateEvent
-    const duringCampDiv = document.createElement("div")
-    duringCampDiv.className = "during-camp_div"
-
-    duringCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div id="w-node-_8e292b85-7013-e53b-a349-66617a361c36-b55b4cc9" class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">During camp</div>
-                </div>
-                <div class="pre-camp_title-div">
-                    <div class="pre-camp_title-text">Resources/Camp Topic</div>
-                </div>
-            </div>
-            ${this.getCampTopicData() ? this.getCampTopicData() : "Resources not available for this camp"}
-            ${this.getAllResources()}
-        `
-
-    return duringCampDiv
-  }
-  // Returns HTML for all resources section with uploaded content links
-  getAllResources() {
-    if (this.$uploadedContent.length == 0) {
+    const campTopicHtml = this.getCampTopicResource()
+    const uploadedHtml = this.getUploadedResources()
+    if (
+      !campTopicHtml &&
+      !uploadedHtml &&
+      !this.$uploadedContent.length &&
+      debateEvent != "Lincoln-Douglas" &&
+      debateEvent != "Public Forum"
+    ) {
       return ""
     }
     return `<div>
-                <div class="pre-camp_subtitle-wrapper">
-                        <div class="pre-camp_subtitle">Resources</div>
-                    </div>
+                <div class="dashboard-node-header margin-bottom-20">Resources</div>
                 <div class="resources_wrapper">
-                    ${this.$uploadedContent.map((uploadData) => this.resourceLink(uploadData)).join("")}
+                    ${campTopicHtml}
+                    ${uploadedHtml}
                 </div>
             </div>`
   }
-  // Returns HTML for resource list including camp topic and uploaded resources
-  resourceList() {
-    const debateEvent = this.$programDetail.debateEvent
-    if (
-      this.$uploadedContent.length ||
-      debateEvent == "Lincoln-Douglas" ||
-      debateEvent == "Public Forum"
-    ) {
-      return `${this.getCampTopicData()}
-                    ${this.getAllResources()}`
-    } else {
-      return ""
-    }
-  }
-  // Returns HTML for a single resource link element
-  resourceLink(uploadData) {
-    if (uploadData.label && uploadData.uploadedFiles[0]) {
-      return `<a href="${uploadData.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
-                    <div class="resources-div">
-                        <div class="resources-text">${uploadData.label}</div>
-                        </div>
-                </a>`
-    } else {
-      return ""
-    }
-  }
-  // Returns HTML for camp topic section based on debate event type
-  getCampTopicData() {
+  // Returns HTML for camp topic as a resource link when debate event applies
+  getCampTopicResource() {
     let textContent = ""
     const debateEvent = this.$programDetail.debateEvent
     if (debateEvent === "Lincoln-Douglas") {
@@ -470,13 +435,28 @@ class NSDPortal {
       textContent =
         "Resolved: The United States federal government should substantially increase its military presence in the Arctic."
     }
-    if (textContent) {
-      return `<div>
-                        <div class="pre-camp_subtitle-wrapper">
-                            <div class="pre-camp_subtitle">Camp Topic</div>
-                        </div>
-                        ${textContent}
-                    </div>`
+    if (!textContent) return ""
+    return `<a href="#" class="resources-link-block w-inline-block" title="${textContent}">
+                <div class="resources-div">
+                    <div class="resources-text-blue">Camp topic</div>
+                </div>
+            </a>`
+  }
+  // Returns HTML for uploaded resource links
+  getUploadedResources() {
+    if (!this.$uploadedContent.length) return ""
+    return this.$uploadedContent
+      .map((uploadData) => this.resourceLink(uploadData))
+      .join("")
+  }
+  // Returns HTML for a single resource link element
+  resourceLink(uploadData) {
+    if (uploadData.label && uploadData.uploadedFiles[0]) {
+      return `<a href="${uploadData.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
+                    <div class="resources-div">
+                        <div class="resources-text-blue">${uploadData.label}</div>
+                    </div>
+                </a>`
     } else {
       return ""
     }
@@ -522,7 +502,7 @@ class NSDPortal {
   // Returns the URL for checked or unchecked icon based on completion status
   getCheckedIcon(status) {
     if (status) {
-      return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495f35742c15354b2e0d_circle-check-regular.png"
+      return "https://cdn.prod.website-files.com/6271a4bf060d543533060f47/667bd773b1a8202a880f7bd8_check%20(2).svg"
     } else {
       return "https://uploads-ssl.webflow.com/6271a4bf060d543533060f47/639c495fdc487955887ade5b_circle-regular.png"
     }
