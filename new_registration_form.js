@@ -64,18 +64,8 @@ class NSDPortal {
   hidePortalData(responseText) {
     if (responseText == "No data Found") {
       document.getElementById("free-resources").style.display = "block"
-      // commented for update profile modal
-      // setTimeout(() => {
-      //     console.log("ready!");
-      //     this.updateMemberFirstName();
-      // }, "3000");
     } else if (responseText.length == 0) {
       document.getElementById("free-resources").style.display = "block"
-      // commented for update profile modal
-      // setTimeout(() => {
-      //     console.log("ready!");
-      //     this.updateMemberFirstName();
-      // }, "3000");
     } else {
       if (!(localStorage.getItem("locat") === null)) {
         localStorage.removeItem("locat")
@@ -97,6 +87,48 @@ class NSDPortal {
     clone.classList.remove("w--current", "w--tab-active")
     clone.removeAttribute("tabindex")
     return clone
+  }
+  // Caches Webflow UI templates from the tab pane before DOM is cleared
+  cacheWebflowTemplates(tabPaneTemplate) {
+    const campInfo = tabPaneTemplate.querySelector(".camp-info-wrapper")
+    if (!campInfo) {
+      console.error("camp-info-wrapper template not found")
+      return false
+    }
+
+    const formRow = campInfo.querySelector(".registration-info-grid")
+    const formsCategory = campInfo
+      .querySelector('[data-portal="view-all-forms"]')
+      ?.closest("div")
+    const invoiceCategory = campInfo.querySelector(".invoice-wrapper")
+    const resourcesSection = campInfo.querySelector(
+      ".dashboard-node-header.margin-bottom-20"
+    )?.parentElement
+    const resourceLink = campInfo.querySelector(
+      ".resources_wrapper .resources-link-block"
+    )
+    const notificationContainer = document.querySelector(
+      ".notification_container"
+    )
+    const notificationText = notificationContainer?.querySelector(".noti_text")
+
+    if (!formRow || !formsCategory || !invoiceCategory || !resourcesSection || !resourceLink) {
+      console.error("Required Webflow UI templates not found in tab pane")
+      return false
+    }
+
+    this.$formRowTemplate = this.cloneTemplate(formRow)
+    this.$formsCategoryTemplate = this.cloneTemplate(formsCategory)
+    this.$invoiceCategoryTemplate = this.cloneTemplate(invoiceCategory)
+    this.$resourcesSectionTemplate = this.cloneTemplate(resourcesSection)
+    this.$resourceLinkTemplate = this.cloneTemplate(resourceLink)
+
+    if (notificationContainer && notificationText) {
+      this.$notificationContainerTemplate = this.cloneTemplate(notificationContainer)
+      this.$notificationTextTemplate = this.cloneTemplate(notificationText)
+    }
+
+    return true
   }
   // Creates portal tabs for multiple student programs using Webflow HTML templates
   createPortalTabs(tabsData) {
@@ -120,8 +152,12 @@ class NSDPortal {
       return
     }
 
+    if (!this.cacheWebflowTemplates(tabPaneTemplate)) {
+      return
+    }
+
     var is_notification = false
-    var notificationDiv = this.creEl("div", "notification_container")
+    var notificationFragment = document.createDocumentFragment()
 
     tabMenus.innerHTML = ""
     tabContent.innerHTML = ""
@@ -145,14 +181,8 @@ class NSDPortal {
       } else {
         is_notification = true
         tab.failedPayment.forEach((item) => {
-          let noText = this.creEl("span", "noti_text")
-          noText.innerHTML =
-            "A recent payment for " +
-            item["Student Name"] +
-            " register for the program " +
-            item["Program Name"] +
-            " has failed."
-          notificationDiv.appendChild(noText)
+          const noText = this.createNotificationText(item)
+          if (noText) notificationFragment.appendChild(noText)
         })
       }
     })
@@ -165,16 +195,34 @@ class NSDPortal {
     portalRoot.style.display = ""
 
     const nsd_portal_container = document.getElementById("nsdPortal")
-    if (is_notification && nsd_portal_container) {
-      nsd_portal_container.prepend(notificationDiv)
+    if (is_notification && nsd_portal_container && notificationFragment.childNodes.length) {
+      const notificationDiv = this.cloneNotificationContainer()
+      if (notificationDiv) {
+        notificationDiv.appendChild(notificationFragment)
+        nsd_portal_container.prepend(notificationDiv)
+      }
     }
 
-    //Initiate lightbox after dom element added
     this.initiateLightbox()
-    // Cross Icon code
     this.crossEvent()
-    // Update memberStack firstname after update modal closed
     this.updateMemberFirstName()
+  }
+  // Clones notification container from Webflow template
+  cloneNotificationContainer() {
+    if (!this.$notificationContainerTemplate) return null
+    return this.cloneTemplate(this.$notificationContainerTemplate)
+  }
+  // Clones and populates a notification text line from Webflow template
+  createNotificationText(item) {
+    if (!this.$notificationTextTemplate) return null
+    const noText = this.cloneTemplate(this.$notificationTextTemplate)
+    noText.textContent =
+      "A recent payment for " +
+      item["Student Name"] +
+      " register for the program " +
+      item["Program Name"] +
+      " has failed."
+    return noText
   }
   // Populates a cloned tab link with program/student data
   populateTabLink(tabHeader, tab, index, tabIndex, isActive) {
@@ -197,6 +245,20 @@ class NSDPortal {
     if (textEls[0]) textEls[0].textContent = `${studentName} | ${dateRange}`
     if (textEls[1]) textEls[1].textContent = `(${tab.studentDetail.currentYear})`
   }
+  // Removes placeholder sections from cloned tab pane (keeps Webflow header/progress shell)
+  clearDynamicSections(campInfoWrapper) {
+    const progressWrapper = campInfoWrapper.querySelector(".camp-progress-wrapper")
+    const pastProgram = campInfoWrapper.querySelector(".past-program-div")
+    if (!progressWrapper) return
+
+    const toRemove = []
+    let el = progressWrapper.nextElementSibling
+    while (el && el !== pastProgram) {
+      toRemove.push(el)
+      el = el.nextElementSibling
+    }
+    toRemove.forEach((node) => node.remove())
+  }
   // Populates a cloned tab pane with forms, invoices, and resources
   populateTabPane(tabPane, tab, index, tabIndex, isActive) {
     tabPane.className = `w-tab-pane${isActive ? " w--tab-active" : ""}`
@@ -212,22 +274,34 @@ class NSDPortal {
       return r.sequence - a.sequence
     })
 
-    const headerEl = campInfoWrapper.querySelector(".camp-header-flex")
-    const headerHtml = headerEl ? headerEl.outerHTML : ""
-
     const deadlineText = `Needs to be completed by ${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate() + this.getOrdinalSuffix(this.$startDate.getDate())}`
-    const formsHtml = this.renderFormCategories()
-    const resourcesHtml = this.renderResourcesSection()
+    const campText = campInfoWrapper.querySelector(".camp-text")
+    if (campText) campText.textContent = deadlineText
 
-    campInfoWrapper.innerHTML = `
-      ${headerHtml}
-      <div class="camp-progress-wrapper">
-        <div class="dm-sans-54 camp-text">${deadlineText}</div>
-        <div class="camp-progress-container">${this.progressBar()}</div>
-      </div>
-      ${formsHtml}
-      ${resourcesHtml}
-    `
+    this.clearDynamicSections(campInfoWrapper)
+
+    const formsFragment = this.renderFormCategories()
+    this.populateProgressBar(campInfoWrapper)
+
+    const progressWrapper = campInfoWrapper.querySelector(".camp-progress-wrapper")
+    const pastProgram = campInfoWrapper.querySelector(".past-program-div")
+
+    if (progressWrapper && formsFragment.childNodes.length) {
+      progressWrapper.after(formsFragment)
+    }
+
+    const resourcesSection = this.renderResourcesSection()
+    if (resourcesSection) {
+      if (pastProgram) {
+        pastProgram.before(resourcesSection)
+      } else {
+        campInfoWrapper.appendChild(resourcesSection)
+      }
+    }
+
+    if (pastProgram) {
+      pastProgram.style.display = "none"
+    }
   }
   // Sets up event handlers for cross icon clicks to reset tab selection
   crossEvent() {
@@ -243,14 +317,6 @@ class NSDPortal {
   // Removes default selected tab state and redraws Webflow tabs
   removeByDefaultSelectedTab() {
     Webflow.require("tabs").redraw()
-    // const panLink = document.querySelectorAll('.w-tab-link');
-    // panLink.forEach(element => {
-    //     element.classList.remove('w--current');
-    // });
-    // const tabPan = document.querySelectorAll('.w-tab-pane');
-    // tabPan.forEach(element => {
-    //     element.classList.remove('w--tab-active');
-    // });
   }
 
   // Updates global variables with form and program data from tab
@@ -266,58 +332,72 @@ class NSDPortal {
     this.$startDate = new Date(this.$programDetail.startDate)
     this.$endDate = new Date(this.$programDetail.endDate)
   }
-  // Renders all form categories (Forms and Invoices) using Webflow markup
+  // Renders all form categories (Forms and Invoices) as cloned Webflow sections
   renderFormCategories() {
-    return this.$formsList
-      .map((formCategory) => this.formCategoryList(formCategory))
-      .filter(Boolean)
-      .join("")
+    const fragment = document.createDocumentFragment()
+    this.$formsList.forEach((formCategory) => {
+      const section = this.formCategoryList(formCategory)
+      if (section) fragment.appendChild(section)
+    })
+    return fragment
   }
-  // Creates and returns HTML for a form category section
+  // Clones and populates a Webflow forms or invoices category section
   formCategoryList(formCategory) {
     const categoryName = formCategory.name || "Forms"
     const isInvoiceCategory = categoryName === "Invoice"
     formCategory.forms = this.filterInvoiceForms(formCategory.forms)
     if (!formCategory.forms.length) {
-      return
+      return null
     }
-    const wrapperClass = isInvoiceCategory ? "invoice-wrapper" : ""
-    return `<div class="${wrapperClass}">
-                <a href="#" data-portal="view-all-${isInvoiceCategory ? "invoices" : "forms"}" class="main-button-67 inline-block hide w-button">View All ${isInvoiceCategory ? "Invoices" : "forms"}</a>
-                <div>
-                    <div class="registration-info-title">${categoryName === "Invoice" ? "Invoices" : categoryName}</div>
-                    <div class="registration-info-wrapper">
-                        ${this.formsList(formCategory)}
-                    </div>
-                </div>
-            </div>`
+
+    const template = isInvoiceCategory
+      ? this.$invoiceCategoryTemplate
+      : this.$formsCategoryTemplate
+    const section = this.cloneTemplate(template)
+
+    const titleEl = section.querySelector(".registration-info-title")
+    if (titleEl) {
+      titleEl.textContent = isInvoiceCategory ? "Invoices" : categoryName
+    }
+
+    const gridWrapper = section.querySelector(".registration-info-wrapper")
+    if (gridWrapper) {
+      gridWrapper.querySelectorAll(".registration-info-grid").forEach((row) => row.remove())
+      gridWrapper.appendChild(this.formsList(formCategory))
+    }
+
+    return section
   }
-  // Returns HTML string for list of forms in a category
+  // Returns a document fragment of cloned form rows for a category
   formsList(formCategory) {
+    const fragment = document.createDocumentFragment()
     if (formCategory.forms.length == 0) {
-      return ""
+      return fragment
     }
-    var forms = formCategory.forms
+    formCategory.forms
       .sort(function (r, a) {
         return r.sequence - a.sequence
       })
-      .map((form) => this.singleForm(form))
-      .join("")
-    return forms
+      .forEach((form) => {
+        const row = this.singleForm(form)
+        if (row) fragment.appendChild(row)
+      })
+    return fragment
   }
-  // Returns HTML string for a single form row with status icon and link
+  // Clones and populates a Webflow registration-info-grid row for a single form
   singleForm(form) {
-    //check it's editable
+    if (!this.$formRowTemplate) return null
+
+    const row = this.cloneTemplate(this.$formRowTemplate)
     let editable = this.checkForm(form.formId)
     let is_live = form.is_live
-    let completed_form = editable ? " completed_form" : ""
     let checkedInIcon = this.getCheckedIcon(editable)
     var added_by_admin = false
     var link
     if (is_live) {
       if (editable) {
         let dbData = this.getFormData(form.formId)
-        if (dbData.submissionId) {
+        if (dbData && dbData.submissionId) {
           if (this.$isLiveProgram && form.is_editable) {
             link = form.formId
               ? "https://www.jotform.com/edit/" +
@@ -357,7 +437,6 @@ class NSDPortal {
       }
     }
 
-    //Add iframe when it's live and above certain screenwidth
     var iframeClassName =
       is_live && window.innerWidth > 1200 && !added_by_admin
         ? "iframe-lightbox-link"
@@ -382,50 +461,81 @@ class NSDPortal {
     if (is_live) {
       this.$totalForm++
     }
-    return `
-            <div class="registration-info-grid">
-                <img loading="lazy" src="${checkedInIcon}" alt="">
-                <div class="dm-sans-54 bold-500${completed_form}">${form.name}</div>
-                <a href="${link || "#"}" class="dashboard_link-block w-inline-block ${iframeClassName}">
-                    <div class="dm-sans-54 medium-red-with-opacity">${link_text}</div>
-                </a>
-            </div>
-        `
+
+    const img = row.querySelector("img")
+    if (img) {
+      img.src = checkedInIcon
+      img.setAttribute("loading", "lazy")
+      img.alt = ""
+    }
+
+    const nameEl = row.querySelector(".bold-500")
+    if (nameEl) {
+      nameEl.textContent = form.name
+      nameEl.classList.toggle("completed_form", editable)
+    }
+
+    const linkEl = row.querySelector(".dashboard_link-block")
+    const linkTextEl = row.querySelector(".medium-red-with-opacity")
+    if (linkEl) {
+      linkEl.href = link || "#"
+      linkEl.className = `dashboard_link-block w-inline-block ${iframeClassName}`.trim()
+    }
+    if (linkTextEl) {
+      linkTextEl.textContent = link_text
+    }
+
+    return row
   }
-  // Returns HTML for progress bar showing form completion percentage
-  progressBar() {
-    let percentageAmount = this.$completedForm.length
+  // Updates progress bar text and width on existing Webflow elements
+  populateProgressBar(campInfoWrapper) {
+    const percentageAmount = this.$completedForm.length
       ? (100 * this.$completedForm.length) / this.$totalForm
       : 0
-    return `<div class="camp-gray-text">${parseInt(percentageAmount)}% / ${this.$completedForm.length} of ${this.$totalForm} forms completed</div>
-                <div class="camp-progress-bar">
-                    <div class="sub-div red-bg" style="width: ${percentageAmount}%;"></div>
-                </div>`
+    const grayText = campInfoWrapper.querySelector(".camp-gray-text")
+    const progressFill = campInfoWrapper.querySelector(
+      ".camp-progress-bar .sub-div"
+    )
+    if (grayText) {
+      grayText.textContent = `${parseInt(percentageAmount)}% / ${this.$completedForm.length} of ${this.$totalForm} forms completed`
+    }
+    if (progressFill) {
+      progressFill.style.width = `${percentageAmount}%`
+    }
   }
-  // Returns HTML for resources section (camp topic + uploaded files)
+  // Clones and populates the Webflow resources section
   renderResourcesSection() {
     const debateEvent = this.$programDetail.debateEvent
-    const campTopicHtml = this.getCampTopicResource()
-    const uploadedHtml = this.getUploadedResources()
-    if (
-      !campTopicHtml &&
-      !uploadedHtml &&
-      !this.$uploadedContent.length &&
-      debateEvent != "Lincoln-Douglas" &&
-      debateEvent != "Public Forum"
-    ) {
-      return ""
+    const hasCampTopic =
+      debateEvent === "Lincoln-Douglas" || debateEvent === "Public Forum"
+    const hasUploads =
+      this.$uploadedContent &&
+      this.$uploadedContent.length > 0 &&
+      this.$uploadedContent.some(
+        (item) => item.label && item.uploadedFiles && item.uploadedFiles[0]
+      )
+
+    if (!hasCampTopic && !hasUploads) {
+      return null
     }
-    return `<div>
-                <div class="dashboard-node-header margin-bottom-20">Resources</div>
-                <div class="resources_wrapper">
-                    ${campTopicHtml}
-                    ${uploadedHtml}
-                </div>
-            </div>`
+
+    const section = this.cloneTemplate(this.$resourcesSectionTemplate)
+    const wrapper = section.querySelector(".resources_wrapper")
+    if (!wrapper) return null
+
+    wrapper.querySelectorAll(".resources-link-block").forEach((link) => link.remove())
+
+    const campTopicLink = this.createCampTopicResource()
+    if (campTopicLink) wrapper.appendChild(campTopicLink)
+
+    this.getUploadedResources().forEach((link) => {
+      if (link) wrapper.appendChild(link)
+    })
+
+    return section
   }
-  // Returns HTML for camp topic as a resource link when debate event applies
-  getCampTopicResource() {
+  // Clones and populates a camp topic resource link from Webflow template
+  createCampTopicResource() {
     let textContent = ""
     const debateEvent = this.$programDetail.debateEvent
     if (debateEvent === "Lincoln-Douglas") {
@@ -435,31 +545,33 @@ class NSDPortal {
       textContent =
         "Resolved: The United States federal government should substantially increase its military presence in the Arctic."
     }
-    if (!textContent) return ""
-    return `<a href="#" class="resources-link-block w-inline-block" title="${textContent}">
-                <div class="resources-div">
-                    <div class="resources-text-blue">Camp topic</div>
-                </div>
-            </a>`
+    if (!textContent || !this.$resourceLinkTemplate) return null
+
+    const link = this.cloneTemplate(this.$resourceLinkTemplate)
+    link.href = "#"
+    link.title = textContent
+    const label = link.querySelector(".resources-text-blue")
+    if (label) label.textContent = "Camp topic"
+    return link
   }
-  // Returns HTML for uploaded resource links
+  // Returns cloned Webflow resource link elements for uploaded files
   getUploadedResources() {
-    if (!this.$uploadedContent.length) return ""
+    if (!this.$uploadedContent || !this.$uploadedContent.length) return []
     return this.$uploadedContent
       .map((uploadData) => this.resourceLink(uploadData))
-      .join("")
+      .filter(Boolean)
   }
-  // Returns HTML for a single resource link element
+  // Clones and populates a single resource link from Webflow template
   resourceLink(uploadData) {
-    if (uploadData.label && uploadData.uploadedFiles[0]) {
-      return `<a href="${uploadData.uploadedFiles[0]}" target="_blank" class="resources-link-block w-inline-block">
-                    <div class="resources-div">
-                        <div class="resources-text-blue">${uploadData.label}</div>
-                    </div>
-                </a>`
-    } else {
-      return ""
-    }
+    if (!uploadData.label || !uploadData.uploadedFiles[0]) return null
+    if (!this.$resourceLinkTemplate) return null
+
+    const link = this.cloneTemplate(this.$resourceLinkTemplate)
+    link.href = uploadData.uploadedFiles[0]
+    link.target = "_blank"
+    const label = link.querySelector(".resources-text-blue")
+    if (label) label.textContent = uploadData.label
+    return link
   }
   // Filters invoice-related forms based on completion status of dropoff/pickup forms
   filterInvoiceForms(forms) {
@@ -517,7 +629,7 @@ class NSDPortal {
   }
   // Returns the ordinal suffix (st, nd, rd, th) for a given day number
   getOrdinalSuffix(day) {
-    if (day > 3 && day < 21) return "th" // Covers 11th to 20th
+    if (day > 3 && day < 21) return "th"
     switch (day % 10) {
       case 1:
         return "st"
@@ -539,7 +651,6 @@ class NSDPortal {
   }
   // Initializes iframe lightbox for form previews
   initiateLightbox() {
-    var $this = this
     ;[].forEach.call(
       document.getElementsByClassName("iframe-lightbox-link"),
       function (el) {
@@ -558,7 +669,6 @@ class NSDPortal {
     var myFunctionNew = function () {
       var memberstack = localStorage.getItem("memberstack")
       var memberstackData = JSON.parse(memberstack)
-      var webflowMemberId = memberstackData.information.id
       var firstName = memberstackData.information["first-name"]
       var userFirstName2 = document.getElementById("userFirstName2")
       var userFirstName1 = document.getElementById("userFirstName1")
@@ -569,16 +679,5 @@ class NSDPortal {
     for (var i = 0; i < elements.length; i++) {
       elements[i].addEventListener("click", myFunctionNew, false)
     }
-  }
-  // Creates a DOM element with optional class and id attributes
-  creEl(name, className, idName) {
-    var el = document.createElement(name)
-    if (className) {
-      el.className = className
-    }
-    if (idName) {
-      el.setAttribute("id", idName)
-    }
-    return el
   }
 }
