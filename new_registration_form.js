@@ -14,7 +14,6 @@ class NSDPortal {
   $studentDetail = {}
   $totalForm = 0
   $isLiveProgram = true
-  $uploadedContent = {}
   $startDate = ""
   $endDate = ""
   // Initializes the NSD portal instance and fetches registration form data
@@ -101,24 +100,12 @@ class NSDPortal {
       .querySelector('[data-portal="view-all-forms"]')
       ?.closest("div")
     const invoiceCategory = campInfo.querySelector(".invoice-wrapper")
-    const resourcesSection = campInfo.querySelector(
-      ".dashboard-node-header.margin-bottom-20"
-    )?.parentElement
-    const resourceLink = campInfo.querySelector(
-      ".resources_wrapper .resources-link-block"
-    )
     const notificationContainer = document.querySelector(
       ".notification_container"
     )
     const notificationText = notificationContainer?.querySelector(".noti_text")
 
-    if (
-      !formRow ||
-      !formsCategory ||
-      !invoiceCategory ||
-      !resourcesSection ||
-      !resourceLink
-    ) {
+    if (!formRow || !formsCategory || !invoiceCategory) {
       console.error("Required Webflow UI templates not found in tab pane")
       return false
     }
@@ -126,8 +113,6 @@ class NSDPortal {
     this.$formRowTemplate = this.cloneTemplate(formRow)
     this.$formsCategoryTemplate = this.cloneTemplate(formsCategory)
     this.$invoiceCategoryTemplate = this.cloneTemplate(invoiceCategory)
-    this.$resourcesSectionTemplate = this.cloneTemplate(resourcesSection)
-    this.$resourceLinkTemplate = this.cloneTemplate(resourceLink)
 
     if (notificationContainer && notificationText) {
       this.$notificationContainerTemplate = this.cloneTemplate(
@@ -258,23 +243,22 @@ class NSDPortal {
     if (textEls[1])
       textEls[1].textContent = `(${tab.studentDetail.currentYear})`
   }
-  // Removes placeholder sections from cloned tab pane (keeps Webflow header/progress shell)
+  // Removes placeholder form/invoice sections from cloned tab pane
   clearDynamicSections(campInfoWrapper) {
     const progressWrapper = campInfoWrapper.querySelector(
       ".camp-progress-wrapper"
     )
-    const pastProgram = campInfoWrapper.querySelector(".past-program-div")
     if (!progressWrapper) return
 
     const toRemove = []
     let el = progressWrapper.nextElementSibling
-    while (el && el !== pastProgram) {
+    while (el) {
       toRemove.push(el)
       el = el.nextElementSibling
     }
     toRemove.forEach((node) => node.remove())
   }
-  // Populates a cloned tab pane with forms, invoices, and resources
+  // Populates a cloned tab pane with forms and invoices
   populateTabPane(tabPane, tab, index, tabIndex, isActive) {
     tabPane.className = `w-tab-pane${isActive ? " w--tab-active" : ""}`
     tabPane.setAttribute("data-w-tab", `Tab ${tabIndex}`)
@@ -289,7 +273,7 @@ class NSDPortal {
       return r.sequence - a.sequence
     })
 
-    const deadlineText = `Needs to be completed by ${this.$startDate.toLocaleString("default", { month: "long" })} ${this.$startDate.getDate() + this.getOrdinalSuffix(this.$startDate.getDate())}`
+    const deadlineText = this.getDeadlineText()
     const campText = campInfoWrapper.querySelector(".camp-text")
     if (campText) campText.textContent = deadlineText
 
@@ -301,23 +285,9 @@ class NSDPortal {
     const progressWrapper = campInfoWrapper.querySelector(
       ".camp-progress-wrapper"
     )
-    const pastProgram = campInfoWrapper.querySelector(".past-program-div")
 
     if (progressWrapper && formsFragment.childNodes.length) {
       progressWrapper.after(formsFragment)
-    }
-
-    const resourcesSection = this.renderResourcesSection()
-    if (resourcesSection) {
-      if (pastProgram) {
-        pastProgram.before(resourcesSection)
-      } else {
-        campInfoWrapper.appendChild(resourcesSection)
-      }
-    }
-
-    if (pastProgram) {
-      pastProgram.style.display = "none"
     }
   }
   // Sets up event handlers for cross icon clicks to reset tab selection
@@ -343,7 +313,6 @@ class NSDPortal {
     this.$programCategory = tab.programCategory
     this.$studentDetail = tab.studentDetail
     this.$programDetail = tab.programDetail
-    this.$uploadedContent = tab.uploadedContent
     this.$totalForm = 0
     this.checkProgramDeadline()
     this.$startDate = new Date(this.$programDetail.startDate)
@@ -523,78 +492,6 @@ class NSDPortal {
       progressFill.style.width = `${percentageAmount}%`
     }
   }
-  // Clones and populates the Webflow resources section
-  renderResourcesSection() {
-    const debateEvent = this.$programDetail.debateEvent
-    const hasCampTopic =
-      debateEvent === "Lincoln-Douglas" || debateEvent === "Public Forum"
-    const hasUploads =
-      this.$uploadedContent &&
-      this.$uploadedContent.length > 0 &&
-      this.$uploadedContent.some(
-        (item) => item.label && item.uploadedFiles && item.uploadedFiles[0]
-      )
-
-    if (!hasCampTopic && !hasUploads) {
-      return null
-    }
-
-    const section = this.cloneTemplate(this.$resourcesSectionTemplate)
-    const wrapper = section.querySelector(".resources_wrapper")
-    if (!wrapper) return null
-
-    wrapper
-      .querySelectorAll(".resources-link-block")
-      .forEach((link) => link.remove())
-
-    const campTopicLink = this.createCampTopicResource()
-    if (campTopicLink) wrapper.appendChild(campTopicLink)
-
-    this.getUploadedResources().forEach((link) => {
-      if (link) wrapper.appendChild(link)
-    })
-
-    return section
-  }
-  // Clones and populates a camp topic resource link from Webflow template
-  createCampTopicResource() {
-    let textContent = ""
-    const debateEvent = this.$programDetail.debateEvent
-    if (debateEvent === "Lincoln-Douglas") {
-      textContent =
-        "Resolved: The United States ought to guarantee the right to housing."
-    } else if (debateEvent === "Public Forum") {
-      textContent =
-        "Resolved: The United States federal government should substantially increase its military presence in the Arctic."
-    }
-    if (!textContent || !this.$resourceLinkTemplate) return null
-
-    const link = this.cloneTemplate(this.$resourceLinkTemplate)
-    link.href = "#"
-    link.title = textContent
-    const label = link.querySelector(".resources-text-blue")
-    if (label) label.textContent = "Camp topic"
-    return link
-  }
-  // Returns cloned Webflow resource link elements for uploaded files
-  getUploadedResources() {
-    if (!this.$uploadedContent || !this.$uploadedContent.length) return []
-    return this.$uploadedContent
-      .map((uploadData) => this.resourceLink(uploadData))
-      .filter(Boolean)
-  }
-  // Clones and populates a single resource link from Webflow template
-  resourceLink(uploadData) {
-    if (!uploadData.label || !uploadData.uploadedFiles[0]) return null
-    if (!this.$resourceLinkTemplate) return null
-
-    const link = this.cloneTemplate(this.$resourceLinkTemplate)
-    link.href = uploadData.uploadedFiles[0]
-    link.target = "_blank"
-    const label = link.querySelector(".resources-text-blue")
-    if (label) label.textContent = uploadData.label
-    return link
-  }
   // Filters invoice-related forms based on completion status of dropoff/pickup forms
   filterInvoiceForms(forms) {
     var newForms = forms.filter((item) => {
@@ -648,6 +545,28 @@ class NSDPortal {
   getFormData($formId) {
     let data = this.$completedForm.find((o) => o.formId == $formId)
     return data
+  }
+  // Returns deadline using programDetail.deadlineDate
+  getDeadlineText() {
+    const deadlineDate = this.$programDetail?.deadlineDate
+    if (!deadlineDate) return ""
+    const formatted = this.formatDate(deadlineDate)
+    return formatted ? `Needs to be completed by ${formatted}` : ""
+  }
+
+  // Formats a date string as "Month Day{ordinal}" (matches new_portal.js)
+  formatDate(dateString) {
+    try {
+      const sanitized = String(dateString).replace(/\\/g, "").replace(/"/g, "")
+      const date = new Date(sanitized)
+      if (isNaN(date.getTime())) return ""
+      const month = date.toLocaleString("default", { month: "long" })
+      const day = date.getDate()
+      const suffix = this.getOrdinalSuffix(day)
+      return `${month} ${day}${suffix}`
+    } catch (e) {
+      return ""
+    }
   }
   // Returns the ordinal suffix (st, nd, rd, th) for a given day number
   getOrdinalSuffix(day) {
