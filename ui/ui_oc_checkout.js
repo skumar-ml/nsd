@@ -237,6 +237,16 @@ document.addEventListener("DOMContentLoaded", function () {
     const programText = `${className} (${term_name})`
     const priceText = `$${price}`
 
+    console.log("programText", programText)
+
+    const checkoutPaymentTitle = document.querySelector(
+      "#checkout_payment_title"
+    )
+    if (checkoutPaymentTitle) {
+      checkoutPaymentTitle.textContent =
+        checkoutPaymentTitle.textContent.replace(/\bclassname\b/, programText)
+    }
+
     document
       .querySelectorAll(".online-program p.dm-sans.font-14.bold")
       .forEach((el) => (el.textContent = programText))
