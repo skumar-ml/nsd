@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
     )
     if (checkoutPaymentTitle) {
       checkoutPaymentTitle.textContent =
-        checkoutPaymentTitle.textContent.replace(/\bclassname\b/, programText)
+        checkoutPaymentTitle.textContent.replace(/\bClassname\b/, programText)
     }
 
     document
