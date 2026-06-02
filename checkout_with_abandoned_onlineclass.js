@@ -3262,6 +3262,7 @@ class CheckOutWebflow extends BriefsUpsellModal {
         let videoEl = document.querySelector(
             ".cart-sidebar .w-embed-youtubevideo",
         )
+        if (!videoEl) return
         if (visibility == "show") {
             videoEl.style.display = "block"
         } else {
@@ -3269,13 +3270,14 @@ class CheckOutWebflow extends BriefsUpsellModal {
         }
     }
     hideShowDivById(Id, display) {
-        if (Id) {
-            document.getElementById(Id).style.display = display
-        }
+        if (!Id) return
+        var el = document.getElementById(Id)
+        if (el) el.style.display = display
     }
     hideAndShowWhyFamilies(classs, display) {
         if (classs) {
-            document.querySelector("." + classs).style.display = display
+            var whyFamiliesEl = document.querySelector("." + classs)
+            if (whyFamiliesEl) whyFamiliesEl.style.display = display
         }
         // Shared Slick slider settings
         var $slider = $(".why-families_slick-slider")
@@ -3311,9 +3313,9 @@ class CheckOutWebflow extends BriefsUpsellModal {
         }
     }
     hideAndShowByClass(classs, display) {
-        if (classs) {
-            document.querySelector("." + classs).style.display = display
-        }
+        if (!classs) return
+        var el = document.querySelector("." + classs)
+        if (el) el.style.display = display
     }
     activeBreadCrumb(activeId) {
         var activeEl = document.getElementById(activeId)
