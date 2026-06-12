@@ -296,7 +296,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const timeTextEl = document.createElement("p")
       timeTextEl.className = "checkout_offering-text"
-      timeTextEl.textContent = `${day} ${utcToEST(start_time)} - ${utcToEST(end_time)}`
+      timeTextEl.textContent = `${day} ${utcDateToEasternTime(start_time)} - ${utcDateToEasternTime(end_time)}`
 
       card.appendChild(timeTextEl)
       wrapper.appendChild(card)

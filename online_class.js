@@ -258,7 +258,7 @@ function renderPane(pane, result) {
                     const availableSpots = schedule.available_spots ?? 0
 
                     if (timeEl)
-                        timeEl.textContent = `${shortDay} ${utcToEST(schedule.start_time) || ""}`
+                        timeEl.textContent = `${shortDay} ${utcDateToEasternTime(schedule.start_time) || ""}`
                     if (spotsEl) spotsEl.textContent = availableSpots
 
                     if (spotWrapper) {
