@@ -6,6 +6,152 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
+window.trial_class_date = ""
+
+const syncTrialClassDate = (radio) => {
+    if (!radio) {
+        window.trial_class_date = ""
+        return
+    }
+
+    window.trial_class_date =
+        radio.dataset.trialDate ||
+        radio
+            .closest(".tc_option-label")
+            ?.querySelector(".trial-class_date")
+            ?.textContent.trim() ||
+        ""
+}
+
+const renderRegisteredDate = (registeredDateEl) => {
+    const el =
+        registeredDateEl ||
+        document.getElementById("registered-date") ||
+        document.getElementById("res-registered-date")
+    if (!el || !window.trial_class_date) return
+
+    el.textContent = `You're registered for the ${window.trial_class_date} trial class!`
+}
+
+const getTrialClassFormRoot = () =>
+    document.querySelector("#trial-class-form") ||
+    document.querySelector("#wf-form-trial-class-form")
+
+const getRescheduleFormRoot = () =>
+    document.querySelector("#trial-class-reschdule-form")
+
+const getTrialClassFormEl = (root) => {
+    if (!root) return null
+    if (root.matches("form")) return root
+    return root.querySelector("form") || root
+}
+
+const clearTrialClassFormFields = (root) => {
+    if (!root) return
+
+    const formEl = getTrialClassFormEl(root)
+    if (formEl?.reset) {
+        formEl.reset()
+    }
+
+    root.querySelectorAll("input, select, textarea").forEach((field) => {
+        const type = field.type
+
+        if (type === "radio" || type === "checkbox") {
+            field.checked = false
+            return
+        }
+
+        if (field.tagName === "SELECT") {
+            field.value = ""
+            if (field.options.length) {
+                field.selectedIndex = 0
+            }
+            return
+        }
+
+        field.value = ""
+    })
+}
+
+const setupInterviewCardLogic = (scope) => {
+    if (!scope) return null
+
+    const studentDescription =
+        scope.querySelector("#Student-Description") ||
+        scope.querySelector(".trial-form-student-desc-field") ||
+        scope.querySelector("#res_student_description")
+
+    const interviewCard = scope.querySelector(".tc_interview-card")
+    const state = { dismissed: false }
+
+    const updateInterviewCardVisibility = () => {
+        if (!studentDescription || !interviewCard) return
+
+        if (studentDescription.value.length <= 100) {
+            state.dismissed = false
+        }
+
+        if (studentDescription.value.length > 100 && !state.dismissed) {
+            interviewCard.style.setProperty("display", "block", "important")
+        } else {
+            interviewCard.style.setProperty("display", "none", "important")
+        }
+    }
+
+    if (interviewCard) {
+        interviewCard.style.setProperty("display", "none", "important")
+
+        const stayWithTrialBtn =
+            interviewCard.querySelector(".tc_button-outline")
+        if (stayWithTrialBtn) {
+            stayWithTrialBtn.addEventListener("click", (e) => {
+                e.preventDefault()
+                state.dismissed = true
+                interviewCard.style.setProperty("display", "none", "important")
+            })
+        }
+    }
+
+    if (studentDescription) {
+        studentDescription.addEventListener(
+            "input",
+            updateInterviewCardVisibility,
+        )
+        updateInterviewCardVisibility()
+    }
+
+    return { updateInterviewCardVisibility, state, interviewCard }
+}
+
+const showFormSuccessState = ({
+    formRoot,
+    successBoxNew,
+    successWrapper,
+    failBox,
+    registeredDateEl,
+}) => {
+    renderRegisteredDate(registeredDateEl)
+
+    if (formRoot) {
+        formRoot.style.setProperty("display", "none", "important")
+    }
+
+    setTimeout(() => {
+        if (failBox) {
+            failBox.style.setProperty("display", "none", "important")
+        }
+        if (successWrapper) {
+            successWrapper.style.removeProperty("display")
+            successWrapper.style.setProperty("display", "block", "important")
+        }
+        if (successBoxNew) {
+            successBoxNew.style.removeProperty("display")
+            successBoxNew.style.setProperty("display", "flex", "important")
+        }
+    }, 50)
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     const urlParams = new URLSearchParams(window.location.search)
     const manageToken = urlParams.get("token")
@@ -31,6 +177,137 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (registrationCard) {
         registrationCard.style.setProperty("display", "none", "important")
     }
+
+    const tabSection = document.querySelector(".tc_tab-section")
+    if (tabSection) {
+        tabSection.style.setProperty("display", "none", "important")
+    }
+
+    const MOBILE_BREAKPOINT = 991
+    const mobileCardIds = ["trial_class_card", "book_card", "book_placement"]
+    const mobileCardVisibility = {
+        0: { show: "trial_class_card", hide: ["book_card", "book_placement"] },
+        1: { show: "book_card", hide: ["book_placement", "trial_class_card"] },
+        2: { show: "book_placement", hide: ["trial_class_card", "book_card"] },
+    }
+
+    const isMobileView = () => window.innerWidth <= MOBILE_BREAKPOINT
+
+    const setCardDisplay = (id, display) => {
+        const el = document.getElementById(id)
+        if (!el) return
+
+        if (display === "none") {
+            el.style.setProperty("display", "none", "important")
+        } else {
+            el.style.removeProperty("display")
+            el.style.setProperty("display", "block", "important")
+        }
+    }
+
+    const resetMobileCards = () => {
+        mobileCardIds.forEach((id) => {
+            const el = document.getElementById(id)
+            if (el) el.style.removeProperty("display")
+        })
+    }
+
+    const getActiveTabIndex = () => {
+        if (!tabSection) return -1
+
+        const tabButtons = tabSection.querySelectorAll(
+            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
+        )
+        return Array.from(tabButtons).findIndex((btn) =>
+            btn.classList.contains("w--current"),
+        )
+    }
+
+    const updateMobileCards = (tabIndex) => {
+        if (!isMobileView()) {
+            resetMobileCards()
+            return
+        }
+
+        const config = mobileCardVisibility[tabIndex]
+        if (!config) return
+
+        config.hide.forEach((id) => setCardDisplay(id, "none"))
+        setCardDisplay(config.show, "block")
+    }
+
+    const removeTrialClassCardGrayBorder = () => {
+        document.getElementById("trial_class_card")?.classList.remove("gray-border")
+    }
+
+    const showTabSection = (tabIndex = 0) => {
+        if (!tabSection) return
+
+        tabSection.style.removeProperty("display")
+        tabSection.style.setProperty("display", "block", "important")
+
+        const tabButtons = tabSection.querySelectorAll(
+            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
+        )
+        const targetTab = tabButtons[tabIndex]
+        if (targetTab) {
+            targetTab.click()
+        }
+
+        if (tabIndex === 0) {
+            removeTrialClassCardGrayBorder()
+        }
+
+        updateMobileCards(tabIndex)
+        tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+
+    const bindTabSectionTrigger = (selector, tabIndex) => {
+        document.querySelectorAll(selector).forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                showTabSection(tabIndex)
+            })
+        })
+    }
+
+    if (tabSection) {
+        const tabButtons = tabSection.querySelectorAll(
+            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
+        )
+        tabButtons.forEach((btn, index) => {
+            btn.addEventListener("click", () => {
+                if (index === 0) {
+                    removeTrialClassCardGrayBorder()
+                }
+                updateMobileCards(index)
+            })
+        })
+    }
+
+    window.addEventListener("resize", () => {
+        if (!isMobileView()) {
+            resetMobileCards()
+            return
+        }
+
+        const activeTabIndex = getActiveTabIndex()
+        if (activeTabIndex >= 0) {
+            updateMobileCards(activeTabIndex)
+        }
+    })
+
+    document.querySelectorAll(".tc_register-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault()
+            showTabSection(0)
+        })
+    })
+    bindTabSectionTrigger(".tc_book-btn", 1)
+    bindTabSectionTrigger(".tc_book-placement-btn", 2)
+    bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
+    bindTabSectionTrigger("#back-discovery-tab", 1)
+    bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
 
     const wrapper = document.querySelector(".trial-class_option-wapper")
     const grid = wrapper
@@ -71,6 +348,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         return el
     }
 
+    const mountTrialOptionsEmpty = (gridEl) => {
+        gridEl.innerHTML = ""
+        const el = document.createElement("p")
+        el.className = "tc-trial-options-empty"
+        el.style.cssText = "padding:1.25rem 1rem;text-align:center;"
+        el.textContent = "Classes not available"
+        gridEl.appendChild(el)
+    }
+
     /** Visible while manage registration (reschedule/cancel) data loads. */
     const mountManageRegistrationLoader = () => {
         const el = document.createElement("div")
@@ -101,6 +387,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                     `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassDetail`,
                 )
                 const classes = await res.json()
+
+                if (
+                    !res.ok ||
+                    !Array.isArray(classes) ||
+                    classes.length === 0
+                ) {
+                    mountTrialOptionsEmpty(grid)
+                    return
+                }
+
                 grid.innerHTML = ""
                 const fragment = document.createDocumentFragment()
 
@@ -108,8 +404,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const clone = templateClone.cloneNode(true)
 
                     const dateEl = clone.querySelector(".trial-class_date")
+                    let shortDate = ""
                     if (dateEl) {
                         const date = new Date(item.start_time)
+                        shortDate = date.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                        })
                         dateEl.textContent = date.toLocaleDateString("en-US", {
                             weekday: "short",
                             month: "short",
@@ -137,18 +438,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                         radio.id = uniqueId
                         radio.value = item._id
                         radio.name = "trial-class"
+                        if (shortDate) {
+                            radio.dataset.trialDate = shortDate
+                        }
                         clone
                             .querySelector("label")
                             ?.setAttribute("for", uniqueId)
-                        radio.addEventListener("change", () =>
-                            updateCardSelectionClass(grid),
-                        )
+                        radio.addEventListener("change", () => {
+                            updateCardSelectionClass(grid)
+                            syncTrialClassDate(radio)
+                        })
                     }
 
                     clone.addEventListener("click", function () {
                         const r = clone.querySelector("input[type='radio']")
                         if (r) r.checked = true
                         updateCardSelectionClass(grid)
+                        syncTrialClassDate(r)
                     })
 
                     fragment.appendChild(clone)
@@ -179,7 +485,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         )
     }
 
-    const form = document.querySelector("#trial-class-form")
+    const form = getTrialClassFormRoot()
     if (!form) return
 
     // Grade dropdown list (async; independent of slot cards)
@@ -211,18 +517,75 @@ document.addEventListener("DOMContentLoaded", async function () {
         })()
     }
 
-    const studentDescription = form.querySelector(
-        ".trial-form-student-desc-field",
-    )
+    const mainFormScope =
+        form.closest(".trial_class_form-container") || form
+    const mainInterviewCardSetup = setupInterviewCardLogic(mainFormScope)
+    const studentDescription =
+        form.querySelector("#Student-Description") ||
+        form.querySelector(".trial-form-student-desc-field")
+
     if (studentDescription) {
         studentDescription.value = studentDescription.value || ""
     }
 
     const successBox = document.querySelector(".tc_form-done")
+    const successBoxNew =
+        document.querySelector("#trial-class-form-success-submission") ||
+        document.querySelector(".tc_form-done-new")
+    const successWrapper = successBoxNew?.closest(".w-form-done")
     const failBox = document.querySelector(".tc_form-fail")
 
     if (successBox) successBox.style.setProperty("display", "none", "important")
+    if (successBoxNew)
+        successBoxNew.style.setProperty("display", "none", "important")
+    if (successWrapper)
+        successWrapper.style.setProperty("display", "none", "important")
     if (failBox) failBox.style.setProperty("display", "none", "important")
+
+    const resetTrialClassForm = () => {
+        if (successBox)
+            successBox.style.setProperty("display", "none", "important")
+        if (successBoxNew)
+            successBoxNew.style.setProperty("display", "none", "important")
+        if (successWrapper)
+            successWrapper.style.setProperty("display", "none", "important")
+        if (failBox)
+            failBox.style.setProperty("display", "none", "important")
+
+        const formRoot = getTrialClassFormRoot()
+        if (formRoot) {
+            formRoot.style.removeProperty("display")
+            clearTrialClassFormFields(formRoot)
+        }
+
+        if (grid) updateCardSelectionClass(grid)
+
+        if (mainInterviewCardSetup) {
+            mainInterviewCardSetup.state.dismissed = false
+            if (mainInterviewCardSetup.interviewCard) {
+                mainInterviewCardSetup.interviewCard.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            }
+            mainInterviewCardSetup.updateInterviewCardVisibility()
+        }
+
+        window.trial_class_date = ""
+        showTabSection(0)
+    }
+
+    document
+        .querySelectorAll(
+            ".tc_form-done-new .tc_button-no-border, #trial-class-form-success-submission .tc_button-no-border",
+        )
+        .forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                resetTrialClassForm()
+            })
+        })
 
     form.setAttribute("action", "#")
     form.removeAttribute("data-wf-page-id")
@@ -235,6 +598,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (successBox)
             successBox.style.setProperty("display", "none", "important")
+        if (successBoxNew)
+            successBoxNew.style.setProperty("display", "none", "important")
+        if (successWrapper)
+            successWrapper.style.setProperty("display", "none", "important")
         if (failBox) failBox.style.setProperty("display", "none", "important")
 
         const selectedRadio = form.querySelector(
@@ -244,6 +611,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             alert("Please select a trial class.")
             return
         }
+
+        syncTrialClassDate(selectedRadio)
 
         const payload = {
             student: {
@@ -297,21 +666,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return
             }
 
-            // Success: hide form, show success box
-            form.style.display = "none"
-
-            setTimeout(() => {
-                if (failBox)
-                    failBox.style.setProperty("display", "none", "important")
-                if (successBox)
-                    successBox.style.setProperty(
-                        "display",
-                        "block",
-                        "important",
-                    )
-            }, 50)
-
-            form.reset()
+            // Success: hide form fields, show success box
+            showFormSuccessState({
+                formRoot: form,
+                successBoxNew,
+                successWrapper,
+                failBox,
+            })
         } catch (err) {
             if (failBox) {
                 failBox.textContent = "Something went wrong. Please try again."
@@ -644,8 +1005,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const clone = rescheduleTemplateClone.cloneNode(true)
 
                         const dateEl = clone.querySelector(".trial-class_date")
+                        let shortDate = ""
                         if (dateEl) {
                             const date = new Date(item.start_time)
+                            shortDate = date.toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                            })
                             dateEl.textContent = date.toLocaleDateString(
                                 "en-US",
                                 {
@@ -678,14 +1044,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                             radio.id = uniqueId
                             radio.value = item._id
                             radio.name = "res-trial-class"
+                            if (shortDate) {
+                                radio.dataset.trialDate = shortDate
+                            }
                             clone
                                 .querySelector("label")
                                 ?.setAttribute("for", uniqueId)
-                            radio.addEventListener("change", () =>
+                            radio.addEventListener("change", () => {
                                 updateRescheduleCardSelectionClass(
                                     rescheduleGrid,
-                                ),
-                            )
+                                )
+                                syncTrialClassDate(radio)
+                            })
 
                             if (!firstRescheduleRadio) {
                                 firstRescheduleRadio = radio
@@ -696,6 +1066,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             const r = clone.querySelector("input[type='radio']")
                             if (r) r.checked = true
                             updateRescheduleCardSelectionClass(rescheduleGrid)
+                            syncTrialClassDate(r)
                         })
 
                         fragment.appendChild(clone)
@@ -705,6 +1076,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     if (firstRescheduleRadio) {
                         firstRescheduleRadio.checked = true
+                        syncTrialClassDate(firstRescheduleRadio)
                     }
                     updateRescheduleCardSelectionClass(rescheduleGrid)
                 }
@@ -810,6 +1182,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     registration.best_description || ""
             }
 
+            const rescheduleFormScope =
+                rescheduleForm.closest(".trial_class_form-container") ||
+                rescheduleForm.parentElement ||
+                rescheduleForm
+            const rescheduleInterviewCardSetup =
+                setupInterviewCardLogic(rescheduleFormScope)
+
             // Make all form fields read-only except class selection radios
             const allRescheduleInputs = rescheduleForm.querySelectorAll(
                 "input, select, textarea",
@@ -834,14 +1213,35 @@ document.addEventListener("DOMContentLoaded", async function () {
             const rescheduleSuccessBox =
                 document.getElementById(
                     "trial-class-res-form-success-submission",
-                ) || rescheduleForm.querySelector(".tc_form-done")
+                ) || rescheduleFormScope.querySelector(".tc_form-done")
+            const rescheduleSuccessBoxNew =
+                document.getElementById(
+                    "trial-class-res-form-success-submission",
+                ) || rescheduleFormScope.querySelector(".tc_form-done-new")
+            const rescheduleSuccessWrapper =
+                rescheduleSuccessBoxNew?.closest(".w-form-done")
+            const rescheduleRegisteredDateEl =
+                document.getElementById("res-registered-date") ||
+                rescheduleSuccessBoxNew?.querySelector("#registered-date")
             const rescheduleFailBox =
                 document.getElementById(
                     "trial-class-res-form-error-submission",
-                ) || rescheduleForm.querySelector(".tc_form-fail")
+                ) || rescheduleFormScope.querySelector(".tc_form-fail")
 
             if (rescheduleSuccessBox)
                 rescheduleSuccessBox.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            if (rescheduleSuccessBoxNew)
+                rescheduleSuccessBoxNew.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            if (rescheduleSuccessWrapper)
+                rescheduleSuccessWrapper.style.setProperty(
                     "display",
                     "none",
                     "important",
@@ -853,6 +1253,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                     "important",
                 )
 
+            if (rescheduleInterviewCardSetup) {
+                rescheduleInterviewCardSetup.updateInterviewCardVisibility()
+            }
+
             rescheduleForm.addEventListener("submit", async function (e) {
                 e.preventDefault()
                 e.stopPropagation()
@@ -860,6 +1264,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 if (rescheduleSuccessBox)
                     rescheduleSuccessBox.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                if (rescheduleSuccessBoxNew)
+                    rescheduleSuccessBoxNew.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                if (rescheduleSuccessWrapper)
+                    rescheduleSuccessWrapper.style.setProperty(
                         "display",
                         "none",
                         "important",
@@ -878,6 +1294,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                     alert("Please select a trial class.")
                     return
                 }
+
+                syncTrialClassDate(selectedRadio)
 
                 const payload = {
                     token: manageToken,
@@ -918,29 +1336,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                         return
                     }
 
-                    // Success: hide form, show success box
-                    rescheduleForm.style.setProperty(
-                        "display",
-                        "none",
-                        "important",
-                    )
-
-                    setTimeout(() => {
-                        if (rescheduleFailBox)
-                            rescheduleFailBox.style.setProperty(
-                                "display",
-                                "none",
-                                "important",
-                            )
-                        if (rescheduleSuccessBox)
-                            rescheduleSuccessBox.style.setProperty(
-                                "display",
-                                "block",
-                                "important",
-                            )
-                    }, 50)
-
-                    rescheduleForm.reset()
+                    // Success: hide form fields, show success box
+                    showFormSuccessState({
+                        formRoot: rescheduleForm,
+                        successBoxNew: rescheduleSuccessBoxNew,
+                        successWrapper: rescheduleSuccessWrapper,
+                        failBox: rescheduleFailBox,
+                        registeredDateEl: rescheduleRegisteredDateEl,
+                    })
                 } catch (err) {
                     rescheduleForm.style.setProperty(
                         "display",
