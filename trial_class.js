@@ -49,13 +49,25 @@ const getTrialClassFormEl = (root) => {
 const clearTrialClassFormFields = (root) => {
     if (!root) return
 
+    const submitButtons = Array.from(
+        root.querySelectorAll('input[type="submit"], button[type="submit"]'),
+    )
+    const submitDefaults = submitButtons.map((btn) => ({
+        el: btn,
+        value: btn.defaultValue || btn.value,
+    }))
+
     const formEl = getTrialClassFormEl(root)
     if (formEl?.reset) {
         formEl.reset()
     }
 
     root.querySelectorAll("input, select, textarea").forEach((field) => {
-        const type = field.type
+        const type = (field.type || "").toLowerCase()
+
+        if (type === "submit" || type === "button" || type === "hidden") {
+            return
+        }
 
         if (type === "radio" || type === "checkbox") {
             field.checked = false
@@ -71,6 +83,12 @@ const clearTrialClassFormFields = (root) => {
         }
 
         field.value = ""
+    })
+
+    submitDefaults.forEach(({ el, value }) => {
+        if (value) {
+            el.value = value
+        }
     })
 }
 
