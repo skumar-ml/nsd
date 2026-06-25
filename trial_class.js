@@ -236,8 +236,29 @@ document.addEventListener("DOMContentLoaded", async function () {
         setCardDisplay(config.show, "block")
     }
 
-    const removeTrialClassCardGrayBorder = () => {
-        document.getElementById("trial_class_card")?.classList.remove("gray-border")
+    const heroCardBorderMap = {
+        0: {
+            active: "trial_class_card",
+            inactive: ["book_card", "book_placement"],
+        },
+        1: {
+            active: "book_card",
+            inactive: ["trial_class_card", "book_placement"],
+        },
+        2: {
+            active: "book_placement",
+            inactive: ["trial_class_card", "book_card"],
+        },
+    }
+
+    const updateHeroCardBorders = (tabIndex) => {
+        const config = heroCardBorderMap[tabIndex]
+        if (!config) return
+
+        document.getElementById(config.active)?.classList.remove("gray-border")
+        config.inactive.forEach((id) => {
+            document.getElementById(id)?.classList.add("gray-border")
+        })
     }
 
     const showTabSection = (tabIndex = 0) => {
@@ -254,10 +275,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             targetTab.click()
         }
 
-        if (tabIndex === 0) {
-            removeTrialClassCardGrayBorder()
-        }
-
+        updateHeroCardBorders(tabIndex)
         updateMobileCards(tabIndex)
         tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
     }
@@ -277,9 +295,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         )
         tabButtons.forEach((btn, index) => {
             btn.addEventListener("click", () => {
-                if (index === 0) {
-                    removeTrialClassCardGrayBorder()
-                }
+                updateHeroCardBorders(index)
                 updateMobileCards(index)
             })
         })
@@ -352,7 +368,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         gridEl.innerHTML = ""
         const el = document.createElement("p")
         el.className = "tc-trial-options-empty"
-        el.style.cssText = "padding:1.25rem 1rem;text-align:center;"
+        el.style.cssText = "padding:1.25rem 1rem;"
         el.textContent = "Classes not available"
         gridEl.appendChild(el)
     }
