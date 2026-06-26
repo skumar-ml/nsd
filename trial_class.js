@@ -92,6 +92,26 @@ const clearTrialClassFormFields = (root) => {
     })
 }
 
+const INTERVIEW_CARD_KEYWORDS = [
+    "PF",
+    "LD",
+    "CX",
+    "Camp",
+    "Year",
+    "public",
+    "forum",
+    "lincoln",
+    "douglas",
+    "policy",
+]
+
+const matchesInterviewCardKeywords = (text) => {
+    const normalized = (text || "").toLowerCase()
+    return INTERVIEW_CARD_KEYWORDS.some((keyword) =>
+        normalized.includes(keyword.toLowerCase()),
+    )
+}
+
 const setupInterviewCardLogic = (scope) => {
     if (!scope) return null
 
@@ -106,11 +126,15 @@ const setupInterviewCardLogic = (scope) => {
     const updateInterviewCardVisibility = () => {
         if (!studentDescription || !interviewCard) return
 
-        if (studentDescription.value.length <= 100) {
+        const hasKeywordMatch = matchesInterviewCardKeywords(
+            studentDescription.value,
+        )
+
+        if (!hasKeywordMatch) {
             state.dismissed = false
         }
 
-        if (studentDescription.value.length > 100 && !state.dismissed) {
+        if (hasKeywordMatch && !state.dismissed) {
             interviewCard.style.setProperty("display", "block", "important")
         } else {
             interviewCard.style.setProperty("display", "none", "important")
@@ -1295,7 +1319,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 e.preventDefault()
                 e.stopPropagation()
                 e.stopImmediatePropagation()
-
+              
                 if (rescheduleSuccessBox)
                     rescheduleSuccessBox.style.setProperty(
                         "display",
