@@ -235,6 +235,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const isMobileView = () => window.innerWidth <= MOBILE_BREAKPOINT
 
+    let mobileCardSelection = null
+
     const setCardDisplay = (id, display) => {
         const el = document.getElementById(id)
         if (!el) return
@@ -254,18 +256,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
-    const getActiveTabIndex = () => {
-        if (!tabSection) return -1
-
-        const tabButtons = tabSection.querySelectorAll(
-            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
-        )
-        return Array.from(tabButtons).findIndex((btn) =>
-            btn.classList.contains("w--current"),
-        )
-    }
-
-    const updateMobileCards = (tabIndex) => {
+    const applyMobileCardSelection = (tabIndex) => {
         if (!isMobileView()) {
             resetMobileCards()
             return
@@ -276,6 +267,30 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         config.hide.forEach((id) => setCardDisplay(id, "none"))
         setCardDisplay(config.show, "block")
+    }
+
+    const setMobileCardSelection = (tabIndex) => {
+        mobileCardSelection = tabIndex
+        applyMobileCardSelection(tabIndex)
+    }
+
+    const syncMobileCardsForViewport = () => {
+        if (!isMobileView()) {
+            mobileCardSelection = null
+            resetMobileCards()
+            return
+        }
+
+        if (mobileCardSelection === null) {
+            resetMobileCards()
+            return
+        }
+
+        applyMobileCardSelection(mobileCardSelection)
+    }
+
+    const updateMobileCards = (tabIndex) => {
+        setMobileCardSelection(tabIndex)
     }
 
     const heroCardBorderMap = {
@@ -343,16 +358,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
+    let mobileResizeTimer
     window.addEventListener("resize", () => {
-        if (!isMobileView()) {
-            resetMobileCards()
-            return
-        }
-
-        const activeTabIndex = getActiveTabIndex()
-        if (activeTabIndex >= 0) {
-            updateMobileCards(activeTabIndex)
-        }
+        clearTimeout(mobileResizeTimer)
+        mobileResizeTimer = setTimeout(() => {
+            syncMobileCardsForViewport()
+        }, 150)
     })
 
     document.querySelectorAll(".tc_register-btn").forEach((btn) => {
