@@ -228,8 +228,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     const MOBILE_BREAKPOINT = 991
     const mobileCardIds = ["trial_class_card", "book_card", "book_placement"]
     const mobileCardVisibility = {
-        0: { show: "trial_class_card", hide: ["book_card", "book_placement"] },
-        1: { show: "book_card", hide: ["book_placement", "trial_class_card"] },
+        0: { show: "book_card", hide: ["trial_class_card", "book_placement"] },
+        1: { show: "trial_class_card", hide: ["book_placement", "book_card"] },
         2: { show: "book_placement", hide: ["trial_class_card", "book_card"] },
     }
 
@@ -295,12 +295,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     const heroCardBorderMap = {
         0: {
-            active: "trial_class_card",
-            inactive: ["book_card", "book_placement"],
-        },
-        1: {
             active: "book_card",
             inactive: ["trial_class_card", "book_placement"],
+        },
+        1: {
+            active: "trial_class_card",
+            inactive: ["book_card", "book_placement"],
         },
         2: {
             active: "book_placement",
@@ -369,10 +369,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.querySelectorAll(".tc_register-btn").forEach((btn) => {
         btn.addEventListener("click", (e) => {
             e.preventDefault()
-            showTabSection(0)
+            showTabSection(1)
         })
     })
-    bindTabSectionTrigger(".tc_book-btn", 1)
+    bindTabSectionTrigger(".tc_book-btn", 0)
     bindTabSectionTrigger(".tc_book-placement-btn", 2)
     bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
     bindTabSectionTrigger("#back-discovery-tab", 1)
@@ -642,7 +642,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         window.trial_class_date = ""
-        showTabSection(0)
+        showTabSection(1)
     }
 
     document
