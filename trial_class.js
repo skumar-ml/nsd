@@ -375,7 +375,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     bindTabSectionTrigger(".tc_book-btn", 0)
     bindTabSectionTrigger(".tc_book-placement-btn", 2)
     bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
-    bindTabSectionTrigger("#back-discovery-tab", 1)
+    bindTabSectionTrigger("#back-discovery-tab", 0)
     bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
 
     const wrapper = document.querySelector(".trial-class_option-wapper")
