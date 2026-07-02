@@ -906,17 +906,6 @@ class NSDPortal {
       }
     }
 
-    // Create during-camp content if program has started
-    if (this.hasProgramStarted(session)) {
-      const duringCampContent = this.createDuringCampContent(
-        session,
-        sessionInvoices,
-      )
-      if (duringCampContent) {
-        campInfoWrapper.appendChild(duringCampContent)
-      }
-    }
-
     tabPane.appendChild(campInfoWrapper)
 
     return tabPane
@@ -982,12 +971,6 @@ class NSDPortal {
     // Create pre-camp content
     const preCampContent = this.createPreCampContent(session, sessionInvoices)
 
-    // Create during-camp content
-    const duringCampContent = this.createDuringCampContent(
-      session,
-      sessionInvoices,
-    )
-
     // Clear and populate tab pane
     while (tabPane.firstChild) {
       tabPane.removeChild(tabPane.firstChild)
@@ -996,11 +979,6 @@ class NSDPortal {
     // Add pre-camp section
     if (preCampContent) {
       tabPane.appendChild(preCampContent)
-    }
-
-    // Add during-camp section if program has started
-    if (duringCampContent && this.hasProgramStarted(session)) {
-      tabPane.appendChild(duringCampContent)
     }
   }
 
@@ -1123,6 +1101,12 @@ class NSDPortal {
       }
     }
 
+    // Create camp topic section
+    const campTopicSection = this.createCampTopicSection(session)
+    if (campTopicSection) {
+      contentContainer.appendChild(campTopicSection)
+    }
+
     // Create resources section
     const resourcesSection = this.createResourcesSection(session)
     if (resourcesSection) {
@@ -1130,6 +1114,25 @@ class NSDPortal {
     }
 
     return contentContainer
+  }
+
+  // Create camp topic section
+  createCampTopicSection(session) {
+    const campTopic = session.programDetail?.campTopic || ""
+    if (!campTopic) {
+      return null
+    }
+
+    const container = document.createElement("div")
+    container.innerHTML = `
+            <div>
+                <div class="pre-camp_subtitle-wrapper">
+                    <div class="pre-camp_subtitle">Camp Topic</div>
+                </div>
+                <div>${campTopic}</div>
+            </div>
+        `
+    return container
   }
 
   // Create forms section
@@ -1289,68 +1292,6 @@ class NSDPortal {
     })
 
     return uniquePrograms
-  }
-
-  // Create during-camp content
-  createDuringCampContent(session, invoiceData) {
-    const duringCampDiv = document.createElement("div")
-    duringCampDiv.className = "during-camp_div"
-
-    const campTopic = session.programDetail?.campTopic || ""
-    const uploadedContent = session.uploadedContent || []
-    const paymentId =
-      session.studentDetail?.uniqueIdentification || session.paymentId
-
-    duringCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">During camp</div>
-                </div>
-                <div class="pre-camp_title-div">
-                    <div class="dashboard-node-header">Resources/Camp Topic</div>
-                </div>
-            </div>
-            ${
-              campTopic
-                ? `
-            <div>
-                <div class="pre-camp_subtitle-wrapper">
-                    <div class="pre-camp_subtitle">Camp Topic</div>
-                </div>
-                <div>${campTopic}</div>
-            </div>
-            `
-                : "Camp topic is not available for this camp"
-            }
-            ${
-              invoiceData && invoiceData.invoiceList
-                ? `
-            <div>
-                <div class="pre-camp_subtitle">Invoice</div>
-                <div class="registration-info-wrapper" id="during_invoice_${paymentId}">
-                </div>
-            </div>
-            `
-                : ""
-            }
-            ${this.renderResources(session, true)}
-        `
-
-    // Add invoices with proper event handlers for during-camp section
-    if (invoiceData && invoiceData.invoiceList) {
-      const duringInvoiceContainer = duringCampDiv.querySelector(
-        `#during_invoice_${paymentId}`,
-      )
-      if (duringInvoiceContainer && invoiceData.invoiceList.length > 0) {
-        this.updateInvoiceList(
-          duringInvoiceContainer,
-          invoiceData.invoiceList,
-          paymentId,
-        )
-      }
-    }
-
-    return duringCampDiv
   }
 
   // Render form categories
