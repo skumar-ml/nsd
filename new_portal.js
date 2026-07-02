@@ -991,26 +991,15 @@ class NSDPortal {
     const formCompletedList = session.formCompletedList || []
     const deadlineDate = session.programDetail?.deadlineDate
 
-    // Calculate total forms FIRST (count all forms, not just live ones, for display)
-    // This ensures we show the total count even if forms aren't live yet
-    const totalForms = this.countTotalForms(formList, false, true)
-
-    // Initialize total form count (will be incremented as forms are rendered for verification)
-    session._totalFormCount = 0
-
-    // Calculate completed forms - filter out invoice forms from completed count
-    // Only count forms where isInvoice == "No" OR form_sub_type is 'dropoff' or 'pickup'
-    const completedFormsOnly = formCompletedList.filter(
-      (i) =>
-        i.isInvoice == "No" ||
-        i.form_sub_type == "dropoff" ||
-        i.form_sub_type == "pickup",
-    )
-    const completedForms = completedFormsOnly.length
+    const { totalForms, completedForms, progressPercentage } =
+      this.getFormProgress(session)
 
     const deadlineText = deadlineDate
       ? `Needs to be completed by ${this.formatDate(deadlineDate)}`
       : ""
+
+    // Initialize total form count (will be incremented as forms are rendered for verification)
+    session._totalFormCount = 0
 
     // Create header section
     const headerDiv = document.createElement("div")
@@ -1035,10 +1024,6 @@ class NSDPortal {
       )
     }
 
-    // Calculate progress percentage
-    const progressPercentage =
-      totalForms > 0 ? Math.round((completedForms / totalForms) * 100) : 0
-
     // Create progress section - only show if deadline exists AND forms are available
     if (deadlineText && formList.length > 0 && totalForms > 0) {
       const progressDiv = document.createElement("div")
@@ -1046,7 +1031,7 @@ class NSDPortal {
       progressDiv.innerHTML = `
                 <div class="dm-sans camp-text">${deadlineText}</div>
                 <div class="camp-progress-container">
-                    <div class="camp-gray-text">${progressPercentage}% / ${completedForms} of ${totalForms} forms complete</div>
+                    <div class="camp-gray-text">${progressPercentage}% / ${completedForms} of ${totalForms} forms completed</div>
                     <div class="camp-progress-bar">
                         <div class="sub-div" style="width: ${progressPercentage}%;"></div>
                     </div>
@@ -1829,11 +1814,39 @@ class NSDPortal {
   // Render progress bar
   renderProgressBar(completed, total, percentage) {
     return `
-            <div class="pre-camp_subtitle opacity-50">${percentage}% / ${completed} of ${total} forms complete</div>
+            <div class="pre-camp_subtitle opacity-50">${percentage}% / ${completed} of ${total} forms completed</div>
             <div class="pre-camp_progress-bar">
                 <div class="sub-div" style="width: ${percentage}%;"></div>
             </div>
         `
+  }
+
+  // Match registration page progress: count only live forms shown in the portal
+  getFormProgress(session) {
+    const formList = session.formList || []
+    const formCompletedList = session.formCompletedList || []
+    const displayedLiveForms = []
+
+    formList.forEach((category) => {
+      let forms = category.forms || []
+      if (category.name === "Invoice") {
+        forms = this.filterInvoiceForms(forms, formCompletedList)
+      }
+      forms
+        .filter((form) => form.is_live)
+        .forEach((form) => displayedLiveForms.push(form))
+    })
+
+    const totalForms = displayedLiveForms.length
+    const completedForms = displayedLiveForms.filter((form) =>
+      formCompletedList.some((completed) => completed.formId === form.formId),
+    ).length
+    const progressPercentage =
+      totalForms > 0
+        ? Math.min(100, Math.round((completedForms / totalForms) * 100))
+        : 0
+
+    return { totalForms, completedForms, progressPercentage }
   }
 
   // Helper methods
