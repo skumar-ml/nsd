@@ -219,6 +219,7 @@ class NSDPortal {
       // Hide or show free/paid resources (brief + camp + online-classes conditions)
       console.log("Step-6: Hiding or showing free/paid resources")
       this.hidePortalData(studentData, briefsData, hasClassEnrollments)
+      this.autoSelectPortalTab()
 
       // Handle briefs
       console.log("Step-7: Handling briefs")
@@ -330,33 +331,53 @@ class NSDPortal {
     const displayVal = hasEnrollments ? "flex" : "none"
     tab.style.display = displayVal
     if (pane) pane.style.display = displayVal
+  }
 
-    // When Classes tab is visible, make it the active tab so Tab 1 isn't left active
-    if (hasEnrollments) {
-      const tabList = tab.closest('[role="tablist"]') || tab.parentElement
-      const tabContent =
-        tab.closest(".w-tabs")?.querySelector(".w-tab-content") ||
-        pane?.parentElement
-      if (tabList) {
-        tabList
-          .querySelectorAll('[role="tab"], .w-tab-link')
-          .forEach((link) => {
-            link.classList.remove("w--tab-active", "w--current")
-            link.setAttribute("aria-selected", "false")
-            link.setAttribute("tabindex", "-1")
-          })
-        tab.classList.add("w--tab-active", "w--current")
-        tab.setAttribute("aria-selected", "true")
-        tab.setAttribute("tabindex", "0")
-      }
-      if (tabContent) {
-        tabContent
-          .querySelectorAll('.w-tab-pane, [role="tabpanel"]')
-          .forEach((p) => {
-            p.classList.remove("w--tab-active")
-          })
-        if (pane) pane.classList.add("w--tab-active")
-      }
+  // Auto-select the first visible top-level tab in priority: Camps, Classes, Briefs
+  autoSelectPortalTab() {
+    const tabSelectors = [
+      '[data-portal="camp-tab"]',
+      '[data-portal="online-class-tab"]',
+      '[data-portal="briefs-tab"]',
+    ]
+
+    const targetTab = tabSelectors
+      .map((selector) => document.querySelector(selector))
+      .find((tab) => {
+        if (!tab) return false
+        const computedDisplay = window.getComputedStyle(tab).display
+        return computedDisplay !== "none"
+      })
+
+    if (!targetTab) return
+
+    const paneId =
+      targetTab.getAttribute("aria-controls") ||
+      (targetTab.getAttribute("href") || "").replace("#", "")
+    const targetPane = paneId ? document.getElementById(paneId) : null
+    const tabList = targetTab.closest('[role="tablist"]') || targetTab.parentElement
+    const tabContent =
+      targetTab.closest(".w-tabs")?.querySelector(".w-tab-content") ||
+      targetPane?.parentElement
+
+    if (tabList) {
+      tabList.querySelectorAll('[role="tab"], .w-tab-link').forEach((link) => {
+        link.classList.remove("w--tab-active", "w--current")
+        link.setAttribute("aria-selected", "false")
+        link.setAttribute("tabindex", "-1")
+      })
+      targetTab.classList.add("w--tab-active", "w--current")
+      targetTab.setAttribute("aria-selected", "true")
+      targetTab.setAttribute("tabindex", "0")
+    }
+
+    if (tabContent) {
+      tabContent
+        .querySelectorAll('.w-tab-pane, [role="tabpanel"]')
+        .forEach((pane) => {
+          pane.classList.remove("w--tab-active")
+        })
+      if (targetPane) targetPane.classList.add("w--tab-active")
     }
   }
 
