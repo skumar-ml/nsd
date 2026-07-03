@@ -219,6 +219,7 @@ class NSDPortal {
       // Hide or show free/paid resources (brief + camp + online-classes conditions)
       console.log("Step-6: Hiding or showing free/paid resources")
       this.hidePortalData(studentData, briefsData, hasClassEnrollments)
+      this.autoSelectPortalTab()
 
       // Handle briefs
       console.log("Step-7: Handling briefs")
@@ -330,33 +331,53 @@ class NSDPortal {
     const displayVal = hasEnrollments ? "flex" : "none"
     tab.style.display = displayVal
     if (pane) pane.style.display = displayVal
+  }
 
-    // When Classes tab is visible, make it the active tab so Tab 1 isn't left active
-    if (hasEnrollments) {
-      const tabList = tab.closest('[role="tablist"]') || tab.parentElement
-      const tabContent =
-        tab.closest(".w-tabs")?.querySelector(".w-tab-content") ||
-        pane?.parentElement
-      if (tabList) {
-        tabList
-          .querySelectorAll('[role="tab"], .w-tab-link')
-          .forEach((link) => {
-            link.classList.remove("w--tab-active", "w--current")
-            link.setAttribute("aria-selected", "false")
-            link.setAttribute("tabindex", "-1")
-          })
-        tab.classList.add("w--tab-active", "w--current")
-        tab.setAttribute("aria-selected", "true")
-        tab.setAttribute("tabindex", "0")
-      }
-      if (tabContent) {
-        tabContent
-          .querySelectorAll('.w-tab-pane, [role="tabpanel"]')
-          .forEach((p) => {
-            p.classList.remove("w--tab-active")
-          })
-        if (pane) pane.classList.add("w--tab-active")
-      }
+  // Auto-select the first visible top-level tab in priority: Camps, Classes, Briefs
+  autoSelectPortalTab() {
+    const tabSelectors = [
+      '[data-portal="camp-tab"]',
+      '[data-portal="online-class-tab"]',
+      '[data-portal="briefs-tab"]',
+    ]
+
+    const targetTab = tabSelectors
+      .map((selector) => document.querySelector(selector))
+      .find((tab) => {
+        if (!tab) return false
+        const computedDisplay = window.getComputedStyle(tab).display
+        return computedDisplay !== "none"
+      })
+
+    if (!targetTab) return
+
+    const paneId =
+      targetTab.getAttribute("aria-controls") ||
+      (targetTab.getAttribute("href") || "").replace("#", "")
+    const targetPane = paneId ? document.getElementById(paneId) : null
+    const tabList = targetTab.closest('[role="tablist"]') || targetTab.parentElement
+    const tabContent =
+      targetTab.closest(".w-tabs")?.querySelector(".w-tab-content") ||
+      targetPane?.parentElement
+
+    if (tabList) {
+      tabList.querySelectorAll('[role="tab"], .w-tab-link').forEach((link) => {
+        link.classList.remove("w--tab-active", "w--current")
+        link.setAttribute("aria-selected", "false")
+        link.setAttribute("tabindex", "-1")
+      })
+      targetTab.classList.add("w--tab-active", "w--current")
+      targetTab.setAttribute("aria-selected", "true")
+      targetTab.setAttribute("tabindex", "0")
+    }
+
+    if (tabContent) {
+      tabContent
+        .querySelectorAll('.w-tab-pane, [role="tabpanel"]')
+        .forEach((pane) => {
+          pane.classList.remove("w--tab-active")
+        })
+      if (targetPane) targetPane.classList.add("w--tab-active")
     }
   }
 
@@ -906,17 +927,6 @@ class NSDPortal {
       }
     }
 
-    // Create during-camp content if program has started
-    if (this.hasProgramStarted(session)) {
-      const duringCampContent = this.createDuringCampContent(
-        session,
-        sessionInvoices,
-      )
-      if (duringCampContent) {
-        campInfoWrapper.appendChild(duringCampContent)
-      }
-    }
-
     tabPane.appendChild(campInfoWrapper)
 
     return tabPane
@@ -982,12 +992,6 @@ class NSDPortal {
     // Create pre-camp content
     const preCampContent = this.createPreCampContent(session, sessionInvoices)
 
-    // Create during-camp content
-    const duringCampContent = this.createDuringCampContent(
-      session,
-      sessionInvoices,
-    )
-
     // Clear and populate tab pane
     while (tabPane.firstChild) {
       tabPane.removeChild(tabPane.firstChild)
@@ -996,11 +1000,6 @@ class NSDPortal {
     // Add pre-camp section
     if (preCampContent) {
       tabPane.appendChild(preCampContent)
-    }
-
-    // Add during-camp section if program has started
-    if (duringCampContent && this.hasProgramStarted(session)) {
-      tabPane.appendChild(duringCampContent)
     }
   }
 
@@ -1013,26 +1012,15 @@ class NSDPortal {
     const formCompletedList = session.formCompletedList || []
     const deadlineDate = session.programDetail?.deadlineDate
 
-    // Calculate total forms FIRST (count all forms, not just live ones, for display)
-    // This ensures we show the total count even if forms aren't live yet
-    const totalForms = this.countTotalForms(formList, false, true)
-
-    // Initialize total form count (will be incremented as forms are rendered for verification)
-    session._totalFormCount = 0
-
-    // Calculate completed forms - filter out invoice forms from completed count
-    // Only count forms where isInvoice == "No" OR form_sub_type is 'dropoff' or 'pickup'
-    const completedFormsOnly = formCompletedList.filter(
-      (i) =>
-        i.isInvoice == "No" ||
-        i.form_sub_type == "dropoff" ||
-        i.form_sub_type == "pickup",
-    )
-    const completedForms = completedFormsOnly.length
+    const { totalForms, completedForms, progressPercentage } =
+      this.getFormProgress(session)
 
     const deadlineText = deadlineDate
       ? `Needs to be completed by ${this.formatDate(deadlineDate)}`
       : ""
+
+    // Initialize total form count (will be incremented as forms are rendered for verification)
+    session._totalFormCount = 0
 
     // Create header section
     const headerDiv = document.createElement("div")
@@ -1057,10 +1045,6 @@ class NSDPortal {
       )
     }
 
-    // Calculate progress percentage
-    const progressPercentage =
-      totalForms > 0 ? Math.round((completedForms / totalForms) * 100) : 0
-
     // Create progress section - only show if deadline exists AND forms are available
     if (deadlineText && formList.length > 0 && totalForms > 0) {
       const progressDiv = document.createElement("div")
@@ -1068,7 +1052,7 @@ class NSDPortal {
       progressDiv.innerHTML = `
                 <div class="dm-sans camp-text">${deadlineText}</div>
                 <div class="camp-progress-container">
-                    <div class="camp-gray-text">${progressPercentage}% / ${completedForms} of ${totalForms} forms complete</div>
+                    <div class="camp-gray-text">${progressPercentage}% / ${completedForms} of ${totalForms} forms completed</div>
                     <div class="camp-progress-bar">
                         <div class="sub-div" style="width: ${progressPercentage}%;"></div>
                     </div>
@@ -1123,6 +1107,12 @@ class NSDPortal {
       }
     }
 
+    // Create camp topic section
+    const campTopicSection = this.createCampTopicSection(session)
+    if (campTopicSection) {
+      contentContainer.appendChild(campTopicSection)
+    }
+
     // Create resources section
     const resourcesSection = this.createResourcesSection(session)
     if (resourcesSection) {
@@ -1130,6 +1120,25 @@ class NSDPortal {
     }
 
     return contentContainer
+  }
+
+  // Create camp topic section
+  createCampTopicSection(session) {
+    const campTopic = session.programDetail?.campTopic || ""
+    if (!campTopic) {
+      return null
+    }
+
+    const container = document.createElement("div")
+    container.innerHTML = `
+            <div>
+                <div class="pre-camp_subtitle-wrapper">
+                    <div class="pre-camp_subtitle">Camp Topic</div>
+                </div>
+                <div>${campTopic}</div>
+            </div>
+        `
+    return container
   }
 
   // Create forms section
@@ -1289,68 +1298,6 @@ class NSDPortal {
     })
 
     return uniquePrograms
-  }
-
-  // Create during-camp content
-  createDuringCampContent(session, invoiceData) {
-    const duringCampDiv = document.createElement("div")
-    duringCampDiv.className = "during-camp_div"
-
-    const campTopic = session.programDetail?.campTopic || ""
-    const uploadedContent = session.uploadedContent || []
-    const paymentId =
-      session.studentDetail?.uniqueIdentification || session.paymentId
-
-    duringCampDiv.innerHTML = `
-            <div class="pre-camp_title-content-wrapper">
-                <div class="pre-camp_title-div bg-blue">
-                    <div class="dm-sans line-height-20">During camp</div>
-                </div>
-                <div class="pre-camp_title-div">
-                    <div class="dashboard-node-header">Resources/Camp Topic</div>
-                </div>
-            </div>
-            ${
-              campTopic
-                ? `
-            <div>
-                <div class="pre-camp_subtitle-wrapper">
-                    <div class="pre-camp_subtitle">Camp Topic</div>
-                </div>
-                <div>${campTopic}</div>
-            </div>
-            `
-                : "Camp topic is not available for this camp"
-            }
-            ${
-              invoiceData && invoiceData.invoiceList
-                ? `
-            <div>
-                <div class="pre-camp_subtitle">Invoice</div>
-                <div class="registration-info-wrapper" id="during_invoice_${paymentId}">
-                </div>
-            </div>
-            `
-                : ""
-            }
-            ${this.renderResources(session, true)}
-        `
-
-    // Add invoices with proper event handlers for during-camp section
-    if (invoiceData && invoiceData.invoiceList) {
-      const duringInvoiceContainer = duringCampDiv.querySelector(
-        `#during_invoice_${paymentId}`,
-      )
-      if (duringInvoiceContainer && invoiceData.invoiceList.length > 0) {
-        this.updateInvoiceList(
-          duringInvoiceContainer,
-          invoiceData.invoiceList,
-          paymentId,
-        )
-      }
-    }
-
-    return duringCampDiv
   }
 
   // Render form categories
@@ -1888,11 +1835,39 @@ class NSDPortal {
   // Render progress bar
   renderProgressBar(completed, total, percentage) {
     return `
-            <div class="pre-camp_subtitle opacity-50">${percentage}% / ${completed} of ${total} forms complete</div>
+            <div class="pre-camp_subtitle opacity-50">${percentage}% / ${completed} of ${total} forms completed</div>
             <div class="pre-camp_progress-bar">
                 <div class="sub-div" style="width: ${percentage}%;"></div>
             </div>
         `
+  }
+
+  // Match registration page progress: count only live forms shown in the portal
+  getFormProgress(session) {
+    const formList = session.formList || []
+    const formCompletedList = session.formCompletedList || []
+    const displayedLiveForms = []
+
+    formList.forEach((category) => {
+      let forms = category.forms || []
+      if (category.name === "Invoice") {
+        forms = this.filterInvoiceForms(forms, formCompletedList)
+      }
+      forms
+        .filter((form) => form.is_live)
+        .forEach((form) => displayedLiveForms.push(form))
+    })
+
+    const totalForms = displayedLiveForms.length
+    const completedForms = displayedLiveForms.filter((form) =>
+      formCompletedList.some((completed) => completed.formId === form.formId),
+    ).length
+    const progressPercentage =
+      totalForms > 0
+        ? Math.min(100, Math.round((completedForms / totalForms) * 100))
+        : 0
+
+    return { totalForms, completedForms, progressPercentage }
   }
 
   // Helper methods
