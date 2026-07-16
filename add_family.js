@@ -248,6 +248,7 @@ class FamilyMember {
         var parentPhone = document.getElementById("parent-phone")
         const editMemberBtn = document.getElementById("editMemberBtn")
         var data = {
+            leadId: memberData.id ? memberData.id : "",
             memberId: memberData.memberId ? memberData.memberId : "",
             oldLastName: memberData.lastName,
             oldFirstName: memberData.firstName,
