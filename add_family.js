@@ -218,7 +218,7 @@ class FamilyMember {
         var $this = this
         const editMemberBtn = document.getElementById("editMemberBtn")
         editMemberBtn.addEventListener("click", function () {
-            editMemberBtn.innerHTML = "Processing"
+            editMemberBtn.innerHTML = "Processing..."
             editMemberBtn.classList.add("disabled")
             editMemberBtn.style.pointerEvents = "none"
             $this.editMemberInfo($this.$editMemberData)
@@ -238,6 +238,14 @@ class FamilyMember {
             modal.style.display = "none"
         }
     }
+    // Resets the Save button after the update request finishes
+    resetEditMemberBtn() {
+        const editMemberBtn = document.getElementById("editMemberBtn")
+        if (!editMemberBtn) return
+        editMemberBtn.innerHTML = "Save"
+        editMemberBtn.classList.remove("disabled")
+        editMemberBtn.style.pointerEvents = "auto"
+    }
     // Sends updated member information to the API and refreshes the family member display
     editMemberInfo(memberData) {
         var $this = this
@@ -246,7 +254,6 @@ class FamilyMember {
         var studentEmail = document.getElementById("Student-Email")
         var studentGrade = document.getElementById("Student-Grade")
         var parentPhone = document.getElementById("parent-phone")
-        const editMemberBtn = document.getElementById("editMemberBtn")
         var data = {
             leadId: memberData.id ? memberData.id : "",
             newEmailId: studentEmail.value,
@@ -257,38 +264,31 @@ class FamilyMember {
         }
         console.log("data", data)
         var xhr = new XMLHttpRequest()
-        var $this = this
         xhr.open("POST", this.authApiBase + "/updateMemberStack", true)
         xhr.withCredentials = false
         xhr.send(JSON.stringify(data))
         xhr.onload = function () {
-            let responseText = JSON.parse(xhr.responseText)
-            console.log(xhr.responseText, responseText)
+            if (xhr.status !== 200) {
+                console.log("Error", xhr.statusText)
+                $this.resetEditMemberBtn()
+                return
+            }
+            try {
+                let responseText = JSON.parse(xhr.responseText)
+                console.log(xhr.responseText, responseText)
+            } catch (error) {
+                console.log("Error parsing response", error)
+            }
             const addFamilyMemberEditModals = document.querySelector(
                 ".add-family-member-edit-modal",
             )
             $this.closeModal(addFamilyMemberEditModals)
+            $this.resetEditMemberBtn()
             $this.displayFamilyMember()
-            // if (responseText.success) {
-            // 	console.log('success')
-            // } else {
-            // 	reject(new Error('API call failed'));
-            // }
-            editMemberBtn.innerHTML = "Save"
-            editMemberBtn.classList.remove("disabled")
-            editMemberBtn.style.pointerEvents = "auto"
         }
-        xhr.onreadystatechange = function (oEvent) {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    console.log(xhr.responseText)
-                } else {
-                    console.log("Error", xhr.statusText)
-                    editMemberBtn.innerHTML = "Save"
-                    editMemberBtn.classList.remove("disabled")
-                    editMemberBtn.style.pointerEvents = "auto"
-                }
-            }
+        xhr.onerror = function () {
+            console.log("Network error while updating family member")
+            $this.resetEditMemberBtn()
         }
     }
     // Deletes an invited member from the system via API call
