@@ -204,7 +204,7 @@ class updateMember {
         var parentPhone = document.getElementById("parent-phone")
         const editMemberBtn = document.getElementById("editMemberBtn")
         var data = {
-            leadId: memberData.id ? memberData.leadId : "",
+            leadId: memberData.id ? memberData.id : "",
             newEmailId: studentEmail.value,
             newFirstName: studentFirstName.value,
             newLastName: studentLastName.value,
