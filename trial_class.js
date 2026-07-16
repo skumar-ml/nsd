@@ -6,7 +6,207 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
+// Global variable to store selected trial class date for success message
+window.trial_class_date = ""
+
+// Sync selected trial class date from radio button to global variable
+const syncTrialClassDate = (radio) => {
+    if (!radio) {
+        window.trial_class_date = ""
+        return
+    }
+
+    window.trial_class_date =
+        radio.dataset.trialDate ||
+        radio
+            .closest(".tc_option-label")
+            ?.querySelector(".trial-class_date")
+            ?.textContent.trim() ||
+        ""
+}
+
+// Render dynamic registered date text in success message element
+const renderRegisteredDate = (registeredDateEl) => {
+    const el =
+        registeredDateEl ||
+        document.getElementById("registered-date") ||
+        document.getElementById("res-registered-date")
+    if (!el || !window.trial_class_date) return
+
+    el.textContent = `You're registered for the ${window.trial_class_date} trial class!`
+}
+
+// Get trial class form wrapper or form element from DOM
+const getTrialClassFormRoot = () =>
+    document.querySelector("#trial-class-form") ||
+    document.querySelector("#wf-form-trial-class-form")
+
+// Get reschedule form element from DOM
+const getRescheduleFormRoot = () =>
+    document.querySelector("#trial-class-reschdule-form")
+
+// Resolve actual form element inside a wrapper root
+const getTrialClassFormEl = (root) => {
+    if (!root) return null
+    if (root.matches("form")) return root
+    return root.querySelector("form") || root
+}
+
+// Clear trial class form fields while preserving submit button label
+const clearTrialClassFormFields = (root) => {
+    if (!root) return
+
+    const submitButtons = Array.from(
+        root.querySelectorAll('input[type="submit"], button[type="submit"]'),
+    )
+    const submitDefaults = submitButtons.map((btn) => ({
+        el: btn,
+        value: btn.defaultValue || btn.value,
+    }))
+
+    const formEl = getTrialClassFormEl(root)
+    if (formEl?.reset) {
+        formEl.reset()
+    }
+
+    root.querySelectorAll("input, select, textarea").forEach((field) => {
+        const type = (field.type || "").toLowerCase()
+
+        if (type === "submit" || type === "button" || type === "hidden") {
+            return
+        }
+
+        if (type === "radio" || type === "checkbox") {
+            field.checked = false
+            return
+        }
+
+        if (field.tagName === "SELECT") {
+            field.value = ""
+            if (field.options.length) {
+                field.selectedIndex = 0
+            }
+            return
+        }
+
+        field.value = ""
+    })
+
+    submitDefaults.forEach(({ el, value }) => {
+        if (value) {
+            el.value = value
+        }
+    })
+}
+
+// Keywords that trigger interview card visibility in student description
+const INTERVIEW_CARD_KEYWORDS = [
+    "PF",
+    "LD",
+    "CX",
+    "Camp",
+    "Year",
+    "public",
+    "forum",
+    "lincoln",
+    "douglas",
+    "policy",
+]
+
+// Check if text contains any interview card keyword (case-insensitive)
+const matchesInterviewCardKeywords = (text) => {
+    const normalized = (text || "").toLowerCase()
+    return INTERVIEW_CARD_KEYWORDS.some((keyword) =>
+        normalized.includes(keyword.toLowerCase()),
+    )
+}
+
+// Setup interview card show/hide logic for registration or reschedule form
+const setupInterviewCardLogic = (scope) => {
+    if (!scope) return null
+
+    const studentDescription =
+        scope.querySelector("#Student-Description") ||
+        scope.querySelector(".trial-form-student-desc-field") ||
+        scope.querySelector("#res_student_description")
+
+    const interviewCard = scope.querySelector(".tc_interview-card")
+    const state = { dismissed: false }
+
+    const updateInterviewCardVisibility = () => {
+        if (!studentDescription || !interviewCard) return
+
+        const hasKeywordMatch = matchesInterviewCardKeywords(
+            studentDescription.value,
+        )
+
+        if (!hasKeywordMatch) {
+            state.dismissed = false
+        }
+
+        if (hasKeywordMatch && !state.dismissed) {
+            interviewCard.style.setProperty("display", "block", "important")
+        } else {
+            interviewCard.style.setProperty("display", "none", "important")
+        }
+    }
+
+    if (interviewCard) {
+        interviewCard.style.setProperty("display", "none", "important")
+
+        const stayWithTrialBtn =
+            interviewCard.querySelector(".tc_button-outline")
+        if (stayWithTrialBtn) {
+            stayWithTrialBtn.addEventListener("click", (e) => {
+                e.preventDefault()
+                state.dismissed = true
+                interviewCard.style.setProperty("display", "none", "important")
+            })
+        }
+    }
+
+    if (studentDescription) {
+        studentDescription.addEventListener(
+            "input",
+            updateInterviewCardVisibility,
+        )
+        updateInterviewCardVisibility()
+    }
+
+    return { updateInterviewCardVisibility, state, interviewCard }
+}
+
+// Hide form and show success box after successful form submission
+const showFormSuccessState = ({
+    formRoot,
+    successBoxNew,
+    successWrapper,
+    failBox,
+    registeredDateEl,
+}) => {
+    renderRegisteredDate(registeredDateEl)
+
+    if (formRoot) {
+        formRoot.style.setProperty("display", "none", "important")
+    }
+
+    setTimeout(() => {
+        if (failBox) {
+            failBox.style.setProperty("display", "none", "important")
+        }
+        if (successWrapper) {
+            successWrapper.style.removeProperty("display")
+            successWrapper.style.setProperty("display", "block", "important")
+        }
+        if (successBoxNew) {
+            successBoxNew.style.removeProperty("display")
+            successBoxNew.style.setProperty("display", "flex", "important")
+        }
+    }, 50)
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
+    // Parse URL for manage registration token
     const urlParams = new URLSearchParams(window.location.search)
     const manageToken = urlParams.get("token")
 
@@ -22,22 +222,206 @@ document.addEventListener("DOMContentLoaded", async function () {
         )
     }
 
+    // Hide reschedule form by default
     const rescheduleForm = document.querySelector("#trial-class-reschdule-form")
     if (rescheduleForm) {
         rescheduleForm.style.setProperty("display", "none", "important")
     }
 
+    // Hide registration manage card by default
     const registrationCard = document.querySelector(".tc_registration-card")
     if (registrationCard) {
         registrationCard.style.setProperty("display", "none", "important")
     }
 
+    // Hide tab section by default until user clicks a CTA
+    const tabSection = document.querySelector(".tc_tab-section")
+    if (tabSection) {
+        tabSection.style.setProperty("display", "none", "important")
+    }
+
+    // Mobile breakpoint and hero card visibility config per tab
+    const MOBILE_BREAKPOINT = 991
+    const mobileCardIds = ["trial_class_card", "book_card", "book_placement"]
+    const mobileCardVisibility = {
+        0: { show: "book_card", hide: ["trial_class_card", "book_placement"] },
+        1: { show: "trial_class_card", hide: ["book_placement", "book_card"] },
+        2: { show: "book_placement", hide: ["trial_class_card", "book_card"] },
+    }
+
+    // Check if viewport width is mobile
+    const isMobileView = () => window.innerWidth <= MOBILE_BREAKPOINT
+
+    // Track explicit user hero card selection on mobile (null = show all)
+    let mobileCardSelection = null
+
+    // Set display style on a hero card by element id
+    const setCardDisplay = (id, display) => {
+        const el = document.getElementById(id)
+        if (!el) return
+
+        if (display === "none") {
+            el.style.setProperty("display", "none", "important")
+        } else {
+            el.style.removeProperty("display")
+            el.style.setProperty("display", "block", "important")
+        }
+    }
+
+    // Reset all hero cards to default display
+    const resetMobileCards = () => {
+        mobileCardIds.forEach((id) => {
+            const el = document.getElementById(id)
+            if (el) el.style.removeProperty("display")
+        })
+    }
+
+    // Apply mobile hero card visibility for a given tab index
+    const applyMobileCardSelection = (tabIndex) => {
+        if (!isMobileView()) {
+            resetMobileCards()
+            return
+        }
+
+        const config = mobileCardVisibility[tabIndex]
+        if (!config) return
+
+        config.hide.forEach((id) => setCardDisplay(id, "none"))
+        setCardDisplay(config.show, "block")
+    }
+
+    // Save mobile card selection and apply visibility
+    const setMobileCardSelection = (tabIndex) => {
+        mobileCardSelection = tabIndex
+        applyMobileCardSelection(tabIndex)
+    }
+
+    // Sync mobile card visibility on viewport resize without unintended hides
+    const syncMobileCardsForViewport = () => {
+        if (!isMobileView()) {
+            mobileCardSelection = null
+            resetMobileCards()
+            return
+        }
+
+        if (mobileCardSelection === null) {
+            resetMobileCards()
+            return
+        }
+
+        applyMobileCardSelection(mobileCardSelection)
+    }
+
+    // Wrapper to update mobile cards for a tab index
+    const updateMobileCards = (tabIndex) => {
+        setMobileCardSelection(tabIndex)
+    }
+
+    // Map tab index to hero card active/inactive states
+    const heroCardBorderMap = {
+        0: {
+            active: "book_card",
+            inactive: ["trial_class_card", "book_placement"],
+        },
+        1: {
+            active: "trial_class_card",
+            inactive: ["book_card", "book_placement"],
+        },
+        2: {
+            active: "book_placement",
+            inactive: ["trial_class_card", "book_card"],
+        },
+    }
+
+    // Update gray-border  on hero cards for active tab
+    const updateHeroCardBorders = (tabIndex) => {
+        const config = heroCardBorderMap[tabIndex]
+        if (!config) return
+
+        document.getElementById(config.active)?.classList.remove("gray-border")
+        config.inactive.forEach((id) => {
+            document.getElementById(id)?.classList.add("gray-border")
+        })
+    }
+
+    // Show tab section, select tab, update cards/borders, and scroll into view
+    const showTabSection = (tabIndex = 0) => {
+        if (!tabSection) return
+
+        tabSection.style.removeProperty("display")
+        tabSection.style.setProperty("display", "block", "important")
+
+        const tabButtons = tabSection.querySelectorAll(
+            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
+        )
+        const targetTab = tabButtons[tabIndex]
+        if (targetTab) {
+            targetTab.click()
+        }
+
+        updateHeroCardBorders(tabIndex)
+        updateMobileCards(tabIndex)
+        tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+
+    // Bind click handler on selector to open a specific tab
+    const bindTabSectionTrigger = (selector, tabIndex) => {
+        document.querySelectorAll(selector).forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                showTabSection(tabIndex)
+            })
+        })
+    }
+
+    // Handle direct tab menu clicks for borders and mobile card visibility
+    if (tabSection) {
+        const tabButtons = tabSection.querySelectorAll(
+            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
+        )
+        tabButtons.forEach((btn, index) => {
+            btn.addEventListener("click", () => {
+                updateHeroCardBorders(index)
+                updateMobileCards(index)
+            })
+        })
+    }
+
+    // Debounced resize handler to sync mobile cards without scroll false triggers
+    let mobileResizeTimer
+    window.addEventListener("resize", () => {
+        clearTimeout(mobileResizeTimer)
+        mobileResizeTimer = setTimeout(() => {
+            syncMobileCardsForViewport()
+        }, 150)
+    })
+
+    // Free trial class card button opens Tab 2 
+    document.querySelectorAll(".tc_register-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+            e.preventDefault()
+            showTabSection(1)
+        })
+    })
+
+    // Book consult button opens Tab 1 (index 0)
+    bindTabSectionTrigger(".tc_book-btn", 0)
+    // Placement interview button opens Tab 3 (index 2)
+    bindTabSectionTrigger(".tc_book-placement-btn", 2)
+    // Interview card CTA opens placement interview tab
+    bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
+    // Back to discovery link opens first tab
+    bindTabSectionTrigger("#back-discovery-tab", 0)
+    bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
+
+    // Trial class slot grid elements
     const wrapper = document.querySelector(".trial-class_option-wapper")
     const grid = wrapper
         ? wrapper.querySelector(".trial-class-grid-container")
         : null
     const template = document.querySelector(".tc_option-label")
 
+    // Toggle selected styling on trial class slot cards
     const updateCardSelectionClass = (container) => {
         if (!container) return
 
@@ -71,6 +455,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         return el
     }
 
+    // Show empty state when no trial classes are available'
+    const mountTrialOptionsEmpty = (gridEl) => {
+        gridEl.innerHTML = ""
+        const el = document.createElement("p")
+        el.className = "tc-trial-options-empty"
+        el.style.cssText = "padding:1.25rem 1rem;"
+        el.textContent = "Classes not available"
+        gridEl.appendChild(el)
+    }
+
     /** Visible while manage registration (reschedule/cancel) data loads. */
     const mountManageRegistrationLoader = () => {
         const el = document.createElement("div")
@@ -101,6 +495,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                     `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassDetail`,
                 )
                 const classes = await res.json()
+
+                if (
+                    !res.ok ||
+                    !Array.isArray(classes) ||
+                    classes.length === 0
+                ) {
+                    mountTrialOptionsEmpty(grid)
+                    return
+                }
+
                 grid.innerHTML = ""
                 const fragment = document.createDocumentFragment()
 
@@ -108,8 +512,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const clone = templateClone.cloneNode(true)
 
                     const dateEl = clone.querySelector(".trial-class_date")
+                    let shortDate = ""
                     if (dateEl) {
                         const date = new Date(item.start_time)
+                        shortDate = date.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                        })
                         dateEl.textContent = date.toLocaleDateString("en-US", {
                             weekday: "short",
                             month: "short",
@@ -137,18 +546,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                         radio.id = uniqueId
                         radio.value = item._id
                         radio.name = "trial-class"
+                        if (shortDate) {
+                            radio.dataset.trialDate = shortDate
+                        }
                         clone
                             .querySelector("label")
                             ?.setAttribute("for", uniqueId)
-                        radio.addEventListener("change", () =>
-                            updateCardSelectionClass(grid),
-                        )
+                        radio.addEventListener("change", () => {
+                            updateCardSelectionClass(grid)
+                            syncTrialClassDate(radio)
+                        })
                     }
 
                     clone.addEventListener("click", function () {
                         const r = clone.querySelector("input[type='radio']")
                         if (r) r.checked = true
                         updateCardSelectionClass(grid)
+                        syncTrialClassDate(r)
                     })
 
                     fragment.appendChild(clone)
@@ -170,6 +584,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         })()
     }
 
+    // Show registration form container when not managing via token
     if (!manageToken && trialClassFormContainer) {
         trialClassFormContainer.style.removeProperty("display")
         trialClassFormContainer.style.setProperty(
@@ -179,12 +594,14 @@ document.addEventListener("DOMContentLoaded", async function () {
         )
     }
 
-    const form = document.querySelector("#trial-class-form")
+    // Get main trial class form root element
+    const form = getTrialClassFormRoot()
     if (!form) return
 
     // Grade dropdown list (async; independent of slot cards)
     const gradeSelect = form.querySelector(".trial-form-select-field")
 
+    // Load grade options from API 
     if (gradeSelect && !manageToken) {
         gradeSelect.disabled = true
         gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
@@ -211,23 +628,86 @@ document.addEventListener("DOMContentLoaded", async function () {
         })()
     }
 
-    const studentDescription = form.querySelector(
-        ".trial-form-student-desc-field",
-    )
+    // Setup interview card keyword logic for main registration form
+    const mainFormScope =
+        form.closest(".trial_class_form-container") || form
+    const mainInterviewCardSetup = setupInterviewCardLogic(mainFormScope)
+    const studentDescription =
+        form.querySelector("#Student-Description") ||
+        form.querySelector(".trial-form-student-desc-field")
+
     if (studentDescription) {
         studentDescription.value = studentDescription.value || ""
     }
 
+    // Success and error message elements for registration form
     const successBox = document.querySelector(".tc_form-done")
+    const successBoxNew =
+        document.querySelector("#trial-class-form-success-submission") ||
+        document.querySelector(".tc_form-done-new")
+    const successWrapper = successBoxNew?.closest(".w-form-done")
     const failBox = document.querySelector(".tc_form-fail")
 
+    // Hide success and error states by default
     if (successBox) successBox.style.setProperty("display", "none", "important")
+    if (successBoxNew)
+        successBoxNew.style.setProperty("display", "none", "important")
+    if (successWrapper)
+        successWrapper.style.setProperty("display", "none", "important")
     if (failBox) failBox.style.setProperty("display", "none", "important")
+
+    // Reset form after success when user clicks Stay with trial class
+    const resetTrialClassForm = () => {
+        if (successBox)
+            successBox.style.setProperty("display", "none", "important")
+        if (successBoxNew)
+            successBoxNew.style.setProperty("display", "none", "important")
+        if (successWrapper)
+            successWrapper.style.setProperty("display", "none", "important")
+        if (failBox)
+            failBox.style.setProperty("display", "none", "important")
+
+        const formRoot = getTrialClassFormRoot()
+        if (formRoot) {
+            formRoot.style.removeProperty("display")
+            clearTrialClassFormFields(formRoot)
+        }
+
+        if (grid) updateCardSelectionClass(grid)
+
+        if (mainInterviewCardSetup) {
+            mainInterviewCardSetup.state.dismissed = false
+            if (mainInterviewCardSetup.interviewCard) {
+                mainInterviewCardSetup.interviewCard.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            }
+            mainInterviewCardSetup.updateInterviewCardVisibility()
+        }
+
+        window.trial_class_date = ""
+        showTabSection(1)
+    }
+
+    // Stay with trial class button resets form and opens trial class tab
+    document
+        .querySelectorAll(
+            ".tc_form-done-new .tc_button-no-border, #trial-class-form-success-submission .tc_button-no-border",
+        )
+        .forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                resetTrialClassForm()
+            })
+        })
 
     form.setAttribute("action", "#")
     form.removeAttribute("data-wf-page-id")
     form.removeAttribute("data-wf-element-id")
 
+    // Handle trial class registration form submission
     form.addEventListener("submit", async function (e) {
         e.preventDefault()
         e.stopPropagation()
@@ -235,6 +715,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (successBox)
             successBox.style.setProperty("display", "none", "important")
+        if (successBoxNew)
+            successBoxNew.style.setProperty("display", "none", "important")
+        if (successWrapper)
+            successWrapper.style.setProperty("display", "none", "important")
         if (failBox) failBox.style.setProperty("display", "none", "important")
 
         const selectedRadio = form.querySelector(
@@ -244,6 +728,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             alert("Please select a trial class.")
             return
         }
+
+        syncTrialClassDate(selectedRadio)
 
         const payload = {
             student: {
@@ -297,21 +783,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return
             }
 
-            // Success: hide form, show success box
-            form.style.display = "none"
-
-            setTimeout(() => {
-                if (failBox)
-                    failBox.style.setProperty("display", "none", "important")
-                if (successBox)
-                    successBox.style.setProperty(
-                        "display",
-                        "block",
-                        "important",
-                    )
-            }, 50)
-
-            form.reset()
+            // Success: hide form fields, show success box
+            showFormSuccessState({
+                formRoot: form,
+                successBoxNew,
+                successWrapper,
+                failBox,
+            })
         } catch (err) {
             if (failBox) {
                 failBox.textContent = "Something went wrong. Please try again."
@@ -587,6 +1065,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (rescheduleForm) {
             const registration = registrationData.registration
 
+            // Load available reschedule slots and render slot cards
             if (
                 registrationData.available_classes &&
                 registrationData.available_classes.length > 0
@@ -644,8 +1123,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const clone = rescheduleTemplateClone.cloneNode(true)
 
                         const dateEl = clone.querySelector(".trial-class_date")
+                        let shortDate = ""
                         if (dateEl) {
                             const date = new Date(item.start_time)
+                            shortDate = date.toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                            })
                             dateEl.textContent = date.toLocaleDateString(
                                 "en-US",
                                 {
@@ -678,14 +1162,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                             radio.id = uniqueId
                             radio.value = item._id
                             radio.name = "res-trial-class"
+                            if (shortDate) {
+                                radio.dataset.trialDate = shortDate
+                            }
                             clone
                                 .querySelector("label")
                                 ?.setAttribute("for", uniqueId)
-                            radio.addEventListener("change", () =>
+                            radio.addEventListener("change", () => {
                                 updateRescheduleCardSelectionClass(
                                     rescheduleGrid,
-                                ),
-                            )
+                                )
+                                syncTrialClassDate(radio)
+                            })
 
                             if (!firstRescheduleRadio) {
                                 firstRescheduleRadio = radio
@@ -696,6 +1184,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             const r = clone.querySelector("input[type='radio']")
                             if (r) r.checked = true
                             updateRescheduleCardSelectionClass(rescheduleGrid)
+                            syncTrialClassDate(r)
                         })
 
                         fragment.appendChild(clone)
@@ -705,6 +1194,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                     if (firstRescheduleRadio) {
                         firstRescheduleRadio.checked = true
+                        syncTrialClassDate(firstRescheduleRadio)
                     }
                     updateRescheduleCardSelectionClass(rescheduleGrid)
                 }
@@ -810,6 +1300,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     registration.best_description || ""
             }
 
+            // Setup interview card keyword logic for reschedule form
+            const rescheduleFormScope =
+                rescheduleForm.closest(".trial_class_form-container") ||
+                rescheduleForm.parentElement ||
+                rescheduleForm
+            const rescheduleInterviewCardSetup =
+                setupInterviewCardLogic(rescheduleFormScope)
+
             // Make all form fields read-only except class selection radios
             const allRescheduleInputs = rescheduleForm.querySelectorAll(
                 "input, select, textarea",
@@ -827,21 +1325,45 @@ document.addEventListener("DOMContentLoaded", async function () {
                 el.readOnly = true
             })
 
+            // Disable Webflow default form handling for reschedule form
             rescheduleForm.setAttribute("action", "#")
             rescheduleForm.removeAttribute("data-wf-page-id")
             rescheduleForm.removeAttribute("data-wf-element-id")
 
+            // Reschedule form success and error elements
             const rescheduleSuccessBox =
                 document.getElementById(
                     "trial-class-res-form-success-submission",
-                ) || rescheduleForm.querySelector(".tc_form-done")
+                ) || rescheduleFormScope.querySelector(".tc_form-done")
+            const rescheduleSuccessBoxNew =
+                document.getElementById(
+                    "trial-class-res-form-success-submission",
+                ) || rescheduleFormScope.querySelector(".tc_form-done-new")
+            const rescheduleSuccessWrapper =
+                rescheduleSuccessBoxNew?.closest(".w-form-done")
+            const rescheduleRegisteredDateEl =
+                document.getElementById("res-registered-date") ||
+                rescheduleSuccessBoxNew?.querySelector("#registered-date")
             const rescheduleFailBox =
                 document.getElementById(
                     "trial-class-res-form-error-submission",
-                ) || rescheduleForm.querySelector(".tc_form-fail")
+                ) || rescheduleFormScope.querySelector(".tc_form-fail")
 
+            // Hide reschedule success and error states by default
             if (rescheduleSuccessBox)
                 rescheduleSuccessBox.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            if (rescheduleSuccessBoxNew)
+                rescheduleSuccessBoxNew.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            if (rescheduleSuccessWrapper)
+                rescheduleSuccessWrapper.style.setProperty(
                     "display",
                     "none",
                     "important",
@@ -853,6 +1375,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     "important",
                 )
 
+            if (rescheduleInterviewCardSetup) {
+                rescheduleInterviewCardSetup.updateInterviewCardVisibility()
+            }
+
+            // Handle reschedule form submission
             rescheduleForm.addEventListener("submit", async function (e) {
                 e.preventDefault()
                 e.stopPropagation()
@@ -860,6 +1387,18 @@ document.addEventListener("DOMContentLoaded", async function () {
 
                 if (rescheduleSuccessBox)
                     rescheduleSuccessBox.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                if (rescheduleSuccessBoxNew)
+                    rescheduleSuccessBoxNew.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                if (rescheduleSuccessWrapper)
+                    rescheduleSuccessWrapper.style.setProperty(
                         "display",
                         "none",
                         "important",
@@ -878,6 +1417,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                     alert("Please select a trial class.")
                     return
                 }
+
+                syncTrialClassDate(selectedRadio)
 
                 const payload = {
                     token: manageToken,
@@ -918,29 +1459,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                         return
                     }
 
-                    // Success: hide form, show success box
-                    rescheduleForm.style.setProperty(
-                        "display",
-                        "none",
-                        "important",
-                    )
-
-                    setTimeout(() => {
-                        if (rescheduleFailBox)
-                            rescheduleFailBox.style.setProperty(
-                                "display",
-                                "none",
-                                "important",
-                            )
-                        if (rescheduleSuccessBox)
-                            rescheduleSuccessBox.style.setProperty(
-                                "display",
-                                "block",
-                                "important",
-                            )
-                    }, 50)
-
-                    rescheduleForm.reset()
+                    // Success: hide form fields, show success box
+                    showFormSuccessState({
+                        formRoot: rescheduleForm,
+                        successBoxNew: rescheduleSuccessBoxNew,
+                        successWrapper: rescheduleSuccessWrapper,
+                        failBox: rescheduleFailBox,
+                        registeredDateEl: rescheduleRegisteredDateEl,
+                    })
                 } catch (err) {
                     rescheduleForm.style.setProperty(
                         "display",
