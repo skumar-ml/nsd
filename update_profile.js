@@ -205,18 +205,11 @@ class updateMember {
         const editMemberBtn = document.getElementById("editMemberBtn")
         var data = {
             leadId: memberData.id ? memberData.leadId : "",
-            memberId: this.memberId,
-            oldLastName: memberData.lastName,
-            oldFirstName: memberData.firstName,
-            oldEmailId: memberData.email,
-            oldPhoneNo: memberData.parentPhoneNumber,
-            oldGrade: memberData.studentGrade,
             newEmailId: studentEmail.value,
             newFirstName: studentFirstName.value,
             newLastName: studentLastName.value,
             newPhoneNo: parentPhone.value,
-            newGrade: studentGrade.value,
-            itemId: memberData.itemId ? memberData.itemId : "",
+            newGrade: studentGrade.value
         }
         console.log("data", data)
 

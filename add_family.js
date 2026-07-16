@@ -248,19 +248,12 @@ class FamilyMember {
         var parentPhone = document.getElementById("parent-phone")
         const editMemberBtn = document.getElementById("editMemberBtn")
         var data = {
-            leadId: memberData.id ? memberData.id : "",
-            memberId: memberData.memberId ? memberData.memberId : "",
-            oldLastName: memberData.lastName,
-            oldFirstName: memberData.firstName,
-            oldEmailId: memberData.email,
-            oldPhoneNo: memberData.parentPhoneNumber,
-            oldGrade: memberData.studentGrade,
+            leadId: memberData.id ? memberData.leadId : "",
             newEmailId: studentEmail.value,
             newFirstName: studentFirstName.value,
             newLastName: studentLastName.value,
             newPhoneNo: parentPhone.value,
-            newGrade: studentGrade.value,
-            itemId: memberData.itemId ? memberData.itemId : "",
+            newGrade: studentGrade.value
         }
         console.log("data", data)
         var xhr = new XMLHttpRequest()
