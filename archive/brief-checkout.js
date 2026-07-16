@@ -622,7 +622,7 @@ class BriefsCheckout {
         // Make API call
         const xhr = new XMLHttpRequest();
         const self = this;
-        xhr.open("POST", `${this.data.apiBaseURL}createCheckoutUrlForBrief`, true);
+        xhr.open("POST", `${this.data.apiBaseURL}/createCheckoutUrlForBrief`, true);
         xhr.withCredentials = false;
         xhr.setRequestHeader('Content-Type', 'application/json');
 

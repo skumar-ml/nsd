@@ -1436,7 +1436,7 @@ class NSDPortal {
 
         const xhr = new XMLHttpRequest();
         const $this = this;
-        xhr.open("POST", this.paymentApiBase + "createCheckoutUrlForInvoice", true);
+        xhr.open("POST", this.paymentApiBase + "/createCheckoutUrlForInvoice", true);
         xhr.withCredentials = false;
         xhr.send(JSON.stringify(data));
         xhr.onload = function () {

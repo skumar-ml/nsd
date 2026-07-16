@@ -264,7 +264,7 @@ class FamilyMember {
         console.log("data", data)
         var xhr = new XMLHttpRequest()
         var $this = this
-        xhr.open("POST", this.authApiBase + "updateMemberStack", true)
+        xhr.open("POST", this.authApiBase + "/updateMemberStack", true)
         xhr.withCredentials = false
         xhr.send(JSON.stringify(data))
         xhr.onload = function () {
@@ -304,7 +304,7 @@ class FamilyMember {
         var $this = this
         xhr.open(
             "DELETE",
-            this.authApiBase + "deleteInvitedMember/" + memberData.email,
+            this.authApiBase + "/deleteInvitedMember/" + memberData.email,
             true,
         )
         xhr.withCredentials = false
