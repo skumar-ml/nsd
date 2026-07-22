@@ -235,7 +235,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Hide tab section by default until user clicks a CTA
-    const tabSection = document.querySelector(".tc-tab-wrapper")
+    const tabSection = document.getElementById("tc-tab-wapper")
     if (tabSection) {
         tabSection.style.setProperty("display", "none", "important")
     }
@@ -243,84 +243,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Hero card container shown by default; hidden while a tab is open
     const cardContainer = document.querySelector("#card-container")
 
-    // Mobile breakpoint and hero card visibility config per tab
-    const MOBILE_BREAKPOINT = 991
-    const mobileCardIds = ["trial_class_card", "book_card", "book_placement"]
-    const mobileCardVisibility = {
-        0: { show: "book_card", hide: ["trial_class_card", "book_placement"] },
-        1: { show: "trial_class_card", hide: ["book_placement", "book_card"] },
-        2: { show: "book_placement", hide: ["trial_class_card", "book_card"] },
-    }
-
-    // Check if viewport width is mobile
-    const isMobileView = () => window.innerWidth <= MOBILE_BREAKPOINT
-
-    // Track explicit user hero card selection on mobile (null = show all)
-    let mobileCardSelection = null
-
-    // Set display style on a hero card by element id
-    const setCardDisplay = (id, display) => {
-        const el = document.getElementById(id)
-        if (!el) return
-
-        if (display === "none") {
-            el.style.setProperty("display", "none", "important")
-        } else {
-            el.style.removeProperty("display")
-            el.style.setProperty("display", "block", "important")
-        }
-    }
-
-    // Reset all hero cards to default display
-    const resetMobileCards = () => {
-        mobileCardIds.forEach((id) => {
-            const el = document.getElementById(id)
-            if (el) el.style.removeProperty("display")
-        })
-    }
-
-    // Apply mobile hero card visibility for a given tab index
-    const applyMobileCardSelection = (tabIndex) => {
-        if (!isMobileView()) {
-            resetMobileCards()
-            return
-        }
-
-        const config = mobileCardVisibility[tabIndex]
-        if (!config) return
-
-        config.hide.forEach((id) => setCardDisplay(id, "none"))
-        setCardDisplay(config.show, "block")
-    }
-
-    // Save mobile card selection and apply visibility
-    const setMobileCardSelection = (tabIndex) => {
-        mobileCardSelection = tabIndex
-        applyMobileCardSelection(tabIndex)
-    }
-
-    // Sync mobile card visibility on viewport resize without unintended hides
-    const syncMobileCardsForViewport = () => {
-        if (!isMobileView()) {
-            mobileCardSelection = null
-            resetMobileCards()
-            return
-        }
-
-        if (mobileCardSelection === null) {
-            resetMobileCards()
-            return
-        }
-
-        applyMobileCardSelection(mobileCardSelection)
-    }
-
-    // Wrapper to update mobile cards for a tab index
-    const updateMobileCards = (tabIndex) => {
-        setMobileCardSelection(tabIndex)
-    }
-
-    // Show tab section, select tab, update cards, and scroll into view
+    // Show tab section, select tab, and scroll into view
     const showTabSection = (tabIndex = 0) => {
         if (!tabSection) return
 
@@ -339,7 +262,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             targetTab.click()
         }
 
-        updateMobileCards(tabIndex)
         tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
     }
 
@@ -353,39 +275,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
-    // Handle direct tab menu clicks for borders and mobile card visibility
-    if (tabSection) {
-        const tabButtons = tabSection.querySelectorAll(
-            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
-        )
-        tabButtons.forEach((btn, index) => {
-            btn.addEventListener("click", () => {
-                updateMobileCards(index)
-            })
-        })
-    }
-
-    // Debounced resize handler to sync mobile cards without scroll false triggers
-    let mobileResizeTimer
-    window.addEventListener("resize", () => {
-        clearTimeout(mobileResizeTimer)
-        mobileResizeTimer = setTimeout(() => {
-            syncMobileCardsForViewport()
-        }, 150)
-    })
-
-    // Free trial class card button opens Tab 2 
-    document.querySelectorAll(".tc_register-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault()
-            showTabSection(1)
-        })
-    })
-
     // Book consult button opens Tab 1 (index 0)
-    bindTabSectionTrigger(".tc_book-btn", 0)
+    bindTabSectionTrigger(".tc_book-consult-btn", 0)
+    // Free trial class button opens Tab 2 (index 1)
+    bindTabSectionTrigger(".tc_book-btn", 1)
     // Placement interview button opens Tab 3 (index 2)
-    bindTabSectionTrigger(".tc_book-placement-btn", 2)
+    bindTabSectionTrigger(".tc_book-placement", 2)
     // Interview card CTA opens placement interview tab
     bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
     // Back to discovery link opens first tab
