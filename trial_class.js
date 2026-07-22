@@ -235,10 +235,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     // Hide tab section by default until user clicks a CTA
-    const tabSection = document.querySelector(".tc_tab-section")
+    const tabSection = document.querySelector(".tc-tab-wrapper")
     if (tabSection) {
         tabSection.style.setProperty("display", "none", "important")
     }
+
+    // Hero card container shown by default; hidden while a tab is open
+    const cardContainer = document.querySelector("#card-container")
 
     // Mobile breakpoint and hero card visibility config per tab
     const MOBILE_BREAKPOINT = 991
@@ -317,39 +320,16 @@ document.addEventListener("DOMContentLoaded", async function () {
         setMobileCardSelection(tabIndex)
     }
 
-    // Map tab index to hero card active/inactive states
-    const heroCardBorderMap = {
-        0: {
-            active: "book_card",
-            inactive: ["trial_class_card", "book_placement"],
-        },
-        1: {
-            active: "trial_class_card",
-            inactive: ["book_card", "book_placement"],
-        },
-        2: {
-            active: "book_placement",
-            inactive: ["trial_class_card", "book_card"],
-        },
-    }
-
-    // Update gray-border  on hero cards for active tab
-    const updateHeroCardBorders = (tabIndex) => {
-        const config = heroCardBorderMap[tabIndex]
-        if (!config) return
-
-        document.getElementById(config.active)?.classList.remove("gray-border")
-        config.inactive.forEach((id) => {
-            document.getElementById(id)?.classList.add("gray-border")
-        })
-    }
-
-    // Show tab section, select tab, update cards/borders, and scroll into view
+    // Show tab section, select tab, update cards, and scroll into view
     const showTabSection = (tabIndex = 0) => {
         if (!tabSection) return
 
         tabSection.style.removeProperty("display")
         tabSection.style.setProperty("display", "block", "important")
+
+        if (cardContainer) {
+            cardContainer.style.setProperty("display", "none", "important")
+        }
 
         const tabButtons = tabSection.querySelectorAll(
             ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
@@ -359,7 +339,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             targetTab.click()
         }
 
-        updateHeroCardBorders(tabIndex)
         updateMobileCards(tabIndex)
         tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
     }
@@ -381,7 +360,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         )
         tabButtons.forEach((btn, index) => {
             btn.addEventListener("click", () => {
-                updateHeroCardBorders(index)
                 updateMobileCards(index)
             })
         })
@@ -413,6 +391,21 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Back to discovery link opens first tab
     bindTabSectionTrigger("#back-discovery-tab", 0)
     bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
+
+    // Back button: hide tab section, restore hero card container
+    const tabBackButton = document.getElementById("tab-back-button")
+    if (tabBackButton) {
+        tabBackButton.addEventListener("click", (e) => {
+            e.preventDefault()
+            if (tabSection) {
+                tabSection.style.setProperty("display", "none", "important")
+            }
+            if (cardContainer) {
+                cardContainer.style.removeProperty("display")
+                cardContainer.style.setProperty("display", "block", "important")
+            }
+        })
+    }
 
     // Trial class slot grid elements
     const wrapper = document.querySelector(".trial-class_option-wapper")
