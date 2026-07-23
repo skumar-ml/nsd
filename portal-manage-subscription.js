@@ -20,8 +20,16 @@ Usage (in the portal dashboard Webflow page embed, where member data is in scope
 
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
 
+// Reference to the manage-subscription button, set on init.
+var _manageSubButton = null
+
 /**
  * Bind the click handler to the manage-subscription button.
+ *
+ * The button is hidden by default; call setManageSubscriptionVisible(true) once
+ * you know the member has a subscription (the portal does this after it loads
+ * its data). Failing safe = stay hidden.
+ *
  * @param {{memberId?:string, accountEmail?:string, buttonId?:string, returnUrl?:string}} options
  */
 function initManageSubscriptionButton(options) {
@@ -36,11 +44,30 @@ function initManageSubscriptionButton(options) {
         return
     }
 
+    _manageSubButton = button
+    // Hide until we know there's a subscription (avoids a flash before data loads).
+    button.style.display = "none"
+
     button.addEventListener("click", function (event) {
         event.preventDefault()
         openBillingPortal(options, button)
     })
 }
+
+/**
+ * Show/hide the manage-subscription button. Safe to call before or after init.
+ * @param {boolean} hasSubscription
+ */
+function setManageSubscriptionVisible(hasSubscription) {
+    var button = _manageSubButton || document.getElementById("brief-subs-btn")
+    if (!button) return
+    // "" reverts to the button's CSS display (Webflow inline-block/flex/etc.)
+    button.style.display = hasSubscription ? "" : "none"
+}
+
+// Expose for the portal script / page embed.
+window.initManageSubscriptionButton = initManageSubscriptionButton
+window.setManageSubscriptionVisible = setManageSubscriptionVisible
 
 /**
  * Resolve the logged-in member's id + email.

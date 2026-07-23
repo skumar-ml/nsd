@@ -231,6 +231,15 @@ class NSDPortal {
         })
       }
 
+      // Show the "Manage subscription" button only if the member has a brief
+      // subscription (subscription-based access, not one-off brief purchases).
+      const hasBriefSubscription = briefsData.some(
+        (b) => b && b.subscription === true,
+      )
+      if (typeof setManageSubscriptionVisible === "function") {
+        setManageSubscriptionVisible(hasBriefSubscription)
+      }
+
       // Render portal
       console.log("Step-8: Rendering portal")
       this.renderPortal()
