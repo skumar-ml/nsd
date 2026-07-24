@@ -234,6 +234,21 @@ document.addEventListener("DOMContentLoaded", async function () {
         registrationCard.style.setProperty("display", "none", "important")
     }
 
+    // Hide cancel-confirmation and cancelled state cards by default
+    const cancelInfoCard = document.querySelector(
+        ".tc_cancel-registration-info-card",
+    )
+    if (cancelInfoCard) {
+        cancelInfoCard.style.setProperty("display", "none", "important")
+    }
+
+    const cancelledCard = document.querySelector(
+        ".tc_registration-cancelled-card",
+    )
+    if (cancelledCard) {
+        cancelledCard.style.setProperty("display", "none", "important")
+    }
+
     // Hide tab section by default until user clicks a CTA
     const tabSection = document.getElementById("tc-tab-wapper")
     if (tabSection) {
@@ -886,16 +901,37 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
-        // Cancel Registration button
-        const cancelBtn =
-            document.querySelector(".tc_cancel-registration-btn") ||
-            document.querySelector(".tc_cancel-btn")
+        // Cancel Registration button (on registration card): open confirmation info card
+        const cancelBtn = document.querySelector(".tc_cancel-btn")
 
-        if (cancelBtn) {
-            cancelBtn.addEventListener("click", function () {
+        if (cancelBtn && registrationCard && cancelInfoCard) {
+            cancelBtn.addEventListener("click", function (e) {
+                e.preventDefault()
+                registrationCard.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+                cancelInfoCard.style.removeProperty("display")
+                cancelInfoCard.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            })
+        }
+
+        // Confirm Cancel button (inside the confirmation info card): actually cancels
+        const confirmCancelBtn = document.querySelector(
+            ".tc_cancel-registration-btn",
+        )
+
+        if (confirmCancelBtn) {
+            confirmCancelBtn.addEventListener("click", function (e) {
+                e.preventDefault()
                 const cancelUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/cancel`
 
-                cancelBtn.disabled = true
+                confirmCancelBtn.disabled = true
 
                 fetch(cancelUrl, {
                     method: "POST",
@@ -911,14 +947,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                             .then((t) => (t && t.trim() ? JSON.parse(t) : {}))
                     })
                     .then(() => {
-                        const infoCard = document.querySelector(
-                            ".tc_cancel-registration-info-card",
-                        )
                         const doneCard = document.querySelector(
                             ".tc_registration-cancelled-card",
                         )
-                        if (infoCard) {
-                            infoCard.style.setProperty(
+                        if (cancelInfoCard) {
+                            cancelInfoCard.style.setProperty(
                                 "display",
                                 "none",
                                 "important",
@@ -940,7 +973,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         )
                     })
                     .finally(() => {
-                        cancelBtn.disabled = false
+                        confirmCancelBtn.disabled = false
                     })
             })
         }
