@@ -484,12 +484,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Get main trial class form root element
     const form = getTrialClassFormRoot()
-    if (!form) return
 
-    // Grade dropdown list (async; independent of slot cards)
-    const gradeSelect = form.querySelector(".trial-form-select-field")
-
-    // Load grade options from API 
+    // Grade dropdown list (async; independent of slot cards) — only present when the main form exists
+    const gradeSelect = form
+        ? form.querySelector(".trial-form-select-field")
+        : null
+    if (form) {
+    // Load grade options from API
     if (gradeSelect && !manageToken) {
         gradeSelect.disabled = true
         gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
@@ -685,6 +686,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
     })
+    }
 
     // Manage registration view when token is present in the URL
     let registrationData = null
