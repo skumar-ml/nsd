@@ -290,12 +290,31 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
-    // Book consult button opens Tab 1 (index 0)
-    bindTabSectionTrigger(".tc_book-consult-btn", 0)
+    // Bind click handler on selector to redirect to an external page
+    const bindRedirectTrigger = (selector, url) => {
+        document.querySelectorAll(selector).forEach((btn) => {
+            if (btn.tagName === "A") {
+                btn.setAttribute("href", url)
+            }
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                window.location.href = url
+            })
+        })
+    }
+
+    // Book consult button redirects to the consults page
+    bindRedirectTrigger(
+        ".tc_book-consult-btn",
+        "https://www.nsdebatecamp.com/online-classes/consults",
+    )
     // Free trial class button opens Tab 2 (index 1)
     bindTabSectionTrigger(".tc_book-btn", 1)
-    // Placement interview button opens Tab 3 (index 2)
-    bindTabSectionTrigger(".tc_book-placement", 2)
+    // Placement interview button redirects to the placement interview page
+    bindRedirectTrigger(
+        ".tc_book-placement",
+        "https://www.nsdebatecamp.com/online-classes/placement-interview",
+    )
     // Interview card CTA opens placement interview tab
     bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
     // Back to discovery link opens first tab
