@@ -855,10 +855,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             return
         }
 
-        // Show registration card; hide main form and reschedule form
-        if (registrationCard) {
-            registrationCard.style.setProperty("display", "block", "important")
-        }
+        // Hide main form and reschedule form (registration card is shown after it is populated)
         if (formContainer) {
             formContainer.style.setProperty("display", "none", "important")
         }
@@ -960,6 +957,12 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
+        // Registration card is populated now (and the loader is gone): show it
+        if (registrationCard) {
+            registrationCard.style.removeProperty("display")
+            registrationCard.style.setProperty("display", "block", "important")
+        }
+
         // Reschedule button: show reschedule form container, hide registration card
         const rescheduleBtn = document.querySelector(".tc_reschedule-btn")
         const rescheduleView = rescheduleFormContainer || rescheduleForm
@@ -1032,23 +1035,47 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
-        // "No, Go Back" button (inside the confirmation info card): return to registration card
-        const cancelBackBtn = cancelInfoCard?.querySelector(
-            ".tc_cancel-btn.black-text, .tc_cancel-btn",
-        )
+        // "Go Back" buttons (confirmation info card + reschedule form): return to registration card
+        const goBackButtons = Array.from(
+            document.querySelectorAll(".tc_cancel-btn.black-text"),
+        ).filter((btn) => !registrationCard?.contains(btn))
 
-        if (cancelBackBtn && cancelInfoCard && registrationCard) {
-            cancelBackBtn.addEventListener("click", function (e) {
+        goBackButtons.forEach((backBtn) => {
+            backBtn.addEventListener("click", function (e) {
                 e.preventDefault()
-                cancelInfoCard.style.setProperty("display", "none", "important")
-                registrationCard.style.removeProperty("display")
-                registrationCard.style.setProperty(
-                    "display",
-                    "block",
-                    "important",
-                )
+
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (rescheduleFormContainer) {
+                    rescheduleFormContainer.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (rescheduleForm) {
+                    rescheduleForm.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                if (registrationCard) {
+                    registrationCard.style.removeProperty("display")
+                    registrationCard.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
             })
-        }
+        })
 
         // Confirm Cancel button (inside the confirmation info card): actually cancels
         const confirmCancelBtn = document.querySelector(
