@@ -228,6 +228,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         rescheduleForm.style.setProperty("display", "none", "important")
     }
 
+    // Hide reschedule form container (wrapper shown when rescheduling) by default
+    const rescheduleFormContainer = document.querySelector(
+        ".tc-reschedule-form-container",
+    )
+    if (rescheduleFormContainer) {
+        rescheduleFormContainer.style.setProperty(
+            "display",
+            "none",
+            "important",
+        )
+    }
+
     // Hide registration manage card by default
     const registrationCard = document.querySelector(".tc_registration-card")
     if (registrationCard) {
@@ -894,24 +906,44 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
-        // Reschedule button: show reschedule form, hide registration card
+        // Reschedule button: show reschedule form container, hide registration card
         const rescheduleBtn = document.querySelector(".tc_reschedule-btn")
-        if (rescheduleBtn && registrationCard && rescheduleForm) {
-            rescheduleBtn.addEventListener("click", function () {
+        const rescheduleView = rescheduleFormContainer || rescheduleForm
+        if (rescheduleBtn && registrationCard && rescheduleView) {
+            rescheduleBtn.addEventListener("click", function (e) {
+                e.preventDefault()
                 registrationCard.style.setProperty(
                     "display",
                     "none",
                     "important",
                 )
-                rescheduleForm.style.removeProperty("display")
-                rescheduleForm.style.setProperty(
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                rescheduleView.style.removeProperty("display")
+                rescheduleView.style.setProperty(
                     "display",
                     "block",
                     "important",
                 )
 
+                // The inner form is hidden by default; make sure it is visible too
+                if (rescheduleForm && rescheduleForm !== rescheduleView) {
+                    rescheduleForm.style.removeProperty("display")
+                    rescheduleForm.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
+
                 const firstVisibleRescheduleRadio =
-                    rescheduleForm.querySelector(
+                    rescheduleForm?.querySelector(
                         "input[name='res-trial-class']",
                     )
                 if (firstVisibleRescheduleRadio) {
@@ -921,7 +953,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
         // Cancel Registration button (on registration card): open confirmation info card
-        const cancelBtn = document.querySelector(".tc_cancel-btn")
+        // Scoped to the registration card because the "No, Go Back" button in the
+        // confirmation card shares the .tc_cancel-btn class.
+        const cancelBtn =
+            registrationCard?.querySelector(".tc_cancel-btn") ||
+            document.querySelector(
+                ".tc_registration-card .tc_cancel-btn, .tc_cancel-btn:not(.black-text)",
+            )
 
         if (cancelBtn && registrationCard && cancelInfoCard) {
             cancelBtn.addEventListener("click", function (e) {
@@ -933,6 +971,24 @@ document.addEventListener("DOMContentLoaded", async function () {
                 )
                 cancelInfoCard.style.removeProperty("display")
                 cancelInfoCard.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            })
+        }
+
+        // "No, Go Back" button (inside the confirmation info card): return to registration card
+        const cancelBackBtn = cancelInfoCard?.querySelector(
+            ".tc_cancel-btn.black-text, .tc_cancel-btn",
+        )
+
+        if (cancelBackBtn && cancelInfoCard && registrationCard) {
+            cancelBackBtn.addEventListener("click", function (e) {
+                e.preventDefault()
+                cancelInfoCard.style.setProperty("display", "none", "important")
+                registrationCard.style.removeProperty("display")
+                registrationCard.style.setProperty(
                     "display",
                     "block",
                     "important",
