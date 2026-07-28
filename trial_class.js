@@ -322,6 +322,60 @@ document.addEventListener("DOMContentLoaded", async function () {
     )
     // Free trial class button opens Tab 2 (index 1)
     bindTabSectionTrigger(".tc_book-btn", 1)
+
+    // Free trial class button also resets the Trial class tab back to the
+    // registration form view (the reschedule view may still be open from before)
+    document.querySelectorAll(".tc_book-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (rescheduleFormContainer) {
+                rescheduleFormContainer.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            }
+            if (rescheduleForm) {
+                rescheduleForm.style.setProperty("display", "none", "important")
+            }
+
+            // With a manage token the correct view is the registration card,
+            // not the registration form
+            if (manageToken) {
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                // Only if the card was actually populated (valid token)
+                const hasRegistrationRows =
+                    registrationCard?.querySelector(".tc_student-card")?.children
+                        .length > 0
+                if (registrationCard && hasRegistrationRows) {
+                    registrationCard.style.removeProperty("display")
+                    registrationCard.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
+                return
+            }
+
+            const registrationFormWrapper = document.querySelector(
+                ".trial-class_form-wapper-new",
+            )
+            if (registrationFormWrapper) {
+                registrationFormWrapper.style.removeProperty("display")
+                registrationFormWrapper.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            }
+        })
+    })
     // Placement interview button redirects to the placement interview page
     bindRedirectTrigger(
         ".tc_book-placement",
