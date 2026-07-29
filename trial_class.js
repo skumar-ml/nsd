@@ -176,6 +176,22 @@ const setupInterviewCardLogic = (scope) => {
     return { updateInterviewCardVisibility, state, interviewCard }
 }
 
+// Fetch registration details for a manage token; returns null when invalid/expired
+const fetchManageRegistration = async (token) => {
+    try {
+        const res = await fetch(
+            `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/manage?token=${encodeURIComponent(token)}`,
+        )
+        if (!res.ok) {
+            throw new Error("Failed to fetch registration details")
+        }
+        return await res.json()
+    } catch (err) {
+        console.error("Error loading trial class registration", err)
+        return null
+    }
+}
+
 // Hide form and show success box after successful form submission
 const showFormSuccessState = ({
     formRoot,
@@ -326,7 +342,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Free trial class button also resets the Trial class tab back to the
     // registration form view (the reschedule view may still be open from before)
     document.querySelectorAll(".tc_book-btn").forEach((btn) => {
-        btn.addEventListener("click", () => {
+        btn.addEventListener("click", async () => {
             if (rescheduleFormContainer) {
                 rescheduleFormContainer.style.setProperty(
                     "display",
@@ -348,11 +364,51 @@ document.addEventListener("DOMContentLoaded", async function () {
                         "important",
                     )
                 }
-                // Only if the card was actually populated (valid token)
-                const hasRegistrationRows =
-                    registrationCard?.querySelector(".tc_student-card")?.children
-                        .length > 0
-                if (registrationCard && hasRegistrationRows) {
+                // Re-validate the token on every click: it may have expired
+                // (or the registration may have been cancelled) since page load
+                if (registrationCard) {
+                    registrationCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                const loaderEl = mountManageRegistrationLoader()
+                const freshData = await fetchManageRegistration(manageToken)
+                if (loaderEl.parentNode) loaderEl.remove()
+
+                const invalidTokenEl = document.getElementById(
+                    "invalid-or-expired-token-found",
+                )
+
+                if (!freshData || !freshData.registration) {
+                    if (trialClassFormContainer) {
+                        trialClassFormContainer.style.setProperty(
+                            "display",
+                            "none",
+                            "important",
+                        )
+                    }
+                    if (invalidTokenEl) {
+                        invalidTokenEl.style.removeProperty("display")
+                        invalidTokenEl.style.setProperty(
+                            "display",
+                            "block",
+                            "important",
+                        )
+                    }
+                    return
+                }
+
+                if (invalidTokenEl) {
+                    invalidTokenEl.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (registrationCard) {
                     registrationCard.style.removeProperty("display")
                     registrationCard.style.setProperty(
                         "display",
@@ -801,22 +857,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             "#trial-class-reschdule-form",
         )
 
-        const apiUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/manage?token=${encodeURIComponent(manageToken)}`
+        registrationData = await fetchManageRegistration(manageToken)
 
-        try {
-            const res = await fetch(apiUrl)
-            if (!res.ok) {
-                throw new Error("Failed to fetch registration details")
-            }
-            const data = await res.json()
-            registrationData = data
-        } catch (err) {
-            console.error("Error loading trial class registration", err)
-            registrationData = null
-        } finally {
-            if (manageLoaderEl.parentNode) {
-                manageLoaderEl.remove()
-            }
+        // Loading text disappears before any card is rendered
+        if (manageLoaderEl.parentNode) {
+            manageLoaderEl.remove()
         }
 
         // If token is invalid or expired, show the dedicated message and stop
@@ -1144,6 +1189,20 @@ document.addEventListener("DOMContentLoaded", async function () {
         if (rescheduleForm) {
             const registration = registrationData.registration
 
+            // No slots to reschedule into (e.g. cancelled registration): clear the
+            // Webflow placeholder slot cards instead of leaving them on screen
+            if (
+                !registrationData.available_classes ||
+                registrationData.available_classes.length === 0
+            ) {
+                const emptyGrid = rescheduleForm
+                    .querySelector(".trial-class_option-wapper")
+                    ?.querySelector(".trial-class-grid-container")
+                if (emptyGrid) {
+                    mountTrialOptionsEmpty(emptyGrid)
+                }
+            }
+
             // Load available reschedule slots and render slot cards
             if (
                 registrationData.available_classes &&
@@ -1371,9 +1430,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                     registration.previous_experience || ""
             }
 
-            const resStudentDescription = rescheduleForm.querySelector(
-                "#res_student_description",
-            )
+            const resStudentDescription =
+                rescheduleForm.querySelector("#res_student_description") ||
+                rescheduleForm.querySelector(
+                    ".trial-form-student-desc-field",
+                ) ||
+                Array.from(rescheduleForm.querySelectorAll("textarea")).find(
+                    (el) =>
+                        `${el.id} ${el.name} ${el.getAttribute("data-name") || ""}`
+                            .toLowerCase()
+                            .includes("desc"),
+                )
+
             if (resStudentDescription) {
                 resStudentDescription.value =
                     registration.best_description || ""
