@@ -374,9 +374,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                     )
                 }
 
-                const loaderEl = mountManageRegistrationLoader()
-                const freshData = await fetchManageRegistration(manageToken)
-                if (loaderEl.parentNode) loaderEl.remove()
+                const freshData = await loadManageRegistration()
 
                 const invalidTokenEl = document.getElementById(
                     "invalid-or-expired-token-found",
@@ -511,6 +509,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     /** Visible while manage registration (reschedule/cancel) data loads. */
     const mountManageRegistrationLoader = () => {
+        // Never mount a second loader (e.g. a click while the first load is in flight)
+        const existing = document.querySelector(".tc-manage-registration-loader")
+        if (existing) return existing
+
         const el = document.createElement("div")
         el.className = "tc-manage-registration-loader"
         el.setAttribute("role", "status")
@@ -526,6 +528,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.body.appendChild(el)
         }
         return el
+    }
+
+    let manageRequestInFlight = null
+    const loadManageRegistration = () => {
+        if (manageRequestInFlight) return manageRequestInFlight
+
+        const loaderEl = mountManageRegistrationLoader()
+        manageRequestInFlight = fetchManageRegistration(manageToken).then(
+            (data) => {
+                if (loaderEl.parentNode) loaderEl.remove()
+                manageRequestInFlight = null
+                return data
+            },
+        )
+
+        return manageRequestInFlight
     }
 
     // Registration form: show structure immediately; load slots in background (skip when managing via token).
@@ -848,21 +866,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     let registrationData = null
 
     if (manageToken) {
-        const manageLoaderEl = mountManageRegistrationLoader()
-
         const formContainer = document.querySelector(
             ".trial_class_form-container",
         )
         const rescheduleForm = document.querySelector(
             "#trial-class-reschdule-form",
         )
-
-        registrationData = await fetchManageRegistration(manageToken)
-
-        // Loading text disappears before any card is rendered
-        if (manageLoaderEl.parentNode) {
-            manageLoaderEl.remove()
-        }
+        registrationData = await loadManageRegistration()
 
         // If token is invalid or expired, show the dedicated message and stop
         if (!registrationData || !registrationData.registration) {
