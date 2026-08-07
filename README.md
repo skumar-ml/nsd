@@ -31,6 +31,7 @@ This folder contains utilities scripts used by NSD, including checkout customiza
 - `supplementary-programs.js` – Legacy supplementary form accordion that tracks completion icons and links per category.
 - `supplementary.css` – Styling for the supplementary accordion, labels, and expanded content states.
 - `update_profile.js` – Update-profile modal handler that loads member details, pre-fills the form, and submits changes.
+- `parent-phone-modal.js` – Blocking parent phone capture: shows only when a parent has no phone number; Continues via `updateMemberStack` (phone only).
 - `utility.js` – Tiny helper exposing `setupAdminViewListener` to toggle admin-only views via ID allowlists or query params.
 
 ## API Domains (current)
