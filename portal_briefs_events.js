@@ -68,12 +68,12 @@ class BriefManager {
         )
         // this.elements.spinner = document.getElementById('half-circle-spinner');
     }
-    // Fetches data from the API
+    // Fetches data from the protected portal API
     async fetchData(endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
             let url = `${this.portalApiBase}/${normalizedEndpoint}`
-            const response = await fetch(url)
+            const response = await NSDAuth.authFetch(url)
             if (!response.ok) throw new Error("Network response was not ok")
 
             const apiData = await response.json()
@@ -479,7 +479,19 @@ class BriefManager {
             }
         }
 
-        xhr.send(JSON.stringify(checkoutData))
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(checkoutData))
+            })
+            .catch(function (err) {
+                console.error("brief event checkout auth failed:", err)
+                if (enrollButtons && enrollButtons.length > 0) {
+                    enrollButtons.forEach((enrollButton) => {
+                        enrollButton.innerHTML = "Enroll Now"
+                        enrollButton.style.pointerEvents = "auto"
+                    })
+                }
+            })
     }
     /**
      * Handle empty state: hide containers if no briefs

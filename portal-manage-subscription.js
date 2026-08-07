@@ -4,7 +4,7 @@ payment-service createBillingPortalSession API. On click it mints a Stripe
 Billing Portal session for the logged-in member and redirects the browser to it,
 where the parent can manage / cancel their NSD Briefs subscription.
 
-Are there any dependent JS files: No (expects window.NSD_API.PAYMENT_API_BASE,
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API;
 same as the other portal scripts). Member context (memberId + accountEmail) is
 passed in by the Webflow page embed, exactly like NSDPortal / BriefManager.
 
@@ -112,7 +112,7 @@ async function openBillingPortal(options, button) {
     button.style.pointerEvents = "none"
 
     try {
-        var response = await fetch(
+        var response = await NSDAuth.authFetch(
             PAYMENT_API_BASE + "/createBillingPortalSession",
             {
                 method: "POST",

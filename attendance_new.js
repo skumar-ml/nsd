@@ -233,7 +233,14 @@ class selfCheckInForm {
         var $this = this
         xhr.open("POST", ATTENDANCE_API_BASE + "/addStudentAttendance_v2", true)
         xhr.withCredentials = false
-        xhr.send(JSON.stringify(data))
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(data))
+            })
+            .catch(function (err) {
+                console.error("addStudentAttendance_v2 auth failed:", err)
+                checkInBtn.innerHTML = "Check In"
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             let checkInIcon = $this.getCheckInIcon()
@@ -263,10 +270,10 @@ class selfCheckInForm {
         })
         this.labsData = labsData
     }
-    // Fetches data from the specified URL endpoint
+    // Fetches data from the specified URL endpoint (protected)
     async fetchData(url) {
         try {
-            const response = await fetch(url)
+            const response = await NSDAuth.authFetch(url)
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -311,7 +318,14 @@ class LabsData {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getAttendanceDetailsByMemberId auth failed:", err)
+                spinner.style.display = "none"
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             new selfCheckInForm($this.webflowMemberId, responseText)

@@ -563,7 +563,15 @@ class SupplementaryProgram {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getCompletedForm auth failed:", err)
+                var spinner2 = document.getElementById("half-circle-spinner-2")
+                if (spinner2) spinner2.style.display = "none"
+            })
         xhr.onload = function () {
             var spinner2 = document.getElementById("half-circle-spinner-2")
             if (spinner2) spinner2.style.display = "none"
@@ -826,7 +834,14 @@ class SupplementaryTabs {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getSupplimentaryForm auth failed:", err)
+                if (spinner) spinner.style.display = "none"
+            })
         xhr.onload = function () {
             try {
                 if (spinner) spinner.style.display = "none"

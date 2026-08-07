@@ -3,7 +3,7 @@ Purpose: Comprehensive competition leaderboard that fetches member data, builds 
 
 Brief Logic: Fetches competition data from API and builds tabbed interface for different competitions. Displays member standings with progress bars and sorting capabilities.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 class NDFLeaderBoard {
@@ -17,11 +17,11 @@ class NDFLeaderBoard {
         this.accountType = accountType
         this.getLeaderboardData()
     }
-    // Fetches data from the API endpoint
+    // Fetches data from the protected portal API (Memberstack Bearer token)
     async fetchData(endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-            const response = await fetch(
+            const response = await NSDAuth.authFetch(
                 `${PORTAL_API_BASE}/${normalizedEndpoint}`,
             )
             if (!response.ok) {

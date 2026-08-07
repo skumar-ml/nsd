@@ -3,7 +3,7 @@ Purpose: Displays a modal to prompt users to recover abandoned checkout carts. V
 
 Brief Logic: Checks localStorage or fetches cart data from API. Validates that cart is older than configured hours but less than 5 months, program hasn't started, and 7-day cooldown period has passed. If all conditions pass, displays modal and updates cart menu with program details.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
 class AbandonedCartModal {
@@ -157,10 +157,10 @@ class AbandonedCartModal {
         localStorage.setItem("lastModalClosedDate", new Date().toISOString())
     }
 
-    // Fetches cart data from the API endpoint using the member ID
+    // Fetches cart data from the protected payment API (Memberstack Bearer token)
     async fetchCartDataFromAPI() {
         try {
-            const response = await fetch(
+            const response = await NSDAuth.authFetch(
                 this.paymentApiBase +
                     "/getCheckoutURLByMemberId/" +
                     this.memberId,

@@ -87,10 +87,10 @@ async function coachResources(coachCampId, memberId) {
     }
 }
 
-// Fetches coach portal data from the API for the specified member ID
+// Fetches coach portal data from the protected portal API
 async function getCoachData(memberId) {
     try {
-        const response = await fetch(
+        const response = await NSDAuth.authFetch(
             COACH_PORTAL_API + "/getCoachPortalData/" + memberId,
         )
         if (!response.ok) {

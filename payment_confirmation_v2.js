@@ -314,12 +314,11 @@ class PaymentConfirmation {
             .removeAttribute("aria-hidden")
     }
 
-    // Get API data with the help of endpoint
-    // Fetches data from the API endpoint
+    // Fetches data from the protected payment API
     async fetchData(endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-            const response = await fetch(
+            const response = await NSDAuth.authFetch(
                 `${PAYMENT_API_BASE}/${normalizedEndpoint}`,
             )
             if (!response.ok) {
@@ -571,13 +570,13 @@ class PaymentConfirmation {
             amount: parseFloat(amount * 100),
             source: "success_page",
         }
-        // Create the POST request
-        fetch(PAYMENT_API_BASE + "/createCheckoutUrlForSupplementary", {
-            method: "POST", // Specify the method
+        // Create the POST request (protected payment endpoint)
+        NSDAuth.authFetch(PAYMENT_API_BASE + "/createCheckoutUrlForSupplementary", {
+            method: "POST",
             headers: {
-                "Content-Type": "application/json", // Specify the content type
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(data), // Convert the data to a JSON string
+            body: JSON.stringify(data),
         })
             .then((response) => {
                 if (!response.ok) {

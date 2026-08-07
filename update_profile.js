@@ -3,7 +3,7 @@ Purpose: Update profile modal that loads member details, pre-fills the form, and
 
 Brief Logic: Fetches member data from API and populates form fields. Handles form submission to update member information via API endpoint.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE
 class updateMember {
@@ -17,10 +17,10 @@ class updateMember {
         this.handleUpdateProfileBtn()
         this.attachEditProfileValidation()
     }
-    // Get API data with the help of endpoint
+    // Get API data with the help of endpoint (protected: Memberstack Bearer token)
     async fetchData(endpoint) {
         try {
-            const response = await fetch(endpoint)
+            const response = await NSDAuth.authFetch(endpoint)
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -221,7 +221,15 @@ class updateMember {
         }
         xhr.open("POST", AUTH_API_BASE + "/updateMemberStack", true)
         xhr.withCredentials = false
-        xhr.send(JSON.stringify(data))
+        // Dual-auth endpoint: send member Bearer token
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(data))
+            })
+            .catch(function (err) {
+                console.error("updateMemberStack auth failed:", err)
+                resetEditButton()
+            })
         xhr.onload = function () {
             if (xhr.status !== 200) {
                 console.log("Error", xhr.statusText)

@@ -598,7 +598,13 @@ class checkInForm {
         var $this = this
         xhr.open("POST", ATTENDANCE_API_BASE + "/addStudentAttendance_v2", true)
         xhr.withCredentials = false
-        xhr.send(JSON.stringify(data))
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(data))
+            })
+            .catch(function (err) {
+                console.error("addStudentAttendance_v2 auth failed:", err)
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             //console.log('responseText', responseText)
@@ -668,7 +674,13 @@ class checkInForm {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getAttendanceDetailsByMemberId auth failed:", err)
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
 
@@ -717,7 +729,14 @@ class LabsData {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getAttendanceDetailsByMemberId auth failed:", err)
+                spinner.style.display = "none"
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             new checkInForm($this.webflowMemberId, responseText)
