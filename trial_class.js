@@ -176,6 +176,22 @@ const setupInterviewCardLogic = (scope) => {
     return { updateInterviewCardVisibility, state, interviewCard }
 }
 
+// Fetch registration details for a manage token; returns null when invalid/expired
+const fetchManageRegistration = async (token) => {
+    try {
+        const res = await fetch(
+            `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/manage?token=${encodeURIComponent(token)}`,
+        )
+        if (!res.ok) {
+            throw new Error("Failed to fetch registration details")
+        }
+        return await res.json()
+    } catch (err) {
+        console.error("Error loading trial class registration", err)
+        return null
+    }
+}
+
 // Hide form and show success box after successful form submission
 const showFormSuccessState = ({
     formRoot,
@@ -228,128 +244,58 @@ document.addEventListener("DOMContentLoaded", async function () {
         rescheduleForm.style.setProperty("display", "none", "important")
     }
 
+    // Hide reschedule form container (wrapper shown when rescheduling) by default
+    const rescheduleFormContainer = document.querySelector(
+        ".tc-reschedule-form-container",
+    )
+    if (rescheduleFormContainer) {
+        rescheduleFormContainer.style.setProperty(
+            "display",
+            "none",
+            "important",
+        )
+    }
+
     // Hide registration manage card by default
     const registrationCard = document.querySelector(".tc_registration-card")
     if (registrationCard) {
         registrationCard.style.setProperty("display", "none", "important")
     }
 
+    // Hide cancel-confirmation and cancelled state cards by default
+    const cancelInfoCard = document.querySelector(
+        ".tc_cancel-registration-info-card",
+    )
+    if (cancelInfoCard) {
+        cancelInfoCard.style.setProperty("display", "none", "important")
+    }
+
+    const cancelledCard = document.querySelector(
+        ".tc_registration-cancelled-card",
+    )
+    if (cancelledCard) {
+        cancelledCard.style.setProperty("display", "none", "important")
+    }
+
     // Hide tab section by default until user clicks a CTA
-    const tabSection = document.querySelector(".tc_tab-section")
+    const tabSection = document.getElementById("tc-tab-wapper")
     if (tabSection) {
         tabSection.style.setProperty("display", "none", "important")
     }
 
-    // Mobile breakpoint and hero card visibility config per tab
-    const MOBILE_BREAKPOINT = 991
-    const mobileCardIds = ["trial_class_card", "book_card", "book_placement"]
-    const mobileCardVisibility = {
-        0: { show: "book_card", hide: ["trial_class_card", "book_placement"] },
-        1: { show: "trial_class_card", hide: ["book_placement", "book_card"] },
-        2: { show: "book_placement", hide: ["trial_class_card", "book_card"] },
-    }
+    // Hero card container shown by default; hidden while a tab is open
+    const cardContainer = document.querySelector("#card-container")
 
-    // Check if viewport width is mobile
-    const isMobileView = () => window.innerWidth <= MOBILE_BREAKPOINT
-
-    // Track explicit user hero card selection on mobile (null = show all)
-    let mobileCardSelection = null
-
-    // Set display style on a hero card by element id
-    const setCardDisplay = (id, display) => {
-        const el = document.getElementById(id)
-        if (!el) return
-
-        if (display === "none") {
-            el.style.setProperty("display", "none", "important")
-        } else {
-            el.style.removeProperty("display")
-            el.style.setProperty("display", "block", "important")
-        }
-    }
-
-    // Reset all hero cards to default display
-    const resetMobileCards = () => {
-        mobileCardIds.forEach((id) => {
-            const el = document.getElementById(id)
-            if (el) el.style.removeProperty("display")
-        })
-    }
-
-    // Apply mobile hero card visibility for a given tab index
-    const applyMobileCardSelection = (tabIndex) => {
-        if (!isMobileView()) {
-            resetMobileCards()
-            return
-        }
-
-        const config = mobileCardVisibility[tabIndex]
-        if (!config) return
-
-        config.hide.forEach((id) => setCardDisplay(id, "none"))
-        setCardDisplay(config.show, "block")
-    }
-
-    // Save mobile card selection and apply visibility
-    const setMobileCardSelection = (tabIndex) => {
-        mobileCardSelection = tabIndex
-        applyMobileCardSelection(tabIndex)
-    }
-
-    // Sync mobile card visibility on viewport resize without unintended hides
-    const syncMobileCardsForViewport = () => {
-        if (!isMobileView()) {
-            mobileCardSelection = null
-            resetMobileCards()
-            return
-        }
-
-        if (mobileCardSelection === null) {
-            resetMobileCards()
-            return
-        }
-
-        applyMobileCardSelection(mobileCardSelection)
-    }
-
-    // Wrapper to update mobile cards for a tab index
-    const updateMobileCards = (tabIndex) => {
-        setMobileCardSelection(tabIndex)
-    }
-
-    // Map tab index to hero card active/inactive states
-    const heroCardBorderMap = {
-        0: {
-            active: "book_card",
-            inactive: ["trial_class_card", "book_placement"],
-        },
-        1: {
-            active: "trial_class_card",
-            inactive: ["book_card", "book_placement"],
-        },
-        2: {
-            active: "book_placement",
-            inactive: ["trial_class_card", "book_card"],
-        },
-    }
-
-    // Update gray-border  on hero cards for active tab
-    const updateHeroCardBorders = (tabIndex) => {
-        const config = heroCardBorderMap[tabIndex]
-        if (!config) return
-
-        document.getElementById(config.active)?.classList.remove("gray-border")
-        config.inactive.forEach((id) => {
-            document.getElementById(id)?.classList.add("gray-border")
-        })
-    }
-
-    // Show tab section, select tab, update cards/borders, and scroll into view
+    // Show tab section, select tab, and scroll into view
     const showTabSection = (tabIndex = 0) => {
         if (!tabSection) return
 
         tabSection.style.removeProperty("display")
         tabSection.style.setProperty("display", "block", "important")
+
+        if (cardContainer) {
+            cardContainer.style.setProperty("display", "none", "important")
+        }
 
         const tabButtons = tabSection.querySelectorAll(
             ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
@@ -359,8 +305,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             targetTab.click()
         }
 
-        updateHeroCardBorders(tabIndex)
-        updateMobileCards(tabIndex)
         tabSection.scrollIntoView({ behavior: "smooth", block: "start" })
     }
 
@@ -374,45 +318,143 @@ document.addEventListener("DOMContentLoaded", async function () {
         })
     }
 
-    // Handle direct tab menu clicks for borders and mobile card visibility
-    if (tabSection) {
-        const tabButtons = tabSection.querySelectorAll(
-            ".tc-tab-menu .tc-tab-button, .tc-tab-menu .w-tab-link",
-        )
-        tabButtons.forEach((btn, index) => {
-            btn.addEventListener("click", () => {
-                updateHeroCardBorders(index)
-                updateMobileCards(index)
+    // Bind click handler on selector to redirect to an external page
+    const bindRedirectTrigger = (selector, url) => {
+        document.querySelectorAll(selector).forEach((btn) => {
+            if (btn.tagName === "A") {
+                btn.setAttribute("href", url)
+            }
+            btn.addEventListener("click", (e) => {
+                e.preventDefault()
+                window.location.href = url
             })
         })
     }
 
-    // Debounced resize handler to sync mobile cards without scroll false triggers
-    let mobileResizeTimer
-    window.addEventListener("resize", () => {
-        clearTimeout(mobileResizeTimer)
-        mobileResizeTimer = setTimeout(() => {
-            syncMobileCardsForViewport()
-        }, 150)
-    })
+    // Book consult button redirects to the consults page
+    bindRedirectTrigger(
+        ".tc_book-consult-btn",
+        "https://www.nsdebatecamp.com/online-classes/consults",
+    )
+    // Free trial class button opens Tab 2 (index 1)
+    bindTabSectionTrigger(".tc_book-btn", 1)
 
-    // Free trial class card button opens Tab 2 
-    document.querySelectorAll(".tc_register-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-            e.preventDefault()
-            showTabSection(1)
+    // Free trial class button also resets the Trial class tab back to the
+    // registration form view (the reschedule view may still be open from before)
+    document.querySelectorAll(".tc_book-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+            if (rescheduleFormContainer) {
+                rescheduleFormContainer.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+            }
+            if (rescheduleForm) {
+                rescheduleForm.style.setProperty("display", "none", "important")
+            }
+
+            // With a manage token the correct view is the registration card,
+            // not the registration form
+            if (manageToken) {
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                // Re-validate the token on every click: it may have expired
+                // (or the registration may have been cancelled) since page load
+                if (registrationCard) {
+                    registrationCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                const freshData = await loadManageRegistration()
+
+                const invalidTokenEl = document.getElementById(
+                    "invalid-or-expired-token-found",
+                )
+
+                if (!freshData || !freshData.registration) {
+                    if (trialClassFormContainer) {
+                        trialClassFormContainer.style.setProperty(
+                            "display",
+                            "none",
+                            "important",
+                        )
+                    }
+                    if (invalidTokenEl) {
+                        invalidTokenEl.style.removeProperty("display")
+                        invalidTokenEl.style.setProperty(
+                            "display",
+                            "block",
+                            "important",
+                        )
+                    }
+                    return
+                }
+
+                if (invalidTokenEl) {
+                    invalidTokenEl.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (registrationCard) {
+                    registrationCard.style.removeProperty("display")
+                    registrationCard.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
+                return
+            }
+
+            const registrationFormWrapper = document.querySelector(
+                ".trial-class_form-wapper-new",
+            )
+            if (registrationFormWrapper) {
+                registrationFormWrapper.style.removeProperty("display")
+                registrationFormWrapper.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            }
         })
     })
-
-    // Book consult button opens Tab 1 (index 0)
-    bindTabSectionTrigger(".tc_book-btn", 0)
-    // Placement interview button opens Tab 3 (index 2)
-    bindTabSectionTrigger(".tc_book-placement-btn", 2)
+    // Placement interview button redirects to the placement interview page
+    bindRedirectTrigger(
+        ".tc_book-placement",
+        "https://www.nsdebatecamp.com/online-classes/placement-interview",
+    )
     // Interview card CTA opens placement interview tab
     bindTabSectionTrigger(".tc_interview-card .tc_button-blue", 2)
     // Back to discovery link opens first tab
     bindTabSectionTrigger("#back-discovery-tab", 0)
     bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
+
+    // Back button: hide tab section, restore hero card container
+    const tabBackButton = document.getElementById("tab-back-button")
+    if (tabBackButton) {
+        tabBackButton.addEventListener("click", (e) => {
+            e.preventDefault()
+            if (tabSection) {
+                tabSection.style.setProperty("display", "none", "important")
+            }
+            if (cardContainer) {
+                cardContainer.style.removeProperty("display")
+                cardContainer.style.setProperty("display", "block", "important")
+            }
+        })
+    }
 
     // Trial class slot grid elements
     const wrapper = document.querySelector(".trial-class_option-wapper")
@@ -467,6 +509,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     /** Visible while manage registration (reschedule/cancel) data loads. */
     const mountManageRegistrationLoader = () => {
+        // Never mount a second loader (e.g. a click while the first load is in flight)
+        const existing = document.querySelector(".tc-manage-registration-loader")
+        if (existing) return existing
+
         const el = document.createElement("div")
         el.className = "tc-manage-registration-loader"
         el.setAttribute("role", "status")
@@ -482,6 +528,22 @@ document.addEventListener("DOMContentLoaded", async function () {
             document.body.appendChild(el)
         }
         return el
+    }
+
+    let manageRequestInFlight = null
+    const loadManageRegistration = () => {
+        if (manageRequestInFlight) return manageRequestInFlight
+
+        const loaderEl = mountManageRegistrationLoader()
+        manageRequestInFlight = fetchManageRegistration(manageToken).then(
+            (data) => {
+                if (loaderEl.parentNode) loaderEl.remove()
+                manageRequestInFlight = null
+                return data
+            },
+        )
+
+        return manageRequestInFlight
     }
 
     // Registration form: show structure immediately; load slots in background (skip when managing via token).
@@ -596,12 +658,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     // Get main trial class form root element
     const form = getTrialClassFormRoot()
-    if (!form) return
 
-    // Grade dropdown list (async; independent of slot cards)
-    const gradeSelect = form.querySelector(".trial-form-select-field")
-
-    // Load grade options from API 
+    // Grade dropdown list (async; independent of slot cards) — only present when the main form exists
+    const gradeSelect = form
+        ? form.querySelector(".trial-form-select-field")
+        : null
+    if (form) {
+    // Load grade options from API
     if (gradeSelect && !manageToken) {
         gradeSelect.disabled = true
         gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
@@ -797,37 +860,19 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
         }
     })
+    }
 
     // Manage registration view when token is present in the URL
     let registrationData = null
 
     if (manageToken) {
-        const manageLoaderEl = mountManageRegistrationLoader()
-
         const formContainer = document.querySelector(
             ".trial_class_form-container",
         )
         const rescheduleForm = document.querySelector(
             "#trial-class-reschdule-form",
         )
-
-        const apiUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/manage?token=${encodeURIComponent(manageToken)}`
-
-        try {
-            const res = await fetch(apiUrl)
-            if (!res.ok) {
-                throw new Error("Failed to fetch registration details")
-            }
-            const data = await res.json()
-            registrationData = data
-        } catch (err) {
-            console.error("Error loading trial class registration", err)
-            registrationData = null
-        } finally {
-            if (manageLoaderEl.parentNode) {
-                manageLoaderEl.remove()
-            }
-        }
+        registrationData = await loadManageRegistration()
 
         // If token is invalid or expired, show the dedicated message and stop
         if (!registrationData || !registrationData.registration) {
@@ -865,10 +910,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             return
         }
 
-        // Show registration card; hide main form and reschedule form
-        if (registrationCard) {
-            registrationCard.style.setProperty("display", "block", "important")
-        }
+        // Hide main form and reschedule form (registration card is shown after it is populated)
         if (formContainer) {
             formContainer.style.setProperty("display", "none", "important")
         }
@@ -970,24 +1012,50 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
-        // Reschedule button: show reschedule form, hide registration card
+        // Registration card is populated now (and the loader is gone): show it
+        if (registrationCard) {
+            registrationCard.style.removeProperty("display")
+            registrationCard.style.setProperty("display", "block", "important")
+        }
+
+        // Reschedule button: show reschedule form container, hide registration card
         const rescheduleBtn = document.querySelector(".tc_reschedule-btn")
-        if (rescheduleBtn && registrationCard && rescheduleForm) {
-            rescheduleBtn.addEventListener("click", function () {
+        const rescheduleView = rescheduleFormContainer || rescheduleForm
+        if (rescheduleBtn && registrationCard && rescheduleView) {
+            rescheduleBtn.addEventListener("click", function (e) {
+                e.preventDefault()
                 registrationCard.style.setProperty(
                     "display",
                     "none",
                     "important",
                 )
-                rescheduleForm.style.removeProperty("display")
-                rescheduleForm.style.setProperty(
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                rescheduleView.style.removeProperty("display")
+                rescheduleView.style.setProperty(
                     "display",
                     "block",
                     "important",
                 )
 
+                // The inner form is hidden by default; make sure it is visible too
+                if (rescheduleForm && rescheduleForm !== rescheduleView) {
+                    rescheduleForm.style.removeProperty("display")
+                    rescheduleForm.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
+
                 const firstVisibleRescheduleRadio =
-                    rescheduleForm.querySelector(
+                    rescheduleForm?.querySelector(
                         "input[name='res-trial-class']",
                     )
                 if (firstVisibleRescheduleRadio) {
@@ -996,16 +1064,85 @@ document.addEventListener("DOMContentLoaded", async function () {
             })
         }
 
-        // Cancel Registration button
+        // Cancel Registration button (on registration card): open confirmation info card
+        // Scoped to the registration card because the "No, Go Back" button in the
+        // confirmation card shares the .tc_cancel-btn class.
         const cancelBtn =
-            document.querySelector(".tc_cancel-registration-btn") ||
-            document.querySelector(".tc_cancel-btn")
+            registrationCard?.querySelector(".tc_cancel-btn") ||
+            document.querySelector(
+                ".tc_registration-card .tc_cancel-btn, .tc_cancel-btn:not(.black-text)",
+            )
 
-        if (cancelBtn) {
-            cancelBtn.addEventListener("click", function () {
+        if (cancelBtn && registrationCard && cancelInfoCard) {
+            cancelBtn.addEventListener("click", function (e) {
+                e.preventDefault()
+                registrationCard.style.setProperty(
+                    "display",
+                    "none",
+                    "important",
+                )
+                cancelInfoCard.style.removeProperty("display")
+                cancelInfoCard.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            })
+        }
+
+        // "Go Back" buttons (confirmation info card + reschedule form): return to registration card
+        const goBackButtons = Array.from(
+            document.querySelectorAll(".tc_cancel-btn.black-text"),
+        ).filter((btn) => !registrationCard?.contains(btn))
+
+        goBackButtons.forEach((backBtn) => {
+            backBtn.addEventListener("click", function (e) {
+                e.preventDefault()
+
+                if (cancelInfoCard) {
+                    cancelInfoCard.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (rescheduleFormContainer) {
+                    rescheduleFormContainer.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+                if (rescheduleForm) {
+                    rescheduleForm.style.setProperty(
+                        "display",
+                        "none",
+                        "important",
+                    )
+                }
+
+                if (registrationCard) {
+                    registrationCard.style.removeProperty("display")
+                    registrationCard.style.setProperty(
+                        "display",
+                        "block",
+                        "important",
+                    )
+                }
+            })
+        })
+
+        // Confirm Cancel button (inside the confirmation info card): actually cancels
+        const confirmCancelBtn = document.querySelector(
+            ".tc_cancel-registration-btn",
+        )
+
+        if (confirmCancelBtn) {
+            confirmCancelBtn.addEventListener("click", function (e) {
+                e.preventDefault()
                 const cancelUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/cancel`
 
-                cancelBtn.disabled = true
+                confirmCancelBtn.disabled = true
 
                 fetch(cancelUrl, {
                     method: "POST",
@@ -1021,14 +1158,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                             .then((t) => (t && t.trim() ? JSON.parse(t) : {}))
                     })
                     .then(() => {
-                        const infoCard = document.querySelector(
-                            ".tc_cancel-registration-info-card",
-                        )
                         const doneCard = document.querySelector(
                             ".tc_registration-cancelled-card",
                         )
-                        if (infoCard) {
-                            infoCard.style.setProperty(
+                        if (cancelInfoCard) {
+                            cancelInfoCard.style.setProperty(
                                 "display",
                                 "none",
                                 "important",
@@ -1050,7 +1184,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         )
                     })
                     .finally(() => {
-                        cancelBtn.disabled = false
+                        confirmCancelBtn.disabled = false
                     })
             })
         }
@@ -1064,6 +1198,20 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         if (rescheduleForm) {
             const registration = registrationData.registration
+
+            // No slots to reschedule into (e.g. cancelled registration): clear the
+            // Webflow placeholder slot cards instead of leaving them on screen
+            if (
+                !registrationData.available_classes ||
+                registrationData.available_classes.length === 0
+            ) {
+                const emptyGrid = rescheduleForm
+                    .querySelector(".trial-class_option-wapper")
+                    ?.querySelector(".trial-class-grid-container")
+                if (emptyGrid) {
+                    mountTrialOptionsEmpty(emptyGrid)
+                }
+            }
 
             // Load available reschedule slots and render slot cards
             if (
@@ -1292,9 +1440,18 @@ document.addEventListener("DOMContentLoaded", async function () {
                     registration.previous_experience || ""
             }
 
-            const resStudentDescription = rescheduleForm.querySelector(
-                "#res_student_description",
-            )
+            const resStudentDescription =
+                rescheduleForm.querySelector("#res_student_description") ||
+                rescheduleForm.querySelector(
+                    ".trial-form-student-desc-field",
+                ) ||
+                Array.from(rescheduleForm.querySelectorAll("textarea")).find(
+                    (el) =>
+                        `${el.id} ${el.name} ${el.getAttribute("data-name") || ""}`
+                            .toLowerCase()
+                            .includes("desc"),
+                )
+
             if (resStudentDescription) {
                 resStudentDescription.value =
                     registration.best_description || ""
