@@ -1,7 +1,7 @@
 /*
 Purpose: Online class schedule page that renders available classes per grade into tab panes with semester/term breakdowns.
 
-Brief Logic: On page load, maps grade tab labels to their corresponding panes and preloads all grade data in parallel from the API. Each pane is rendered with semester/term cards containing course cards, schedule slots, prerequisite info, and register button links. Shows a skeleton loader while fetching and a "not found" state when no data is returned. Spot-warning badge is shown when available spots are 3 or fewer. Default active tab is set via jQuery on load.
+Brief Logic: On page load, maps grade tab labels to their corresponding panes and preloads all grade data in parallel from the API (active session details only; no hardcoded session_id). Each pane is rendered with one semester card per session_detail_id containing course cards, schedule slots, prerequisite info, and register button links. Shows a skeleton loader while fetching and a "not found" state when no data is returned. Spot-warning badge is shown when available spots are 3 or fewer. Default active tab is set via jQuery on load.
 
 Are there any dependent JS files: No
 */
@@ -77,7 +77,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 })
 
 async function preloadAllGrades(grades) {
-    const baseURL = `${window.NSD_API.ONLINE_CLASS_API_BASE}/classes?session_id=fall&grade_id=`
+    // Fetch classes for each grade from all active session details (no session_id filter)
+    const baseURL = `${window.NSD_API.ONLINE_CLASS_API_BASE}/classes?grade_id=`
 
     const requests = grades.map(async (grade) => {
         try {
@@ -116,9 +117,9 @@ function renderPane(pane, result) {
         return
     }
 
-    const sessions = result.data?.[0]?.sessions ?? []
-    const terms = sessions[0]?.terms ?? []
-    if (!terms.length) return
+    // New API shape: grade.session_details[] (one UI semester card per session_detail_id)
+    const sessionDetails = result.data?.[0]?.session_details ?? []
+    if (!sessionDetails.length) return
 
     const container = template.parentElement
     const originalTemplate = template
@@ -132,7 +133,7 @@ function renderPane(pane, result) {
         })
     }
 
-    terms.forEach((term) => {
+    sessionDetails.forEach((sessionDetail) => {
         const termClone = originalTemplate.cloneNode(true)
         termClone.style.display = "block"
 
@@ -142,20 +143,21 @@ function renderPane(pane, result) {
         const countEl = termClone.querySelector(".tc-class-count")
         const redBadge = termClone.querySelector(".online-class_red-badge")
 
-        if (nameEl) nameEl.textContent = term.term_name || ""
+        // Keep existing semester card labels/fields; data now comes from session_detail
+        if (nameEl) nameEl.textContent = sessionDetail.term_name || ""
         if (dateEl)
-            dateEl.textContent = `${formatDate(term.start_date)} – ${formatDate(term.end_date)}`
-        if (descEl) descEl.textContent = term.term_description || ""
+            dateEl.textContent = `${formatDate(sessionDetail.start_date)} – ${formatDate(sessionDetail.end_date)}`
+        if (descEl) descEl.textContent = sessionDetail.term_description || ""
 
         if (redBadge) {
-            if (term.term_name === "Semester") {
+            if (sessionDetail.term_name === "Semester") {
                 redBadge.classList.add("show")
             } else {
                 redBadge.classList.remove("show")
             }
         }
 
-        const classes = term.classes || []
+        const classes = sessionDetail.classes || []
 
         if (countEl) {
             countEl.textContent =
@@ -191,11 +193,11 @@ function renderPane(pane, result) {
                 )
                 url.searchParams.set(
                     "session_name",
-                    sessions[0]?.session_name || "",
+                    sessionDetail.session_name || "",
                 )
                 url.searchParams.set(
                     "session_detail_id",
-                    term.session_detail_id || "",
+                    sessionDetail.session_detail_id || "",
                 )
                 url.searchParams.set(
                     "class_detail_id",
