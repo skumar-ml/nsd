@@ -3,7 +3,7 @@ Purpose: New registration form that fetches form data from the API and displays 
 
 Brief Logic: Fetches registration form data from API and displays forms in a grid. Handles form completion tracking, program category filtering, and form submission.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var FORMS_API_BASE = window.NSD_API.FORMS_API_BASE
 class NSDPortal {
@@ -22,11 +22,13 @@ class NSDPortal {
     this.accountEmail = accountEmail
     this.getPortalData()
   }
-  // Fetches data from the API endpoint
+  // Fetches data from the protected forms API
   async fetchData(endpoint) {
     try {
       const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-      const response = await fetch(`${FORMS_API_BASE}/${normalizedEndpoint}`)
+      const response = await NSDAuth.authFetch(
+        `${FORMS_API_BASE}/${normalizedEndpoint}`,
+      )
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }

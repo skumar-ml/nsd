@@ -3,7 +3,7 @@ Purpose: Multi-step checkout wizard for briefs/events that pulls inventory, hand
 
 Brief Logic: Fetches briefs and events data from API and displays them in a grid with accordion navigation. Handles item selection, preview modal, payment method tabs, and dynamically updates total amounts based on selected items.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
@@ -29,6 +29,7 @@ class BriefsEventsCheckout {
         this.getBriefsAndEvents()
     }
 
+    // Fetches from a protected portal/payment API (Memberstack Bearer token)
     async fetchData(baseUrl, endpoint, memberId = null) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
@@ -37,7 +38,7 @@ class BriefsEventsCheckout {
                 url = `${baseUrl}/${normalizedEndpoint}/${memberId}`
             }
 
-            const response = await fetch(url)
+            const response = await NSDAuth.authFetch(url)
             if (!response.ok) throw new Error("Network response was not ok")
 
             const apiData = await response.json()
@@ -1502,7 +1503,17 @@ class BriefsEventsCheckout {
             })
         }
 
-        xhr.send(JSON.stringify(checkoutData))
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(checkoutData))
+            })
+            .catch(function (err) {
+                console.error("brief checkout auth failed:", err)
+                payNowButtons.forEach((element) => {
+                    element.innerHTML = "Pay Now"
+                    element.style.pointerEvents = "auto"
+                })
+            })
     }
     // Activates the specified breadcrumb step in the checkout process
     activeBreadCrumb(activeId) {

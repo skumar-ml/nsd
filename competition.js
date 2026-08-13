@@ -282,10 +282,10 @@ class AccordionTabs {
         })
     }
 
-    // Fetches data from the specified URL endpoint
+    // Fetches data from the specified URL endpoint (protected)
     async fetchData(url) {
         try {
-            const response = await fetch(url)
+            const response = await NSDAuth.authFetch(url)
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -366,7 +366,14 @@ class AccordionTabs {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getCompetitionDetails auth failed:", err)
+                spinner.style.display = "none"
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             if (responseText.length > 0) {
@@ -423,10 +430,10 @@ class AccordionTabs {
         })
     }
 
-    // Fetches live check-in data from API and displays notifications
+    // Fetches live check-in data from protected attendance API
     async getLiveCheckInData() {
         try {
-            const response = await fetch(
+            const response = await NSDAuth.authFetch(
                 ATTENDANCE_API_BASE +
                     "/checkForLiveAttendanceTime/" +
                     this.webflowMemberId,

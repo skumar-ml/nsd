@@ -1185,11 +1185,13 @@ class CheckOutWebflow extends BriefsUpsellModal {
             }
         }
     }
-    // Fetches data from the API endpoint
+    // Fetches data from the API endpoint (protected: Memberstack Bearer token)
     async fetchData(baseUrl, endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-            const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
+            const response = await NSDAuth.authFetch(
+                `${baseUrl}/${normalizedEndpoint}`,
+            )
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -1286,7 +1288,14 @@ class CheckOutWebflow extends BriefsUpsellModal {
             var $this = this
             xhr.open("POST", `${PAYMENT_API_BASE}/` + $baseUrl, true)
             xhr.withCredentials = false
-            xhr.send(JSON.stringify(data))
+            NSDAuth.authorizeXhr(xhr)
+                .then(function () {
+                    xhr.send(JSON.stringify(data))
+                })
+                .catch(function (err) {
+                    console.error("checkout auth failed:", err)
+                    reject(err)
+                })
             xhr.onload = function () {
                 if (xhr.responseText == null) {
                     alert(
@@ -1437,7 +1446,14 @@ class CheckOutWebflow extends BriefsUpsellModal {
 
             xhr.open("POST", `${PAYMENT_API_BASE}/updateStripeCheckoutDb`, true)
             xhr.withCredentials = false
-            xhr.send(JSON.stringify(data))
+            NSDAuth.authorizeXhr(xhr)
+                .then(function () {
+                    xhr.send(JSON.stringify(data))
+                })
+                .catch(function (err) {
+                    console.error("updateStripeCheckoutDb auth failed:", err)
+                    reject(err)
+                })
             xhr.onload = function () {
                 ach_payment.innerHTML = "Checkout"
                 ach_payment.disabled = false

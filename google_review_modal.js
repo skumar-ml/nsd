@@ -102,8 +102,10 @@ class GoogleReviewModal {
         ) {
             this.checkConditionsAndShowModal()
         } else {
-            // Fetch program data
-            fetch(`${FORMS_API_BASE}/getCompletedForm/${this.memberId}/current`)
+            // Fetch program data from protected forms API
+            NSDAuth.authFetch(
+                `${FORMS_API_BASE}/getCompletedForm/${this.memberId}/current`,
+            )
                 .then((response) => response.json())
                 .then((campData) => {
                     campData = campData.studentData || []

@@ -183,7 +183,14 @@ class AccordionTabs {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("getCompletedForm auth failed:", err)
+                spinner.style.display = "none"
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             if (responseText.length > 0) {

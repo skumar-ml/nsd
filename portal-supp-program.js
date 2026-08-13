@@ -38,7 +38,9 @@ class DisplaySuppProgram {
     async fetchData(baseUrl, endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-            const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
+            const response = await NSDAuth.authFetch(
+                `${baseUrl}/${normalizedEndpoint}`,
+            )
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -664,14 +666,17 @@ class DisplaySuppProgram {
             amount: parseFloat(amount * 100),
             source: "portal_page",
         }
-        // Create the POST request
-        fetch(this.paymentApiBase + "/createCheckoutUrlForSupplementary", {
-            method: "POST", // Specify the method
-            headers: {
-                "Content-Type": "application/json", // Specify the content type
+        // Create the POST request (protected payment endpoint)
+        NSDAuth.authFetch(
+            this.paymentApiBase + "/createCheckoutUrlForSupplementary",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(data),
             },
-            body: JSON.stringify(data), // Convert the data to a JSON string
-        })
+        )
             .then((response) => {
                 if (!response.ok) {
                     // Handle the error response

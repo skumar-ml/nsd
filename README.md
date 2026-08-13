@@ -33,6 +33,26 @@ This folder contains utilities scripts used by NSD, including checkout customiza
 - `update_profile.js` – Update-profile modal handler that loads member details, pre-fills the form, and submits changes.
 - `parent-phone-modal.js` – Blocking parent phone capture: shows only when a parent has no phone number; Continues via `updateMemberStack` (phone only).
 - `utility.js` – Tiny helper exposing `setupAdminViewListener` to toggle admin-only views via ID allowlists or query params.
+- `nsd-auth.js` – Shared Memberstack auth helpers (`NSDAuth.authFetch` / `NSDAuth.authorizeXhr`) that attach `Authorization: Bearer <token>` to protected AWS API calls.
+
+## Auth (Memberstack Bearer token)
+
+Protected backend endpoints require a Memberstack 1.0 JWT. Load these in the Webflow **site-wide Header** custom code (order matters):
+
+1. Your existing token helper:
+```html
+<script>
+  async function getAuthToken() {
+    await window.MemberStack.onReady;
+    return await window.MemberStack.getToken();
+  }
+</script>
+```
+2. Then `nsd-auth.js` (before any feature script that calls AWS APIs).
+
+Feature scripts call `NSDAuth.authFetch(...)` or `NSDAuth.authorizeXhr(xhr)` before `send()`.
+
+**Left unauthenticated (public by design):** `checkMemberExist` / signup, online-class catalog, and the trial-class funnel.
 
 ## API Domains (current)
 

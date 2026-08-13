@@ -3,7 +3,7 @@ Purpose: Loader for the family member grid that fetches household profiles, sort
 
 Brief Logic: Fetches family member data from API endpoint and sorts it with current member first. Displays sorted members in a grid with edit/delete functionality based on account type and permissions.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
 */
 var AUTH_API_BASE = window.NSD_API.AUTH_API_BASE
 class FamilyMember {
@@ -16,11 +16,13 @@ class FamilyMember {
         this.displayFamilyMember()
         this.handleEditMember()
     }
-    // Fetches data from the API endpoint and returns the response
+    // Fetches data from a protected API endpoint (sends Memberstack Bearer token)
     async fetchData(baseUrl, endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-            const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
+            const response = await NSDAuth.authFetch(
+                `${baseUrl}/${normalizedEndpoint}`,
+            )
             if (!response.ok) {
                 throw new Error("Network response was not ok")
             }
@@ -266,7 +268,15 @@ class FamilyMember {
         var xhr = new XMLHttpRequest()
         xhr.open("POST", this.authApiBase + "/updateMemberStack", true)
         xhr.withCredentials = false
-        xhr.send(JSON.stringify(data))
+        // Dual-auth endpoint: send member Bearer token (admin path uses x-admin-key)
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send(JSON.stringify(data))
+            })
+            .catch(function (err) {
+                console.error("updateMemberStack auth failed:", err)
+                $this.resetEditMemberBtn()
+            })
         xhr.onload = function () {
             if (xhr.status !== 200) {
                 console.log("Error", xhr.statusText)
@@ -302,7 +312,13 @@ class FamilyMember {
             true,
         )
         xhr.withCredentials = false
-        xhr.send()
+        NSDAuth.authorizeXhr(xhr)
+            .then(function () {
+                xhr.send()
+            })
+            .catch(function (err) {
+                console.error("deleteInvitedMember auth failed:", err)
+            })
         xhr.onload = function () {
             let responseText = JSON.parse(xhr.responseText)
             console.log(xhr.responseText, responseText)

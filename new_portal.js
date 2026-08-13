@@ -29,11 +29,13 @@ class NSDPortal {
     await this.loadPortalData()
   }
 
-  // Fetch data from API (handles "No data Found", non-JSON, and fallback on 5xx)
+  // Fetch data from protected API (Memberstack Bearer token via NSDAuth)
   async fetchData(baseUrl, endpoint) {
     try {
       const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
-      const response = await fetch(`${baseUrl}/${normalizedEndpoint}`)
+      const response = await NSDAuth.authFetch(
+        `${baseUrl}/${normalizedEndpoint}`,
+      )
       if (!response.ok) {
         // Graceful fallback so portal UI can still render empty states on API failure.
         if (normalizedEndpoint.includes("getInvoiceList")) return []
@@ -1785,7 +1787,13 @@ class NSDPortal {
     const $this = this
     xhr.open("POST", this.paymentApiBase + "/createCheckoutUrlForInvoice", true)
     xhr.withCredentials = false
-    xhr.send(JSON.stringify(data))
+    NSDAuth.authorizeXhr(xhr)
+      .then(function () {
+        xhr.send(JSON.stringify(data))
+      })
+      .catch(function (err) {
+        console.error("createCheckoutUrlForInvoice auth failed:", err)
+      })
     xhr.onload = function () {
       try {
         const responseText = JSON.parse(xhr.responseText)
