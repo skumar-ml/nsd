@@ -382,12 +382,16 @@ class NSDPortal {
       targetTab.setAttribute("tabindex", "0")
     }
 
+    // Only toggle direct child panes so nested student/program tabs stay active
     if (tabContent) {
-      tabContent
-        .querySelectorAll('.w-tab-pane, [role="tabpanel"]')
-        .forEach((pane) => {
+      Array.from(tabContent.children).forEach((pane) => {
+        if (
+          pane.classList.contains("w-tab-pane") ||
+          pane.getAttribute("role") === "tabpanel"
+        ) {
           pane.classList.remove("w--tab-active")
-        })
+        }
+      })
       if (targetPane) targetPane.classList.add("w--tab-active")
     }
   }
@@ -569,10 +573,11 @@ class NSDPortal {
     // Find the nested program tabs container within this student tab pane
     const nestedTabsContainer =
       studentTabPane.querySelector(".portal-tab.w-tabs")
+    // Past-only students have no Webflow program tabs; skip redraw for them
     if (!nestedTabsContainer) {
-      console.warn(
-        `Nested program tabs container not found for student index ${studentIndex}`,
-      )
+      return
+    }
+    if (nestedTabsContainer.querySelectorAll(".w-tab-link").length === 0) {
       return
     }
 
@@ -775,6 +780,18 @@ class NSDPortal {
 
   // Create nested program tabs container for a student's sessions
   createProgramTabsContainer(sessions, studentIndex) {
+    // Filter out past sessions and programDetailId 21 (NSD Merch / Care Package)
+    const sessionsToShow = sessions.filter(
+      (s) => s.sessionType !== "past" && s.programDetail?.programDetailId != 21,
+    )
+
+    // Past-only students: do not use Webflow tab chrome. An empty .w-tab-content
+    // has no .w-tab-pane, so tabs.redraw() collapses it (overflow:hidden, height 0)
+    // and the past-program card stays in the DOM but is not visible.
+    if (sessionsToShow.length === 0) {
+      return this.createPastOnlyProgramContent(sessions)
+    }
+
     const tabsDiv = document.createElement("div")
     tabsDiv.className = "portal-tab w-tabs"
     tabsDiv.setAttribute("data-current", "Tab 1")
@@ -790,23 +807,17 @@ class NSDPortal {
     const tabContent = document.createElement("div")
     tabContent.className = "w-tab-content program-tab-content"
 
-    // Filter out past sessions and programDetailId 21(NSD Merch / Care Package program) - they should only show in past program card
-    const sessionsToShow = sessions.filter(
-      (s) => s.sessionType !== "past" && s.programDetail?.programDetailId != 21,
-    )
-
-    // Hide program tabs if no current/future sessions available
+    // Hide the program tab menu when only one current/future session exists
     if (sessionsToShow.length === 1) {
       tabMenu.style.display = "none"
     }
 
-    // Create tabs for each program/session (only current/future)
+    // Create tabs for each current/future program session
     sessionsToShow.forEach((session, sessionIndex) => {
       const programTabIndex = sessionIndex + 1
       const isActive = sessionIndex === 0 ? "w--current" : ""
       const isTabActive = sessionIndex === 0 ? "w--tab-active" : ""
 
-      // Create program tab button
       const programTabButton = this.createProgramTabButton(
         session,
         programTabIndex,
@@ -816,7 +827,6 @@ class NSDPortal {
       )
       tabMenu.appendChild(programTabButton)
 
-      // Create program tab pane
       const programTabPane = this.createProgramTabPane(
         session,
         programTabIndex,
@@ -827,42 +837,58 @@ class NSDPortal {
       tabContent.appendChild(programTabPane)
     })
 
-    // If no current/future sessions, show past programs card
-    if (sessionsToShow.length === 0) {
-      const pastSessions = sessions.filter((s) => s.sessionType === "past")
-      if (pastSessions.length > 0) {
-        // Get past programs for the first past session (to identify the student)
-        const pastPrograms = this.getPastProgramsForStudent(pastSessions[0])
-        if (pastPrograms.length > 0) {
-          const pastProgramsHTML = pastPrograms
-            .map(
-              (program) => `
+    tabsDiv.appendChild(tabMenu)
+    tabsDiv.appendChild(tabContent)
+
+    return tabsDiv
+  }
+
+  // Render past-program card without Webflow tab wrappers (past-only students)
+  createPastOnlyProgramContent(sessions) {
+    const wrapper = document.createElement("div")
+    wrapper.className = "program-tab-content"
+
+    const pastSessions = sessions.filter((s) => s.sessionType === "past")
+    if (pastSessions.length === 0) {
+      return wrapper
+    }
+
+    const pastPrograms = this.getPastProgramsForStudent(pastSessions[0])
+    const pastProgramCard = this.createPastProgramCard(pastPrograms)
+    if (pastProgramCard) {
+      wrapper.appendChild(pastProgramCard)
+    }
+
+    return wrapper
+  }
+
+  // Build the Past Program list card used in past-only and current-session views
+  createPastProgramCard(pastPrograms) {
+    if (!pastPrograms || pastPrograms.length === 0) {
+      return null
+    }
+
+    const pastProgramsHTML = pastPrograms
+      .map(
+        (program) => `
                             <div class="past-program-flex-wrapper">
                                 <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
                                 <p class="poppins-para no-margin-bottom">${program.programName}</p>
                                 ${program.isRefunded ? '<div class="refunded-rounded-div"><p class="poppins-para refunded-dark-gray-text">REFUNDED</p></div>' : ""}
                             </div>
                         `,
-            )
-            .join("")
+      )
+      .join("")
 
-          const pastProgramCard = document.createElement("div")
-          pastProgramCard.className = "past-program-div"
-          pastProgramCard.innerHTML = `
+    const pastProgramCard = document.createElement("div")
+    pastProgramCard.className = "past-program-div"
+    pastProgramCard.innerHTML = `
                         <p class="portal-node-title-dashboard">Past Program</p>
                         <div data-portal="past-classe-list">
                             ${pastProgramsHTML}
                         </div>
                     `
-          tabContent.appendChild(pastProgramCard)
-        }
-      }
-    }
-
-    tabsDiv.appendChild(tabMenu)
-    tabsDiv.appendChild(tabContent)
-
-    return tabsDiv
+    return pastProgramCard
   }
 
   // Create program tab button
@@ -1211,6 +1237,7 @@ class NSDPortal {
 
     // Get past programs for this student
     const pastPrograms = this.getPastProgramsForStudent(session)
+    const pastProgramCard = this.createPastProgramCard(pastPrograms)
 
     // Build resources HTML (uploadedContent goes in resources_wrapper)
     const resourcesHTML = uploadedContent
@@ -1228,50 +1255,25 @@ class NSDPortal {
       )
       .join("")
 
-    // Build past programs HTML (goes in past-program-div)
-    const pastProgramsHTML = pastPrograms
-      .map(
-        (program) => `
-                <div class="past-program-flex-wrapper">
-                    <img loading="lazy" src="https://cdn.prod.website-files.com/6271a4bf060d543533060f47/695246e72a37f4a86f9e7878_history.svg" alt="">
-                    <p class="poppins-para no-margin-bottom">${program.programName}</p>
-                    ${program.isRefunded ? '<div class="refunded-rounded-div"><p class="poppins-para refunded-dark-gray-text">REFUNDED</p></div>' : ""}
-                </div>
-            `,
-      )
-      .join("")
-
     // Only show section if there are resources or past programs
-    if (uploadedContent.length === 0 && pastPrograms.length === 0) {
+    if (uploadedContent.length === 0 && !pastProgramCard) {
       return null
     }
 
-    container.innerHTML = `
+    if (uploadedContent.length > 0) {
+      container.innerHTML = `
             <div>
-                ${
-                  uploadedContent.length > 0
-                    ? `
                 <div class="dashboard-node-header margin-bottom-20">Resources</div>
                 <div class="resources_wrapper">
                     ${resourcesHTML}
-                </div> 
-            </div>`
-                    : ""
-                }
-                ${
-                  pastPrograms.length > 0
-                    ? `
-                <div class="past-program-div">
-                    <p class="portal-node-title-dashboard">Past Program</p>
-                    <div data-portal="past-classe-list">
-                        ${pastProgramsHTML}
-                    </div>
                 </div>
-                `
-                    : ""
-                }
-            
+            </div>
         `
+    }
+
+    if (pastProgramCard) {
+      container.appendChild(pastProgramCard)
+    }
 
     return container
   }
