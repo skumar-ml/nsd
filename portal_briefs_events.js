@@ -3,7 +3,8 @@ Purpose: Manages the briefs and events for the NSD portal.
 
 Brief Logic: Initializes briefs and events, caches DOM elements, and fetches data from API to display in grid. Analyzes user's briefs to determine subscription recommendations and updates upsell elements with dynamic content.
 
-Are there any dependent JS files: No
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected payment
+checkout; getBriefDetails catalog is public — no token)
 */
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
@@ -68,12 +69,12 @@ class BriefManager {
         )
         // this.elements.spinner = document.getElementById('half-circle-spinner');
     }
-    // Fetches data from the protected portal API
+    // Fetches public briefs catalog (getBriefDetails — SEC-23, no auth)
     async fetchData(endpoint) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
             let url = `${this.portalApiBase}/${normalizedEndpoint}`
-            const response = await NSDAuth.authFetch(url)
+            const response = await fetch(url)
             if (!response.ok) throw new Error("Network response was not ok")
 
             const apiData = await response.json()
