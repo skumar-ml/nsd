@@ -4,17 +4,16 @@ Purpose: Renders the view-briefs card grid from getBriefDetails.
 Brief Logic: On DOMContentLoaded, fetches briefs from the portal API, sorts by
 displayOrder, renders cards, and wires Preview buttons to the PDF modal.
 
-getBriefDetails is a protected endpoint — requires nsd-auth.js (NSDAuth) and the
-site-header getAuthToken() helper so Authorization: Bearer <token> is sent.
+getBriefDetails is public (SEC-23) — no Memberstack token required. Works on
+marketing / browse pages for logged-out visitors.
 
 Webflow usage:
 
 ```
-<script src="…/nsd-auth.js"></script>
 <script src="…/briefs.js"></script>
 ```
 
-Are there any dependent JS files: nsd-auth.js
+Are there any dependent JS files: No (expects window.NSD_API.PORTAL_API_BASE)
 */
 document.addEventListener("DOMContentLoaded", function () {
     /* Briefs cards data fetch logic */
@@ -55,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Protected portal API call — attaches Memberstack Bearer token via NSDAuth
+        // Public catalog endpoint — no Authorization header (SEC-23)
         async fetchData(endpoint, memberId = null) {
             try {
                 const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
@@ -64,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     url = `${this.data.apiBaseURL}/${normalizedEndpoint}/${memberId}`
                 }
 
-                const response = await NSDAuth.authFetch(url)
+                const response = await fetch(url)
                 if (!response.ok) throw new Error("Network response was not ok")
 
                 const apiData = await response.json()

@@ -221,20 +221,23 @@ class BriefsUpsellModal {
             ? [this.selectedBriefEventsWrapper]
             : []
     }
-    // Fetches brief events from API and renders them in the modal
+    // Fetches brief events from public catalog API (getBriefDetails — no auth)
     async fetchBriefEvents() {
-        if (typeof this.fetchData !== "function") {
+        if (typeof this.fetchData !== "function" && typeof fetch !== "function") {
             return
         }
         try {
-            const response = await this.fetchData(
-                PORTAL_API_BASE,
-                "/getBriefDetails?programId=" + this.memberData.programId,
-            )
+            const url =
+                String(PORTAL_API_BASE).replace(/\/$/, "") +
+                "/getBriefDetails?programId=" +
+                encodeURIComponent(this.memberData.programId)
+            const response = await fetch(url)
+            if (!response.ok) {
+                throw new Error("Network response was not ok")
+            }
+            const data = await response.json()
             const events =
-                response && Array.isArray(response.briefEvents)
-                    ? response.briefEvents
-                    : []
+                data && Array.isArray(data.briefEvents) ? data.briefEvents : []
             //console.log("Brief events inside render:", this.briefEvents);
 
             this.briefEvents = events.sort((a, b) => {
@@ -244,7 +247,7 @@ class BriefsUpsellModal {
                     typeof b.displayOrder === "number" ? b.displayOrder : 0
                 return aOrder - bOrder
             })
-            this.debateEventId = response.debateEventId
+            this.debateEventId = data.debateEventId
             this.renderBriefEvents()
             //this.selectBriefEvent(this.debateEventId)
         } catch (error) {

@@ -3,7 +3,8 @@ Purpose: Multi-step checkout wizard for briefs/events that pulls inventory, hand
 
 Brief Logic: Fetches briefs and events data from API and displays them in a grid with accordion navigation. Handles item selection, preview modal, payment method tabs, and dynamically updates total amounts based on selected items.
 
-Are there any dependent JS files: nsd-auth.js (Bearer token for protected API)
+Are there any dependent JS files: nsd-auth.js (Bearer token for protected payment APIs;
+getBriefDetails catalog is public — no token)
 */
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
@@ -29,7 +30,7 @@ class BriefsEventsCheckout {
         this.getBriefsAndEvents()
     }
 
-    // Fetches from a protected portal/payment API (Memberstack Bearer token)
+    // Fetches public catalog data (getBriefDetails — SEC-23, no auth required)
     async fetchData(baseUrl, endpoint, memberId = null) {
         try {
             const normalizedEndpoint = String(endpoint).replace(/^\/+/, "")
@@ -38,7 +39,7 @@ class BriefsEventsCheckout {
                 url = `${baseUrl}/${normalizedEndpoint}/${memberId}`
             }
 
-            const response = await NSDAuth.authFetch(url)
+            const response = await fetch(url)
             if (!response.ok) throw new Error("Network response was not ok")
 
             const apiData = await response.json()
