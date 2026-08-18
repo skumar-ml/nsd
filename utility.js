@@ -46,9 +46,7 @@ class NSDUtilityClass {
     static updateAllPortalLinks() {
         const urlParams = new URLSearchParams(window.location.search)
         const testMemberId = urlParams.get("testMemberId")
-        const testAccountEmail = urlParams.get("testAccountEmail")
-        const testAccountType = urlParams.get("testAccountType")
-        if (!testMemberId && !testAccountEmail && !testAccountType) {
+        if (!testMemberId) {
             return
         }
         const allPortalLinks = document.querySelectorAll('a[href*="/portal/"]')
@@ -72,12 +70,6 @@ class NSDUtilityClass {
 
                     // Add or update testMemberId parameter
                     url.searchParams.set("testMemberId", testMemberId)
-
-                    // Add or update testAccountEmail parameter
-                    url.searchParams.set("testAccountEmail", testAccountEmail)
-
-                    // Add or update testAccountType parameter
-                    url.searchParams.set("testAccountType", testAccountType)
 
                     // Update the link
                     link.setAttribute("href", url.pathname + url.search)
