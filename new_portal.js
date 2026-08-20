@@ -804,8 +804,10 @@ class NSDPortal {
       (s) => s.sessionType !== "past" && s.programDetail?.programDetailId != 21,
     )
 
-    // Hide program tabs if no current/future sessions available
-    if (sessionsToShow.length === 1) {
+    // Hide the program tab strip unless there are multiple current/future
+    // programs to switch between. An empty camp-tabs-wrapper still has border/
+    // padding from Webflow CSS, which shows as a blank bar (e.g. past-only).
+    if (sessionsToShow.length < 2) {
       tabMenu.style.display = "none"
     }
 
