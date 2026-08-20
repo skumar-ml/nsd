@@ -1,6 +1,5 @@
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
-var ONLINE_CLASS_API_BASE = window.NSD_API.ONLINE_CLASS_API_BASE
 
 /**
  * NSD Portal - Staging
@@ -14,7 +13,6 @@ class NSDPortal {
     this.accountEmail = config.accountEmail
     this.portalApiBase = PORTAL_API_BASE
     this.paymentApiBase = PAYMENT_API_BASE
-    this.onlineClassApiBase = ONLINE_CLASS_API_BASE
     this.allSessions = []
     this.invoiceData = []
     this.classPortalData = null
@@ -44,7 +42,7 @@ class NSDPortal {
         if (normalizedEndpoint.includes("getPortalDetails")) {
           return { studentData: [], brief: [] }
         }
-        if (normalizedEndpoint.includes("classes/enrollments")) {
+        if (normalizedEndpoint.includes("getOnlineClassPortalDetails")) {
           return { studentData: [] }
         }
         return null
@@ -56,7 +54,7 @@ class NSDPortal {
         if (normalizedEndpoint.includes("getPortalDetails")) {
           return { studentData: [], brief: [] }
         }
-        if (normalizedEndpoint.includes("classes/enrollments")) {
+        if (normalizedEndpoint.includes("getOnlineClassPortalDetails")) {
           return { studentData: [] }
         }
         return null
@@ -322,9 +320,9 @@ class NSDPortal {
         "Checking class enrollments for member:",
         this.webflowMemberId,
       )
-      const endpoint = `/classes/enrollments/${this.webflowMemberId}`
+      const endpoint = `/getOnlineClassPortalDetails/${this.webflowMemberId}`
       const enrollmentData = await this.fetchData(
-        this.onlineClassApiBase,
+        this.portalApiBase,
         endpoint,
       )
       console.log("Class enrollments response:", enrollmentData)
