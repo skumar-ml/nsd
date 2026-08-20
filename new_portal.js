@@ -1,6 +1,5 @@
 var PORTAL_API_BASE = window.NSD_API.PORTAL_API_BASE
 var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
-var ONLINE_CLASS_API_BASE = window.NSD_API.ONLINE_CLASS_API_BASE
 
 /**
  * NSD Portal - Staging
@@ -14,9 +13,10 @@ class NSDPortal {
     this.accountEmail = config.accountEmail
     this.portalApiBase = PORTAL_API_BASE
     this.paymentApiBase = PAYMENT_API_BASE
-    this.onlineClassApiBase = ONLINE_CLASS_API_BASE
     this.allSessions = []
     this.invoiceData = []
+    this.classPortalData = null
+    this.classStudents = []
     this.userName = config.userName
 
     // Log IDs to verify correct member is used
@@ -42,6 +42,9 @@ class NSDPortal {
         if (normalizedEndpoint.includes("getPortalDetails")) {
           return { studentData: [], brief: [] }
         }
+        if (normalizedEndpoint.includes("getOnlineClassPortalDetails")) {
+          return { studentData: [] }
+        }
         return null
       }
       const text = await response.text()
@@ -50,6 +53,9 @@ class NSDPortal {
         if (normalizedEndpoint.includes("getInvoiceList")) return []
         if (normalizedEndpoint.includes("getPortalDetails")) {
           return { studentData: [], brief: [] }
+        }
+        if (normalizedEndpoint.includes("getOnlineClassPortalDetails")) {
+          return { studentData: [] }
         }
         return null
       }
@@ -212,6 +218,9 @@ class NSDPortal {
       const hasClassEnrollments = await this.checkClassEnrollments()
       console.log("Class enrollments:", hasClassEnrollments)
       this.setOnlineClassTabVisibility(hasClassEnrollments)
+      if (hasClassEnrollments) {
+        this.renderClassesTab()
+      }
 
       // Normalize studentData to array (API may return string "No data Found" or object)
       const studentData = Array.isArray(apiResponse.studentData)
@@ -311,23 +320,287 @@ class NSDPortal {
         "Checking class enrollments for member:",
         this.webflowMemberId,
       )
-      const endpoint = `/classes/enrollments/${this.webflowMemberId}`
+      const endpoint = `/getOnlineClassPortalDetails/${this.webflowMemberId}`
       const enrollmentData = await this.fetchData(
-        this.onlineClassApiBase,
+        this.portalApiBase,
         endpoint,
       )
       console.log("Class enrollments response:", enrollmentData)
-
-      if (!enrollmentData || !enrollmentData.success) {
-        return false
-      }
-      return (
-        Array.isArray(enrollmentData.enrollments) &&
-        enrollmentData.enrollments.length > 0
-      )
+      this.classPortalData = enrollmentData
+      this.classStudents = this.normalizeClassStudentData(enrollmentData)
+      return this.hasClassEnrollmentsData(enrollmentData)
     } catch (error) {
       console.error("Error while checking class enrollments:", error)
+      this.classPortalData = null
+      this.classStudents = []
       return false
+    }
+  }
+
+  hasClassEnrollmentsData(enrollmentData) {
+    if (!enrollmentData) return false
+    if (
+      Array.isArray(enrollmentData.studentData) &&
+      enrollmentData.studentData.length > 0
+    ) {
+      return true
+    }
+    return (
+      enrollmentData.success === true &&
+      Array.isArray(enrollmentData.enrollments) &&
+      enrollmentData.enrollments.length > 0
+    )
+  }
+
+  // Flatten { studentData: [{ "name": { studentDetail, currentSession, ... } }] } into student cards.
+  normalizeClassStudentData(enrollmentData) {
+    if (!enrollmentData || !Array.isArray(enrollmentData.studentData)) {
+      return []
+    }
+
+    return enrollmentData.studentData
+      .map((studentObj) => {
+        if (!studentObj || typeof studentObj !== "object") return null
+        const studentKey = Object.keys(studentObj)[0]
+        if (!studentKey) return null
+
+        const data = studentObj[studentKey] || {}
+        const detail = data.studentDetail || {}
+        const studentName =
+          [detail.firstName, detail.lastName].filter(Boolean).join(" ") ||
+          studentKey
+
+        return {
+          studentKey,
+          studentName,
+          studentEmail: detail.email || "",
+          studentDetail: detail,
+          parentDetail: data.parentDetail || {},
+          currentSessions: Array.isArray(data.currentSession)
+            ? data.currentSession
+            : [],
+          futureSessions: Array.isArray(data.futureSession)
+            ? data.futureSession
+            : [],
+          pastSessions: Array.isArray(data.pastSession) ? data.pastSession : [],
+        }
+      })
+      .filter(Boolean)
+  }
+
+  getVisibleClassSessions(student) {
+    if (!student) return []
+    if (student.currentSessions && student.currentSessions.length > 0) {
+      return student.currentSessions
+    }
+    return student.futureSessions || []
+  }
+
+  formatEasternTime(isoString) {
+    if (!isoString) return ""
+    const date = new Date(isoString)
+    if (Number.isNaN(date.getTime())) return ""
+    return date
+      .toLocaleTimeString("en-US", {
+        timeZone: "America/New_York",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })
+      .replace(/\s/g, "")
+  }
+
+  formatClassDetails(session) {
+    if (!session) return ""
+    const dayTime = [session.day, this.formatEasternTime(session.startTime)]
+      .filter(Boolean)
+      .join(" ")
+    return [session.className, dayTime, session.termName]
+      .filter(Boolean)
+      .join(" | ")
+  }
+
+  // Map class enrollments onto the Webflow Classes tab (student cards + current program).
+  // First student is selected by default, matching camp tab behavior.
+  renderClassesTab() {
+    const list = document.querySelector(".portal_class-student-debate-maindiv")
+    if (!list) {
+      console.warn("Classes student list container not found")
+      return
+    }
+
+    const template = list.querySelector(".portal_class-students-debate")
+    if (!template) {
+      console.warn("Classes student card template not found")
+      return
+    }
+
+    const cardTemplate = template.cloneNode(true)
+    cardTemplate.classList.remove("selected-border")
+    list.innerHTML = ""
+
+    if (!this.classStudents.length) return
+
+    this.classStudents.forEach((student, index) => {
+      const card = this.createClassStudentCard(
+        cardTemplate,
+        student,
+        index === 0,
+      )
+      card.addEventListener("click", () => this.selectClassStudent(index))
+      list.appendChild(card)
+    })
+
+    this.selectClassStudent(0)
+  }
+
+  createClassStudentCard(template, student, isSelected) {
+    const card = template.cloneNode(true)
+    card.classList.toggle("selected-border", isSelected)
+
+    const nameEl = card.querySelector(".portal_class-student-card-name")
+    const emailEl = card.querySelector(".portal_class-student-card-email")
+    if (nameEl) nameEl.textContent = student.studentName
+    if (emailEl) emailEl.textContent = student.studentEmail
+
+    const cardBody = card.querySelector(".portal_class-student-card")
+    const btnTemplate = card.querySelector(".portal_class-student-card-btn")
+    const sessions = this.getVisibleClassSessions(student)
+
+    if (btnTemplate) {
+      card
+        .querySelectorAll(".portal_class-student-card-btn")
+        .forEach((btn, btnIndex) => {
+          if (btnIndex > 0) btn.remove()
+        })
+
+      if (!sessions.length) {
+        btnTemplate.textContent = ""
+        btnTemplate.style.display = "none"
+      } else {
+        btnTemplate.style.display = ""
+        btnTemplate.textContent = sessions[0].className || ""
+        sessions.slice(1).forEach((session) => {
+          const extraBtn = btnTemplate.cloneNode(true)
+          extraBtn.textContent = session.className || ""
+          if (cardBody) {
+            cardBody.appendChild(extraBtn)
+          } else {
+            card.appendChild(extraBtn)
+          }
+        })
+      }
+    }
+
+    return card
+  }
+
+  selectClassStudent(index) {
+    const student = this.classStudents[index]
+    if (!student) return
+
+    const list = document.querySelector(".portal_class-student-debate-maindiv")
+    if (list) {
+      list
+        .querySelectorAll(".portal_class-students-debate")
+        .forEach((card, cardIndex) => {
+          card.classList.toggle("selected-border", cardIndex === index)
+        })
+    }
+
+    this.renderSelectedClassDetails(student)
+  }
+
+  renderSelectedClassDetails(student) {
+    const heading = document.querySelector(".portal_class-tab-heading")
+    if (!heading) return
+
+    const detailsTemplate = heading.querySelector(".portal_class-details")
+    if (!detailsTemplate) return
+
+    const prototype = detailsTemplate.cloneNode(true)
+    heading
+      .querySelectorAll(".portal_class-details")
+      .forEach((el) => el.remove())
+
+    const sessions = this.getVisibleClassSessions(student)
+    if (!sessions.length) {
+      prototype.textContent = ""
+      heading.appendChild(prototype)
+      this.updateCalendarTermTabs(student)
+      return
+    }
+
+    sessions.forEach((session) => {
+      const line = prototype.cloneNode(true)
+      line.textContent = this.formatClassDetails(session)
+      heading.appendChild(line)
+    })
+
+    this.updateCalendarTermTabs(student)
+  }
+
+  // Show only calendar term tabs that match the selected student's classes.
+  updateCalendarTermTabs(student) {
+    const root =
+      document.getElementById("portal_dashboard_calender_tab") ||
+      document.querySelector(".calender_semester-main-div .w-tabs")
+    if (!root) return
+
+    const calendarWrapper =
+      root.closest(".calender_semester-main-div") || root
+    const sessions = this.getVisibleClassSessions(student)
+    const availableTerms = new Set(
+      sessions
+        .map((session) => (session.termName || "").trim().toLowerCase())
+        .filter(Boolean),
+    )
+
+    const tabs = Array.from(root.querySelectorAll(".w-tab-menu .w-tab-link"))
+    const visibleTabs = []
+
+    tabs.forEach((tab) => {
+      const isVisible = availableTerms.has(tab.textContent.trim().toLowerCase())
+      tab.style.display = isVisible ? "" : "none"
+      if (isVisible) visibleTabs.push(tab)
+    })
+
+    if (!visibleTabs.length) {
+      calendarWrapper.style.display = "none"
+      return
+    }
+
+    calendarWrapper.style.display = ""
+
+    const preferredTerm = (sessions[0]?.termName || "").trim().toLowerCase()
+    const match =
+      visibleTabs.find(
+        (tab) => tab.textContent.trim().toLowerCase() === preferredTerm,
+      ) || visibleTabs[0]
+
+    this.activateCalendarTermTab(root, match)
+  }
+
+  activateCalendarTermTab(root, match) {
+    if (!root || !match) return
+
+    const tabName = match.getAttribute("data-w-tab")
+    root.querySelectorAll(".w-tab-menu .w-tab-link").forEach((tab) => {
+      const isCurrent = tab === match
+      tab.classList.toggle("w--current", isCurrent)
+      tab.setAttribute("aria-selected", isCurrent ? "true" : "false")
+      tab.setAttribute("tabindex", isCurrent ? "0" : "-1")
+    })
+
+    root.querySelectorAll(".w-tab-content .w-tab-pane").forEach((pane) => {
+      pane.classList.toggle(
+        "w--tab-active",
+        pane.getAttribute("data-w-tab") === tabName,
+      )
+    })
+
+    if (tabName) {
+      root.setAttribute("data-current", tabName)
     }
   }
 
@@ -339,9 +612,18 @@ class NSDPortal {
       tab.getAttribute("aria-controls") ||
       (tab.getAttribute("href") || "").replace("#", "")
     const pane = paneId ? document.getElementById(paneId) : null
-    const displayVal = hasEnrollments ? "flex" : "none"
-    tab.style.display = displayVal
-    if (pane) pane.style.display = displayVal
+    tab.style.display = hasEnrollments ? "flex" : "none"
+    // Do not set display:flex on the pane — Webflow tabs hide inactive panes with
+    // .w-tab-pane { display: none } and show the active one via .w--tab-active.
+    // An inline flex on the pane keeps Classes content visible on every tab.
+    if (pane) {
+      if (hasEnrollments) {
+        pane.style.removeProperty("display")
+      } else {
+        pane.style.display = "none"
+        pane.classList.remove("w--tab-active")
+      }
+    }
   }
 
   // Auto-select the first visible top-level tab in priority: Camps, Classes, Briefs
@@ -795,8 +1077,10 @@ class NSDPortal {
       (s) => s.sessionType !== "past" && s.programDetail?.programDetailId != 21,
     )
 
-    // Hide program tabs if no current/future sessions available
-    if (sessionsToShow.length === 1) {
+    // Hide the program tab strip unless there are multiple current/future
+    // programs to switch between. An empty camp-tabs-wrapper still has border/
+    // padding from Webflow CSS, which shows as a blank bar (e.g. past-only).
+    if (sessionsToShow.length < 2) {
       tabMenu.style.display = "none"
     }
 
