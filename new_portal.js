@@ -527,6 +527,7 @@ class NSDPortal {
     if (!sessions.length) {
       prototype.textContent = ""
       heading.appendChild(prototype)
+      this.updateCalendarTermTabs(student)
       return
     }
 
@@ -536,23 +537,55 @@ class NSDPortal {
       heading.appendChild(line)
     })
 
-    this.selectCalendarTermTab(sessions[0].termName)
+    this.updateCalendarTermTabs(student)
   }
 
-  selectCalendarTermTab(termName) {
-    const root = document.querySelector(".calender_semester-main-div")
-    if (!root || !termName) return
+  // Show only calendar term tabs that match the selected student's classes.
+  updateCalendarTermTabs(student) {
+    const root =
+      document.getElementById("portal_dashboard_calender_tab") ||
+      document.querySelector(".calender_semester-main-div .w-tabs")
+    if (!root) return
+
+    const calendarWrapper =
+      root.closest(".calender_semester-main-div") || root
+    const sessions = this.getVisibleClassSessions(student)
+    const availableTerms = new Set(
+      sessions
+        .map((session) => (session.termName || "").trim().toLowerCase())
+        .filter(Boolean),
+    )
 
     const tabs = Array.from(root.querySelectorAll(".w-tab-menu .w-tab-link"))
-    const match = tabs.find(
-      (tab) =>
-        tab.textContent.trim().toLowerCase() ===
-        String(termName).trim().toLowerCase(),
-    )
-    if (!match) return
+    const visibleTabs = []
+
+    tabs.forEach((tab) => {
+      const isVisible = availableTerms.has(tab.textContent.trim().toLowerCase())
+      tab.style.display = isVisible ? "" : "none"
+      if (isVisible) visibleTabs.push(tab)
+    })
+
+    if (!visibleTabs.length) {
+      calendarWrapper.style.display = "none"
+      return
+    }
+
+    calendarWrapper.style.display = ""
+
+    const preferredTerm = (sessions[0]?.termName || "").trim().toLowerCase()
+    const match =
+      visibleTabs.find(
+        (tab) => tab.textContent.trim().toLowerCase() === preferredTerm,
+      ) || visibleTabs[0]
+
+    this.activateCalendarTermTab(root, match)
+  }
+
+  activateCalendarTermTab(root, match) {
+    if (!root || !match) return
 
     const tabName = match.getAttribute("data-w-tab")
-    tabs.forEach((tab) => {
+    root.querySelectorAll(".w-tab-menu .w-tab-link").forEach((tab) => {
       const isCurrent = tab === match
       tab.classList.toggle("w--current", isCurrent)
       tab.setAttribute("aria-selected", isCurrent ? "true" : "false")
@@ -566,9 +599,8 @@ class NSDPortal {
       )
     })
 
-    const tabsRoot = root.querySelector(".w-tabs")
-    if (tabsRoot && tabName) {
-      tabsRoot.setAttribute("data-current", tabName)
+    if (tabName) {
+      root.setAttribute("data-current", tabName)
     }
   }
 
