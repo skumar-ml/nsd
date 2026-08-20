@@ -339,9 +339,18 @@ class NSDPortal {
       tab.getAttribute("aria-controls") ||
       (tab.getAttribute("href") || "").replace("#", "")
     const pane = paneId ? document.getElementById(paneId) : null
-    const displayVal = hasEnrollments ? "flex" : "none"
-    tab.style.display = displayVal
-    if (pane) pane.style.display = displayVal
+    tab.style.display = hasEnrollments ? "flex" : "none"
+    // Do not set display:flex on the pane — Webflow tabs hide inactive panes with
+    // .w-tab-pane { display: none } and show the active one via .w--tab-active.
+    // An inline flex on the pane keeps Classes content visible on every tab.
+    if (pane) {
+      if (hasEnrollments) {
+        pane.style.removeProperty("display")
+      } else {
+        pane.style.display = "none"
+        pane.classList.remove("w--tab-active")
+      }
+    }
   }
 
   // Auto-select the first visible top-level tab in priority: Camps, Classes, Briefs
