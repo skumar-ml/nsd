@@ -2,7 +2,7 @@
 Purpose: Renders the view-briefs card grid from getBriefDetails.
 
 Brief Logic: On DOMContentLoaded, fetches briefs from the portal API, sorts by
-displayOrder, renders cards, and wires Preview buttons to the PDF modal.
+created_at (earliest to latest), renders cards, and wires Preview buttons to the PDF modal.
 
 getBriefDetails is public (SEC-23) — no Memberstack token required. Works on
 marketing / browse pages for logged-out visitors.
@@ -110,8 +110,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             container.innerHTML = ""
 
+            const createdAtMs = (brief) => {
+                const raw = brief.created_at
+                if (!raw) return 0
+                const parsed = Date.parse(String(raw).replace(" ", "T"))
+                return Number.isNaN(parsed) ? 0 : parsed
+            }
+
             const sortedBriefs = briefs.sort(
-                (a, b) => (a.displayOrder || 0) - (b.displayOrder || 0),
+                (a, b) => createdAtMs(a) - createdAtMs(b),
             )
 
             sortedBriefs.forEach((brief) => {
