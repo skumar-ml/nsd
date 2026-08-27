@@ -1,7 +1,10 @@
 /*
 Purpose: Manages the briefs and events for the NSD portal.
 
-Brief Logic: Initializes briefs and events, caches DOM elements, and fetches data from API to display in grid. Analyzes user's briefs to determine subscription recommendations and updates upsell elements with dynamic content.
+Brief Logic: Initializes briefs and events, sorts briefs by created_at (earliest
+to latest), caches DOM elements, and fetches data from API to display in grid.
+Analyzes user's briefs to determine subscription recommendations and updates
+upsell elements with dynamic content.
 
 Are there any dependent JS files: nsd-auth.js (Bearer token for protected payment
 checkout; getBriefDetails catalog is public — no token)
@@ -11,7 +14,7 @@ var PAYMENT_API_BASE = window.NSD_API.PAYMENT_API_BASE
 class BriefManager {
     constructor(briefs, data) {
         // Array of briefs (each brief should have: title, pdf_url, doc_url)
-        this.$briefs = briefs
+        this.$briefs = this.sortBriefsByCreatedAt(briefs)
         // crazy egg session recording script
         ;(window.CE_API || (window.CE_API = [])).push(function () {
             CE2.startRecording()
@@ -35,6 +38,21 @@ class BriefManager {
         }
 
         this.init()
+    }
+
+    /**
+     * Sort briefs by created_at, earliest to latest (same as briefs.js).
+     */
+    sortBriefsByCreatedAt(briefs) {
+        const createdAtMs = (brief) => {
+            const raw = brief && brief.created_at
+            if (!raw) return 0
+            const parsed = Date.parse(String(raw).replace(" ", "T"))
+            return Number.isNaN(parsed) ? 0 : parsed
+        }
+        return [...(briefs || [])].sort(
+            (a, b) => createdAtMs(a) - createdAtMs(b),
+        )
     }
 
     /**
