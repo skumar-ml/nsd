@@ -385,6 +385,31 @@ const setupContactUsForm = () => {
     })
 }
 
+// Show the contact form again after a previous success or error state.
+const resetContactUsForm = () => {
+    const successBox = document.getElementById(
+        "contact-us-form-success-submission",
+    )
+    if (successBox) {
+        successBox.style.setProperty("display", "none", "important")
+    }
+
+    const contactFormRoot = document.getElementById("contact-us-form")
+    const contactForm = getTrialClassFormEl(contactFormRoot)
+    const contactScope =
+        contactFormRoot?.closest(".trial_class_form-container") ||
+        contactFormRoot
+    const failBox = contactScope?.querySelector(".tc_form-fail")
+    if (failBox) {
+        failBox.style.setProperty("display", "none", "important")
+    }
+
+    if (contactForm) {
+        contactForm.style.removeProperty("display")
+        clearTrialClassFormFields(contactForm)
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     // Parse URL for manage registration token
     const urlParams = new URLSearchParams(window.location.search)
@@ -647,6 +672,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (contactUsTrigger) {
         contactUsTrigger.addEventListener("click", (e) => {
             e.preventDefault()
+            resetContactUsForm()
 
             if (cardContainer) {
                 cardContainer.style.setProperty("display", "none", "important")
