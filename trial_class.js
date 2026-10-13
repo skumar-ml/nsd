@@ -233,11 +233,17 @@ const setupContactUsForm = () => {
     const formShell = contactFormRoot.matches("form")
         ? contactFormRoot.parentElement || contactFormRoot
         : contactFormRoot
-    const successBox = formShell.querySelector(".w-form-done")
-    const failBox = formShell.querySelector(".w-form-fail")
+    const successBoxNew =
+        formShell.querySelector("#contact-us-form-success-submission") ||
+        formShell.querySelector(".tc_form-done-new")
+    const successWrapper = successBoxNew?.closest(".w-form-done")
+    const failBox = formShell.querySelector(".tc_form-fail")
 
-    if (successBox) {
-        successBox.style.setProperty("display", "none", "important")
+    if (successBoxNew) {
+        successBoxNew.style.setProperty("display", "none", "important")
+    }
+    if (successWrapper) {
+        successWrapper.style.setProperty("display", "none", "important")
     }
     if (failBox) {
         failBox.style.setProperty("display", "none", "important")
@@ -287,15 +293,18 @@ const setupContactUsForm = () => {
         e.stopPropagation()
         e.stopImmediatePropagation()
 
-        if (successBox) {
-            successBox.style.setProperty("display", "none", "important")
+        if (successBoxNew) {
+            successBoxNew.style.setProperty("display", "none", "important")
+        }
+        if (successWrapper) {
+            successWrapper.style.setProperty("display", "none", "important")
         }
         if (failBox) {
             failBox.style.setProperty("display", "none", "important")
         }
 
         const payload = {
-          student: {
+            student: {
                 first_name: contactForm
                     .querySelector("#student_first_name_cu")
                     .value.trim(),
@@ -360,9 +369,13 @@ const setupContactUsForm = () => {
             if (failBox) {
                 failBox.style.setProperty("display", "none", "important")
             }
-            if (successBox) {
-                successBox.style.removeProperty("display")
-                successBox.style.setProperty("display", "block", "important")
+            if (successWrapper) {
+                successWrapper.style.removeProperty("display")
+                successWrapper.style.setProperty("display", "block", "important")
+            }
+            if (successBoxNew) {
+                successBoxNew.style.removeProperty("display")
+                successBoxNew.style.setProperty("display", "block", "important")
             }
         } catch (err) {
             console.error("Error submitting contact form", err)
@@ -618,9 +631,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     bindTabSectionTrigger("#back-discovery-tab", 0)
     bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
 
-    // Back button: hide tab section, restore hero card container
-    const tabBackButton = document.getElementById("tab-back-button")
-    if (tabBackButton) {
+    // Back button: hide tab section or contact form, restore hero cards.
+    document.querySelectorAll("#tab-back-button").forEach((tabBackButton) => {
         tabBackButton.addEventListener("click", (e) => {
             e.preventDefault()
             hideContactFormWrapper()
@@ -632,7 +644,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 cardContainer.style.setProperty("display", "block", "important")
             }
         })
-    }
+    })
 
     // Contact us: hide the hero cards and show the contact form
     const contactUsTrigger = document.getElementById("contact_us")
@@ -903,13 +915,24 @@ document.addEventListener("DOMContentLoaded", async function () {
         studentDescription.value = studentDescription.value || ""
     }
 
-    // Success and error message elements for registration form
-    const successBox = document.querySelector(".tc_form-done")
+    // Success and error message elements for registration form.
+    // Skip the contact-us copies, which reuse these classes.
+    const outsideContactForm = (el) =>
+        !el.closest(
+            "#contact-us-form, #contact-form-wrapper, .oc_contact-wrapper",
+        )
+    const successBox = [...document.querySelectorAll(".tc_form-done")].find(
+        outsideContactForm,
+    )
     const successBoxNew =
         document.querySelector("#trial-class-form-success-submission") ||
-        document.querySelector(".tc_form-done-new")
+        [...document.querySelectorAll(".tc_form-done-new")].find(
+            outsideContactForm,
+        )
     const successWrapper = successBoxNew?.closest(".w-form-done")
-    const failBox = document.querySelector(".tc_form-fail")
+    const failBox = [...document.querySelectorAll(".tc_form-fail")].find(
+        outsideContactForm,
+    )
 
     // Hide success and error states by default
     if (successBox) successBox.style.setProperty("display", "none", "important")
