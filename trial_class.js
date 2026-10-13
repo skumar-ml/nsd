@@ -230,20 +230,17 @@ const setupContactUsForm = () => {
     const contactForm = getTrialClassFormEl(contactFormRoot)
     if (!contactForm) return
 
-    const formShell = contactFormRoot.matches("form")
-        ? contactFormRoot.parentElement || contactFormRoot
-        : contactFormRoot
-    const successBoxNew =
-        formShell.querySelector("#contact-us-form-success-submission") ||
-        formShell.querySelector(".tc_form-done-new")
-    const successWrapper = successBoxNew?.closest(".w-form-done")
-    const failBox = formShell.querySelector(".tc_form-fail")
+    const contactScope =
+        contactFormRoot.closest(".trial_class_form-container") ||
+        contactFormRoot.parentElement ||
+        contactFormRoot
+    const successBoxNew = document.getElementById(
+        "contact-us-form-success-submission",
+    )
+    const failBox = contactScope.querySelector(".tc_form-fail")
 
     if (successBoxNew) {
         successBoxNew.style.setProperty("display", "none", "important")
-    }
-    if (successWrapper) {
-        successWrapper.style.setProperty("display", "none", "important")
     }
     if (failBox) {
         failBox.style.setProperty("display", "none", "important")
@@ -295,9 +292,6 @@ const setupContactUsForm = () => {
 
         if (successBoxNew) {
             successBoxNew.style.setProperty("display", "none", "important")
-        }
-        if (successWrapper) {
-            successWrapper.style.setProperty("display", "none", "important")
         }
         if (failBox) {
             failBox.style.setProperty("display", "none", "important")
@@ -366,17 +360,19 @@ const setupContactUsForm = () => {
             }
 
             contactForm.style.setProperty("display", "none", "important")
-            if (failBox) {
-                failBox.style.setProperty("display", "none", "important")
-            }
-            if (successWrapper) {
-                successWrapper.style.removeProperty("display")
-                successWrapper.style.setProperty("display", "block", "important")
-            }
-            if (successBoxNew) {
-                successBoxNew.style.removeProperty("display")
-                successBoxNew.style.setProperty("display", "block", "important")
-            }
+            setTimeout(() => {
+                if (failBox) {
+                    failBox.style.setProperty("display", "none", "important")
+                }
+                if (successBoxNew) {
+                    successBoxNew.style.removeProperty("display")
+                    successBoxNew.style.setProperty(
+                        "display",
+                        "flex",
+                        "important",
+                    )
+                }
+            }, 50)
         } catch (err) {
             console.error("Error submitting contact form", err)
             if (failBox) {
