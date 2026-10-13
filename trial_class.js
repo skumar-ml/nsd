@@ -814,11 +814,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                         shortDate = date.toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
+                            timeZone: "America/New_York",
                         })
                         dateEl.textContent = date.toLocaleDateString("en-US", {
                             weekday: "short",
                             month: "short",
                             day: "numeric",
+                            timeZone: "America/New_York",
                         })
                     }
 
@@ -1178,6 +1180,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         weekday: "short",
                         month: "short",
                         day: "numeric",
+                        timeZone: "America/New_York",
                     })
                     const startTime = utcDateToEasternTime(
                         currentClass.start_time,
@@ -1520,6 +1523,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             shortDate = date.toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
+                                timeZone: "America/New_York",
                             })
                             dateEl.textContent = date.toLocaleDateString(
                                 "en-US",
@@ -1527,6 +1531,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                     weekday: "short",
                                     month: "short",
                                     day: "numeric",
+                                    timeZone: "America/New_York",
                                 },
                             )
                         }
