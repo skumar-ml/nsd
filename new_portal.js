@@ -396,17 +396,54 @@ class NSDPortal {
     return student.futureSessions || []
   }
 
+  // Offering startTime is a UTC clock pasted onto the term start date.
+  // That date can sit on the other side of DST, so converting the whole
+  // instant shows 4:00 PM for a 5:00 PM class. Keep the UTC hour and minute
+  // and apply today's Eastern offset, same as utcDateToEasternTime(..., "clock").
   formatEasternTime(isoString) {
     if (!isoString) return ""
-    const date = new Date(isoString)
-    if (Number.isNaN(date.getTime())) return ""
-    return date
-      .toLocaleTimeString("en-US", {
-        timeZone: "America/New_York",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true,
-      })
+    if (typeof utcDateToEasternTime === "function") {
+      return String(utcDateToEasternTime(isoString, "clock") || "").replace(
+        /\s/g,
+        "",
+      )
+    }
+
+    let raw = String(isoString).trim()
+    if (!raw.includes("T")) {
+      raw = `1970-01-01T${raw.replace(/z$/i, "")}Z`
+    } else if (!/(?:z|[+-]\d{2}:?\d{2})$/i.test(raw)) {
+      raw += "Z"
+    }
+    const parsed = new Date(raw)
+    if (Number.isNaN(parsed.getTime())) return ""
+
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(new Date())
+    const part = (type) =>
+      Number(parts.find((item) => item.type === type).value)
+    const instant = new Date(
+      Date.UTC(
+        part("year"),
+        part("month") - 1,
+        part("day"),
+        parsed.getUTCHours(),
+        parsed.getUTCMinutes(),
+        0,
+      ),
+    )
+
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/New_York",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    })
+      .format(instant)
       .replace(/\s/g, "")
   }
 
