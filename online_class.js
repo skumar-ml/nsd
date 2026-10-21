@@ -185,16 +185,8 @@ function renderPane(pane, result) {
             if (registerBtn) {
                 const url = new URL(registerBtn.href)
                 url.searchParams.set(
-                    "grade_id",
-                    result.data?.[0]?.grade_id || "",
-                )
-                url.searchParams.set(
                     "grade_name",
                     result.data?.[0]?.gradeLabel || "",
-                )
-                url.searchParams.set(
-                    "session_name",
-                    sessionDetail.session_name || "",
                 )
                 url.searchParams.set(
                     "session_detail_id",
