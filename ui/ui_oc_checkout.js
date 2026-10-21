@@ -1,7 +1,7 @@
 /*
 Purpose: Online class checkout page init — session recording, class offering cards, checkout form, login modal, accordion, and iframe mode.
 
-Brief Logic: Fires MemberStack Crazy Egg session recording when a member is logged in. On DOMContentLoaded, parses URL params to validate required fields (grade_name, class_detail_id, session_detail_id) and shows/hides the signup form accordingly. Fetches available class offering slots from the API and renders selectable time-slot cards with full/almost-full seat states. Initialises login modal open/close behaviour, stepper sync via MutationObserver, student info accordion, and iframe-mode body class. Builds the memberData object and instantiates CheckOutWebflow. Handles tab-based price switching and jQuery form validation.
+Brief Logic: Fires MemberStack Crazy Egg session recording when a member is logged in. On DOMContentLoaded, parses URL params to validate required fields (class_detail_id, session_detail_id) and shows/hides the signup form accordingly. Fetches available class offering slots from the API and renders selectable time-slot cards with full/almost-full seat states. Initialises login modal open/close behaviour, stepper sync via MutationObserver, student info accordion, and iframe-mode body class. Builds the memberData object and instantiates CheckOutWebflow. Handles tab-based price switching and jQuery form validation.
 
 Are there any dependent JS files: No
 */
@@ -108,7 +108,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var urlPar = new URLSearchParams(query)
   var product =
     urlPar.get("productType") || urlPar.get("producttype") || "online-class"
-  var grade_name = urlPar.get("grade_name") || ""
   var class_detail_id_raw = urlPar.get("class_detail_id") || ""
   var session_detail_id_raw = urlPar.get("session_detail_id") || ""
   var core_product_price = document.getElementById("core_product_price")
@@ -135,15 +134,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var missing = []
 
-  if (!grade_name || String(grade_name).trim() === "")
-    missing.push("grade_name")
   if (!class_detail_id || String(class_detail_id).trim() === "")
     missing.push("class_detail_id")
   if (!session_detail_id || String(session_detail_id).trim() === "")
     missing.push("session_detail_id")
 
   // Validate using raw values as secondary check
-  if (!grade_name.trim()) missing.push("grade_name")
   if (!class_detail_id_raw.trim()) missing.push("class_detail_id")
   if (!session_detail_id_raw.trim()) missing.push("session_detail_id")
 
@@ -439,7 +435,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   if (product === "online_class" && rendorCheckoutForm) {
-    memberData.grade_name = grade_name || ""
     memberData.class_detail_id = class_detail_id || ""
     memberData.session_detail_id = session_detail_id || ""
   }
