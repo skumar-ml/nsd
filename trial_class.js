@@ -6,6 +6,19 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
+// Trial slots are real UTC instants. Always show the Eastern calendar date.
+function formatTrialDate(utcISOString, withWeekday) {
+    const date = new Date(utcISOString)
+    if (Number.isNaN(date.getTime())) return ""
+    const options = {
+        timeZone: "America/New_York",
+        month: "short",
+        day: "numeric",
+    }
+    if (withWeekday) options.weekday = "short"
+    return date.toLocaleDateString("en-US", options)
+}
+
 // Global variable to store selected trial class date for success message
 window.trial_class_date = ""
 
@@ -576,16 +589,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const dateEl = clone.querySelector(".trial-class_date")
                     let shortDate = ""
                     if (dateEl) {
-                        const date = new Date(item.start_time)
-                        shortDate = date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                        })
-                        dateEl.textContent = date.toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                        })
+                        shortDate = formatTrialDate(item.start_time, false)
+                        dateEl.textContent = formatTrialDate(item.start_time, true)
                     }
 
                     const timeEl = clone.querySelector(".trial-class_time-info")
@@ -930,12 +935,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             let classDescription = ""
             try {
                 if (currentClass.start_time && currentClass.end_time) {
-                    const start = new Date(currentClass.start_time)
-                    const datePart = start.toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                    })
+                    const datePart = formatTrialDate(currentClass.start_time, true)
                     const startTime = utcDateToEasternTime(
                         currentClass.start_time,
                     )
@@ -1273,19 +1273,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const dateEl = clone.querySelector(".trial-class_date")
                         let shortDate = ""
                         if (dateEl) {
-                            const date = new Date(item.start_time)
-                            shortDate = date.toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                            })
-                            dateEl.textContent = date.toLocaleDateString(
-                                "en-US",
-                                {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                },
-                            )
+                            shortDate = formatTrialDate(item.start_time, false)
+                            dateEl.textContent = formatTrialDate(item.start_time, true)
                         }
 
                         const timeEl = clone.querySelector(
