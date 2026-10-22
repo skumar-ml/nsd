@@ -823,18 +823,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const dateEl = clone.querySelector(".trial-class_date")
                     let shortDate = ""
                     if (dateEl) {
-                        const date = new Date(item.start_time)
-                        shortDate = date.toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            timeZone: "America/New_York",
-                        })
-                        dateEl.textContent = date.toLocaleDateString("en-US", {
-                            weekday: "short",
-                            month: "short",
-                            day: "numeric",
-                            timeZone: "America/New_York",
-                        })
                         shortDate = formatTrialDate(item.start_time, false)
                         dateEl.textContent = formatTrialDate(item.start_time, true)
                     }
@@ -1190,13 +1178,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             let classDescription = ""
             try {
                 if (currentClass.start_time && currentClass.end_time) {
-                    const start = new Date(currentClass.start_time)
-                    const datePart = start.toLocaleDateString("en-US", {
-                        weekday: "short",
-                        month: "short",
-                        day: "numeric",
-                        timeZone: "America/New_York",
-                    })
                     const datePart = formatTrialDate(currentClass.start_time, true)
                     const startTime = utcDateToEasternTime(
                         currentClass.start_time,
@@ -1535,21 +1516,6 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const dateEl = clone.querySelector(".trial-class_date")
                         let shortDate = ""
                         if (dateEl) {
-                            const date = new Date(item.start_time)
-                            shortDate = date.toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                                timeZone: "America/New_York",
-                            })
-                            dateEl.textContent = date.toLocaleDateString(
-                                "en-US",
-                                {
-                                    weekday: "short",
-                                    month: "short",
-                                    day: "numeric",
-                                    timeZone: "America/New_York",
-                                },
-                            )
                             shortDate = formatTrialDate(item.start_time, false)
                             dateEl.textContent = formatTrialDate(item.start_time, true)
                         }
