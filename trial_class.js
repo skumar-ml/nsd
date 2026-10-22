@@ -1,10 +1,34 @@
 /*
-Purpose: Trial class registration form with schedule selection, form submission, and manage/reschedule/cancel flows via token.
+Purpose: Trial class registration form with schedule selection, form submission, and manage/reschedule/cancel flows via token. Also opens the contact-us form from #contact_us.
 
-Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default. Reads URL token first: with a manage token, shows a loader until registration details load, then shows the manage card or invalid-token message. Without a token, shows the registration form immediately; trial class slot cards and grade options load asynchronously (loaders and “Loading grades…” for SEO). If a manage token is present, fetches registration details and shows the registration card with prefilled student/parent info. Supports rescheduling (shows reschedule form with available slots) and cancellation via API calls. Handles success/error state display for both registration and reschedule form submissions.
+Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default. Reads URL token first: with a manage token, shows a loader until registration details load, then shows the manage card or invalid-token message. Without a token, shows the registration form immediately; trial class slot cards and grade options load asynchronously (loaders and “Loading grades…” for SEO). If a manage token is present, fetches registration details and shows the registration card with prefilled student/parent info. Supports rescheduling (shows reschedule form with available slots) and cancellation via API calls. Handles success/error state display for both registration and reschedule form submissions. Clicking #contact_us hides #card-container and shows #contact-form-wrapper; #contact-us-form posts to the camp contact-us endpoint and does not share submit handling with the trial class form.
 
 Are there any dependent JS files: No
 */
+
+// Swap a submit control to "Please wait..." until the request finishes.
+const setSubmitWaiting = (btn, waiting) => {
+    if (!btn) return
+
+    const isInput = btn.tagName === "INPUT"
+    if (waiting) {
+        if (btn.dataset.originalLabel == null) {
+            btn.dataset.originalLabel = isInput ? btn.value : btn.textContent
+        }
+        if (isInput) btn.value = "Please wait..."
+        else btn.textContent = "Please wait..."
+        btn.disabled = true
+        btn.setAttribute("aria-busy", "true")
+        return
+    }
+
+    if (btn.dataset.originalLabel != null) {
+        if (isInput) btn.value = btn.dataset.originalLabel
+        else btn.textContent = btn.dataset.originalLabel
+    }
+    btn.disabled = false
+    btn.removeAttribute("aria-busy")
+}
 
 // Trial slots are real UTC instants. Always show the Eastern calendar date.
 function formatTrialDate(utcISOString, withWeekday) {
@@ -234,14 +258,209 @@ const showFormSuccessState = ({
     }, 50)
 }
 
+// Contact-us form: grade options, submit, and success/error. Scoped so it
+// never binds the trial class form. Field ids match the trial form with _cu.
+const setupContactUsForm = () => {
+    const contactFormRoot = document.getElementById("contact-us-form")
+    if (!contactFormRoot) return
+
+    const contactForm = getTrialClassFormEl(contactFormRoot)
+    if (!contactForm) return
+
+    const contactScope =
+        contactFormRoot.closest(".trial_class_form-container") ||
+        contactFormRoot.parentElement ||
+        contactFormRoot
+    const successBoxNew = document.getElementById(
+        "contact-us-form-success-submission",
+    )
+    const failBox = contactScope.querySelector(".tc_form-fail")
+
+    if (successBoxNew) {
+        successBoxNew.style.setProperty("display", "none", "important")
+    }
+    if (failBox) {
+        failBox.style.setProperty("display", "none", "important")
+    }
+
+    const gradeSelect =
+        contactForm.querySelector("select.trial-form-select-field") ||
+        contactForm.querySelector("select")
+
+    if (gradeSelect) {
+        gradeSelect.disabled = true
+        gradeSelect.innerHTML = '<option value="">Loading grades…</option>'
+        ;(async () => {
+            try {
+                const res = await fetch(
+                    `${window.NSD_API.TRIAL_CLASS_API_BASE}/getGrades`,
+                )
+                const grades = await res.json()
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
+                if (Array.isArray(grades)) {
+                    grades.forEach((grade) => {
+                        const option = document.createElement("option")
+                        option.value = grade.grade_name
+                        option.textContent = grade.grade_name
+                        gradeSelect.appendChild(option)
+                    })
+                }
+            } catch (err) {
+                console.error("Error loading contact form grades", err)
+                gradeSelect.innerHTML = '<option value="">Select Grade</option>'
+            } finally {
+                gradeSelect.disabled = false
+            }
+        })()
+    }
+
+    const studentDescription = contactForm.querySelector(
+        "#Student-Description_cu",
+    )
+
+    contactForm.setAttribute("action", "#")
+    contactForm.removeAttribute("data-wf-page-id")
+    contactForm.removeAttribute("data-wf-element-id")
+
+    contactForm.addEventListener("submit", async function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+        e.stopImmediatePropagation()
+
+        if (successBoxNew) {
+            successBoxNew.style.setProperty("display", "none", "important")
+        }
+        if (failBox) {
+            failBox.style.setProperty("display", "none", "important")
+        }
+
+        const payload = {
+            student: {
+                first_name: contactForm
+                    .querySelector("#student_first_name_cu")
+                    .value.trim(),
+                last_name: contactForm
+                    .querySelector("#student_last_name_cu")
+                    .value.trim(),
+                email:
+                    contactForm.querySelector("#student_email_cu")?.value.trim() ||
+                    "",
+                grade: gradeSelect ? gradeSelect.value : "",
+            },
+            parent: {
+                first_name: contactForm
+                    .querySelector("#parent_first_name_cu")
+                    .value.trim(),
+                last_name: contactForm
+                    .querySelector("#parent_last_name_cu")
+                    .value.trim(),
+                email: contactForm
+                    .querySelector("#parent_email_cu")
+                    .value.trim(),
+                phone: contactForm
+                    .querySelector("#parent_phone_cu")
+                    .value.trim(),
+            },
+            what_best_describes_you: studentDescription
+                ? studentDescription.value
+                : "",
+            previous_exp: contactForm
+                .querySelector("#previous_experience_cu")
+                .value.trim(),
+        }
+
+        const submitBtn = contactForm.querySelector(
+            'input[type="submit"], button[type="submit"]',
+        )
+        setSubmitWaiting(submitBtn, true)
+
+        try {
+            const response = await fetch(
+                `${window.NSD_API.FORMS_API_BASE}/oc_contact_us`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload),
+                },
+            )
+
+            const data = await response.json().catch(() => ({}))
+
+            if (!response.ok) {
+                const errorMessage =
+                    data?.error || "Something went wrong. Please try again."
+                setSubmitWaiting(submitBtn, false)
+                if (failBox) {
+                    failBox.textContent = errorMessage
+                    failBox.style.setProperty("display", "block", "important")
+                }
+                return
+            }
+
+            contactForm.style.setProperty("display", "none", "important")
+            setTimeout(() => {
+                if (failBox) {
+                    failBox.style.setProperty("display", "none", "important")
+                }
+                if (successBoxNew) {
+                    successBoxNew.style.removeProperty("display")
+                    successBoxNew.style.setProperty(
+                        "display",
+                        "flex",
+                        "important",
+                    )
+                }
+            }, 50)
+        } catch (err) {
+            console.error("Error submitting contact form", err)
+            setSubmitWaiting(submitBtn, false)
+            if (failBox) {
+                failBox.textContent = "Something went wrong. Please try again."
+                failBox.style.setProperty("display", "block", "important")
+            }
+        }
+    })
+}
+
+// Show the contact form again after a previous success or error state.
+const resetContactUsForm = () => {
+    const successBox = document.getElementById(
+        "contact-us-form-success-submission",
+    )
+    if (successBox) {
+        successBox.style.setProperty("display", "none", "important")
+    }
+
+    const contactFormRoot = document.getElementById("contact-us-form")
+    const contactForm = getTrialClassFormEl(contactFormRoot)
+    const contactScope =
+        contactFormRoot?.closest(".trial_class_form-container") ||
+        contactFormRoot
+    const failBox = contactScope?.querySelector(".tc_form-fail")
+    if (failBox) {
+        failBox.style.setProperty("display", "none", "important")
+    }
+
+    if (contactForm) {
+        contactForm.style.removeProperty("display")
+        clearTrialClassFormFields(contactForm)
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async function () {
     // Parse URL for manage registration token
     const urlParams = new URLSearchParams(window.location.search)
     const manageToken = urlParams.get("token")
 
-    // By default hide all the form containers
-    const trialClassFormContainer = document.querySelector(
-        ".trial_class_form-container",
+    // By default hide all the form containers.
+    // Skip the contact-us copy, which reuses .trial_class_form-container.
+    const trialClassFormContainer = Array.from(
+        document.querySelectorAll(".trial_class_form-container"),
+    ).find(
+        (el) =>
+            !el.closest(
+                "#contact-form-wrapper, #contact-us-form, .contact_form-wapper",
+            ),
     )
     if (trialClassFormContainer) {
         trialClassFormContainer.style.setProperty(
@@ -299,9 +518,31 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Hero card container shown by default; hidden while a tab is open
     const cardContainer = document.querySelector("#card-container")
 
+    // Contact-us view. Hidden until #contact_us is clicked.
+    const contactFormWrapper =
+        document.getElementById("contact-form-wrapper") ||
+        document.querySelector(".oc_contact-wrapper")
+
+    if (contactFormWrapper) {
+        contactFormWrapper.style.setProperty("display", "none", "important")
+    }
+
+    const hideContactFormWrapper = () => {
+        if (!contactFormWrapper) return
+        contactFormWrapper.style.setProperty("display", "none", "important")
+    }
+
+    const hideCancelledCard = () => {
+        if (!cancelledCard) return
+        cancelledCard.style.setProperty("display", "none", "important")
+    }
+
     // Show tab section, select tab, and scroll into view
     const showTabSection = (tabIndex = 0) => {
         if (!tabSection) return
+
+        hideContactFormWrapper()
+        hideCancelledCard()
 
         tabSection.style.removeProperty("display")
         tabSection.style.setProperty("display", "block", "important")
@@ -370,6 +611,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // With a manage token the correct view is the registration card,
             // not the registration form
             if (manageToken) {
+                hideCancelledCard()
                 if (cancelInfoCard) {
                     cancelInfoCard.style.setProperty(
                         "display",
@@ -454,11 +696,12 @@ document.addEventListener("DOMContentLoaded", async function () {
     bindTabSectionTrigger("#back-discovery-tab", 0)
     bindTabSectionTrigger(".tc_form-done-new .tc_button-blue-rounded", 2)
 
-    // Back button: hide tab section, restore hero card container
-    const tabBackButton = document.getElementById("tab-back-button")
-    if (tabBackButton) {
+    // Back button: hide tab section or contact form, restore hero cards.
+    document.querySelectorAll("#tab-back-button").forEach((tabBackButton) => {
         tabBackButton.addEventListener("click", (e) => {
             e.preventDefault()
+            hideContactFormWrapper()
+            hideCancelledCard()
             if (tabSection) {
                 tabSection.style.setProperty("display", "none", "important")
             }
@@ -467,7 +710,30 @@ document.addEventListener("DOMContentLoaded", async function () {
                 cardContainer.style.setProperty("display", "block", "important")
             }
         })
+    })
+
+    // Contact us: hide the hero cards and show the contact form
+    const contactUsTrigger = document.getElementById("contact_us")
+    if (contactUsTrigger) {
+        contactUsTrigger.addEventListener("click", (e) => {
+            e.preventDefault()
+            resetContactUsForm()
+
+            if (cardContainer) {
+                cardContainer.style.setProperty("display", "none", "important")
+            }
+            if (contactFormWrapper) {
+                contactFormWrapper.style.removeProperty("display")
+                contactFormWrapper.style.setProperty(
+                    "display",
+                    "block",
+                    "important",
+                )
+            }
+        })
     }
+
+    setupContactUsForm()
 
     // Trial class slot grid elements
     const wrapper = document.querySelector(".trial-class_option-wapper")
@@ -708,13 +974,24 @@ document.addEventListener("DOMContentLoaded", async function () {
         studentDescription.value = studentDescription.value || ""
     }
 
-    // Success and error message elements for registration form
-    const successBox = document.querySelector(".tc_form-done")
+    // Success and error message elements for registration form.
+    // Skip the contact-us copies, which reuse these classes.
+    const outsideContactForm = (el) =>
+        !el.closest(
+            "#contact-us-form, #contact-form-wrapper, .oc_contact-wrapper",
+        )
+    const successBox = [...document.querySelectorAll(".tc_form-done")].find(
+        outsideContactForm,
+    )
     const successBoxNew =
         document.querySelector("#trial-class-form-success-submission") ||
-        document.querySelector(".tc_form-done-new")
+        [...document.querySelectorAll(".tc_form-done-new")].find(
+            outsideContactForm,
+        )
     const successWrapper = successBoxNew?.closest(".w-form-done")
-    const failBox = document.querySelector(".tc_form-fail")
+    const failBox = [...document.querySelectorAll(".tc_form-fail")].find(
+        outsideContactForm,
+    )
 
     // Hide success and error states by default
     if (successBox) successBox.style.setProperty("display", "none", "important")
@@ -827,6 +1104,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             landingURL: getLandingURL(),
         }
 
+        const submitBtn = form.querySelector(
+            'input[type="submit"], button[type="submit"]',
+        )
+        setSubmitWaiting(submitBtn, true)
+
         try {
             const response = await fetch(
                 `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassRegistration`,
@@ -843,6 +1125,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const errorMessage =
                     data?.error || "Something went wrong. Please try again."
 
+                setSubmitWaiting(submitBtn, false)
                 if (failBox) {
                     failBox.textContent = errorMessage
                     failBox.style.setProperty("display", "block", "important")
@@ -859,6 +1142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 failBox,
             })
         } catch (err) {
+            setSubmitWaiting(submitBtn, false)
             if (failBox) {
                 failBox.textContent = "Something went wrong. Please try again."
                 failBox.style.setProperty("display", "block", "important")
@@ -871,9 +1155,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let registrationData = null
 
     if (manageToken) {
-        const formContainer = document.querySelector(
-            ".trial_class_form-container",
-        )
+        const formContainer = trialClassFormContainer
         const rescheduleForm = document.querySelector(
             "#trial-class-reschdule-form",
         )
@@ -903,6 +1185,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 rescheduleForm.style.setProperty("display", "none", "important")
             }
 
+            hideCancelledCard()
             if (invalidTokenEl) {
                 invalidTokenEl.style.removeProperty("display")
                 invalidTokenEl.style.setProperty(
@@ -1099,6 +1382,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             backBtn.addEventListener("click", function (e) {
                 e.preventDefault()
 
+                hideCancelledCard()
                 if (cancelInfoCard) {
                     cancelInfoCard.style.setProperty(
                         "display",
@@ -1142,7 +1426,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 e.preventDefault()
                 const cancelUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/cancel`
 
-                confirmCancelBtn.disabled = true
+                if (confirmCancelBtn.getAttribute("aria-busy") === "true") {
+                    return
+                }
+                setSubmitWaiting(confirmCancelBtn, true)
 
                 fetch(cancelUrl, {
                     method: "POST",
@@ -1158,8 +1445,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                             .then((t) => (t && t.trim() ? JSON.parse(t) : {}))
                     })
                     .then(() => {
-                        const doneCard = document.querySelector(
-                            ".tc_registration-cancelled-card",
+                        const invalidTokenEl = document.getElementById(
+                            "invalid-or-expired-token-found",
                         )
                         if (cancelInfoCard) {
                             cancelInfoCard.style.setProperty(
@@ -1168,9 +1455,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 "important",
                             )
                         }
-                        if (doneCard) {
-                            doneCard.style.removeProperty("display")
-                            doneCard.style.setProperty(
+                        if (registrationCard) {
+                            registrationCard.style.setProperty(
+                                "display",
+                                "none",
+                                "important",
+                            )
+                        }
+                        if (invalidTokenEl) {
+                            invalidTokenEl.style.setProperty(
+                                "display",
+                                "none",
+                                "important",
+                            )
+                        }
+                        if (cancelledCard) {
+                            cancelledCard.style.removeProperty("display")
+                            cancelledCard.style.setProperty(
                                 "display",
                                 "block",
                                 "important",
@@ -1182,9 +1483,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             "Error cancelling trial class registration",
                             err,
                         )
-                    })
-                    .finally(() => {
-                        confirmCancelBtn.disabled = false
+                        setSubmitWaiting(confirmCancelBtn, false)
                     })
             })
         }
@@ -1571,6 +1870,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     new_trial_class_id: selectedRadio.value,
                 }
 
+                const submitBtn = rescheduleForm.querySelector(
+                    'input[type="submit"], button[type="submit"]',
+                )
+                setSubmitWaiting(submitBtn, true)
+
                 try {
                     const response = await fetch(
                         `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/reschedule`,
@@ -1588,6 +1892,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             data?.error ||
                             "Something went wrong. Please try again."
 
+                        setSubmitWaiting(submitBtn, false)
                         rescheduleForm.style.setProperty(
                             "display",
                             "none",
@@ -1614,6 +1919,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         registeredDateEl: rescheduleRegisteredDateEl,
                     })
                 } catch (err) {
+                    setSubmitWaiting(submitBtn, false)
                     rescheduleForm.style.setProperty(
                         "display",
                         "none",
