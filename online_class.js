@@ -128,6 +128,7 @@ function renderPane(pane, result) {
     function formatDate(dateStr) {
         if (!dateStr) return ""
         return new Date(dateStr).toLocaleDateString("en-US", {
+            timeZone: "America/New_York",
             month: "short",
             day: "numeric",
         })
@@ -260,7 +261,7 @@ function renderPane(pane, result) {
                     const availableSpots = schedule.available_spots ?? 0
 
                     if (timeEl)
-                        timeEl.textContent = `${shortDay} ${utcDateToEasternTime(schedule.start_time) || ""}`
+                        timeEl.textContent = `${shortDay} ${utcDateToEasternTime(schedule.start_time, "clock") || ""}`
                     if (spotsEl) spotsEl.textContent = availableSpots
 
                     if (spotWrapper) {

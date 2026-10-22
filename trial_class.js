@@ -6,6 +6,19 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
+// Trial slots are real UTC instants. Always show the Eastern calendar date.
+function formatTrialDate(utcISOString, withWeekday) {
+    const date = new Date(utcISOString)
+    if (Number.isNaN(date.getTime())) return ""
+    const options = {
+        timeZone: "America/New_York",
+        month: "short",
+        day: "numeric",
+    }
+    if (withWeekday) options.weekday = "short"
+    return date.toLocaleDateString("en-US", options)
+}
+
 // Global variable to store selected trial class date for success message
 window.trial_class_date = ""
 
@@ -822,6 +835,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                             day: "numeric",
                             timeZone: "America/New_York",
                         })
+                        shortDate = formatTrialDate(item.start_time, false)
+                        dateEl.textContent = formatTrialDate(item.start_time, true)
                     }
 
                     const timeEl = clone.querySelector(".trial-class_time-info")
@@ -1182,6 +1197,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         day: "numeric",
                         timeZone: "America/New_York",
                     })
+                    const datePart = formatTrialDate(currentClass.start_time, true)
                     const startTime = utcDateToEasternTime(
                         currentClass.start_time,
                     )
@@ -1534,6 +1550,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                                     timeZone: "America/New_York",
                                 },
                             )
+                            shortDate = formatTrialDate(item.start_time, false)
+                            dateEl.textContent = formatTrialDate(item.start_time, true)
                         }
 
                         const timeEl = clone.querySelector(
