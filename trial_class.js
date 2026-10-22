@@ -6,6 +6,30 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
+// Swap a submit control to "Please wait..." until the request finishes.
+const setSubmitWaiting = (btn, waiting) => {
+    if (!btn) return
+
+    const isInput = btn.tagName === "INPUT"
+    if (waiting) {
+        if (btn.dataset.originalLabel == null) {
+            btn.dataset.originalLabel = isInput ? btn.value : btn.textContent
+        }
+        if (isInput) btn.value = "Please wait..."
+        else btn.textContent = "Please wait..."
+        btn.disabled = true
+        btn.setAttribute("aria-busy", "true")
+        return
+    }
+
+    if (btn.dataset.originalLabel != null) {
+        if (isInput) btn.value = btn.dataset.originalLabel
+        else btn.textContent = btn.dataset.originalLabel
+    }
+    btn.disabled = false
+    btn.removeAttribute("aria-busy")
+}
+
 // Trial slots are real UTC instants. Always show the Eastern calendar date.
 function formatTrialDate(utcISOString, withWeekday) {
     const date = new Date(utcISOString)
@@ -348,7 +372,7 @@ const setupContactUsForm = () => {
         const submitBtn = contactForm.querySelector(
             'input[type="submit"], button[type="submit"]',
         )
-        if (submitBtn) submitBtn.disabled = true
+        setSubmitWaiting(submitBtn, true)
 
         try {
             const response = await fetch(
@@ -365,6 +389,7 @@ const setupContactUsForm = () => {
             if (!response.ok) {
                 const errorMessage =
                     data?.error || "Something went wrong. Please try again."
+                setSubmitWaiting(submitBtn, false)
                 if (failBox) {
                     failBox.textContent = errorMessage
                     failBox.style.setProperty("display", "block", "important")
@@ -388,12 +413,11 @@ const setupContactUsForm = () => {
             }, 50)
         } catch (err) {
             console.error("Error submitting contact form", err)
+            setSubmitWaiting(submitBtn, false)
             if (failBox) {
                 failBox.textContent = "Something went wrong. Please try again."
                 failBox.style.setProperty("display", "block", "important")
             }
-        } finally {
-            if (submitBtn) submitBtn.disabled = false
         }
     })
 }
@@ -508,11 +532,17 @@ document.addEventListener("DOMContentLoaded", async function () {
         contactFormWrapper.style.setProperty("display", "none", "important")
     }
 
+    const hideCancelledCard = () => {
+        if (!cancelledCard) return
+        cancelledCard.style.setProperty("display", "none", "important")
+    }
+
     // Show tab section, select tab, and scroll into view
     const showTabSection = (tabIndex = 0) => {
         if (!tabSection) return
 
         hideContactFormWrapper()
+        hideCancelledCard()
 
         tabSection.style.removeProperty("display")
         tabSection.style.setProperty("display", "block", "important")
@@ -581,6 +611,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             // With a manage token the correct view is the registration card,
             // not the registration form
             if (manageToken) {
+                hideCancelledCard()
                 if (cancelInfoCard) {
                     cancelInfoCard.style.setProperty(
                         "display",
@@ -670,6 +701,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         tabBackButton.addEventListener("click", (e) => {
             e.preventDefault()
             hideContactFormWrapper()
+            hideCancelledCard()
             if (tabSection) {
                 tabSection.style.setProperty("display", "none", "important")
             }
@@ -1072,6 +1104,11 @@ document.addEventListener("DOMContentLoaded", async function () {
             landingURL: getLandingURL(),
         }
 
+        const submitBtn = form.querySelector(
+            'input[type="submit"], button[type="submit"]',
+        )
+        setSubmitWaiting(submitBtn, true)
+
         try {
             const response = await fetch(
                 `${window.NSD_API.TRIAL_CLASS_API_BASE}/trialClassRegistration`,
@@ -1088,6 +1125,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const errorMessage =
                     data?.error || "Something went wrong. Please try again."
 
+                setSubmitWaiting(submitBtn, false)
                 if (failBox) {
                     failBox.textContent = errorMessage
                     failBox.style.setProperty("display", "block", "important")
@@ -1104,6 +1142,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 failBox,
             })
         } catch (err) {
+            setSubmitWaiting(submitBtn, false)
             if (failBox) {
                 failBox.textContent = "Something went wrong. Please try again."
                 failBox.style.setProperty("display", "block", "important")
@@ -1146,6 +1185,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 rescheduleForm.style.setProperty("display", "none", "important")
             }
 
+            hideCancelledCard()
             if (invalidTokenEl) {
                 invalidTokenEl.style.removeProperty("display")
                 invalidTokenEl.style.setProperty(
@@ -1342,6 +1382,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             backBtn.addEventListener("click", function (e) {
                 e.preventDefault()
 
+                hideCancelledCard()
                 if (cancelInfoCard) {
                     cancelInfoCard.style.setProperty(
                         "display",
@@ -1385,7 +1426,10 @@ document.addEventListener("DOMContentLoaded", async function () {
                 e.preventDefault()
                 const cancelUrl = `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/cancel`
 
-                confirmCancelBtn.disabled = true
+                if (confirmCancelBtn.getAttribute("aria-busy") === "true") {
+                    return
+                }
+                setSubmitWaiting(confirmCancelBtn, true)
 
                 fetch(cancelUrl, {
                     method: "POST",
@@ -1401,8 +1445,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                             .then((t) => (t && t.trim() ? JSON.parse(t) : {}))
                     })
                     .then(() => {
-                        const doneCard = document.querySelector(
-                            ".tc_registration-cancelled-card",
+                        const invalidTokenEl = document.getElementById(
+                            "invalid-or-expired-token-found",
                         )
                         if (cancelInfoCard) {
                             cancelInfoCard.style.setProperty(
@@ -1411,9 +1455,23 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 "important",
                             )
                         }
-                        if (doneCard) {
-                            doneCard.style.removeProperty("display")
-                            doneCard.style.setProperty(
+                        if (registrationCard) {
+                            registrationCard.style.setProperty(
+                                "display",
+                                "none",
+                                "important",
+                            )
+                        }
+                        if (invalidTokenEl) {
+                            invalidTokenEl.style.setProperty(
+                                "display",
+                                "none",
+                                "important",
+                            )
+                        }
+                        if (cancelledCard) {
+                            cancelledCard.style.removeProperty("display")
+                            cancelledCard.style.setProperty(
                                 "display",
                                 "block",
                                 "important",
@@ -1425,9 +1483,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             "Error cancelling trial class registration",
                             err,
                         )
-                    })
-                    .finally(() => {
-                        confirmCancelBtn.disabled = false
+                        setSubmitWaiting(confirmCancelBtn, false)
                     })
             })
         }
@@ -1814,6 +1870,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     new_trial_class_id: selectedRadio.value,
                 }
 
+                const submitBtn = rescheduleForm.querySelector(
+                    'input[type="submit"], button[type="submit"]',
+                )
+                setSubmitWaiting(submitBtn, true)
+
                 try {
                     const response = await fetch(
                         `${window.NSD_API.TRIAL_CLASS_API_BASE}/trial-class/registration/reschedule`,
@@ -1831,6 +1892,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                             data?.error ||
                             "Something went wrong. Please try again."
 
+                        setSubmitWaiting(submitBtn, false)
                         rescheduleForm.style.setProperty(
                             "display",
                             "none",
@@ -1857,6 +1919,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                         registeredDateEl: rescheduleRegisteredDateEl,
                     })
                 } catch (err) {
+                    setSubmitWaiting(submitBtn, false)
                     rescheduleForm.style.setProperty(
                         "display",
                         "none",
