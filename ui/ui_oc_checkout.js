@@ -10,6 +10,31 @@ Are there any dependent JS files: No
 //  Utility helpers
 // ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Format an Eastern wall-clock time ("19:00:00") as "7PM" / "7:30PM".
+ * Class offerings store the Eastern time the admin picked, so no time zone
+ * conversion is done here.
+ */
+function formatEasternWallClock(wallClock) {
+  const match = /^(\d{1,2}):(\d{2})/.exec(String(wallClock || "").trim())
+  if (!match) return ""
+  const hour = Number(match[1])
+  if (hour > 23) return ""
+  const suffix = hour < 12 ? "AM" : "PM"
+  const hour12 = hour % 12 || 12
+  return match[2] === "00" ? `${hour12}${suffix}` : `${hour12}:${match[2]}${suffix}`
+}
+
+/**
+ * Display time for a schedule slot: the Eastern wall clock (start_time_et) when
+ * the API sends it, otherwise the older UTC value converted by the site helper.
+ */
+function scheduleClockText(schedule, field) {
+  const wallClock = formatEasternWallClock(schedule?.[`${field}_et`])
+  if (wallClock) return wallClock
+  return utcDateToEasternTime(schedule?.[field], "clock") || ""
+}
+
 function toMongoObjectId(value) {
   if (value == null) return ""
   var str
@@ -265,8 +290,6 @@ document.addEventListener("DOMContentLoaded", function () {
     schedules.forEach(function (schedule) {
       const class_offering_id = schedule.class_offering_id || ""
       const day = schedule.day || ""
-      const start_time = schedule.start_time || ""
-      const end_time = schedule.end_time || ""
       const totalSpots = schedule.total_spots || 0
       const enrolledCount = schedule.enrolled_count || 0
       const availableSpots =
@@ -296,7 +319,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const timeTextEl = document.createElement("p")
       timeTextEl.className = "checkout_offering-text"
-      timeTextEl.textContent = `${day} ${utcDateToEasternTime(start_time, "clock")} - ${utcDateToEasternTime(end_time, "clock")}`
+      timeTextEl.textContent = `${day} ${scheduleClockText(schedule, "start_time")} - ${scheduleClockText(schedule, "end_time")}`
 
       card.appendChild(timeTextEl)
       wrapper.appendChild(card)

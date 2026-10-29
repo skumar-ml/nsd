@@ -410,9 +410,28 @@ class NSDPortal {
       .replace(/\s/g, "")
   }
 
+  /**
+   * Format an Eastern wall-clock time ("19:00:00") as "7PM" / "7:30PM".
+   * Class offerings store the Eastern time the admin picked, so no time zone
+   * conversion is done here.
+   */
+  formatEasternWallClock(wallClock) {
+    const match = /^(\d{1,2}):(\d{2})/.exec(String(wallClock || "").trim())
+    if (!match) return ""
+    const hour = Number(match[1])
+    if (hour > 23) return ""
+    const suffix = hour < 12 ? "AM" : "PM"
+    const hour12 = hour % 12 || 12
+    return match[2] === "00" ? `${hour12}${suffix}` : `${hour12}:${match[2]}${suffix}`
+  }
+
   formatClassDetails(session) {
     if (!session) return ""
-    const dayTime = [session.day, this.formatEasternTime(session.startTime)]
+    // Prefer the stored Eastern wall clock; fall back to converting the UTC moment.
+    const time =
+      this.formatEasternWallClock(session.startTimeEt) ||
+      this.formatEasternTime(session.startTime)
+    const dayTime = [session.day, time]
       .filter(Boolean)
       .join(" ")
     return [session.className, dayTime, session.termName]

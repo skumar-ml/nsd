@@ -20,6 +20,31 @@ document.addEventListener(
 
 const classesCache = {}
 
+/**
+ * Format an Eastern wall-clock time ("19:00:00") as "7PM" / "7:30PM".
+ * Class offerings store the Eastern time the admin picked, so no time zone
+ * conversion is done here.
+ */
+function formatEasternWallClock(wallClock) {
+    const match = /^(\d{1,2}):(\d{2})/.exec(String(wallClock || "").trim())
+    if (!match) return ""
+    const hour = Number(match[1])
+    if (hour > 23) return ""
+    const suffix = hour < 12 ? "AM" : "PM"
+    const hour12 = hour % 12 || 12
+    return match[2] === "00" ? `${hour12}${suffix}` : `${hour12}:${match[2]}${suffix}`
+}
+
+/**
+ * Display time for a schedule slot: the Eastern wall clock (start_time_et) when
+ * the API sends it, otherwise the older UTC value converted by the site helper.
+ */
+function scheduleClockText(schedule, field) {
+    const wallClock = formatEasternWallClock(schedule?.[`${field}_et`])
+    if (wallClock) return wallClock
+    return utcDateToEasternTime(schedule?.[field], "clock") || ""
+}
+
 function toggleSkeleton(pane, show) {
     const wrapper = pane?.querySelector(".skeleton-wrapper")
     if (!wrapper) return
@@ -261,7 +286,7 @@ function renderPane(pane, result) {
                     const availableSpots = schedule.available_spots ?? 0
 
                     if (timeEl)
-                        timeEl.textContent = `${shortDay} ${utcDateToEasternTime(schedule.start_time, "clock") || ""}`
+                        timeEl.textContent = `${shortDay} ${scheduleClockText(schedule, "start_time")}`
                     if (spotsEl) spotsEl.textContent = availableSpots
 
                     if (spotWrapper) {
