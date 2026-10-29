@@ -21,7 +21,7 @@ document.addEventListener(
 const classesCache = {}
 
 /**
- * Format an Eastern wall-clock time ("19:00:00") as "7PM" / "7:30PM".
+ * Format an Eastern wall-clock time ("19:00:00") as "7:00 PM" / "7:30 PM".
  * Class offerings store the Eastern time the admin picked, so no time zone
  * conversion is done here.
  */
@@ -32,7 +32,7 @@ function formatEasternWallClock(wallClock) {
     if (hour > 23) return ""
     const suffix = hour < 12 ? "AM" : "PM"
     const hour12 = hour % 12 || 12
-    return match[2] === "00" ? `${hour12}${suffix}` : `${hour12}:${match[2]}${suffix}`
+    return `${hour12}:${match[2]} ${suffix}`
 }
 
 /**
