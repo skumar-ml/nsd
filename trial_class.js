@@ -6,7 +6,7 @@ Brief Logic: On DOMContentLoaded, hides reschedule/registration views by default
 Are there any dependent JS files: No
 */
 
-// Trial slots are real UTC instants. Always show the Eastern calendar date.
+// Fallback for older API responses: start_time is a UTC instant; show the Eastern calendar date.
 function formatTrialDate(utcISOString, withWeekday) {
     const date = new Date(utcISOString)
     if (Number.isNaN(date.getTime())) return ""
@@ -17,6 +17,39 @@ function formatTrialDate(utcISOString, withWeekday) {
     }
     if (withWeekday) options.weekday = "short"
     return date.toLocaleDateString("en-US", options)
+}
+
+// Trial classes store the Eastern date + time the admin picked ("2026-11-02T19:00:00").
+// The API sends it as start_time_et / end_time_et; split it into parts with no time zone math.
+function parseEasternWallTime(text) {
+    const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(String(text || "").trim())
+    if (!match) return null
+    return {
+        year: Number(match[1]),
+        month: Number(match[2]),
+        day: Number(match[3]),
+        hour: Number(match[4]),
+        minute: match[5],
+    }
+}
+
+// Date label for a trial class field ("start_time"), e.g. "Mon, Nov 2". Prefers the Eastern text.
+function trialDateText(item, field, withWeekday) {
+    const wall = parseEasternWallTime(item && item[`${field}_et`])
+    if (!wall) return formatTrialDate(item && item[field], withWeekday)
+    // Noon UTC on that calendar day keeps the date the same in every viewer time zone.
+    const date = new Date(Date.UTC(wall.year, wall.month - 1, wall.day, 12))
+    const options = { timeZone: "UTC", month: "short", day: "numeric" }
+    if (withWeekday) options.weekday = "short"
+    return date.toLocaleDateString("en-US", options)
+}
+
+// Clock label for a trial class field, e.g. "7:00 PM". Prefers the Eastern text.
+function trialClockText(item, field) {
+    const wall = parseEasternWallTime(item && item[`${field}_et`])
+    if (!wall) return utcDateToEasternTime(item && item[field])
+    const suffix = wall.hour >= 12 ? "PM" : "AM"
+    return `${wall.hour % 12 || 12}:${wall.minute} ${suffix}`
 }
 
 // Global variable to store selected trial class date for success message
@@ -589,14 +622,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                     const dateEl = clone.querySelector(".trial-class_date")
                     let shortDate = ""
                     if (dateEl) {
-                        shortDate = formatTrialDate(item.start_time, false)
-                        dateEl.textContent = formatTrialDate(item.start_time, true)
+                        shortDate = trialDateText(item, "start_time", false)
+                        dateEl.textContent = trialDateText(item, "start_time", true)
                     }
 
                     const timeEl = clone.querySelector(".trial-class_time-info")
                     if (timeEl) {
-                        const start = utcDateToEasternTime(item.start_time)
-                        const end = utcDateToEasternTime(item.end_time)
+                        const start = trialClockText(item, "start_time")
+                        const end = trialClockText(item, "end_time")
                         timeEl.textContent = `${start} - ${end} EST`
                     }
 
@@ -935,11 +968,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             let classDescription = ""
             try {
                 if (currentClass.start_time && currentClass.end_time) {
-                    const datePart = formatTrialDate(currentClass.start_time, true)
-                    const startTime = utcDateToEasternTime(
-                        currentClass.start_time,
-                    )
-                    const endTime = utcDateToEasternTime(currentClass.end_time)
+                    const datePart = trialDateText(currentClass, "start_time", true)
+                    const startTime = trialClockText(currentClass, "start_time")
+                    const endTime = trialClockText(currentClass, "end_time")
                     classDescription = `${datePart} – ${startTime}–${endTime} EST`
                 }
             } catch (e) {
@@ -1273,16 +1304,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                         const dateEl = clone.querySelector(".trial-class_date")
                         let shortDate = ""
                         if (dateEl) {
-                            shortDate = formatTrialDate(item.start_time, false)
-                            dateEl.textContent = formatTrialDate(item.start_time, true)
+                            shortDate = trialDateText(item, "start_time", false)
+                            dateEl.textContent = trialDateText(item, "start_time", true)
                         }
 
                         const timeEl = clone.querySelector(
                             ".trial-class_time-info",
                         )
                         if (timeEl) {
-                            const start = utcDateToEasternTime(item.start_time)
-                            const end = utcDateToEasternTime(item.end_time)
+                            const start = trialClockText(item, "start_time")
+                            const end = trialClockText(item, "end_time")
                             timeEl.textContent = `${start} - ${end} EST`
                         }
 
