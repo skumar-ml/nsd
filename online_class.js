@@ -20,6 +20,31 @@ document.addEventListener(
 
 const classesCache = {}
 
+/**
+ * Format an Eastern wall-clock time ("19:00:00") as "7:00 PM" / "7:30 PM".
+ * Class offerings store the Eastern time the admin picked, so no time zone
+ * conversion is done here.
+ */
+function formatEasternWallClock(wallClock) {
+    const match = /^(\d{1,2}):(\d{2})/.exec(String(wallClock || "").trim())
+    if (!match) return ""
+    const hour = Number(match[1])
+    if (hour > 23) return ""
+    const suffix = hour < 12 ? "AM" : "PM"
+    const hour12 = hour % 12 || 12
+    return `${hour12}:${match[2]} ${suffix}`
+}
+
+/**
+ * Display time for a schedule slot: the Eastern wall clock (start_time_et) when
+ * the API sends it, otherwise the older UTC value converted by the site helper.
+ */
+function scheduleClockText(schedule, field) {
+    const wallClock = formatEasternWallClock(schedule?.[`${field}_et`])
+    if (wallClock) return wallClock
+    return utcDateToEasternTime(schedule?.[field], "clock") || ""
+}
+
 function toggleSkeleton(pane, show) {
     const wrapper = pane?.querySelector(".skeleton-wrapper")
     if (!wrapper) return
@@ -185,16 +210,8 @@ function renderPane(pane, result) {
             if (registerBtn) {
                 const url = new URL(registerBtn.href)
                 url.searchParams.set(
-                    "grade_id",
-                    result.data?.[0]?.grade_id || "",
-                )
-                url.searchParams.set(
                     "grade_name",
                     result.data?.[0]?.gradeLabel || "",
-                )
-                url.searchParams.set(
-                    "session_name",
-                    sessionDetail.session_name || "",
                 )
                 url.searchParams.set(
                     "session_detail_id",
@@ -261,7 +278,7 @@ function renderPane(pane, result) {
                     const availableSpots = schedule.available_spots ?? 0
 
                     if (timeEl)
-                        timeEl.textContent = `${shortDay} ${utcDateToEasternTime(schedule.start_time, "clock") || ""}`
+                        timeEl.textContent = `${shortDay} ${scheduleClockText(schedule, "start_time")}`
                     if (spotsEl) spotsEl.textContent = availableSpots
 
                     if (spotWrapper) {
