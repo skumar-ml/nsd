@@ -301,6 +301,26 @@ const getContactFormParts = () => {
     return { contactFormRoot, contactForm, contactScope }
 }
 
+// Same keys the Acuity info-session embed reads: localStorage, then this page URL.
+const CONTACT_US_TRACKING_KEYS = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "fbclid",
+]
+
+const contactUsTracking = () => {
+    const params = new URLSearchParams(window.location.search)
+    const tracking = {}
+    CONTACT_US_TRACKING_KEYS.forEach((key) => {
+        tracking[key] = localStorage.getItem(key) || params.get(key) || ""
+    })
+    return tracking
+}
+
 // Contact-us form: grade options, submit, and success/error. Field ids match
 // the reused Webflow form (_cu). This does not bind the trial class form.
 const setupContactUsForm = () => {
@@ -404,6 +424,7 @@ const setupContactUsForm = () => {
             previous_exp: contactForm
                 .querySelector("#previous_experience_cu")
                 .value.trim(),
+            ...contactUsTracking(),
         }
 
         const submitBtn = contactForm.querySelector(
