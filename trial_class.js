@@ -292,6 +292,26 @@ const showFormSuccessState = ({
     }, 50)
 }
 
+// Same keys the Acuity info-session embed reads: localStorage, then this page URL.
+const CONTACT_US_TRACKING_KEYS = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+    "gclid",
+    "fbclid",
+]
+
+const contactUsTracking = () => {
+    const params = new URLSearchParams(window.location.search)
+    const tracking = {}
+    CONTACT_US_TRACKING_KEYS.forEach((key) => {
+        tracking[key] = localStorage.getItem(key) || params.get(key) || ""
+    })
+    return tracking
+}
+
 // Contact-us form: grade options, submit, and success/error. Scoped so it
 // never binds the trial class form. Field ids match the trial form with _cu.
 const setupContactUsForm = () => {
@@ -401,6 +421,7 @@ const setupContactUsForm = () => {
             previous_exp: contactForm
                 .querySelector("#previous_experience_cu")
                 .value.trim(),
+            ...contactUsTracking(),
         }
 
         const submitBtn = contactForm.querySelector(
@@ -555,16 +576,33 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Contact-us view. Hidden until #contact_us is clicked.
     const contactFormWrapper =
         document.getElementById("contact-form-wrapper") ||
+        document.getElementById("contact-us-form")?.closest(".oc_contact-wrapper") ||
         document.querySelector(".oc_contact-wrapper")
 
-    if (contactFormWrapper) {
-        contactFormWrapper.style.setProperty("display", "none", "important")
-    }
+    // .oc_contact-wrapper is used more than once and copies can be nested inside
+    // #contact-form-wrapper; nested copies must keep their own display untouched.
+    const isNestedContactWrapper = (wrapper) =>
+        wrapper !== contactFormWrapper && contactFormWrapper?.contains(wrapper)
 
     const hideContactFormWrapper = () => {
-        if (!contactFormWrapper) return
-        contactFormWrapper.style.setProperty("display", "none", "important")
+        document
+            .querySelectorAll("#contact-form-wrapper, .oc_contact-wrapper")
+            .forEach((wrapper) => {
+                if (isNestedContactWrapper(wrapper)) {
+                    wrapper.style.removeProperty("display")
+                    return
+                }
+                wrapper.style.setProperty("display", "none", "important")
+            })
     }
+
+    const showContactFormWrapper = () => {
+        if (!contactFormWrapper) return
+        contactFormWrapper.style.removeProperty("display")
+        contactFormWrapper.style.setProperty("display", "block", "important")
+    }
+
+    hideContactFormWrapper()
 
     const hideCancelledCard = () => {
         if (!cancelledCard) return
@@ -756,14 +794,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (cardContainer) {
                 cardContainer.style.setProperty("display", "none", "important")
             }
-            if (contactFormWrapper) {
-                contactFormWrapper.style.removeProperty("display")
-                contactFormWrapper.style.setProperty(
-                    "display",
-                    "block",
-                    "important",
-                )
-            }
+            hideContactFormWrapper()
+            showContactFormWrapper()
         })
     }
 
