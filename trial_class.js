@@ -574,20 +574,32 @@ document.addEventListener("DOMContentLoaded", async function () {
     const cardContainer = document.querySelector("#card-container")
 
     // Contact-us view. Hidden until #contact_us is clicked.
-    // The page has more than one .oc_contact-wrapper, so every copy is hidden
-    // and only the one holding #contact-us-form is shown.
-    const contactFormWrappers = Array.from(
-        document.querySelectorAll("#contact-form-wrapper, .oc_contact-wrapper"),
-    )
     const contactFormWrapper =
         document.getElementById("contact-form-wrapper") ||
         document.getElementById("contact-us-form")?.closest(".oc_contact-wrapper") ||
-        contactFormWrappers[0]
+        document.querySelector(".oc_contact-wrapper")
+
+    // .oc_contact-wrapper is used more than once and copies can be nested inside
+    // #contact-form-wrapper; nested copies must keep their own display untouched.
+    const isNestedContactWrapper = (wrapper) =>
+        wrapper !== contactFormWrapper && contactFormWrapper?.contains(wrapper)
 
     const hideContactFormWrapper = () => {
-        contactFormWrappers.forEach((wrapper) => {
-            wrapper.style.setProperty("display", "none", "important")
-        })
+        document
+            .querySelectorAll("#contact-form-wrapper, .oc_contact-wrapper")
+            .forEach((wrapper) => {
+                if (isNestedContactWrapper(wrapper)) {
+                    wrapper.style.removeProperty("display")
+                    return
+                }
+                wrapper.style.setProperty("display", "none", "important")
+            })
+    }
+
+    const showContactFormWrapper = () => {
+        if (!contactFormWrapper) return
+        contactFormWrapper.style.removeProperty("display")
+        contactFormWrapper.style.setProperty("display", "block", "important")
     }
 
     hideContactFormWrapper()
@@ -782,14 +794,8 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (cardContainer) {
                 cardContainer.style.setProperty("display", "none", "important")
             }
-            if (contactFormWrapper) {
-                contactFormWrapper.style.removeProperty("display")
-                contactFormWrapper.style.setProperty(
-                    "display",
-                    "block",
-                    "important",
-                )
-            }
+            hideContactFormWrapper()
+            showContactFormWrapper()
         })
     }
 
