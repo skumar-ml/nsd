@@ -574,18 +574,23 @@ document.addEventListener("DOMContentLoaded", async function () {
     const cardContainer = document.querySelector("#card-container")
 
     // Contact-us view. Hidden until #contact_us is clicked.
+    // The page has more than one .oc_contact-wrapper, so every copy is hidden
+    // and only the one holding #contact-us-form is shown.
+    const contactFormWrappers = Array.from(
+        document.querySelectorAll("#contact-form-wrapper, .oc_contact-wrapper"),
+    )
     const contactFormWrapper =
         document.getElementById("contact-form-wrapper") ||
-        document.querySelector(".oc_contact-wrapper")
-
-    if (contactFormWrapper) {
-        contactFormWrapper.style.setProperty("display", "none", "important")
-    }
+        document.getElementById("contact-us-form")?.closest(".oc_contact-wrapper") ||
+        contactFormWrappers[0]
 
     const hideContactFormWrapper = () => {
-        if (!contactFormWrapper) return
-        contactFormWrapper.style.setProperty("display", "none", "important")
+        contactFormWrappers.forEach((wrapper) => {
+            wrapper.style.setProperty("display", "none", "important")
+        })
     }
+
+    hideContactFormWrapper()
 
     const hideCancelledCard = () => {
         if (!cancelledCard) return
