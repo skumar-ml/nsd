@@ -6,6 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!dialog) return;
 
+  // Open the popup as soon as the page loads.
+  if (!dialog.open) dialog.showModal();
+
   // Open dialog
   if (openBtn) {
     openBtn.addEventListener("click", () => {
