@@ -679,6 +679,17 @@ const openContactFromModal = () => {
     thirdCard.scrollIntoView({ behavior: "smooth", block: "center" })
 }
 
+// Close the modal and select the 2nd radio so its tab content is shown.
+const openTrialFormFromModal = () => {
+    closeTrialModalSmooth()
+
+    const secondCard = document.getElementById("second-radio-tab")
+    if (!secondCard) return
+
+    selectRadioCard(secondCard)
+    secondCard.scrollIntoView({ behavior: "smooth", block: "center" })
+}
+
 // Show one modal step, hide the rest, and update the step indicator and text.
 const showModalStep = (stepId) => {
     MODAL_STEP_IDS.forEach((id) => {
@@ -707,6 +718,12 @@ const setupModalSteps = () => {
     document
         .getElementById("dialog_trial_stepper_open_btn")
         ?.addEventListener("click", resetModalSteps)
+
+    // Close modal and open the 2nd radio tab (trial form content).
+    document.getElementById("show-trial-form")?.addEventListener("click", (e) => {
+        e.preventDefault()
+        openTrialFormFromModal()
+    })
 
     // Each option or back link opens its target step.
     Object.entries(MODAL_OPTION_TARGETS).forEach(([optionId, targetId]) => {
