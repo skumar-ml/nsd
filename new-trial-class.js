@@ -1,108 +1,114 @@
-// Open and close the trial stepper popup modal.
-document.addEventListener("DOMContentLoaded", () => {
-  const dialog = document.getElementById("dialog_trial_stepper");
-  const openBtn = document.getElementById("dialog_trial_stepper_open_btn");
-  const closeBtn = document.getElementById("dialog_trial_stepper_cls_btn");
+// Popup modal: smooth open/close + 15s auto-open.
+// Never leave showModal()'s backdrop up while the panel is hidden.
+const MODAL_ANIM_MS = 320
+let modalAutoOpenTimer = null
 
-  if (!dialog) return;
+const getTrialModal = () => document.getElementById("dialog_trial_stepper")
 
-  const AUTO_OPEN_DELAY_MS = 15000;
-  const OPEN_ANIMATION_MS = 320;
-  let autoOpenTimer = null;
+const resetTrialModalStyles = (dialog) => {
+    if (!dialog) return
+    dialog.classList.remove("tc-modal-open", "tc-modal-animating")
+    dialog.style.removeProperty("display")
+    dialog.style.removeProperty("visibility")
+}
 
-  // Fade/scale so showModal() is not abrupt. Injected once so Webflow CSS is not required.
-  if (!document.getElementById("tc-modal-open-animation-style")) {
-    const style = document.createElement("style");
-    style.id = "tc-modal-open-animation-style";
+const ensureTrialModalStyles = () => {
+    if (document.getElementById("tc-modal-open-animation-style")) return
+    const style = document.createElement("style")
+    style.id = "tc-modal-open-animation-style"
     style.textContent = `
-      #dialog_trial_stepper {
-        opacity: 0;
-        transform: translateY(12px) scale(0.98);
-        transition: opacity ${OPEN_ANIMATION_MS}ms ease, transform ${OPEN_ANIMATION_MS}ms ease;
-      }
-      #dialog_trial_stepper.tc-modal-open {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-      #dialog_trial_stepper::backdrop {
-        opacity: 0;
-        transition: opacity ${OPEN_ANIMATION_MS}ms ease;
-        background: rgba(0, 0, 0, 0.45);
-      }
-      #dialog_trial_stepper.tc-modal-open::backdrop {
-        opacity: 1;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+      #dialog_trial_stepper[open]{display:flex!important;flex-direction:column;margin:auto;border:none;opacity:1;visibility:visible}
+      #dialog_trial_stepper[open].tc-modal-animating{opacity:0;transform:translateY(12px) scale(.98)}
+      #dialog_trial_stepper[open].tc-modal-open{opacity:1;transform:none;transition:opacity ${MODAL_ANIM_MS}ms ease,transform ${MODAL_ANIM_MS}ms ease}
+      #dialog_trial_stepper::backdrop{background:rgba(0,0,0,.45);opacity:1}
+      #dialog_trial_stepper.tc-modal-animating::backdrop{opacity:0}
+      #dialog_trial_stepper.tc-modal-open::backdrop{opacity:1;transition:opacity ${MODAL_ANIM_MS}ms ease}
+    `
+    document.head.appendChild(style)
+}
 
-  const cancelAutoOpen = () => {
-    if (autoOpenTimer == null) return;
-    clearTimeout(autoOpenTimer);
-    autoOpenTimer = null;
-  };
+const openTrialModalSmooth = () => {
+    const dialog = getTrialModal()
+    if (!dialog) return
 
-  // Open with a short enter animation. Safe to call if already open.
-  const openDialogSmooth = () => {
-    cancelAutoOpen();
+    clearTimeout(modalAutoOpenTimer)
+    modalAutoOpenTimer = null
+    ensureTrialModalStyles()
+    dialog.style.setProperty("display", "flex", "important")
+    dialog.style.setProperty("visibility", "visible", "important")
+
     if (dialog.open) {
-      dialog.classList.add("tc-modal-open");
-      return;
+        dialog.classList.remove("tc-modal-animating")
+        dialog.classList.add("tc-modal-open")
+        return
     }
 
-    dialog.classList.remove("tc-modal-open");
-    dialog.showModal();
-    // Next frame so the browser paints the closed state before animating in.
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        dialog.classList.add("tc-modal-open");
-      });
-    });
-  };
+    dialog.classList.add("tc-modal-animating")
+    dialog.classList.remove("tc-modal-open")
+    dialog.showModal()
+    requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+            dialog.classList.remove("tc-modal-animating")
+            dialog.classList.add("tc-modal-open")
+        }),
+    )
+}
 
-  // Animate out, then close the native dialog.
-  const closeDialogSmooth = () => {
-    cancelAutoOpen();
-    if (!dialog.open) return;
+const closeTrialModalSmooth = () => {
+    const dialog = getTrialModal()
+    if (!dialog) return
 
-    dialog.classList.remove("tc-modal-open");
-    const finishClose = () => {
-      dialog.removeEventListener("transitionend", onTransitionEnd);
-      if (dialog.open) dialog.close();
-    };
-    const onTransitionEnd = (event) => {
-      if (event.target !== dialog || event.propertyName !== "opacity") return;
-      finishClose();
-    };
-    dialog.addEventListener("transitionend", onTransitionEnd);
-    setTimeout(finishClose, OPEN_ANIMATION_MS + 40);
-  };
+    clearTimeout(modalAutoOpenTimer)
+    modalAutoOpenTimer = null
+    if (!dialog.open) return resetTrialModalStyles(dialog)
 
-  // Open dialog
-  if (openBtn) {
-    openBtn.addEventListener("click", () => {
-      openDialogSmooth();
-    });
-  }
+    ensureTrialModalStyles()
+    dialog.classList.remove("tc-modal-open")
+    dialog.classList.add("tc-modal-animating")
 
-  // Close dialog
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => {
-      closeDialogSmooth();
-    });
-  }
+    const finish = () => {
+        dialog.removeEventListener("transitionend", onEnd)
+        if (dialog.open) dialog.close()
+        resetTrialModalStyles(dialog)
+    }
+    const onEnd = (e) => {
+        if (e.target === dialog && e.propertyName === "opacity") finish()
+    }
+    dialog.addEventListener("transitionend", onEnd)
+    setTimeout(finish, MODAL_ANIM_MS + 50)
+}
 
-  // Auto-open after 15s on first visit to this page load.
-  // Manage-registration links (?token=...) skip it so the registration card stays primary.
-  // Opening via "Get started" earlier cancels this timer.
-  const hasManageToken = new URLSearchParams(window.location.search).has("token");
-  if (!hasManageToken) {
-    autoOpenTimer = setTimeout(() => {
-      autoOpenTimer = null;
-      if (!dialog.open) openDialogSmooth();
-    }, AUTO_OPEN_DELAY_MS);
-  }
-});
+document.addEventListener("DOMContentLoaded", () => {
+    const dialog = getTrialModal()
+    if (!dialog) return
+
+    ensureTrialModalStyles()
+    if (dialog.open) dialog.close()
+    dialog.removeAttribute("open")
+    resetTrialModalStyles(dialog)
+
+    document
+        .getElementById("dialog_trial_stepper_open_btn")
+        ?.addEventListener("click", (e) => {
+            e.preventDefault()
+            openTrialModalSmooth()
+        })
+    document
+        .getElementById("dialog_trial_stepper_cls_btn")
+        ?.addEventListener("click", (e) => {
+            e.preventDefault()
+            closeTrialModalSmooth()
+        })
+    dialog.addEventListener("close", () => resetTrialModalStyles(dialog))
+
+    // Auto-open after 15s unless this is a manage-registration link.
+    if (!new URLSearchParams(location.search).has("token")) {
+        modalAutoOpenTimer = setTimeout(() => {
+            modalAutoOpenTimer = null
+            if (!dialog.open) openTrialModalSmooth()
+        }, 15000)
+    }
+})
 
 
 // Webflow class names for the "Know what you want?" radio cards and their panels.
@@ -663,7 +669,7 @@ const isSendInfoLink = (el) =>
 
 // Close the modal and open "Have someone reach out" with a fresh contact form.
 const openContactFromModal = () => {
-    document.getElementById("dialog_trial_stepper")?.close()
+    closeTrialModalSmooth()
 
     const thirdCard = document.getElementById("third-radio-tab")
     if (!thirdCard) return
